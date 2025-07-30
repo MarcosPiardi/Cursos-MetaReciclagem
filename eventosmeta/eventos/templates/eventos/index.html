@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
         <title>Testando - index.html</title>
     </head>
     <body>
@@ -11,7 +11,7 @@
             {% for question in latest_question_list %}
             <li>
                 <a href="{% url 'eventos:vote' question.id %}"
-                    >{{question.question_text}}</a
+                    >{{ question.question_text }}</a
                 >
             </li>
             {% endfor %}
