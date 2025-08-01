@@ -19,8 +19,13 @@ def index(request):
     # return render(request, 'eventos/detail.html', {'question': question})
 
 def results(request, question_id):
-    question = Question(pk=question_id)
+    # question = Question(pk=question_id)
+    question = get_object_or_404(Question, pk=question_id)
+    print(f"Question: {question}")
+    print(f"Question text: {question.question_text}")
+    print(f"Choices: {question.choice_set.all()}")
     return render(request, 'eventos/results.html', {'question': question })
+    
 
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
@@ -29,7 +34,7 @@ def vote(request, question_id):
     except KeyError:
         return render(request, 'eventos/vote.html', {
             'question': question,
-            'error_message': "you didnt select a choice.",
+            'error_message': "Você não escolheu uma opção",
         })
     else:
         selected_choice.votes += 1
