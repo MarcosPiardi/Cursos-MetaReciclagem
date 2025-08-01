@@ -16,8 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.shortcuts import redirect
+
+def redirect_to_eventos(request):
+    return redirect('eventos:index')
 
 urlpatterns = [
     path('eventos/', include('eventos.urls')),
     path('admin/', admin.site.urls),
+    path('', redirect_to_eventos),
 ]
