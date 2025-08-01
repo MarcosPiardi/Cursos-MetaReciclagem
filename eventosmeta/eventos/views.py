@@ -29,12 +29,12 @@ def vote(request, question_id):
     except KeyError:
         return render(request, 'eventos/vote.html', {
             'question': question,
-            'error_message': "you didn´t select a choice",
+            'error_message': "you didnt select a choice.",
         })
-    else
+    else:
         selected_choice.votes += 1
         selected_choice.save()
-        return HttpResponseRedirect(reverse('eventos:results' args=(question.id,)))
+        return HttpResponseRedirect(reverse('eventos:results', args=(question.id,)))
 
 
 
