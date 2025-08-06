@@ -24,5 +24,6 @@ def redirect_to_eventos(request):
 urlpatterns = [
     path('eventos/', include('eventos.urls')),
     path('admin/', admin.site.urls),
+    # path('index/', include('eventos.urls')),
     path('', redirect_to_eventos),
 ]

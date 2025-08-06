@@ -9,6 +9,7 @@ from .models import Question
 def index(request):
     latest_question_list = Question.objects.order_by('-pub_date')[:5]
     context = {'latest_question_list': latest_question_list}
+    # print("sssssssssssssssssssssssssssssssssssssssssssssssssssss")
     return render(request, 'eventos/index.html', context)
 
 #  def details(request, question_id):
@@ -21,9 +22,9 @@ def index(request):
 def results(request, question_id):
     # question = Question(pk=question_id)
     question = get_object_or_404(Question, pk=question_id)
-    print(f"Question: {question}")
-    print(f"Question text: {question.question_text}")
-    print(f"Choices: {question.choice_set.all()}")
+    # print(f"Question: {question}")
+    # print(f"Question text: {question.question_text}")
+    # print(f"Choices: {question.choice_set.all()}")
     return render(request, 'eventos/results.html', {'question': question })
     
 
