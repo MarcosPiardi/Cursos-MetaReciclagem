@@ -20,3 +20,10 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.choice_text
+    
+class Status(models.Model):
+    status = models.CharField(max_length=15)
+    def __str__(self):
+        return self.status
+
+
