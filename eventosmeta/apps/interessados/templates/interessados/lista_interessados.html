@@ -1,0 +1,581 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interessados.html - Sistema de Cadastro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        td {
+            padding: 15px;
+            color: #333;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            margin: 0 3px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #5568d3;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 10px 8px;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 Sistema de Cadastro</h1>
+            <p class="subtitle">Gerenciamento de Interessados</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalInteressados">0</div>
+                <div class="stat-label">Total de Interessados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalNecessidades">0</div>
+                <div class="stat-label">Com Necessidades Especiais</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalProgramaSocial">0</div>
+                <div class="stat-label">Em Programa Social</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Buscar por nome, CPF ou cidade...">
+            </div>
+            <button class="btn btn-primary" onclick="window.location.href='/admin/interessados/interessado/add/'">
+                ➕ Novo Interessado
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table id="interessadosTable">
+                <thead>
+                    <tr>
+                        <th>CPF</th>
+                        <th>Nome</th>
+                        <th>Idade</th>
+                        <th>Cidade</th>
+                        <th>Celular</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Dados serão inseridos aqui via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Dados de exemplo (em produção, virão do backend via API)
+        const interessados = [
+            {
+                cpf: '12345678901',
+                nome: 'João Silva Santos',
+                dataNascimento: '1985-05-15',
+                cidadeResidencia: 'Sorocaba',
+                ufResidencia: 'SP',
+                celular: '15987654321',
+                email: 'joao@email.com',
+                necessidadesEspeciais: false,
+                programaSocial: true,
+                endereco: 'Rua das Flores, 123',
+                bairro: 'Centro'
+            },
+            {
+                cpf: '98765432100',
+                nome: 'Maria Oliveira Costa',
+                dataNascimento: '1992-08-22',
+                cidadeResidencia: 'Sorocaba',
+                ufResidencia: 'SP',
+                celular: '15912345678',
+                email: 'maria@email.com',
+                necessidadesEspeciais: true,
+                programaSocial: false,
+                endereco: 'Av. Principal, 456',
+                bairro: 'Jardim'
+            },
+            {
+                cpf: '45678912300',
+                nome: 'Carlos Eduardo Pereira',
+                dataNascimento: '1978-12-10',
+                cidadeResidencia: 'Votorantim',
+                ufResidencia: 'SP',
+                celular: '15998877665',
+                email: 'carlos@email.com',
+                necessidadesEspeciais: true,
+                programaSocial: true,
+                endereco: 'Rua Santos Dumont, 789',
+                bairro: 'Vila Nova'
+            }
+        ];
+
+        function calcularIdade(dataNascimento) {
+            const hoje = new Date();
+            const nascimento = new Date(dataNascimento);
+            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            const mes = hoje.getMonth() - nascimento.getMonth();
+            if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+                idade--;
+            }
+            return idade;
+        }
+
+        function formatarCPF(cpf) {
+            return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+
+        function formatarTelefone(tel) {
+            if (tel.length === 11) {
+                return tel.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            }
+            return tel.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+        }
+
+        function renderizarTabela(dados = interessados) {
+            const tbody = document.getElementById('tableBody');
+            
+            if (dados.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>Nenhum interessado encontrado</h3>
+                            <p>Adicione novos interessados ou ajuste sua busca</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = dados.map((int, index) => `
+                <tr>
+                    <td>${formatarCPF(int.cpf)}</td>
+                    <td><strong>${int.nome}</strong></td>
+                    <td>${calcularIdade(int.dataNascimento)} anos</td>
+                    <td>${int.cidadeResidencia}/${int.ufResidencia}</td>
+                    <td>${formatarTelefone(int.celular)}</td>
+                    <td>
+                        ${int.necessidadesEspeciais ? '<span class="badge badge-warning">Necessidades Especiais</span>' : ''}
+                        ${int.programaSocial ? '<span class="badge badge-info">Programa Social</span>' : ''}
+                        ${!int.necessidadesEspeciais && !int.programaSocial ? '<span class="badge badge-success">Regular</span>' : ''}
+                    </td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="verDetalhes(${index})">👁️ Ver</button>
+                        <button class="action-btn btn-edit" onclick="editar('${int.cpf}')">✏️ Editar</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            atualizarEstatisticas(dados);
+        }
+
+        function atualizarEstatisticas(dados) {
+            document.getElementById('totalInteressados').textContent = dados.length;
+            document.getElementById('totalNecessidades').textContent = dados.filter(i => i.necessidadesEspeciais).length;
+            document.getElementById('totalProgramaSocial').textContent = dados.filter(i => i.programaSocial).length;
+        }
+
+        function verDetalhes(index) {
+            const int = interessados[index];
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('modalContent');
+
+            content.innerHTML = `
+                <h2>📄 Detalhes do Interessado</h2>
+                
+                <div class="detail-section">
+                    <h3>Dados Pessoais</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Nome:</span>
+                        <span class="detail-value">${int.nome}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">CPF:</span>
+                        <span class="detail-value">${formatarCPF(int.cpf)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Data de Nascimento:</span>
+                        <span class="detail-value">${new Date(int.dataNascimento).toLocaleDateString('pt-BR')} (${calcularIdade(int.dataNascimento)} anos)</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Endereço</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Endereço:</span>
+                        <span class="detail-value">${int.endereco}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Bairro:</span>
+                        <span class="detail-value">${int.bairro}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Cidade/UF:</span>
+                        <span class="detail-value">${int.cidadeResidencia}/${int.ufResidencia}</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Contato</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Celular:</span>
+                        <span class="detail-value">${formatarTelefone(int.celular)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">E-mail:</span>
+                        <span class="detail-value">${int.email}</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Informações Adicionais</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Necessidades Especiais:</span>
+                        <span class="detail-value">${int.necessidadesEspeciais ? '✅ Sim' : '❌ Não'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Programa Social:</span>
+                        <span class="detail-value">${int.programaSocial ? '✅ Sim' : '❌ Não'}</span>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function editar(cpf) {
+            window.location.href = `/admin/interessados/interessado/${cpf}/change/`;
+        }
+
+        // Busca
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const termo = e.target.value.toLowerCase();
+            const filtrados = interessados.filter(int => 
+                int.nome.toLowerCase().includes(termo) ||
+                int.cpf.includes(termo) ||
+                int.cidadeResidencia.toLowerCase().includes(termo)
+            );
+            renderizarTabela(filtrados);
+        });
+
+        // Fechar modal ao clicar fora
+        window.onclick = (event) => {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        // Inicializar
+        renderizarTabela();
+    </script>
+</body>
+</html>

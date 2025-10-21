@@ -1,0 +1,48 @@
+<!--
+ARQUIVO: template/index.html
+AÇÃO: SUBSTITUIR o arquivo template/index.html
+MUDANÇA: Link "Fazer Inscrição" agora aponta para {% url 'interessados:cadastro' %}
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos MetaReciclagem</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="main-container">
+        <div class="logo-container">
+            <img src="{% static 'images/metareciclagem.jpg' %}" alt="MetaReciclagem" class="logo-image">
+        </div>
+        
+        <h1>Eventos MetaReciclagem</h1>
+        <p class="subtitle">Sistema de Gestão de Cursos e Eventos</p>
+        
+        <div class="buttons-container">
+            <a href="{% url 'accounts:login_staff' %}" class="access-card staff">
+                <div class="access-card-icon">🔐</div>
+                <h2>Área Administrativa</h2>
+                <p>Acesso restrito para coordenadores, professores e administradores do sistema</p>
+            </a>
+            
+            <a href="{% url 'interessados:cadastro' %}" class="access-card public">
+                <div class="access-card-icon">📝</div>
+                <h2>Fazer Inscrição</h2>
+                <p>Cadastre-se ou faça login para se inscrever em nossos cursos e eventos</p>
+            </a>
+        </div>
+        
+        <div class="info-section">
+            <h3>📚 Sobre o Sistema</h3>
+            <p>
+                Bem-vindo ao sistema de gestão de eventos e cursos da MetaReciclagem. 
+                Aqui você pode se inscrever em nossos cursos, acompanhar sua matrícula 
+                e ter acesso a todas as informações necessárias para sua participação.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
