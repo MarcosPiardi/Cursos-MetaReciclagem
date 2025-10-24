@@ -1,7 +1,5 @@
-
-...
-    mermaid
-    erDiagram
+```mermaid
+erDiagram
     INTERESSADO ||--o{ INSCRICAO : "faz"
     INTERESSADO ||--o{ MATRICULA : "matricula-se"
     
@@ -165,4 +163,5 @@
         boolean Aprovado
         boolean EmiteCertificado
     }
-...    
+```
+
