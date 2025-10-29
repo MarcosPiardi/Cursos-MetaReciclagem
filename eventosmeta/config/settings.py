@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'apps.accounts',
     'apps.interessados',
     # TODO: Descomentar na ETAPA 2
-    # 'apps.cursoseoutros',
+    'apps.cursoseoutros',
 ]
 
 MIDDLEWARE = [
