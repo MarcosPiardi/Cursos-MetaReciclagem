@@ -1,25 +1,46 @@
 """
 ARQUIVO: config/settings.py - ETAPA 2
 AÇÃO: SUBSTITUIR o arquivo config/settings.py
-MUDANÇA: Linha 147 - Backend de autenticação do Interessado ATIVADO
+MUDANÇA 1: Linha 147 - Backend de autenticação do Interessado ATIVADO
+MUDANÇA 2: Configurações sensíveis movidas para .env (python-decouple)
+MUDANÇA 3: Segurança aprimorada (ALLOWED_HOSTS, configurações dinâmicas)
 """
 
 from pathlib import Path
+from decouple import config, Csv  # ← NOVO: Importação do decouple
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%wg6e&its5+pj=sy_!3yiy*b)5dek4)&nf@9zl$3$zhtjx-!a%'
+# ==============================================================================
+# SEGURANÇA - MOVIDO PARA .env
+# ==============================================================================
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# ANTES (hardcoded - INSEGURO):
+# SECRET_KEY = 'django-insecure-%wg6e&its5+pj=sy_!3yiy*b)5dek4)&nf@9zl$3$zhtjx-!a%'
 
-ALLOWED_HOSTS = []
+# DEPOIS (lê do .env - SEGURO):
+SECRET_KEY = config('SECRET_KEY')
 
 
-# Application definition
+# ANTES (sempre True - PERIGOSO em produção):
+# DEBUG = True
+
+# DEPOIS (configurável por ambiente):
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+
+# ANTES (vazio - aceita qualquer host):
+# ALLOWED_HOSTS = []
+
+# DEPOIS (lista de hosts permitidos do .env):
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+
+
+# ==============================================================================
+# APPLICATION DEFINITION
+# ==============================================================================
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -32,8 +53,7 @@ INSTALLED_APPS = [
     # Apps do projeto
     'apps.accounts',
     'apps.interessados',
-    # TODO: Descomentar na ETAPA 2
-    'apps.cursoseoutros',
+    'apps.cursoseoutros',  # ✅ ETAPA 2 ativado
 ]
 
 MIDDLEWARE = [
@@ -67,19 +87,37 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+# ==============================================================================
+# DATABASE - CONFIGURÁVEL POR AMBIENTE
+# ==============================================================================
 
+# ANTES (sempre SQLite):
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# DEPOIS (lê do .env - permite trocar banco em produção):
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': config('DATABASE_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME': config('DATABASE_NAME', default=str(BASE_DIR / 'db.sqlite3')),
+        # Para PostgreSQL em produção, adicionar no .env:
+        # DATABASE_ENGINE=django.db.backends.postgresql
+        # DATABASE_NAME=nome_do_banco
+        # DATABASE_USER=usuario
+        # DATABASE_PASSWORD=senha
+        # DATABASE_HOST=localhost
+        # DATABASE_PORT=5432
     }
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
+# ==============================================================================
+# PASSWORD VALIDATION
+# ==============================================================================
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -97,53 +135,92 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
+# ==============================================================================
+# INTERNATIONALIZATION
+# ==============================================================================
 
-LANGUAGE_CODE = 'pt-br'
+# ANTES (hardcoded):
+# LANGUAGE_CODE = 'pt-br'
+# TIME_ZONE = 'America/Sao_Paulo'
 
-TIME_ZONE = 'America/Sao_Paulo'
+# DEPOIS (configurável):
+LANGUAGE_CODE = config('LANGUAGE_CODE', default='pt-br')
+TIME_ZONE = config('TIME_ZONE', default='America/Sao_Paulo')
 
 USE_I18N = True
-
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
+# ==============================================================================
+# STATIC FILES (CSS, JavaScript, Images)
+# ==============================================================================
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']  # Arquivos estáticos globais
 STATIC_ROOT = BASE_DIR / 'staticfiles'  # Para produção (collectstatic)
 
 
-# Media files (uploads)
+# ==============================================================================
+# MEDIA FILES (uploads)
+# ==============================================================================
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+# ==============================================================================
+# DEFAULT PRIMARY KEY FIELD TYPE
+# ==============================================================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# User Model Customizado
+# ==============================================================================
+# USER MODEL CUSTOMIZADO
+# ==============================================================================
+
 AUTH_USER_MODEL = 'accounts.Usuario'
 
 
-# Authentication Backends
+# ==============================================================================
+# AUTHENTICATION BACKENDS
+# ==============================================================================
+
 # Backend padrão (Usuario/Staff) + Backend customizado (Interessado com CPF)
-# ⚠️ MUDANÇA PRINCIPAL AQUI ⚠️
+# ⚠️ ETAPA 2 - INTERESSADO BACKEND ATIVADO ⚠️
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Autenticação padrão (Usuario)
-    'apps.interessados.authentication.InteressadoBackend',  # ← LINHA ATIVADA!
+    'apps.interessados.authentication.InteressadoBackend',  # ← ATIVADO! Autenticação por CPF
 ]
 
 
-# Login URLs
-LOGIN_URL = '/staff/login/'  # URL padrão para login (staff)
-LOGIN_REDIRECT_URL = '/staff/dashboard/'  # Redirect após login staff
-LOGOUT_REDIRECT_URL = '/'  # Redirect após logout
+# ==============================================================================
+# LOGIN URLs - CONFIGURÁVEL POR AMBIENTE
+# ==============================================================================
+
+# ANTES (hardcoded):
+# LOGIN_URL = '/staff/login/'
+# LOGIN_REDIRECT_URL = '/staff/dashboard/'
+# LOGOUT_REDIRECT_URL = '/'
+
+# DEPOIS (lê do .env):
+LOGIN_URL = config('LOGIN_URL', default='/staff/login/')
+LOGIN_REDIRECT_URL = config('LOGIN_REDIRECT_URL', default='/staff/dashboard/')
+LOGOUT_REDIRECT_URL = config('LOGOUT_REDIRECT_URL', default='/')
 
 
+# ==============================================================================
+# CONFIGURAÇÕES DE SEGURANÇA ADICIONAIS (Questão 4.57)
+# ==============================================================================
+
+# Headers de segurança (opção E escolhida)
+if not DEBUG:  # Apenas em produção
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_SSL_REDIRECT = True  # Força HTTPS
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 ano
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True

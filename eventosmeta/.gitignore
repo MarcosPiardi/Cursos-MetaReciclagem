@@ -1,8 +1,40 @@
-db.sqlite3
-*.pyc
-__pycache__/
-*.xlsx
-*.txt
-venv/
-env/
+# Ambientes e segredos
 .env
+*.env
+.env.*
+!.env.example
+
+# Banco de dados
+*.sqlite3
+db.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+
+# Django
+/staticfiles/
+/media/
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+
+
+# db.sqlite3
+# *.pyc
+# __pycache__/
+# *.xlsx
+# *.txt
+# venv/
+# env/
+# .env
+# *.env

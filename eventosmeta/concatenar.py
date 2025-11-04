@@ -4,6 +4,7 @@
 
 import os
 from pathlib import Path
+from datetime import datetime
 
 def concatenar_arquivos(pasta_projeto, tipos_arquivo=['models.py', 'views.py'], arquivo_saida='projeto_concatenado.txt'):
     """
@@ -20,7 +21,8 @@ def concatenar_arquivos(pasta_projeto, tipos_arquivo=['models.py', 'views.py'], 
     with open(arquivo_saida, 'w', encoding='utf-8') as saida:
         saida.write(f"# PROJETO DJANGO - ARQUIVOS CONCATENADOS\n")
         saida.write(f"# Pasta: {pasta_projeto}\n")
-        saida.write(f"# Data: {Path(arquivo_saida).stat().st_mtime}\n\n")
+        # saida.write(f"# Data: {Path(arquivo_saida).stat().st_mtime}\n\n")
+        saida.write(f"# Data: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}\n\n")
         saida.write("=" * 80 + "\n\n")
         
         for tipo in tipos_arquivo:
@@ -64,6 +66,15 @@ if __name__ == "__main__":
     # Escolha quais arquivos quer concatenar
     concatenar_arquivos(
         pasta_projeto=PASTA_PROJETO,
-        tipos_arquivo=['models.py', 'views.py', 'urls.py', 'settings.py'],
-        arquivo_saida='meu_projeto_django-MetaReciclagem.txt'
+        # tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
+        #                'forms.py', 'models.py', 'services.py', 
+        #                'urls.py', 'views.py', 'settings.py', 
+        #                '*.html', '*.css', '*.js'],
+
+        # tipos_arquivo=['models.py', 'views.py', 'settings.py'],
+
+        tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
+                       'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
+                          
+        arquivo_saida='Artefatos-Secundarios-MetaReciclagem-03-11.txt'
     )
