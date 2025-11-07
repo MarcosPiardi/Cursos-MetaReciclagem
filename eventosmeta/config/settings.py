@@ -100,17 +100,29 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # }
 
 # DEPOIS (lê do .env - permite trocar banco em produção):
+# DATABASES = {
+#     'default': {
+#         'ENGINE': config('DATABASE_ENGINE', default='django.db.backends.sqlite3'),
+#         'NAME': config('DATABASE_NAME', default=str(BASE_DIR / 'db.sqlite3')),
+#         # Para PostgreSQL em produção, adicionar no .env:
+#         # DATABASE_ENGINE=django.db.backends.postgresql
+#         # DATABASE_NAME=nome_do_banco
+#         # DATABASE_USER=usuario
+#         # DATABASE_PASSWORD=senha
+#         # DATABASE_HOST=localhost
+#         # DATABASE_PORT=5432
+#     }
+# }
+
+# DATABASES com suporte completo ao .env -------- após mudar efetivamente do sqlite3 para postgresql
 DATABASES = {
     'default': {
         'ENGINE': config('DATABASE_ENGINE', default='django.db.backends.sqlite3'),
         'NAME': config('DATABASE_NAME', default=str(BASE_DIR / 'db.sqlite3')),
-        # Para PostgreSQL em produção, adicionar no .env:
-        # DATABASE_ENGINE=django.db.backends.postgresql
-        # DATABASE_NAME=nome_do_banco
-        # DATABASE_USER=usuario
-        # DATABASE_PASSWORD=senha
-        # DATABASE_HOST=localhost
-        # DATABASE_PORT=5432
+        'USER': config('DATABASE_USER', default=''),
+        'PASSWORD': config('DATABASE_PASSWORD', default=''),
+        'HOST': config('DATABASE_HOST', default=''),
+        'PORT': config('DATABASE_PORT', default=''),
     }
 }
 
