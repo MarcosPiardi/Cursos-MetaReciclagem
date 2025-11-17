@@ -1,0 +1,47 @@
+[
+  {
+    "model": "cursoseoutros.status",
+    "pk": 1,
+    "fields": {
+      "status": "Inscrições Abertas",
+      "permite_inscricao": true,
+      "ordem": 1
+    }
+  },
+  {
+    "model": "cursoseoutros.status",
+    "pk": 2,
+    "fields": {
+      "status": "Inscrições Encerradas",
+      "permite_inscricao": false,
+      "ordem": 2
+    }
+  },
+  {
+    "model": "cursoseoutros.status",
+    "pk": 3,
+    "fields": {
+      "status": "Em Andamento",
+      "permite_inscricao": false,
+      "ordem": 3
+    }
+  },
+  {
+    "model": "cursoseoutros.status",
+    "pk": 4,
+    "fields": {
+      "status": "Concluído",
+      "permite_inscricao": false,
+      "ordem": 4
+    }
+  },
+  {
+    "model": "cursoseoutros.status",
+    "pk": 5,
+    "fields": {
+      "status": "Cancelado",
+      "permite_inscricao": false,
+      "ordem": 5
+    }
+  }
+]
