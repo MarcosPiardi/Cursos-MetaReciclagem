@@ -53,7 +53,10 @@ INSTALLED_APPS = [
     # Apps do projeto
     'apps.accounts',
     'apps.interessados',
-    'apps.cursoseoutros',  # ✅ ETAPA 2 ativado
+    'apps.cursoseoutros',  
+
+    # Ferramentas
+    'django_extensions', 
 ]
 
 MIDDLEWARE = [

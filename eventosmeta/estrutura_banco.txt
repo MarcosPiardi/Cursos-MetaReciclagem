@@ -1,0 +1,342 @@
+# This is an auto-generated Django model module.
+# You'll have to do the following manually to clean this up:
+#   * Rearrange models' order
+#   * Make sure each model has one field with primary_key=True
+#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
+#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
+# Feel free to rename the models, but don't rename db_table values or field names.
+from django.db import models
+
+
+class AccountsUsuario(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField(blank=True, null=True)
+    is_superuser = models.BooleanField()
+    username = models.CharField(unique=True, max_length=150)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    email = models.CharField(max_length=254)
+    is_staff = models.BooleanField()
+    is_active = models.BooleanField()
+    date_joined = models.DateTimeField()
+    cpf = models.CharField(unique=True, max_length=11)
+    setor_trabalho = models.CharField(max_length=50)
+    local_trabalho = models.CharField(max_length=50)
+    telefone = models.CharField(max_length=11)
+    celular = models.CharField(max_length=11)
+
+    class Meta:
+        managed = False
+        db_table = 'accounts_usuario'
+
+
+class AccountsUsuarioGroups(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    usuario = models.ForeignKey(AccountsUsuario, models.DO_NOTHING)
+    group = models.ForeignKey('AuthGroup', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'accounts_usuario_groups'
+        unique_together = (('usuario', 'group'),)
+
+
+class AccountsUsuarioUserPermissions(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    usuario = models.ForeignKey(AccountsUsuario, models.DO_NOTHING)
+    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'accounts_usuario_user_permissions'
+        unique_together = (('usuario', 'permission'),)
+
+
+class AuthGroup(models.Model):
+    name = models.CharField(unique=True, max_length=150)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_group'
+
+
+class AuthGroupPermissions(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
+    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_group_permissions'
+        unique_together = (('group', 'permission'),)
+
+
+class AuthPermission(models.Model):
+    name = models.CharField(max_length=255)
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
+    codename = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_permission'
+        unique_together = (('content_type', 'codename'),)
+
+
+class CursoseoutrosAvaliacao(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    frequencia = models.DecimalField(max_digits=5, decimal_places=2)
+    nota = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    aprovado = models.BooleanField()
+    emite_certificado = models.BooleanField()
+    matricula = models.OneToOneField('CursoseoutrosMatricula', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_avaliacao'
+
+
+class CursoseoutrosClassificacao(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    score_total = models.DecimalField(max_digits=10, decimal_places=2)
+    posicao = models.IntegerField(blank=True, null=True)
+    data_classificacao = models.DateTimeField()
+    inscricao = models.OneToOneField('CursoseoutrosInscricao', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_classificacao'
+
+
+class CursoseoutrosCriterio(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    descricao_criterio = models.CharField(max_length=100)
+    tipo_criterio = models.CharField(max_length=20)
+    ativo = models.BooleanField()
+    criado_em = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_criterio'
+
+
+class CursoseoutrosEvento(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    descricao = models.CharField(max_length=200)
+    programa = models.TextField()
+    objetivo = models.TextField()
+    pre_requisito = models.TextField()
+    carga_horaria = models.CharField(max_length=50)
+    docente = models.CharField(max_length=100)
+    vagas = models.IntegerField()
+    vagas_minimas = models.IntegerField()
+    modalidade = models.CharField(max_length=15)
+    inicio_inscricoes = models.DateField(blank=True, null=True)
+    fim_inscricoes = models.DateField(blank=True, null=True)
+    inicio_matricula = models.DateField(blank=True, null=True)
+    fim_matricula = models.DateField(blank=True, null=True)
+    inicio_aulas = models.DateField(blank=True, null=True)
+    fim_aulas = models.DateField(blank=True, null=True)
+    horario_aulas = models.CharField(max_length=100)
+    local = models.CharField(max_length=100)
+    endereco_local = models.CharField(max_length=200)
+    observacao = models.TextField()
+    criado_em = models.DateTimeField()
+    atualizado_em = models.DateTimeField()
+    status = models.ForeignKey('CursoseoutrosStatus', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_evento'
+
+
+class CursoseoutrosEventocriterio(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    peso = models.IntegerField()
+    tipo_reserva = models.CharField(max_length=15)
+    vagas_reservadas = models.IntegerField()
+    ordem = models.IntegerField()
+    ordem_idade = models.CharField(max_length=15, blank=True, null=True)
+    idade_minima = models.IntegerField(blank=True, null=True)
+    idade_maxima = models.IntegerField(blank=True, null=True)
+    observacao = models.TextField()
+    criterio = models.ForeignKey(CursoseoutrosCriterio, models.DO_NOTHING)
+    evento = models.ForeignKey(CursoseoutrosEvento, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_eventocriterio'
+        unique_together = (('evento', 'criterio'),)
+
+
+class CursoseoutrosInscricao(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    data_inscricao = models.DateTimeField()
+    status = models.CharField(max_length=20)
+    evento = models.ForeignKey(CursoseoutrosEvento, models.DO_NOTHING)
+    interessado = models.ForeignKey('InteressadosInteressado', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_inscricao'
+        unique_together = (('evento', 'interessado'),)
+
+
+class CursoseoutrosInscricaocriterioatendido(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    pontos_obtidos = models.DecimalField(max_digits=10, decimal_places=2)
+    validado = models.BooleanField()
+    data_validacao = models.DateTimeField(blank=True, null=True)
+    criterio = models.ForeignKey(CursoseoutrosCriterio, models.DO_NOTHING)
+    inscricao = models.ForeignKey(CursoseoutrosInscricao, models.DO_NOTHING)
+    validado_por = models.ForeignKey(AccountsUsuario, models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_inscricaocriterioatendido'
+        unique_together = (('inscricao', 'criterio'),)
+
+
+class CursoseoutrosMatricula(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    data_matricula = models.DateTimeField()
+    status = models.CharField(max_length=15)
+    interessado = models.ForeignKey('InteressadosInteressado', models.DO_NOTHING)
+    turma = models.ForeignKey('CursoseoutrosTurma', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_matricula'
+        unique_together = (('turma', 'interessado'),)
+
+
+class CursoseoutrosStatus(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    status = models.CharField(unique=True, max_length=30)
+    permite_inscricao = models.BooleanField()
+    ordem = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_status'
+
+
+class CursoseoutrosTurma(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    descricao_turma = models.CharField(max_length=100)
+    data_inicio = models.DateField(blank=True, null=True)
+    data_fim = models.DateField(blank=True, null=True)
+    horario_aulas = models.CharField(max_length=100)
+    local_aulas = models.CharField(max_length=100)
+    evento = models.ForeignKey(CursoseoutrosEvento, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'cursoseoutros_turma'
+
+
+class DjangoAdminLog(models.Model):
+    action_time = models.DateTimeField()
+    object_id = models.TextField(blank=True, null=True)
+    object_repr = models.CharField(max_length=200)
+    action_flag = models.SmallIntegerField()
+    change_message = models.TextField()
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey(AccountsUsuario, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'django_admin_log'
+
+
+class DjangoContentType(models.Model):
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'django_content_type'
+        unique_together = (('app_label', 'model'),)
+
+
+class DjangoMigrations(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    app = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    applied = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_migrations'
+
+
+class DjangoSession(models.Model):
+    session_key = models.CharField(primary_key=True, max_length=40)
+    session_data = models.TextField()
+    expire_date = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_session'
+
+
+class InteressadosFototipo(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    nome = models.CharField(max_length=50)
+    descricao = models.TextField()
+
+    class Meta:
+        managed = False
+        db_table = 'interessados_fototipo'
+
+
+class InteressadosInteressado(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    senha = models.CharField(max_length=128)
+    last_login = models.DateTimeField(blank=True, null=True)
+    cpf = models.CharField(unique=True, max_length=11)
+    nome = models.CharField(max_length=50)
+    data_nascimento = models.DateField(blank=True, null=True)
+    cidade_nascimento = models.CharField(max_length=50)
+    uf_nascimento = models.CharField(max_length=2)
+    nacionalidade = models.CharField(max_length=50)
+    endereco_residencial = models.CharField(max_length=50)
+    num_endereco = models.CharField(max_length=7)
+    bairro = models.CharField(max_length=30)
+    complemento = models.CharField(max_length=50)
+    cidade_residencia = models.CharField(max_length=50)
+    uf_residencia = models.CharField(max_length=2)
+    telefone = models.CharField(max_length=11)
+    celular = models.CharField(max_length=11)
+    email = models.CharField(max_length=100)
+    programa_social = models.BooleanField()
+    num_nis = models.CharField(max_length=15)
+    necessidades_especiais = models.BooleanField()
+    fisica = models.BooleanField()
+    visual = models.BooleanField()
+    auditiva = models.BooleanField()
+    intelectual = models.BooleanField()
+    psicossocial = models.BooleanField()
+    multiplas = models.BooleanField()
+    nome_responsavel = models.CharField(max_length=50)
+    telefone_responsavel = models.CharField(max_length=11)
+    celular_responsavel = models.CharField(max_length=11)
+    email_responsavel = models.CharField(max_length=100)
+    observacao = models.TextField()
+    criado_em = models.DateTimeField()
+    atualizado_em = models.DateTimeField()
+    fototipo = models.ForeignKey(InteressadosFototipo, models.DO_NOTHING, blank=True, null=True)
+    sexo = models.ForeignKey('InteressadosSexo', models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'interessados_interessado'
+
+
+class InteressadosSexo(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    nome = models.CharField(max_length=20)
+
+    class Meta:
+        managed = False
+        db_table = 'interessados_sexo'

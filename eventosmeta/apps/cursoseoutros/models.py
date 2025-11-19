@@ -1,4 +1,13 @@
+
 """
+ARQUIVO: apps/cursoseoutros/models.py
+AÇÃO: SUBSTITUIR arquivo completo
+MUDANÇA: Models organizados - Status como FK (não TextChoices)
+DATA/HORA: 2025-11-18 13:15
+"""
+
+"""
+Alteração anterior-------------------
 ARQUIVO: apps/cursoseoutros/models.py
 AÇÃO: CRIAR/SUBSTITUIR arquivo completo
 MUDANÇA: Models completos para sistema de eventos, cursos, inscrições, classificação e turmas
@@ -6,10 +15,14 @@ DATA/HORA: 2025-10-29 14:30:00
 """
 
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from decimal import Decimal
 
+
+# ========================
+# TABELAS AUXILIARES
+# ========================
 
 class Status(models.Model):
     """
@@ -39,10 +52,42 @@ class Status(models.Model):
         return self.status
     
     class Meta:
-        verbose_name = 'Status'
-        verbose_name_plural = 'Status'
+        verbose_name = 'Status de Evento'
+        verbose_name_plural = 'Status de Eventos'
         ordering = ['ordem', 'status']
 
+
+class StatusInscricao(models.Model):
+    """Status do processo de inscrição"""
+    nome = models.CharField('Status', max_length=30, unique=True)
+    ordem = models.IntegerField('Ordem', default=0)
+    
+    def __str__(self):
+        return self.nome
+    
+    class Meta:
+        verbose_name = 'Status de Inscrição'
+        verbose_name_plural = 'Status de Inscrições'
+        ordering = ['ordem']
+
+
+class StatusMatricula(models.Model):
+    """Status da matrícula do aluno"""
+    nome = models.CharField('Status', max_length=30, unique=True)
+    ordem = models.IntegerField('Ordem', default=0)
+    
+    def __str__(self):
+        return self.nome
+    
+    class Meta:
+        verbose_name = 'Status de Matrícula'
+        verbose_name_plural = 'Status de Matrículas'
+        ordering = ['ordem']
+
+
+# ========================
+# CRITÉRIOS E CLASSIFICAÇÃO
+# ========================
 
 class TipoCriterio(models.TextChoices):
     """Tipos de critérios disponíveis para classificação"""
@@ -90,6 +135,10 @@ class Criterio(models.Model):
         verbose_name_plural = 'Critérios de Classificação'
         ordering = ['tipo_criterio', 'descricao_criterio']
 
+
+# ========================
+# EVENTOS
+# ========================
 
 class Modalidade(models.TextChoices):
     """Modalidades de realização do evento"""
@@ -269,7 +318,7 @@ class Evento(models.Model):
     def vagas_disponiveis(self):
         """Calcula vagas disponíveis"""
         matriculas_confirmadas = self.turmas.aggregate(
-            total=models.Count('matriculas', filter=models.Q(matriculas__status='CONFIRMADA'))
+            total=models.Count('matriculas', filter=models.Q(matriculas__status__nome='Confirmada'))
         )['total'] or 0
         return self.vagas - matriculas_confirmadas
     
@@ -384,17 +433,9 @@ class EventoCriterio(models.Model):
         unique_together = ['evento', 'criterio']
 
 
-class StatusInscricao(models.TextChoices):
-    """Status possíveis de uma inscrição"""
-    INSCRITO = 'INSCRITO', 'Inscrito'
-    AGUARDANDO_CLASSIFICACAO = 'AGUARD_CLASS', 'Aguardando Classificação'
-    CLASSIFICADO = 'CLASSIFICADO', 'Classificado'
-    APROVADO = 'APROVADO', 'Aprovado (Dentro das Vagas)'
-    FILA_ESPERA = 'FILA_ESPERA', 'Fila de Espera'
-    MATRICULADO = 'MATRICULADO', 'Matriculado'
-    DESISTENTE = 'DESISTENTE', 'Desistente'
-    NAO_COMPARECEU = 'NAO_COMPARECEU', 'Não Compareceu'
-
+# ========================
+# INSCRIÇÕES
+# ========================
 
 class Inscricao(models.Model):
     """
@@ -421,11 +462,10 @@ class Inscricao(models.Model):
         help_text='Data e hora em que a inscrição foi realizada'
     )
     
-    status = models.CharField(
-        'Status da Inscrição',
-        max_length=20,
-        choices=StatusInscricao.choices,
-        default=StatusInscricao.INSCRITO
+    status = models.ForeignKey(
+        StatusInscricao,
+        on_delete=models.PROTECT,
+        verbose_name='Status da Inscrição'
     )
     
     def __str__(self):
@@ -538,6 +578,10 @@ class InscricaoCriterioAtendido(models.Model):
         unique_together = ['inscricao', 'criterio']
 
 
+# ========================
+# TURMAS E MATRÍCULAS
+# ========================
+
 class Turma(models.Model):
     """
     Turma/Classe formada após matrículas.
@@ -589,20 +633,12 @@ class Turma(models.Model):
     
     def total_alunos(self):
         """Retorna total de alunos matriculados"""
-        return self.matriculas.filter(status='CONFIRMADA').count()
+        return self.matriculas.filter(status__nome='Confirmada').count()
     
     class Meta:
         verbose_name = 'Turma'
         verbose_name_plural = 'Turmas'
         ordering = ['evento', 'descricao_turma']
-
-
-class StatusMatricula(models.TextChoices):
-    """Status possíveis de uma matrícula"""
-    PENDENTE = 'PENDENTE', 'Pendente'
-    CONFIRMADA = 'CONFIRMADA', 'Confirmada'
-    CANCELADA = 'CANCELADA', 'Cancelada'
-    TRANCADA = 'TRANCADA', 'Trancada'
 
 
 class Matricula(models.Model):
@@ -629,11 +665,10 @@ class Matricula(models.Model):
         default=timezone.now
     )
     
-    status = models.CharField(
-        'Status da Matrícula',
-        max_length=15,
-        choices=StatusMatricula.choices,
-        default=StatusMatricula.PENDENTE
+    status = models.ForeignKey(
+        StatusMatricula,
+        on_delete=models.PROTECT,
+        verbose_name='Status da Matrícula'
     )
     
     def __str__(self):
@@ -645,6 +680,10 @@ class Matricula(models.Model):
         ordering = ['turma', 'data_matricula']
         unique_together = ['turma', 'interessado']
 
+
+# ========================
+# AVALIAÇÕES
+# ========================
 
 class Avaliacao(models.Model):
     """
