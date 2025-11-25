@@ -1,15 +1,28 @@
+
 <!--
+ARQUIVO: template/index.html
+AÇÃO: SUBSTITUIR arquivo completo
+MUDANÇA: Corrigir favicon - adicionar static no href e ajustar type para image/x-icon
+DATA: 2025-11-19
+
 ARQUIVO: template/index.html
 AÇÃO: SUBSTITUIR o arquivo template/index.html
 MUDANÇA: Link "Fazer Inscrição" agora aponta para {% url 'interessados:cadastro' %}
 -->
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eventos MetaReciclagem</title>
+    
     {% load static %}
+    
+    <!-- FAVICON -->
+    <link rel="icon" type="image/x-icon" href="{% static 'images/metareciclagem.ico' %}">
+    
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
