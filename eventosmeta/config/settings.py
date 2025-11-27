@@ -53,7 +53,14 @@ INSTALLED_APPS = [
     # Apps do projeto
     'apps.accounts',
     'apps.interessados',
-    'apps.cursoseoutros',  
+
+    # App antigo (MANTER por enquanto - remover depois)
+    # 'apps.cursoseoutros',  
+
+    # Apps refatorados (ADICIONAR ESTAS 3 LINHAS) 
+    'apps.eventos',
+    'apps.selecao',
+    'apps.academico',
 
     # Ferramentas
     'django_extensions', 

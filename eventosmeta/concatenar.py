@@ -71,10 +71,10 @@ if __name__ == "__main__":
         #                'urls.py', 'views.py', 'settings.py', 
         #                '*.html', '*.css', '*.js'],
 
-        # tipos_arquivo=['models.py', 'views.py', 'settings.py'],
+        tipos_arquivo=['models.py', 'views.py', 'settings.py'],
 
-        tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
-                       'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
+        # tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
+                    #    'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
                           
-        arquivo_saida='Artefatos-Secundarios-MetaReciclagem-03-11.txt'
+        arquivo_saida='Artefatos-Primarios-MetaReciclagem-26-11.txt'
     )

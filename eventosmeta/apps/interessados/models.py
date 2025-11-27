@@ -1,17 +1,11 @@
 
-"""
-ARQUIVO: apps/interessados/models.py
-AÇÃO: SUBSTITUIR o arquivo apps/interessados/models.py COMPLETO
-MUDANÇA: Adiciona campo 'senha' e métodos set_password() e check_password()
-"""
-"""
-ARQUIVO: apps/interessados/models.py
-AÇÃO: SUBSTITUIR o arquivo apps/interessados/models.py COMPLETO
-MUDANÇA: Adiciona campo 'senha' e métodos set_password() e check_password()
-"""
 
 
-# apps/interessados/models.py
+"""
+ARQUIVO: apps/interessados/models.py
+Models do app INTERESSADOS
+Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
+"""
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.hashers import make_password, check_password
@@ -66,7 +60,7 @@ class Interessado(models.Model):
         message='NIS deve conter entre 11 e 15 dígitos'
     )
     
-    # AUTENTICAÇÃO (NOVO!)
+    # AUTENTICAÇÃO
     senha = models.CharField(
         'Senha',
         max_length=128,
@@ -226,39 +220,39 @@ class Interessado(models.Model):
         help_text='Número de Identificação Social (11 a 15 dígitos)'
     )
     
-    # NECESSIDADES ESPECIAIS
+    # NECESSIDADES ESPECIAIS / PCD
     necessidades_especiais = models.BooleanField(
         'Possui Necessidades Especiais',
         default=False
     )
     
-    fisica = models.BooleanField(
-        'Necessidade Física',
+    pcd_fisica = models.BooleanField(
+        'PCD Física',
         default=False
     )
     
-    visual = models.BooleanField(
-        'Necessidade Visual',
+    pcd_visual = models.BooleanField(
+        'PCD Visual',
         default=False
     )
     
-    auditiva = models.BooleanField(
-        'Necessidade Auditiva',
+    pcd_auditiva = models.BooleanField(
+        'PCD Auditiva',
         default=False
     )
     
-    intelectual = models.BooleanField(
-        'Necessidade Intelectual',
+    pcd_intelectual = models.BooleanField(
+        'PCD Intelectual',
         default=False
     )
     
-    psicossocial = models.BooleanField(
-        'Necessidade Psicossocial',
+    pcd_psicossocial = models.BooleanField(
+        'PCD Psicossocial',
         default=False
     )
     
-    multiplas = models.BooleanField(
-        'Necessidades Múltiplas',
+    pcd_multiplas = models.BooleanField(
+        'PCD Múltiplas',
         default=False
     )
     
@@ -304,7 +298,7 @@ class Interessado(models.Model):
     criado_em = models.DateTimeField('Criado em', auto_now_add=True)
     atualizado_em = models.DateTimeField('Atualizado em', auto_now=True)
     
-    # MÉTODOS DE SENHA (NOVO!)
+    # MÉTODOS DE SENHA
     def set_password(self, raw_password):
         """Define a senha criptografada"""
         self.senha = make_password(raw_password)
@@ -313,10 +307,23 @@ class Interessado(models.Model):
         """Verifica se a senha está correta"""
         return check_password(raw_password, self.senha)
     
+    @property
+    def tem_deficiencia(self):
+        """Verifica se tem alguma deficiência"""
+        return any([
+            self.pcd_fisica,
+            self.pcd_visual,
+            self.pcd_auditiva,
+            self.pcd_intelectual,
+            self.pcd_psicossocial,
+            self.pcd_multiplas
+        ])
+    
     def __str__(self):
         return f"{self.nome} - CPF: {self.cpf}"
     
     class Meta:
         verbose_name = 'Interessado'
         verbose_name_plural = 'Interessados'
-        ordering = ['nome']
+
+        
