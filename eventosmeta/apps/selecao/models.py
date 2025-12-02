@@ -1,6 +1,5 @@
 
 
-
 """
 Models do app SELEÇÃO
 Responsável por: Processo seletivo, inscrições, classificação
@@ -77,7 +76,18 @@ class Classificacao(models.Model):
         on_delete=models.CASCADE,
         related_name='classificacao'
     )
-    posicao = models.PositiveIntegerField()
+    
+    # ========================================================================
+    # ALTERAÇÃO: Campo 'posicao' agora permite NULL
+    # MOTIVO: A posição é atribuída apenas após o processamento completo
+    #         da classificação. Durante o cálculo de pontos, o registro
+    #         é criado sem posição definida.
+    # ========================================================================
+    posicao = models.PositiveIntegerField(
+        null=True,      # ← ADICIONADO: Permite valores nulos
+        blank=True      # ← ADICIONADO: Permite campo vazio no admin
+    )
+    
     pontuacao_total = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -138,5 +148,4 @@ class InscricaoCriterioAtendido(models.Model):
     def __str__(self):
         return f"{self.inscricao.interessado.nome} - {self.criterio.nome} ({self.pontos_atribuidos} pts)"
     
-
     

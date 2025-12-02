@@ -1,0 +1,58 @@
+[
+  {
+    "model": "eventos.eventocriterio",
+    "pk": 1,
+    "fields": {
+      "evento": 1,
+      "criterio": 1,
+      "pontos_customizados": null,
+      "obrigatorio": false,
+      "ordem": 1
+    }
+  },
+  {
+    "model": "eventos.eventocriterio",
+    "pk": 2,
+    "fields": {
+      "evento": 1,
+      "criterio": 2,
+      "pontos_customizados": null,
+      "obrigatorio": false,
+      "ordem": 2
+    }
+  },
+  {
+    "model": "eventos.eventocriterio",
+    "pk": 3,
+    "fields": {
+      "evento": 1,
+      "criterio": 3,
+      "pontos_customizados": null,
+      "obrigatorio": false,
+      "ordem": 3
+    }
+  },
+  {
+    "model": "eventos.eventocriterio",
+    "pk": 4,
+    "fields": {
+      "evento": 1,
+      "criterio": 4,
+      "pontos_customizados": null,
+      "obrigatorio": false,
+      "ordem": 4
+    }
+  },
+  {
+    "model": "eventos.eventocriterio",
+    "pk": 5,
+    "fields": {
+      "evento": 1,
+      "criterio": 7,
+      "pontos_customizados": null,
+      "obrigatorio": false,
+      "ordem": 5
+    }
+  }
+]
+
