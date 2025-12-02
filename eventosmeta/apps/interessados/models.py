@@ -82,12 +82,22 @@ class Interessado(models.Model):
         validators=[cpf_validator],
         help_text='Somente números (11 dígitos)'
     )
-    
+
+     
     nome = models.CharField(
         'Nome Completo',
         max_length=50
     )
     
+  # DOCUMENTO
+    rg = models.CharField(
+        'RG/Identidade',
+        max_length=20,
+        blank=True,
+        default='',
+        help_text='Número do RG ou documento de identidade'
+    )
+
     sexo = models.ForeignKey(
         Sexo,
         on_delete=models.PROTECT,
@@ -203,6 +213,26 @@ class Interessado(models.Model):
         verbose_name='Fototipo',
         null=True,
         blank=True
+    )
+
+        # ESCOLARIDADE
+    ESCOLARIDADE_CHOICES = [
+        ('FUNDAMENTAL_INCOMPLETO', 'Ensino Fundamental Incompleto'),
+        ('FUNDAMENTAL_COMPLETO', 'Ensino Fundamental Completo'),
+        ('MEDIO_INCOMPLETO', 'Ensino Médio Incompleto'),
+        ('MEDIO_COMPLETO', 'Ensino Médio Completo'),
+        ('SUPERIOR_INCOMPLETO', 'Ensino Superior Incompleto'),
+        ('SUPERIOR_COMPLETO', 'Ensino Superior Completo'),
+        ('POS_GRADUACAO', 'Pós-Graduação'),
+    ]
+    
+    escolaridade = models.CharField(
+        'Escolaridade',
+        max_length=30,
+        choices=ESCOLARIDADE_CHOICES,
+        blank=True,
+        default='',
+        help_text='Nível de escolaridade do interessado'
     )
     
     # PROGRAMA SOCIAL

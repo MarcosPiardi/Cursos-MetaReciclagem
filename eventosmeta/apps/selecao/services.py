@@ -28,9 +28,12 @@ class ClassificadorService:
         Returns:
             Decimal: Pontuação total
         """
+        # 
+        # ALTERAÇÃO: Removido filtro validado=True
+        # MOTIVO: Critérios automáticos devem ser computados imediatamente
+        # 
         criterios_atendidos = InscricaoCriterioAtendido.objects.filter(
-            inscricao=inscricao,
-            validado=True
+            inscricao=inscricao
         )
         
         total = sum(
@@ -62,42 +65,102 @@ class ClassificadorService:
             atende = False
             pontos = evento_criterio.pontos_customizados or criterio.pontos
             
-            # CRITÉRIO: Morador de Manaus
-            if criterio.tipo == 'MORADOR_MANAUS':
-                if interessado.cidade_residencia and 'manaus' in interessado.cidade_residencia.lower():
-                    atende = True
-            
+            # 
             # CRITÉRIO: Pessoa com Deficiência (PCD)
-            elif criterio.tipo == 'PCD':
+            # 
+            if criterio.tipo == 'PCD':
                 if interessado.tem_deficiencia:
                     atende = True
             
+            # 
             # CRITÉRIO: Beneficiário de Programa Social
+            # LÓGICA: Verifica se participa de programa social E possui NIS
+            # 
             elif criterio.tipo == 'PROGRAMA_SOCIAL':
-                if interessado.programa_social:
+                if interessado.programa_social and interessado.num_nis:
                     atende = True
             
-            # CRITÉRIO: Faixa Etária (requer validação manual)
+            # 
+            # CRITÉRIO: Faixa Etária
+            # LÓGICA: Calcula idade e verifica se atende a faixa específica
+            # 
             elif criterio.tipo == 'FAIXA_ETARIA':
-                # Será validado manualmente
-                atende = False
+                if interessado.data_nascimento:
+                    hoje = timezone.now().date()
+                    idade = hoje.year - interessado.data_nascimento.year
+                    
+                    # Ajusta se ainda não fez aniversário este ano
+                    if (hoje.month, hoje.day) < (interessado.data_nascimento.month, interessado.data_nascimento.day):
+                        idade -= 1
+                    
+                    # Verificar qual faixa etária é este critério
+                    if '16' in criterio.nome and '24' in criterio.nome:
+                        if 16 <= idade <= 24:
+                            atende = True
+                    elif '50' in criterio.nome:
+                        if idade >= 50:
+                            atende = True
             
-            # CRITÉRIO: Escolaridade (requer validação manual)
+            # 
+            # CRITÉRIO: Escolaridade
+            # LÓGICA: Verifica se o interessado possui o nível mínimo exigido
+            # 
             elif criterio.tipo == 'ESCOLARIDADE':
-                # Será validado manualmente
+                if interessado.escolaridade:
+                    # Ordem hierárquica de níveis de escolaridade
+                    niveis_ordem = [
+                        'FUNDAMENTAL_INCOMPLETO',
+                        'FUNDAMENTAL_COMPLETO',
+                        'MEDIO_INCOMPLETO',
+                        'MEDIO_COMPLETO',
+                        'SUPERIOR_INCOMPLETO',
+                        'SUPERIOR_COMPLETO',
+                        'POS_GRADUACAO'
+                    ]
+                    
+                    # Identificar qual nível mínimo o critério exige
+                    nivel_minimo = None
+                    if 'Fundamental Completo' in criterio.nome:
+                        nivel_minimo = 'FUNDAMENTAL_COMPLETO'
+                    elif 'Médio Completo' in criterio.nome or 'Medio Completo' in criterio.nome:
+                        nivel_minimo = 'MEDIO_COMPLETO'
+                    elif 'Superior' in criterio.nome:
+                        nivel_minimo = 'SUPERIOR_COMPLETO'
+                    
+                    # Verificar se o interessado atende o nível mínimo
+                    if nivel_minimo and interessado.escolaridade in niveis_ordem:
+                        idx_interessado = niveis_ordem.index(interessado.escolaridade)
+                        idx_minimo = niveis_ordem.index(nivel_minimo)
+                        
+                        # Atende se o nível do interessado é maior ou igual ao mínimo
+                        if idx_interessado >= idx_minimo:
+                            atende = True
+            
+            # 
+            # CRITÉRIO: Renda Familiar
+            # STATUS: DESABILITADO - Campo não existe no modelo Interessado
+            # 
+            elif criterio.tipo == 'RENDA_FAMILIAR':
+                # Campo renda_familiar não implementado no modelo
+                # Critério ignorado automaticamente
                 atende = False
             
-            # CRITÉRIO: Renda Familiar (requer validação manual)
-            elif criterio.tipo == 'RENDA_FAMILIAR':
-                # Será validado manualmente
-                atende = False
+            # 
+            # CRITÉRIO: Fototipo (Cotas Raciais)
+            # LÓGICA: Pontua pretos, pardos e indígenas
+            # 
+            elif criterio.tipo == 'FOTOTIPO':
+                if interessado.fototipo:
+                    # Critérios de cotas raciais geralmente pontuam pretos, pardos e indígenas
+                    if interessado.fototipo.nome in ['Preta', 'Parda', 'Indígena']:
+                        atende = True
             
             # Se atende o critério, adiciona à lista
             if atende:
                 criterios_atendidos.append({
                     'criterio': criterio,
                     'pontos': pontos,
-                    'validado': not criterio.requer_validacao_manual
+                    'validado': True  # ← ALTERAÇÃO: Sempre True para critérios automáticos
                 })
         
         return criterios_atendidos
