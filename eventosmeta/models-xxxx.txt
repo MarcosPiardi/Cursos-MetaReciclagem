@@ -1,0 +1,10 @@
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\academico\models.py
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\academico\__pycache__\models.cpython-313.pyc
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\models.py
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\__pycache__\models.cpython-313.pyc
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\models.py
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\__pycache__\models.cpython-313.pyc
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\models.py
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\__pycache__\models.cpython-313.pyc
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao\models.py
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao\__pycache__\models.cpython-313.pyc

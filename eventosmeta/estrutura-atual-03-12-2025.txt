@@ -1,0 +1,282 @@
+Listagem de caminhos de pasta
+O número de série do volume é 92D0-3051
+C:.
+|   .env
+|   .gitignore
+|   Artefatos-MetaReciclagem-30-10.txt
+|   Artefatos-Primarios-MetaReciclagem-26-11.txt
+|   Artefatos-Principais-MetaReciclagem-03-11.txt
+|   Artefatos-Secundarios-MetaReciclagem-03-11.txt
+|   Artefatos-Secundarios-MetaReciclagem-26-11.txt
+|   Arvore de menus.png
+|   concatenar.py
+|   db.sqlite3
+|   Diagrama-MetaReciclagem.png
+|   diagrama.md
+|   diagrama26-11.dot
+|   Diagrama26-11.pdf
+|   dirMeta1.txt
+|   dirMeta26-11.txt
+|   dump.dump
+|   estrutura-atual-03-12-2025.txt
+|   estrutura.txt
+|   estrutura26-11.txt
+|   estrutura_banco.txt
+|   limpar_migrations_postgres.ps1
+|   limpar_migrations_sqlite3.ps1
+|   manage.py
+|   meu_projeto_django-MetaReciclagem.txt
+|   requirements-dev.txt
+|   requirements-full.txt
+|   requirements-installed.txt
+|   requirements.txt
+|   requirements19112025.txt
+|   vscode-extensions.txt
+|   
++---apps
+|   |   __init__.py
+|   |   
+|   +---academico
+|   |   |   admin.py
+|   |   |   apps.py
+|   |   |   models.py
+|   |   |   services.py
+|   |   |   tests.py
+|   |   |   views.py
+|   |   |   __init__.py
+|   |   |   
+|   |   +---migrations
+|   |   |   |   0001_initial.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           0001_initial.cpython-313.pyc
+|   |   |           __init__.cpython-313.pyc
+|   |   |           
+|   |   +---services
+|   |   \---__pycache__
+|   |           admin.cpython-313.pyc
+|   |           apps.cpython-313.pyc
+|   |           models.cpython-313.pyc
+|   |           __init__.cpython-313.pyc
+|   |           
+|   +---accounts
+|   |   |   admin.py
+|   |   |   apps.py
+|   |   |   forms.py
+|   |   |   models.py
+|   |   |   tests.py
+|   |   |   urls.py
+|   |   |   views.py
+|   |   |   __init__.py
+|   |   |   
+|   |   +---migrations
+|   |   |   |   0001_initial.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           0001_initial.cpython-313.pyc
+|   |   |           __init__.cpython-313.pyc
+|   |   |           
+|   |   +---templates
+|   |   |   \---accounts
+|   |   |           dashboard_staff.html
+|   |   |           login_staff.html
+|   |   |           
+|   |   \---__pycache__
+|   |           admin.cpython-313.pyc
+|   |           apps.cpython-313.pyc
+|   |           forms.cpython-313.pyc
+|   |           models.cpython-313.pyc
+|   |           urls.cpython-313.pyc
+|   |           views.cpython-313.pyc
+|   |           __init__.cpython-313.pyc
+|   |           
+|   +---eventos
+|   |   |   admin.py
+|   |   |   apps.py
+|   |   |   models.py
+|   |   |   tests.py
+|   |   |   views.py
+|   |   |   __init__.py
+|   |   |   
+|   |   +---management
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   +---commands
+|   |   |   |   |   configurar_criterios_evento.py
+|   |   |   |   |   popular_criterios.py
+|   |   |   |   |   popular_dados_iniciais.py
+|   |   |   |   |   __init__.py
+|   |   |   |   |   
+|   |   |   |   \---__pycache__
+|   |   |   |           configurar_criterios_evento.cpython-313.pyc
+|   |   |   |           popular_criterios.cpython-313.pyc
+|   |   |   |           popular_dados_iniciais.cpython-313.pyc
+|   |   |   |           __init__.cpython-313.pyc
+|   |   |   |           
+|   |   |   \---__pycache__
+|   |   |           __init__.cpython-313.pyc
+|   |   |           
+|   |   +---migrations
+|   |   |   |   0001_initial.py
+|   |   |   |   0002_alter_criterio_options_alter_evento_options_and_more.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           0001_initial.cpython-313.pyc
+|   |   |           0002_alter_criterio_options_alter_evento_options_and_more.cpython-313.pyc
+|   |   |           __init__.cpython-313.pyc
+|   |   |           
+|   |   \---__pycache__
+|   |           admin.cpython-313.pyc
+|   |           apps.cpython-313.pyc
+|   |           models.cpython-313.pyc
+|   |           __init__.cpython-313.pyc
+|   |           
+|   +---interessados
+|   |   |   admin.py
+|   |   |   apps.py
+|   |   |   authentication.py
+|   |   |   forms.py
+|   |   |   models.py
+|   |   |   tests.py
+|   |   |   urls.py
+|   |   |   views.py
+|   |   |   __init__.py
+|   |   |   
+|   |   +---fixtures
+|   |   +---management
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   +---commands
+|   |   |   |   |   criar_dados_teste.py
+|   |   |   |   |   __init__.py
+|   |   |   |   |   
+|   |   |   |   \---__pycache__
+|   |   |   |           criar_dados_teste.cpython-313.pyc
+|   |   |   |           __init__.cpython-313.pyc
+|   |   |   |           
+|   |   |   \---__pycache__
+|   |   |           __init__.cpython-313.pyc
+|   |   |           
+|   |   +---migrations
+|   |   |   |   0001_initial.py
+|   |   |   |   0002_interessado_escolaridade_interessado_rg.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           0001_initial.cpython-313.pyc
+|   |   |           0002_interessado_escolaridade_interessado_rg.cpython-313.pyc
+|   |   |           __init__.cpython-313.pyc
+|   |   |           
+|   |   +---static
+|   |   |   \---interessados
+|   |   |       |   formStyles.css
+|   |   |       |   
+|   |   |       \---imagens
+|   |   +---templates
+|   |   |   \---interessados
+|   |   |           base.html
+|   |   |           cadastro.html
+|   |   |           dashboard.html
+|   |   |           detalhes.html
+|   |   |           form_interessados.html
+|   |   |           lista_interessados.html
+|   |   |           login_interessado.html
+|   |   |           sucesso.html
+|   |   |           
+|   |   \---__pycache__
+|   |           admin.cpython-313.pyc
+|   |           apps.cpython-313.pyc
+|   |           authentication.cpython-313.pyc
+|   |           forms.cpython-313.pyc
+|   |           models.cpython-313.pyc
+|   |           urls.cpython-313.pyc
+|   |           views.cpython-313.pyc
+|   |           __init__.cpython-313.pyc
+|   |           
+|   +---selecao
+|   |   |   admin.py
+|   |   |   apps.py
+|   |   |   models.py
+|   |   |   services.py
+|   |   |   tests.py
+|   |   |   views.py
+|   |   |   __init__.py
+|   |   |   
+|   |   +---management
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   +---commands
+|   |   |   |   |   classificar_evento.py
+|   |   |   |   |   __init__.py
+|   |   |   |   |   
+|   |   |   |   \---__pycache__
+|   |   |   |           classificar_evento.cpython-313.pyc
+|   |   |   |           __init__.cpython-313.pyc
+|   |   |   |           
+|   |   |   \---__pycache__
+|   |   |           __init__.cpython-313.pyc
+|   |   |           
+|   |   +---migrations
+|   |   |   |   0001_initial.py
+|   |   |   |   0002_alter_classificacao_posicao.py
+|   |   |   |   __init__.py
+|   |   |   |   
+|   |   |   \---__pycache__
+|   |   |           0001_initial.cpython-313.pyc
+|   |   |           0002_alter_classificacao_posicao.cpython-313.pyc
+|   |   |           __init__.cpython-313.pyc
+|   |   |           
+|   |   +---services
+|   |   \---__pycache__
+|   |           admin.cpython-313.pyc
+|   |           apps.cpython-313.pyc
+|   |           models.cpython-313.pyc
+|   |           services.cpython-313.pyc
+|   |           __init__.cpython-313.pyc
+|   |           
+|   \---__pycache__
+|           __init__.cpython-313.pyc
+|           
++---config
+|   |   asgi.py
+|   |   settings.py
+|   |   urls.py
+|   |   wsgi.py
+|   |   __init__.py
+|   |   
+|   +---media
+|   \---__pycache__
+|           settings.cpython-313.pyc
+|           urls.cpython-313.pyc
+|           wsgi.cpython-313.pyc
+|           __init__.cpython-313.pyc
+|           
++---eventosmeta
+|   \---static
+|       \---css
++---fixtures
+|       01_interessados.json
+|       02_evento.json
+|       03_evento_criterios.json
+|       04_turmas.json
+|       05_inscricoes.json
+|       
++---media
++---static
+|   +---css
+|   |       style.css
+|   |       
+|   +---images
+|   |       metareciclagem.ico
+|   |       metareciclagem.jpg
+|   |       
+|   \---js
+|           script.js
+|           
+\---template
+        base.html
+        index.html
+        
