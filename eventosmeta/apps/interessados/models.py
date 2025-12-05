@@ -1,11 +1,28 @@
+"""
+ARQUIVO: apps/interessados/models.py
+Models do app INTERESSADOS
+Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
+Arquivo: apps/interessados/models.py
+Alteração: Adicionar métodos de permissão para compatibilidade com autenticação Django
+Data: 05/12/2025
+"""
 
-
+"""
+ARQUIVO: apps/interessados/models.py
+Models do app INTERESSADOS
+Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
+Arquivo: apps/interessados/models.py
+Alteração: Adicionar campos is_active, is_staff, is_superuser para autenticação
+Data: 05/12/2025
+"""
 
 """
 ARQUIVO: apps/interessados/models.py
 Models do app INTERESSADOS
 Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
 """
+
+
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.hashers import make_password, check_password
@@ -37,7 +54,7 @@ class Fototipo(models.Model):
 
 
 class Interessado(models.Model):
-    """Modelo para cadastro de interessados"""
+    """Modelo para cadastro de interessados com autenticação"""
     
     # Validadores
     cpf_validator = RegexValidator(
@@ -60,7 +77,9 @@ class Interessado(models.Model):
         message='NIS deve conter entre 11 e 15 dígitos'
     )
     
-    # AUTENTICAÇÃO
+    # ============================================================
+    # CAMPOS DE AUTENTICAÇÃO - Adicionados em 05/12/2025
+    # ============================================================
     senha = models.CharField(
         'Senha',
         max_length=128,
@@ -74,6 +93,24 @@ class Interessado(models.Model):
         help_text='Data e hora do último login'
     )
     
+    is_active = models.BooleanField(
+        'Ativo',
+        default=True,
+        help_text='Indica se o interessado pode fazer login no sistema'
+    )
+    
+    is_staff = models.BooleanField(
+        'Membro da Equipe',
+        default=False,
+        help_text='Indica se o interessado pode acessar o admin (normalmente False)'
+    )
+    
+    is_superuser = models.BooleanField(
+        'Superusuário',
+        default=False,
+        help_text='Indica se o interessado tem todas as permissões (normalmente False)'
+    )
+    
     # DADOS PESSOAIS
     cpf = models.CharField(
         'CPF',
@@ -82,14 +119,13 @@ class Interessado(models.Model):
         validators=[cpf_validator],
         help_text='Somente números (11 dígitos)'
     )
-
      
     nome = models.CharField(
         'Nome Completo',
         max_length=50
     )
     
-  # DOCUMENTO
+    # DOCUMENTO
     rg = models.CharField(
         'RG/Identidade',
         max_length=20,
@@ -215,7 +251,7 @@ class Interessado(models.Model):
         blank=True
     )
 
-        # ESCOLARIDADE
+    # ESCOLARIDADE
     ESCOLARIDADE_CHOICES = [
         ('FUNDAMENTAL_INCOMPLETO', 'Ensino Fundamental Incompleto'),
         ('FUNDAMENTAL_COMPLETO', 'Ensino Fundamental Completo'),
@@ -328,7 +364,9 @@ class Interessado(models.Model):
     criado_em = models.DateTimeField('Criado em', auto_now_add=True)
     atualizado_em = models.DateTimeField('Atualizado em', auto_now=True)
     
+    # ============================================================
     # MÉTODOS DE SENHA
+    # ============================================================
     def set_password(self, raw_password):
         """Define a senha criptografada"""
         self.senha = make_password(raw_password)
@@ -337,6 +375,60 @@ class Interessado(models.Model):
         """Verifica se a senha está correta"""
         return check_password(raw_password, self.senha)
     
+    # ============================================================
+    # MÉTODOS DE PERMISSÃO - Adicionados em 05/12/2025
+    # Necessários para compatibilidade com sistema de autenticação Django
+    # ============================================================
+    def has_perm(self, perm, obj=None):
+        """
+        Verifica se o interessado tem uma permissão específica
+        Superusuários têm todas as permissões
+        """
+        return self.is_superuser
+    
+    def has_perms(self, perm_list, obj=None):
+        """
+        Verifica se o interessado tem uma lista de permissões
+        """
+        return all(self.has_perm(perm, obj) for perm in perm_list)
+    
+    def has_module_perms(self, app_label):
+        """
+        Verifica se o interessado tem permissões para acessar um módulo/app
+        Staff e superusuários têm acesso
+        """
+        return self.is_staff or self.is_superuser
+    
+    @property
+    def is_anonymous(self):
+        """
+        Sempre False para usuários autenticados
+        """
+        return False
+    
+    @property
+    def is_authenticated(self):
+        """
+        Sempre True para usuários autenticados
+        """
+        return True
+    
+    def get_username(self):
+        """
+        Retorna o identificador único do interessado (CPF)
+        """
+        return self.cpf
+    
+    @property
+    def username(self):
+        """
+        Propriedade username para compatibilidade com Django admin
+        """
+        return self.cpf
+    
+    # ============================================================
+    # PROPRIEDADES E MÉTODOS AUXILIARES
+    # ============================================================
     @property
     def tem_deficiencia(self):
         """Verifica se tem alguma deficiência"""
@@ -356,4 +448,3 @@ class Interessado(models.Model):
         verbose_name = 'Interessado'
         verbose_name_plural = 'Interessados'
 
-        
