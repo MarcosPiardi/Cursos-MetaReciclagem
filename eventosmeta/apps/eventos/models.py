@@ -1,5 +1,8 @@
 """
-Models do app EVENTOS
+Arquivo: models.py
+Caminho: apps/eventos/models.py
+Alteração: Adicionado tipo_criterio em Criterio e prioridade em EventoCriterio
+Data: 09/12/2025
 """
 from django.db import models
 from django.core.validators import MinValueValidator
@@ -26,13 +29,26 @@ class Status(models.Model):
 
 class Criterio(models.Model):
     """
-    Critérios fixos de classificação (pontuação não editável)
+    Critérios de classificação: pontuação OU ordenação
     """
+    TIPO_CHOICES = [
+        ('PONTUACAO', 'Pontuação'),
+        ('ORDENACAO', 'Ordenação'),
+    ]
+    
+    tipo_criterio = models.CharField(
+        'Tipo de Critério',
+        max_length=20,
+        choices=TIPO_CHOICES,
+        default='PONTUACAO',
+        help_text='Pontuação = soma pontos | Ordenação = define ordem de classificação'
+    )
+    
     codigo = models.CharField(
         'Código',
         max_length=30,
         unique=True,
-        help_text='Código único do critério (ex: PCD, NIS, JOVEM)'
+        help_text='Código único do critério (ex: PCD, ORDEM_INSCRICAO, IDADE_CRESCENTE)'
     )
     
     nome = models.CharField(
@@ -49,13 +65,18 @@ class Criterio(models.Model):
     
     pontos = models.IntegerField(
         'Pontos',
-        help_text='Pontuação fixa atribuída (NÃO editável após criação)'
+        null=True,
+        blank=True,
+        help_text='Pontuação (apenas para tipo PONTUACAO)'
     )
     
     categoria = models.CharField(
         'Categoria',
         max_length=50,
         choices=[
+            ('ORDENACAO', 'Ordenação'),
+            ('CRONOLÓGICA', 'Ordem de Inscrição'),
+            ('IDADE', 'Idade'),
             ('VULNERABILIDADE', 'Vulnerabilidade Social'),
             ('FAIXA_ETARIA', 'Faixa Etária'),
             ('ESCOLARIDADE', 'Escolaridade'),
@@ -79,7 +100,9 @@ class Criterio(models.Model):
         ordering = ['categoria', '-pontos', 'nome']
     
     def __str__(self):
-        return f'{self.nome} ({self.pontos} pts)'
+        if self.pontos is not None:
+            return f'{self.nome} ({self.pontos} pts)'
+        return self.nome
 
 
 class Evento(models.Model):
@@ -130,7 +153,6 @@ class Evento(models.Model):
 class EventoCriterio(models.Model):
     """
     Relacionamento entre Evento e Critérios ativos
-    (Admin apenas ativa/desativa, não customiza pontos)
     """
     evento = models.ForeignKey(
         Evento,
@@ -145,6 +167,12 @@ class EventoCriterio(models.Model):
         verbose_name='Critério'
     )
     
+    prioridade = models.IntegerField(
+        'Prioridade',
+        default=999,
+        help_text='Ordem de aplicação (1 = primeiro, 2 = segundo, etc.)'
+    )
+    
     ativo = models.BooleanField(
         'Ativo',
         default=True,
@@ -157,7 +185,7 @@ class EventoCriterio(models.Model):
         verbose_name = 'Critério do Evento'
         verbose_name_plural = 'Critérios do Evento'
         unique_together = ['evento', 'criterio']
-        ordering = ['-criterio__pontos', 'criterio__nome']
+        ordering = ['prioridade', '-criterio__pontos', 'criterio__nome']
     
     def __str__(self):
         return f'{self.evento.nome} - {self.criterio.nome}'
@@ -240,5 +268,3 @@ class Horario(models.Model):
     
     def __str__(self):
         return f'{self.turma.nome} - {self.get_dia_semana_display()}'
-    
-    

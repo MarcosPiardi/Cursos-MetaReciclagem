@@ -1,10 +1,39 @@
+
 """
-Admin do app EVENTOS - Modelo Simplificado
+Arquivo: admin.py
+Caminho: apps/eventos/admin.py
+Alteração: Adicionado exportador de classificação detalhada para Excel/CSV
+Data: 10/12/2025
 """
+
+"""
+Arquivo: admin.py
+Caminho: apps/eventos/admin.py
+Alteração: Simplificado para usar ClassificadorService (sem métodos _classificar_inscricao)
+Data: 10/12/2025
+"""
+
+"""
+Arquivo: admin.py
+Caminho: apps/eventos/admin.py
+Alteração: Campo codigo agora é editável (removido de readonly_fields)
+Data: 10/12/2025
+"""
+
+"""
+Arquivo: admin.py
+Caminho: apps/eventos/admin.py
+Alteração: EventoCriterio com campo prioridade e CriterioAdmin com tipo_criterio
+Data: 09/12/2025
+"""
+
 from django.contrib import admin
 from django.contrib import messages
-from django.db import transaction
+from django.http import HttpResponse
 from datetime import date
+from decimal import Decimal
+import csv
+
 from .models import Status, Criterio, Evento, EventoCriterio, Turma, Horario
 
 
@@ -17,18 +46,19 @@ class StatusAdmin(admin.ModelAdmin):
 
 @admin.register(Criterio)
 class CriterioAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'categoria', 'pontos', 'ativo']
-    list_filter = ['categoria', 'ativo']
+    list_display = ['nome', 'tipo_criterio', 'categoria', 'pontos', 'ativo']
+    list_filter = ['tipo_criterio', 'categoria', 'ativo']
     list_editable = ['ativo']
     search_fields = ['nome', 'codigo', 'descricao']
-    readonly_fields = ['codigo', 'pontos']
+    readonly_fields = []
     
     fieldsets = (
         ('IDENTIFICAÇÃO', {
-            'fields': ('codigo', 'nome', 'descricao')
+            'fields': ('tipo_criterio', 'codigo', 'nome', 'descricao')
         }),
         ('CLASSIFICAÇÃO', {
-            'fields': ('categoria', 'pontos')
+            'fields': ('categoria', 'pontos'),
+            'description': 'Pontos: obrigatório para tipo PONTUACAO, deixe vazio para ORDENACAO'
         }),
         ('STATUS', {
             'fields': ('ativo',)
@@ -46,19 +76,27 @@ class EventoCriterioInline(admin.TabularInline):
     """
     model = EventoCriterio
     extra = 1
-    fields = ['criterio', 'pontos_display', 'ativo']
+    fields = ['criterio', 'prioridade', 'pontos_display', 'ativo']
     readonly_fields = ['pontos_display']
+    ordering = ['prioridade', '-criterio__pontos']
     
     def pontos_display(self, obj):
         """Mostra os pontos do critério (não editável)"""
         if obj.criterio:
-            return f'{obj.criterio.pontos} pontos'
+            if obj.criterio.pontos is not None:
+                return f'{obj.criterio.pontos} pontos'
+            return 'Ordenação'
         return '-'
     pontos_display.short_description = 'Pontuação'
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related('criterio')
+    
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "criterio":
+            kwargs["queryset"] = Criterio.objects.filter(ativo=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class TurmaInline(admin.TabularInline):
@@ -75,7 +113,7 @@ class EventoAdmin(admin.ModelAdmin):
     list_display = ['nome', 'status', 'total_vagas', 'data_inicio_evento', 'data_fim_evento']
     list_filter = ['status', 'data_inicio_evento']
     search_fields = ['nome', 'descricao']
-    actions = ['classificar_inscricoes']
+    actions = ['classificar_inscricoes', 'exportar_classificacao_excel']
     
     fieldsets = (
         ('INFORMAÇÕES BÁSICAS', {
@@ -94,18 +132,22 @@ class EventoAdmin(admin.ModelAdmin):
     def classificar_inscricoes(self, request, queryset):
         """
         Action para classificar inscrições dos eventos selecionados
+        Delega toda a lógica para o ClassificadorService
         """
-        from apps.selecao.models import Inscricao, Classificacao, InscricaoCriterioAtendido, StatusInscricao
+        from apps.selecao.services import ClassificadorService
+        from apps.selecao.models import Inscricao
         
         total_eventos = 0
-        total_classificados = 0
+        total_inscricoes = 0
         
         for evento in queryset:
-            # Buscar critérios ativos
+            from apps.eventos.models import EventoCriterio
+            
+            # Verificar se tem critérios ativos
             criterios_ativos = EventoCriterio.objects.filter(
                 evento=evento,
                 ativo=True
-            ).select_related('criterio')
+            )
             
             if not criterios_ativos.exists():
                 messages.warning(
@@ -114,227 +156,137 @@ class EventoAdmin(admin.ModelAdmin):
                 )
                 continue
             
-            # Buscar status "CONFIRMADA" (ou similar)
-            try:
-                status_confirmada = StatusInscricao.objects.get(nome__iexact='CONFIRMADA')
-            except StatusInscricao.DoesNotExist:
-                # Tentar variações
-                try:
-                    status_confirmada = StatusInscricao.objects.get(nome__icontains='CONFIRM')
-                except StatusInscricao.DoesNotExist:
-                    messages.error(
-                        request,
-                        f'❌ Status "CONFIRMADA" não encontrado! Crie um StatusInscricao com esse nome.'
-                    )
-                    continue
+            # Contar inscrições para feedback
+            inscricoes_count = Inscricao.objects.filter(evento=evento).count()
             
-            # Buscar inscrições confirmadas
-            inscricoes = Inscricao.objects.filter(
-                evento=evento,
-                status=status_confirmada
-            ).select_related('interessado')
-            
-            if not inscricoes.exists():
+            if inscricoes_count == 0:
                 messages.warning(
                     request,
-                    f'⚠️ Evento "{evento.nome}" não possui inscrições confirmadas!'
+                    f'⚠️ Evento "{evento.nome}" não possui inscrições!'
                 )
                 continue
             
-            # Classificar cada inscrição
-            for inscricao in inscricoes:
-                try:
-                    with transaction.atomic():
-                        resultado = self._classificar_inscricao(inscricao, criterios_ativos)
-                        self._salvar_classificacao(inscricao, resultado)
-                        total_classificados += 1
-                except Exception as e:
-                    messages.error(
-                        request,
-                        f'❌ Erro ao classificar {inscricao.interessado.nome}: {str(e)}'
-                    )
-            
-            # Atualizar posições
-            self._atualizar_posicoes(evento, criterios_ativos, status_confirmada)
-            total_eventos += 1
-            
-            messages.success(
-                request,
-                f'✅ Evento "{evento.nome}": {inscricoes.count()} inscrições classificadas!'
-            )
+            # Classificar usando o service
+            try:
+                ClassificadorService.classificar_evento(evento)
+                total_eventos += 1
+                total_inscricoes += inscricoes_count
+                
+                messages.success(
+                    request,
+                    f'✅ Evento "{evento.nome}": {inscricoes_count} inscrição(ões) classificada(s)!'
+                )
+            except Exception as e:
+                messages.error(
+                    request,
+                    f'❌ Erro ao classificar "{evento.nome}": {str(e)}'
+                )
         
         if total_eventos > 0:
             messages.success(
                 request,
-                f'🎯 TOTAL: {total_eventos} evento(s) processado(s), {total_classificados} inscrição(ões) classificada(s)!'
+                f'🎯 TOTAL: {total_eventos} evento(s) processado(s), {total_inscricoes} inscrição(ões) classificada(s)!'
             )
     
     classificar_inscricoes.short_description = '🎯 Classificar inscrições dos eventos selecionados'
     
-    def _classificar_inscricao(self, inscricao, criterios_ativos):
-        """Calcula pontuação de uma inscrição"""
-        interessado = inscricao.interessado
-        pontuacao_total = 0
-        criterios_atendidos = []
-        
-        # Calcular idade
-        hoje = date.today()
-        idade = (
-            hoje.year - interessado.data_nascimento.year -
-            ((hoje.month, hoje.day) < (interessado.data_nascimento.month, interessado.data_nascimento.day))
-        )
-        
-        # Verificar cada critério
-        for evento_criterio in criterios_ativos:
-            criterio = evento_criterio.criterio
-            atendido = False
-            observacao = ''
-            
-            # PCD
-            if criterio.codigo == 'PCD':
-                if interessado.tem_deficiencia:
-                    atendido = True
-                    observacao = f'PCD: {interessado.tipo_deficiencia or "Sim"}'
-            
-            # NIS
-            elif criterio.codigo == 'NIS':
-                if interessado.num_nis:
-                    atendido = True
-                    observacao = f'NIS: {interessado.num_nis}'
-            
-            # JOVEM
-            elif criterio.codigo == 'JOVEM':
-                if 16 <= idade <= 24:
-                    atendido = True
-                    observacao = f'Idade: {idade} anos'
-            
-            # IDOSO
-            elif criterio.codigo == 'IDOSO':
-                if idade >= 50:
-                    atendido = True
-                    observacao = f'Idade: {idade} anos'
-            
-            # COTA RACIAL
-            elif criterio.codigo == 'COTA_RACIAL':
-                racas_cotistas = ['PRETO', 'PARDO', 'INDIGENA']
-                if interessado.fototipo and interessado.fototipo.upper() in racas_cotistas:
-                    atendido = True
-                    observacao = f'Raça/Cor: {interessado.get_fototipo_display()}'
-            
-            # ESCOLARIDADE
-            elif criterio.codigo == 'ESC_FUND_INC':
-                if interessado.escolaridade == 'FUNDAMENTAL_INCOMPLETO':
-                    atendido = True
-                    observacao = 'Ens. Fundamental Incompleto'
-            
-            elif criterio.codigo == 'ESC_FUND_COMP':
-                if interessado.escolaridade == 'FUNDAMENTAL_COMPLETO':
-                    atendido = True
-                    observacao = 'Ens. Fundamental Completo'
-            
-            elif criterio.codigo == 'ESC_MEDIO_INC':
-                if interessado.escolaridade == 'MEDIO_INCOMPLETO':
-                    atendido = True
-                    observacao = 'Ens. Médio Incompleto'
-            
-            elif criterio.codigo == 'ESC_MEDIO_COMP':
-                if interessado.escolaridade == 'MEDIO_COMPLETO':
-                    atendido = True
-                    observacao = 'Ens. Médio Completo'
-            
-            if atendido:
-                pontuacao_total += criterio.pontos
-                criterios_atendidos.append({
-                    'criterio': criterio,
-                    'pontos': criterio.pontos,
-                    'observacao': observacao
-                })
-        
-        return {
-            'pontuacao': pontuacao_total,
-            'criterios_atendidos': criterios_atendidos,
-            'idade': idade
-        }
-    
-    def _salvar_classificacao(self, inscricao, resultado):
-        """Salva a classificação no banco"""
+    def exportar_classificacao_excel(self, request, queryset):
+        """
+        Exporta classificação detalhada para CSV/Excel
+        Inclui: pontuação calculada vs salva, critérios atendidos, dados pessoais
+        """
         from apps.selecao.models import Classificacao, InscricaoCriterioAtendido
         
-        classificacao, _ = Classificacao.objects.update_or_create(
-            inscricao=inscricao,
-            defaults={
-                'pontuacao_total': resultado['pontuacao'],
-                'classificado': False,  # Será atualizado depois
-                'lista_espera': False
-            }
-        )
+        # Criar resposta HTTP com CSV
+        response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+        response['Content-Disposition'] = 'attachment; filename="classificacao_detalhada.csv"'
         
-        InscricaoCriterioAtendido.objects.filter(inscricao=inscricao).delete()
+        # Adicionar BOM para Excel reconhecer UTF-8
+        response.write('\ufeff')
         
-        for crit in resultado['criterios_atendidos']:
-            InscricaoCriterioAtendido.objects.create(
-                inscricao=inscricao,
-                criterio=crit['criterio'],
-                pontos_atribuidos=crit['pontos'],
-                observacao_validacao=crit['observacao']
-            )
+        writer = csv.writer(response, delimiter=';')
         
-        return classificacao
+        # Cabeçalho
+        writer.writerow([
+            'Evento',
+            'Posição',
+            'Nome',
+            'CPF',
+            'Data Nascimento',
+            'Idade',
+            'Status Inscrição',
+            'Critérios Atendidos',
+            'Pontuação Calculada',
+            'Pontuação Salva',
+            'Diferença',
+            'Classificado',
+            'Detalhes Critérios'
+        ])
+        
+        for evento in queryset:
+            classificacoes = Classificacao.objects.filter(
+                inscricao__evento=evento
+            ).select_related(
+                'inscricao__interessado',
+                'inscricao__status'
+            ).order_by('posicao')
+            
+            hoje = date.today()
+            
+            for c in classificacoes:
+                interessado = c.inscricao.interessado
+                
+                # Calcular idade
+                dn = interessado.data_nascimento
+                idade = hoje.year - dn.year - ((hoje.month, hoje.day) < (dn.month, dn.day))
+                
+                # Buscar critérios atendidos
+                criterios_atendidos = InscricaoCriterioAtendido.objects.filter(
+                    inscricao=c.inscricao
+                ).select_related('criterio')
+                
+                # Calcular pontuação manualmente
+                pontuacao_calculada = sum(
+                    ca.pontos_atribuidos for ca in criterios_atendidos
+                )
+                
+                # Pontuação salva
+                pontuacao_salva = c.pontuacao_total
+                
+                # Diferença
+                diferenca = Decimal(str(pontuacao_calculada)) - pontuacao_salva
+                
+                # Detalhes dos critérios
+                detalhes_criterios = ' | '.join([
+                    f"{ca.criterio.nome}: {ca.pontos_atribuidos} pts"
+                    for ca in criterios_atendidos
+                ]) if criterios_atendidos.exists() else 'Nenhum'
+                
+                # Nome dos critérios
+                nomes_criterios = ', '.join([
+                    ca.criterio.nome for ca in criterios_atendidos
+                ]) if criterios_atendidos.exists() else 'Nenhum'
+                
+                writer.writerow([
+                    evento.nome,
+                    c.posicao or 'N/A',
+                    interessado.nome,
+                    interessado.cpf,
+                    dn.strftime('%d/%m/%Y'),
+                    idade,
+                    c.inscricao.status.nome,
+                    nomes_criterios,
+                    f'{pontuacao_calculada:.2f}',
+                    f'{pontuacao_salva:.2f}',
+                    f'{diferenca:.2f}',
+                    'Sim' if c.classificado else 'Não',
+                    detalhes_criterios
+                ])
+        
+        messages.success(request, '✅ Classificação exportada com sucesso!')
+        return response
     
-    def _atualizar_posicoes(self, evento, criterios_ativos, status_confirmada):
-        """Atualiza posições de classificação"""
-        from apps.selecao.models import Classificacao
-        
-        tem_jovem = criterios_ativos.filter(criterio__codigo='JOVEM').exists()
-        tem_idoso = criterios_ativos.filter(criterio__codigo='IDOSO').exists()
-        
-        classificacoes = Classificacao.objects.filter(
-            inscricao__evento=evento,
-            inscricao__status=status_confirmada
-        ).select_related('inscricao', 'inscricao__interessado')
-        
-        classificacoes_list = list(classificacoes)
-        hoje = date.today()
-        
-        for c in classificacoes_list:
-            dn = c.inscricao.interessado.data_nascimento
-            c.idade_calc = (
-                hoje.year - dn.year -
-                ((hoje.month, hoje.day) < (dn.month, dn.day))
-            )
-        
-        if tem_jovem:
-            classificacoes_list.sort(
-                key=lambda x: (-x.pontuacao_total, x.idade_calc, x.inscricao.data_inscricao)
-            )
-        elif tem_idoso:
-            classificacoes_list.sort(
-                key=lambda x: (-x.pontuacao_total, -x.idade_calc, x.inscricao.data_inscricao)
-            )
-        else:
-            classificacoes_list.sort(
-                key=lambda x: (-x.pontuacao_total, x.inscricao.data_inscricao)
-            )
-        
-        # Atualizar posições e flags classificado/lista_espera
-        total_vagas = evento.total_vagas
-        
-        for posicao, classificacao in enumerate(classificacoes_list, start=1):
-            classificacao.posicao = posicao
-            classificacao.classificado = (posicao <= total_vagas)
-            classificacao.lista_espera = (posicao > total_vagas)
-            classificacao.save(update_fields=['posicao', 'classificado', 'lista_espera'])
-
-
-@admin.register(EventoCriterio)
-class EventoCriterioAdmin(admin.ModelAdmin):
-    """
-    Admin separado para visualizar todos os vínculos evento-critério
-    """
-    list_display = ['evento', 'criterio', 'pontos', 'ativo']
-    list_filter = ['evento', 'ativo', 'criterio__categoria']
-    list_editable = ['ativo']
-    ordering = ['evento', '-criterio__pontos']
+    exportar_classificacao_excel.short_description = '📊 Exportar classificação detalhada (Excel)'
 
 
 @admin.register(Turma)
@@ -352,4 +304,5 @@ class HorarioAdmin(admin.ModelAdmin):
     def dia_semana_display(self, obj):
         return obj.get_dia_semana_display()
     dia_semana_display.short_description = 'Dia da Semana'
-    
+
+

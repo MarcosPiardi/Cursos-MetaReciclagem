@@ -1,7 +1,18 @@
 """
-Services do app SELEÇÃO
-Responsável por: Lógica de classificação e pontuação
+Arquivo: services.py
+Caminho: apps/selecao/services.py
+Alteração: Corrigido erro fototipo.upper() para fototipo.nome e ampliado status válidos
+Data: 10/12/2025
 """
+
+"""
+Arquivo: services.py
+Caminho: apps/selecao/services.py
+Responsável por: Lógica de classificação e pontuação
+Alteração: Adicionado suporte a critérios de ORDENACAO com prioridade
+Data: 09/12/2025
+"""
+
 from django.db import transaction
 from django.utils import timezone
 from .models import Inscricao, Classificacao, InscricaoCriterioAtendido, StatusInscricao
@@ -28,10 +39,6 @@ class ClassificadorService:
         Returns:
             Decimal: Pontuação total
         """
-        # 
-        # ALTERAÇÃO: Removido filtro validado=True
-        # MOTIVO: Critérios automáticos devem ser computados imediatamente
-        # 
         criterios_atendidos = InscricaoCriterioAtendido.objects.filter(
             inscricao=inscricao
         )
@@ -56,58 +63,47 @@ class ClassificadorService:
         """
         interessado = inscricao.interessado
         evento = inscricao.evento
-        criterios_evento = EventoCriterio.objects.filter(evento=evento)
+        criterios_evento = EventoCriterio.objects.filter(evento=evento, ativo=True)
         
         criterios_atendidos = []
         
         for evento_criterio in criterios_evento:
             criterio = evento_criterio.criterio
-            atende = False
-            pontos = evento_criterio.pontos_customizados or criterio.pontos
             
-            # 
-            # CRITÉRIO: Pessoa com Deficiência (PCD)
-            # 
-            if criterio.tipo == 'PCD':
+            if criterio.tipo_criterio == 'ORDENACAO':
+                continue
+            
+            atende = False
+            pontos = criterio.pontos or 0
+            
+            if criterio.codigo == 'PCD':
                 if interessado.tem_deficiencia:
                     atende = True
             
-            # 
-            # CRITÉRIO: Beneficiário de Programa Social
-            # LÓGICA: Verifica se participa de programa social E possui NIS
-            # 
-            elif criterio.tipo == 'PROGRAMA_SOCIAL':
+            elif criterio.codigo == 'PROGRAMA_SOCIAL' or criterio.codigo == 'NIS':
                 if interessado.programa_social and interessado.num_nis:
                     atende = True
             
-            # 
-            # CRITÉRIO: Faixa Etária
-            # LÓGICA: Calcula idade e verifica se atende a faixa específica
-            # 
-            elif criterio.tipo == 'FAIXA_ETARIA':
+            elif criterio.codigo.startswith('JOVEM') or criterio.codigo.startswith('IDOSO') or criterio.categoria == 'FAIXA_ETARIA':
                 if interessado.data_nascimento:
                     hoje = timezone.now().date()
                     idade = hoje.year - interessado.data_nascimento.year
                     
-                    # Ajusta se ainda não fez aniversário este ano
                     if (hoje.month, hoje.day) < (interessado.data_nascimento.month, interessado.data_nascimento.day):
                         idade -= 1
                     
-                    # Verificar qual faixa etária é este critério
                     if '16' in criterio.nome and '24' in criterio.nome:
                         if 16 <= idade <= 24:
                             atende = True
-                    elif '50' in criterio.nome:
+                    elif '50' in criterio.nome or 'Idoso' in criterio.nome:
                         if idade >= 50:
                             atende = True
+                    elif '60' in criterio.nome:
+                        if idade >= 60:
+                            atende = True
             
-            # 
-            # CRITÉRIO: Escolaridade
-            # LÓGICA: Verifica se o interessado possui o nível mínimo exigido
-            # 
-            elif criterio.tipo == 'ESCOLARIDADE':
+            elif criterio.categoria == 'ESCOLARIDADE':
                 if interessado.escolaridade:
-                    # Ordem hierárquica de níveis de escolaridade
                     niveis_ordem = [
                         'FUNDAMENTAL_INCOMPLETO',
                         'FUNDAMENTAL_COMPLETO',
@@ -118,7 +114,6 @@ class ClassificadorService:
                         'POS_GRADUACAO'
                     ]
                     
-                    # Identificar qual nível mínimo o critério exige
                     nivel_minimo = None
                     if 'Fundamental Completo' in criterio.nome:
                         nivel_minimo = 'FUNDAMENTAL_COMPLETO'
@@ -127,40 +122,27 @@ class ClassificadorService:
                     elif 'Superior' in criterio.nome:
                         nivel_minimo = 'SUPERIOR_COMPLETO'
                     
-                    # Verificar se o interessado atende o nível mínimo
                     if nivel_minimo and interessado.escolaridade in niveis_ordem:
                         idx_interessado = niveis_ordem.index(interessado.escolaridade)
                         idx_minimo = niveis_ordem.index(nivel_minimo)
                         
-                        # Atende se o nível do interessado é maior ou igual ao mínimo
                         if idx_interessado >= idx_minimo:
                             atende = True
             
-            # 
-            # CRITÉRIO: Renda Familiar
-            # STATUS: DESABILITADO - Campo não existe no modelo Interessado
-            # 
-            elif criterio.tipo == 'RENDA_FAMILIAR':
-                # Campo renda_familiar não implementado no modelo
-                # Critério ignorado automaticamente
+            elif criterio.codigo == 'RENDA_FAMILIAR':
                 atende = False
             
-            # 
-            # CRITÉRIO: Fototipo (Cotas Raciais)
-            # LÓGICA: Pontua pretos, pardos e indígenas
-            # 
-            elif criterio.tipo == 'FOTOTIPO':
+            elif criterio.categoria == 'COTA_RACIAL':
                 if interessado.fototipo:
-                    # Critérios de cotas raciais geralmente pontuam pretos, pardos e indígenas
-                    if interessado.fototipo.nome in ['Preta', 'Parda', 'Indígena']:
+                    racas_cotistas = ['Preta', 'Parda', 'Indígena', 'Preto', 'Pardo', 'Indigena']
+                    if interessado.fototipo.nome in racas_cotistas:
                         atende = True
             
-            # Se atende o critério, adiciona à lista
             if atende:
                 criterios_atendidos.append({
                     'criterio': criterio,
                     'pontos': pontos,
-                    'validado': True  # ← ALTERAÇÃO: Sempre True para critérios automáticos
+                    'validado': True
                 })
         
         return criterios_atendidos
@@ -174,10 +156,8 @@ class ClassificadorService:
         Args:
             inscricao: Objeto Inscricao
         """
-        # 1. Verificar critérios automaticamente
         criterios_atendidos = ClassificadorService.verificar_criterios_automaticos(inscricao)
         
-        # 2. Criar registros de critérios atendidos
         for item in criterios_atendidos:
             InscricaoCriterioAtendido.objects.update_or_create(
                 inscricao=inscricao,
@@ -188,10 +168,8 @@ class ClassificadorService:
                 }
             )
         
-        # 3. Calcular pontuação total
         pontuacao_total = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
         
-        # 4. Criar ou atualizar classificação
         Classificacao.objects.update_or_create(
             inscricao=inscricao,
             defaults={
@@ -208,12 +186,15 @@ class ClassificadorService:
         """
         Classifica todas as inscrições de um evento
         
+        LÓGICA:
+        - Critérios são aplicados conforme prioridade definida no evento
+        - Pode ser: ORDENACAO primeiro, PONTUACAO primeiro, ou misturado
+        
         Args:
             evento: Objeto Evento
         """
-        # 1. Buscar inscrições aprovadas/pendentes
         status_validos = StatusInscricao.objects.filter(
-            nome__in=['Aprovada', 'Pendente']
+            nome__in=['Aprovada', 'Pendente', 'APROVADA', 'PENDENTE', 'Confirmada', 'CONFIRMADA']
         )
         
         inscricoes = Inscricao.objects.filter(
@@ -221,19 +202,45 @@ class ClassificadorService:
             status__in=status_validos
         ).select_related('interessado')
         
-        # 2. Processar cada inscrição
         for inscricao in inscricoes:
             ClassificadorService.processar_inscricao(inscricao)
         
-        # 3. Ordenar classificações
+        criterios_evento = EventoCriterio.objects.filter(
+            evento=evento,
+            ativo=True
+        ).select_related('criterio').order_by('prioridade')
+        
+        order_fields = []
+        
+        for evento_criterio in criterios_evento:
+            criterio = evento_criterio.criterio
+            
+            if criterio.tipo_criterio == 'PONTUACAO':
+                if '-pontuacao_total' not in order_fields:
+                    order_fields.append('-pontuacao_total')
+            
+            elif criterio.tipo_criterio == 'ORDENACAO':
+                codigo = criterio.codigo
+                
+                if codigo == 'ORDEM_INSCRICAO':
+                    order_fields.append('inscricao__data_inscricao')
+                
+                elif codigo == 'IDADE_CRESCENTE':
+                    order_fields.append('-inscricao__interessado__data_nascimento')
+                
+                elif codigo == 'IDADE_DECRESCENTE':
+                    order_fields.append('inscricao__interessado__data_nascimento')
+        
+        if not order_fields:
+            order_fields = ['-pontuacao_total', 'inscricao__data_inscricao']
+        
+        if 'inscricao__data_inscricao' not in order_fields and '-inscricao__data_inscricao' not in order_fields:
+            order_fields.append('inscricao__data_inscricao')
+        
         classificacoes = Classificacao.objects.filter(
             inscricao__evento=evento
-        ).select_related('inscricao__interessado').order_by(
-            '-pontuacao_total',
-            'inscricao__data_inscricao'  # Desempate por data
-        )
+        ).select_related('inscricao__interessado').order_by(*order_fields)
         
-        # 4. Atualizar posições e status (classificado/lista de espera)
         total_vagas = evento.total_vagas
         posicao = 1
         
@@ -246,8 +253,9 @@ class ClassificadorService:
             
             posicao += 1
         
-        logger.info(f"Evento {evento.nome} classificado. Total: {classificacoes.count()} inscrições")
+        logger.info(
+            f"Evento {evento.nome} classificado com critérios: {order_fields}. "
+            f"Total: {classificacoes.count()} inscrições"
+        )
         
         return classificacoes
-    
-    

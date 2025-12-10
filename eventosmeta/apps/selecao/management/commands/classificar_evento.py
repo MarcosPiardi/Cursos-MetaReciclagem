@@ -1,4 +1,11 @@
 """
+Arquivo: classificar_evento.py
+Caminho: apps/selecao/management/commands/classificar_evento.py
+Alteração: Corrigido fototipo.upper() para fototipo.nome e tipo_deficiencia
+Data: 10/12/2025
+"""
+
+"""
 Comando para classificar inscrições de um evento
 Modelo Simplificado com Pontuação Fixa
 """
@@ -38,7 +45,7 @@ class Command(BaseCommand):
         # Buscar inscrições confirmadas
         inscricoes = Inscricao.objects.filter(
             evento=evento,
-            status='CONFIRMADA'
+            status__nome__in=['CONFIRMADA', 'Confirmada', 'APROVADA', 'Aprovada']
         ).select_related('interessado')
         
         total = inscricoes.count()
@@ -65,7 +72,10 @@ class Command(BaseCommand):
         
         self.stdout.write('📋 Critérios ativos:')
         for ec in criterios_ativos:
-            self.stdout.write(f'   • {ec.criterio.nome} ({ec.criterio.pontos} pts)')
+            if ec.criterio.pontos is not None:
+                self.stdout.write(f'   • {ec.criterio.nome} ({ec.criterio.pontos} pts)')
+            else:
+                self.stdout.write(f'   • {ec.criterio.nome} (Ordenação)')
         
         self.stdout.write('\n' + '-'*70)
         
@@ -118,6 +128,11 @@ class Command(BaseCommand):
         # Verificar cada critério
         for evento_criterio in criterios_ativos:
             criterio = evento_criterio.criterio
+            
+            # Pular critérios de ORDENACAO (não somam pontos)
+            if criterio.tipo_criterio == 'ORDENACAO':
+                continue
+            
             atendido = False
             observacao = ''
             
@@ -125,7 +140,7 @@ class Command(BaseCommand):
             if criterio.codigo == 'PCD':
                 if interessado.tem_deficiencia:
                     atendido = True
-                    observacao = f'PCD: {interessado.tipo_deficiencia or "Sim"}'
+                    observacao = 'PCD: Sim'
             
             # NIS (Cadastro Único)
             elif criterio.codigo == 'NIS':
@@ -147,10 +162,10 @@ class Command(BaseCommand):
             
             # COTA RACIAL
             elif criterio.codigo == 'COTA_RACIAL':
-                racas_cotistas = ['PRETO', 'PARDO', 'INDIGENA']
-                if interessado.fototipo and interessado.fototipo.upper() in racas_cotistas:
+                racas_cotistas = ['Preta', 'Parda', 'Indígena', 'Preto', 'Pardo', 'Indigena']
+                if interessado.fototipo and interessado.fototipo.nome in racas_cotistas:
                     atendido = True
-                    observacao = f'Raça/Cor: {interessado.get_fototipo_display()}'
+                    observacao = f'Raça/Cor: {interessado.fototipo.nome}'
             
             # ESCOLARIDADE - Fundamental Incompleto
             elif criterio.codigo == 'ESC_FUND_INC':
@@ -178,10 +193,11 @@ class Command(BaseCommand):
             
             # Se atendeu o critério, adiciona pontos
             if atendido:
-                pontuacao_total += criterio.pontos
+                pontos = criterio.pontos or 0
+                pontuacao_total += pontos
                 criterios_atendidos.append({
                     'criterio': criterio,
-                    'pontos': criterio.pontos,
+                    'pontos': pontos,
                     'observacao': observacao
                 })
         
@@ -199,11 +215,8 @@ class Command(BaseCommand):
         classificacao, created = Classificacao.objects.update_or_create(
             inscricao=inscricao,
             defaults={
-                'pontuacao': resultado['pontuacao'],
-                'criterios_detalhes': ', '.join([
-                    f"{c['criterio'].nome} (+{c['pontos']} pts)"
-                    for c in resultado['criterios_atendidos']
-                ]) if resultado['criterios_atendidos'] else 'Nenhum critério atendido'
+                'pontuacao_total': resultado['pontuacao'],
+                'processado_em': date.today()
             }
         )
         
@@ -215,8 +228,9 @@ class Command(BaseCommand):
             InscricaoCriterioAtendido.objects.create(
                 inscricao=inscricao,
                 criterio=crit['criterio'],
-                pontos_obtidos=crit['pontos'],
-                observacao=crit['observacao']
+                pontos_atribuidos=crit['pontos'],
+                observacao_validacao=crit['observacao'],
+                validado=True
             )
         
         return classificacao
@@ -236,7 +250,7 @@ class Command(BaseCommand):
         # Buscar todas as classificações
         classificacoes = Classificacao.objects.filter(
             inscricao__evento=evento,
-            inscricao__status='CONFIRMADA'
+            inscricao__status__nome__in=['CONFIRMADA', 'Confirmada', 'APROVADA', 'Aprovada']
         ).select_related('inscricao', 'inscricao__interessado')
         
         # Calcular idade para cada classificação
@@ -254,22 +268,24 @@ class Command(BaseCommand):
         if tem_jovem:
             # Prioriza mais jovens no desempate
             classificacoes_list.sort(
-                key=lambda x: (-x.pontuacao, x.idade_calc, x.inscricao.data_inscricao)
+                key=lambda x: (-x.pontuacao_total, x.idade_calc, x.inscricao.data_inscricao)
             )
         elif tem_idoso:
             # Prioriza mais velhos no desempate
             classificacoes_list.sort(
-                key=lambda x: (-x.pontuacao, -x.idade_calc, x.inscricao.data_inscricao)
+                key=lambda x: (-x.pontuacao_total, -x.idade_calc, x.inscricao.data_inscricao)
             )
         else:
             # Apenas pontuação e data
             classificacoes_list.sort(
-                key=lambda x: (-x.pontuacao, x.inscricao.data_inscricao)
+                key=lambda x: (-x.pontuacao_total, x.inscricao.data_inscricao)
             )
         
-        # Atualizar posições
+        # Atualizar posições e flags
+        total_vagas = evento.total_vagas
+        
         for posicao, classificacao in enumerate(classificacoes_list, start=1):
             classificacao.posicao = posicao
-            classificacao.save(update_fields=['posicao'])
-
-            
+            classificacao.classificado = (posicao <= total_vagas)
+            classificacao.lista_espera = (posicao > total_vagas)
+            classificacao.save(update_fields=['posicao', 'classificado', 'lista_espera'])
