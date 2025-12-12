@@ -1,0 +1,718 @@
+# Desenvolvimento - Diretrizes e Padrões
+**Projeto:** Sistema MetaReciclagem
+**Última atualização:** 12/12/2025
+
+---
+
+## Filosofia de Desenvolvimento
+
+### Abordagem
+- **Pragmático:** Foco em soluções práticas e aplicáveis
+- **Proativo:** Sempre pensar no próximo passo
+- **Estratégico:** Planejamento de longo prazo
+- **Incremental:** Construir conhecimento progressivamente
+- **Passo a passo:** Uma solução por vez (não múltiplas alternativas)
+
+### Princípios
+1. Resolver app por app e testar na sequência
+2. Não inventar dados ou informações
+3. Confirmar antes de implementar decisões importantes
+4. Ser claro sobre limitações
+5. Sempre sugerir próximos passos
+
+---
+
+## Padrões de Código
+
+### Estrutura de Código
+- HTML, CSS e JavaScript em arquivos separados
+- Organização modular
+- Código comentado em português
+- Docstrings em models, views e services
+
+### Nomenclatura
+```python
+# Models: PascalCase
+class Interessado(models.Model):
+    pass
+
+# Variáveis/funções: snake_case
+def calcular_pontuacao_inscricao():
+    data_inscricao = inscricao.data_inscricao
+    
+# Constantes: UPPER_SNAKE_CASE
+PONTUACAO_MAXIMA = 100
+TIPO_PONTUACAO = 'PONTUACAO'
+```
+
+### Comentários
+```python
+# Comentários descritivos em português
+# Explicam O QUE e PORQUÊ, não apenas o COMO
+
+class Criterio(models.Model):
+    """
+    Critério de classificação que pode ser de pontuação ou ordenação.
+    
+    Critérios de PONTUACAO somam pontos ao candidato.
+    Critérios de ORDENACAO definem ordem de desempate.
+    """
+    # Campo código identifica unicamente o critério
+    codigo = models.CharField(max_length=50, unique=True)
+```
+
+---
+
+## Padrão de Documentação em Artefatos
+
+### Cabeçalho Obrigatório
+
+#### Para arquivos Python (.py)
+```python
+"""
+Arquivo: apps/eventos/models.py
+Caminho: eventosmeta/apps/eventos/models.py
+Alteração: Adicionado campo prioridade em EventoCriterio
+Data: 09/12/2025
+"""
+```
+
+#### Para arquivos HTML/CSS/JS
+```html
+<!--
+Arquivo: templates/index.html
+Caminho: eventosmeta/templates/index.html
+Alteração: Adicionado menu de navegação responsivo
+Data: 09/12/2025
+-->
+```
+
+### Comentários Internos (Opcional - Quando Solicitado)
+```python
+class EventoCriterio(models.Model):
+    # ALTERAÇÃO: Campo adicionado em 09/12/2025
+    prioridade = models.IntegerField(
+        default=1,
+        help_text="Ordem de aplicação (1=primeiro, 2=segundo...)"
+    )
+```
+
+### Regra de Geração
+- Artefatos só devem ser gerados mediante solicitação ou consentimento explícito
+- Sempre gerar arquivo COMPLETO (não apenas trechos)
+- Incluir resumo das mudanças após o código
+
+---
+
+## Estrutura de Models Django
+
+### Padrão de Model
+```python
+class NomeDoModel(models.Model):
+    """Docstring explicando o propósito do model."""
+    
+    # Campos obrigatórios primeiro
+    nome = models.CharField(max_length=100)
+    cpf = models.CharField(max_length=14, unique=True, db_index=True)
+    
+    # Campos opcionais depois
+    observacao = models.TextField(blank=True, null=True)
+    
+    # Campos de controle
+    ativo = models.BooleanField(default=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Nome Singular"
+        verbose_name_plural = "Nome Plural"
+        ordering = ['-criado_em']
+        indexes = [
+            models.Index(fields=['campo_importante']),
+        ]
+    
+    def __str__(self):
+        return self.nome
+    
+    def save(self, *args, **kwargs):
+        # Validações customizadas antes de salvar
+        super().save(*args, **kwargs)
+```
+
+### Validações
+```python
+from django.core.exceptions import ValidationError
+
+class Inscricao(models.Model):
+    # ... campos ...
+    
+    def clean(self):
+        """Validações customizadas."""
+        # Verificar se já existe inscrição
+        if Inscricao.objects.filter(
+            evento=self.evento,
+            interessado=self.interessado
+        ).exclude(pk=self.pk).exists():
+            raise ValidationError('Já existe inscrição neste evento.')
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Executa clean()
+        super().save(*args, **kwargs)
+```
+
+### Properties Úteis
+```python
+class Interessado(models.Model):
+    # ... campos PCD ...
+    
+    @property
+    def tem_deficiencia(self):
+        """Verifica se tem alguma deficiência."""
+        return any([
+            self.pcd_fisica,
+            self.pcd_visual,
+            self.pcd_auditiva,
+            self.pcd_intelectual,
+            self.pcd_psicossocial,
+            self.pcd_multiplas
+        ])
+    
+    @property
+    def idade(self):
+        """Calcula idade atual."""
+        from datetime import date
+        hoje = date.today()
+        return hoje.year - self.data_nascimento.year - (
+            (hoje.month, hoje.day) < 
+            (self.data_nascimento.month, self.data_nascimento.day)
+        )
+```
+
+---
+
+## Padrões de Views
+
+### Function-Based Views (FBVs)
+```python
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+@login_required
+def detalhe_evento(request, evento_id):
+    """Exibe detalhes de um evento."""
+    evento = get_object_or_404(Evento, pk=evento_id)
+    
+    context = {
+        'evento': evento,
+        'inscricoes_abertas': evento.status.codigo == 'INSCRICOES_ABERTAS'
+    }
+    
+    return render(request, 'eventos/detalhe.html', context)
+```
+
+### Queries Otimizadas
+```python
+def lista_classificacao(request, evento_id):
+    """Lista classificação com dados relacionados."""
+    # ✅ Correto: select_related para ForeignKey
+    classificacoes = Classificacao.objects.filter(
+        inscricao__evento_id=evento_id
+    ).select_related(
+        'inscricao',
+        'inscricao__interessado',
+        'inscricao__evento'
+    ).prefetch_related(
+        'inscricao__inscricaocriterioatendido_set__criterio'
+    ).order_by('posicao')
+    
+    # ❌ Errado: sem otimização (N+1 queries)
+    # classificacoes = Classificacao.objects.filter(
+    #     inscricao__evento_id=evento_id
+    # )
+    
+    return render(request, 'classificacao/lista.html', {
+        'classificacoes': classificacoes
+    })
+```
+
+---
+
+## Service Layer
+
+### Quando Usar
+- Lógica de negócio complexa
+- Operações que envolvem múltiplos models
+- Cálculos e processamentos pesados
+- Reutilização de código
+
+### Estrutura de Service
+```python
+# apps/selecao/services.py
+
+from django.db import transaction
+from apps.eventos.models import Evento, EventoCriterio
+from apps.selecao.models import Inscricao, Classificacao
+
+class ClassificadorService:
+    """
+    Service responsável pela classificação de inscrições.
+    
+    Centraliza toda a lógica de pontuação e ordenação.
+    """
+    
+    @staticmethod
+    @transaction.atomic
+    def classificar_evento(evento: Evento) -> dict:
+        """
+        Classifica todas as inscrições de um evento.
+        
+        Args:
+            evento: Instância do evento a classificar
+            
+        Returns:
+            dict com estatísticas da classificação
+        """
+        # Limpar classificações anteriores
+        Classificacao.objects.filter(inscricao__evento=evento).delete()
+        
+        # Buscar inscrições válidas
+        inscricoes = Inscricao.objects.filter(
+            evento=evento,
+            status__codigo__in=['PENDENTE', 'APROVADA', 'CONFIRMADA']
+        ).select_related('interessado')
+        
+        # Processar cada inscrição
+        for inscricao in inscricoes:
+            pontuacao = ClassificadorService._calcular_pontuacao(
+                inscricao, 
+                evento
+            )
+            ClassificadorService._criar_classificacao(
+                inscricao, 
+                pontuacao
+            )
+        
+        # Definir posições
+        ClassificadorService._atualizar_posicoes(evento)
+        
+        return {
+            'total_inscricoes': inscricoes.count(),
+            'classificados': Classificacao.objects.filter(
+                inscricao__evento=evento,
+                classificado=True
+            ).count()
+        }
+    
+    @staticmethod
+    def _calcular_pontuacao(inscricao, evento):
+        """Método privado para cálculo."""
+        # Implementação...
+        pass
+```
+
+---
+
+## Admin Django
+
+### Configuração Básica
+```python
+from django.contrib import admin
+from .models import Evento, EventoCriterio
+
+@admin.register(Evento)
+class EventoAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'vagas', 'status', 'data_inicio']
+    list_filter = ['status', 'criado_em']
+    search_fields = ['nome', 'descricao']
+    date_hierarchy = 'data_inicio'
+    
+    # Campos readonly
+    readonly_fields = ['criado_em', 'atualizado_em']
+    
+    # Organização de campos
+    fieldsets = (
+        ('Informações Básicas', {
+            'fields': ('nome', 'descricao', 'conteudo')
+        }),
+        ('Vagas', {
+            'fields': ('vagas_totais', 'vagas_reservadas')
+        }),
+        ('Cronograma', {
+            'fields': (
+                'data_inicio_inscricoes',
+                'data_fim_inscricoes',
+                'data_inicio',
+                'data_fim'
+            )
+        }),
+    )
+```
+
+### Inlines
+```python
+class EventoCriterioInline(admin.TabularInline):
+    model = EventoCriterio
+    extra = 1
+    fields = ['criterio', 'prioridade', 'ativo']
+    ordering = ['prioridade']
+
+@admin.register(Evento)
+class EventoAdmin(admin.ModelAdmin):
+    inlines = [EventoCriterioInline]
+```
+
+### Actions Customizadas
+```python
+@admin.register(Evento)
+class EventoAdmin(admin.ModelAdmin):
+    actions = ['classificar_inscricoes', 'exportar_classificacao']
+    
+    @admin.action(description='Classificar inscrições dos eventos selecionados')
+    def classificar_inscricoes(self, request, queryset):
+        """Classifica inscrições de eventos selecionados."""
+        total = 0
+        for evento in queryset:
+            resultado = ClassificadorService.classificar_evento(evento)
+            total += resultado['classificados']
+        
+        self.message_user(
+            request,
+            f'{total} inscrições classificadas com sucesso.',
+            level=messages.SUCCESS
+        )
+```
+
+### Exportação para Excel/CSV
+```python
+import csv
+from django.http import HttpResponse
+
+@admin.action(description='📊 Exportar classificação detalhada (Excel)')
+def exportar_classificacao_excel(self, request, queryset):
+    """Exporta classificação com detalhes."""
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
+    response['Content-Disposition'] = 'attachment; filename="classificacao.csv"'
+    response.write('\ufeff')  # BOM para Excel
+    
+    writer = csv.writer(response, delimiter=';')
+    writer.writerow(['Evento', 'Posição', 'Nome', 'CPF', 'Pontos'])
+    
+    for evento in queryset:
+        classificacoes = Classificacao.objects.filter(
+            inscricao__evento=evento
+        ).select_related(
+            'inscricao__interessado'
+        ).order_by('posicao')
+        
+        for c in classificacoes:
+            writer.writerow([
+                evento.nome,
+                c.posicao,
+                c.inscricao.interessado.nome,
+                c.inscricao.interessado.cpf,
+                c.pontuacao_total
+            ])
+    
+    return response
+```
+
+---
+
+## Tratamento de Erros
+
+### Try-Except em Services
+```python
+class ClassificadorService:
+    @staticmethod
+    def classificar_evento(evento):
+        try:
+            # Lógica de classificação
+            resultado = processar_classificacao(evento)
+            return resultado
+            
+        except Evento.DoesNotExist:
+            raise ValueError(f'Evento {evento.id} não encontrado')
+            
+        except Exception as e:
+            # Log do erro
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f'Erro ao classificar evento {evento.id}: {str(e)}')
+            raise
+```
+
+### Mensagens ao Usuário
+```python
+from django.contrib import messages
+
+def minha_view(request):
+    try:
+        # Operação
+        messages.success(request, 'Operação realizada com sucesso!')
+    except Exception as e:
+        messages.error(request, f'Erro: {str(e)}')
+    
+    return redirect('lista')
+```
+
+---
+
+## Testes
+
+### Estrutura de Testes
+```python
+# apps/selecao/tests/test_classificacao.py
+
+from django.test import TestCase
+from apps.eventos.models import Evento, Criterio
+from apps.selecao.services import ClassificadorService
+
+class ClassificacaoTestCase(TestCase):
+    """Testes do sistema de classificação."""
+    
+    def setUp(self):
+        """Configuração inicial dos testes."""
+        self.evento = Evento.objects.create(
+            nome='Curso Teste',
+            vagas_totais=10
+        )
+        self.criterio_pcd = Criterio.objects.create(
+            codigo='PCD',
+            nome='Pessoa com Deficiência',
+            tipo_criterio='PONTUACAO',
+            pontos=10
+        )
+    
+    def test_classificacao_por_pcd(self):
+        """Testa se PCD recebe pontuação correta."""
+        # Criar inscrição de pessoa com deficiência
+        inscricao = criar_inscricao_pcd(self.evento)
+        
+        # Classificar
+        ClassificadorService.classificar_evento(self.evento)
+        
+        # Verificar
+        classificacao = Classificacao.objects.get(inscricao=inscricao)
+        self.assertEqual(classificacao.pontuacao_total, 10)
+    
+    def test_ordenacao_por_pontos(self):
+        """Testa se ordenação está correta."""
+        # Criar 2 inscrições
+        inscricao1 = criar_inscricao_pcd(self.evento)  # 10 pontos
+        inscricao2 = criar_inscricao_normal(self.evento)  # 0 pontos
+        
+        # Classificar
+        ClassificadorService.classificar_evento(self.evento)
+        
+        # Verificar posições
+        c1 = Classificacao.objects.get(inscricao=inscricao1)
+        c2 = Classificacao.objects.get(inscricao=inscricao2)
+        
+        self.assertEqual(c1.posicao, 1)
+        self.assertEqual(c2.posicao, 2)
+```
+
+### Rodar Testes
+```bash
+# Todos os testes
+pytest
+
+# App específico
+pytest apps/selecao/
+
+# Arquivo específico
+pytest apps/selecao/tests/test_classificacao.py
+
+# Teste específico
+pytest apps/selecao/tests/test_classificacao.py::ClassificacaoTestCase::test_classificacao_por_pcd
+
+# Com cobertura
+pytest --cov=apps --cov-report=html
+```
+
+---
+
+## Migrations
+
+### Criar Migration
+```bash
+# Detectar mudanças nos models
+python manage.py makemigrations
+
+# Migration específica de um app
+python manage.py makemigrations eventos
+
+# Com nome descritivo
+python manage.py makemigrations eventos --name adicionar_prioridade
+```
+
+### Aplicar Migrations
+```bash
+# Todas pendentes
+python manage.py migrate
+
+# App específico
+python manage.py migrate eventos
+
+# Voltar para migration específica
+python manage.py migrate eventos 0003
+```
+
+### Ver SQL de uma Migration
+```bash
+python manage.py sqlmigrate eventos 0004
+```
+
+---
+
+## Fixtures
+
+### Criar Fixture
+```bash
+# Exportar dados de um model
+python manage.py dumpdata eventos.Criterio --indent 2 > apps/eventos/fixtures/criterios.json
+
+# Exportar app inteiro
+python manage.py dumpdata eventos --indent 2 > apps/eventos/fixtures/eventos_completo.json
+```
+
+### Carregar Fixture
+```bash
+# Arquivo específico
+python manage.py loaddata apps/eventos/fixtures/criterios.json
+
+# Todos os fixtures de um app (busca em app/fixtures/)
+python manage.py loaddata criterios
+```
+
+### Exemplo de Fixture
+```json
+[
+  {
+    "model": "eventos.criterio",
+    "pk": 1,
+    "fields": {
+      "codigo": "PCD",
+      "nome": "Pessoa com Deficiência",
+      "tipo_criterio": "PONTUACAO",
+      "categoria": "DEFICIENCIA",
+      "pontos": "10.00",
+      "ativo": true
+    }
+  }
+]
+```
+
+---
+
+## Checklist de Qualidade
+
+### Antes de Commitar
+- [ ] Código formatado com black
+- [ ] Imports organizados com isort
+- [ ] Sem erros do flake8
+- [ ] Testes passando
+- [ ] Docstrings atualizadas
+- [ ] Comentários em português
+- [ ] Migrations criadas (se necessário)
+
+### Antes de Deploy
+- [ ] Testes de integração passando
+- [ ] Variáveis de ambiente configuradas
+- [ ] Migrations aplicadas
+- [ ] Fixtures carregadas
+- [ ] Arquivos estáticos coletados
+- [ ] Backup do banco de dados
+- [ ] Monitoramento configurado
+
+---
+
+## Comandos de Desenvolvimento
+
+### Formatação e Linting
+```bash
+# Formatar código
+black .
+
+# Organizar imports
+isort .
+
+# Verificar código
+flake8
+
+# Tudo de uma vez
+black . && isort . && flake8
+```
+
+### Shell Django
+```python
+# Abrir shell
+python manage.py shell
+
+# Comandos úteis no shell
+from apps.eventos.models import Evento
+from apps.selecao.services import ClassificadorService
+
+# Buscar evento
+evento = Evento.objects.get(nome='Curso de Informática')
+
+# Classificar
+resultado = ClassificadorService.classificar_evento(evento)
+print(resultado)
+```
+
+---
+
+## Boas Práticas
+
+### DRY (Don't Repeat Yourself)
+- Evitar código duplicado
+- Usar service layer para lógica reutilizável
+- Criar mixins para funcionalidades comuns
+
+### KISS (Keep It Simple, Stupid)
+- Soluções simples primeiro
+- Não otimizar prematuramente
+- Código legível > código "inteligente"
+
+### YAGNI (You Aren't Gonna Need It)
+- Implementar apenas o necessário agora
+- Não adicionar funcionalidades "por precaução"
+- Evoluir conforme demanda real
+
+### Single Responsibility
+- Cada classe/função com uma responsabilidade
+- Models cuidam de dados
+- Services cuidam de lógica
+- Views cuidam de requisição/resposta
+
+---
+
+## Roadmap de Desenvolvimento
+
+### Fase 1: Fundação (✅ Concluído)
+- Estrutura de apps
+- Models principais
+- Autenticação
+- Admin básico
+- Sistema de classificação
+
+### Fase 2: Otimização (🔄 Em Progresso)
+- Performance (índices, paginação)
+- Exportações detalhadas
+- Testes automatizados
+- Documentação
+
+### Fase 3: Produção (📋 Planejado)
+- Deploy em servidor
+- HTTPS
+- Backup automático
+- Monitoramento
+- Cache
+
+### Fase 4: Evolução (🔮 Futuro)
+- Notificações por email
+- Dashboard com gráficos
+- API REST
+- Aplicativo mobile

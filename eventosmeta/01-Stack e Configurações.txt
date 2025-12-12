@@ -1,0 +1,412 @@
+# Tecnologia - Stack e Configurações
+**Projeto:** Sistema MetaReciclagem
+**Última atualização:** 12/12/2025
+
+---
+
+## Stack Tecnológica
+
+### Backend
+- **Framework:** Django 5.1.4
+- **Linguagem:** Python 3.13
+- **Banco de Dados:** PostgreSQL 16 (migrado de SQLite)
+- **ORM:** Django ORM
+
+### Frontend
+- **Templates:** Django Templates
+- **CSS Framework:** Bootstrap
+- **JavaScript:** Vanilla JS
+
+### Ambiente de Desenvolvimento
+- **SO:** Windows
+- **Editor:** VS Code (versão em português)
+- **Ambiente Virtual:** venv
+
+---
+
+## Configuração de Banco de Dados
+
+### PostgreSQL - Produção
+```bash
+DATABASE_ENGINE=django.db.backends.postgresql
+DATABASE_NAME=metareciclagem
+DATABASE_USER=metareciclagem_user
+DATABASE_PASSWORD=********
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+```
+
+### Variáveis de Ambiente (.env)
+```bash
+# Ambiente
+DEBUG=True
+SECRET_KEY=sua-chave-secreta-aqui
+DATABASE_URL=postgresql://user:password@localhost/metareciclagem
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Email (SMTP Prefeitura)
+EMAIL_HOST=smtp.prefeitura.gov.br
+EMAIL_PORT=587
+EMAIL_HOST_USER=sistema@prefeitura.gov.br
+EMAIL_HOST_PASSWORD=senha-segura
+EMAIL_USE_TLS=True
+DEFAULT_FROM_EMAIL=MetaReciclagem <noreply@prefeitura.gov.br>
+```
+
+---
+
+## Dependências (requirements.txt)
+
+### Core
+- Django==5.1.4
+- psycopg2-binary==2.9.9
+- python-dotenv==1.0.0
+
+### Relatórios e Exportação
+- openpyxl==3.1.2
+- reportlab==4.0.7
+
+### Validação
+- django-cpf-cnpj==1.0.0
+- validate_docbr==1.11.1
+
+### Desenvolvimento
+- django-debug-toolbar==4.2.0
+- django-silk==5.0.4
+- gprof2dot==2025.4.14
+
+### Qualidade de Código
+- black==23.11.0
+- flake8==6.1.0
+- isort==5.12.0
+- autopep8==2.2.0
+
+### Testes
+- pytest==7.4.3
+- pytest-django==4.7.0
+- pytest-cov==4.1.0
+- coverage==7.11.0
+
+### Produção
+- gunicorn==21.2.0
+- whitenoise==6.6.0
+- sentry-sdk==1.38.0
+
+### Utilidades
+- Pillow==12.0.0
+
+---
+
+## Arquitetura de Apps Django
+
+### Estrutura de Diretórios
+```
+Eventos-MetaReciclagem/
+├── eventosmeta/              # Projeto Django
+│   ├── accounts/             # App de staff/administração
+│   │   ├── models.py         # Usuario customizado
+│   │   ├── admin.py
+│   │   └── fixtures/
+│   ├── eventos/              # App principal (cursos/eventos)
+│   │   ├── models.py         # Evento, Criterio, Turma
+│   │   ├── admin.py
+│   │   └── fixtures/
+│   ├── interessados/         # App de público
+│   │   ├── models.py         # Interessado
+│   │   ├── admin.py
+│   │   └── fixtures/
+│   ├── selecao/              # App de inscrições
+│   │   ├── models.py         # Inscricao, Classificacao
+│   │   ├── services.py       # ClassificadorService
+│   │   └── management/
+│   ├── academico/            # App de matrículas
+│   │   ├── models.py         # Matricula, Avaliacao
+│   │   └── admin.py
+│   ├── metareciclagem/       # Settings do projeto
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── static/
+│   ├── templates/
+│   │   └── index.html        # Página inicial
+│   ├── manage.py
+│   └── .env                  # Não commitado
+└── venv/                     # Ambiente virtual
+```
+
+---
+
+## Modelos de Dados Principais
+
+### App: eventos
+- **Status** - Status dos eventos
+- **Criterio** - Critérios de classificação (tipo_criterio, codigo, pontos)
+- **Evento** - Cursos/eventos oferecidos
+- **EventoCriterio** - Critérios aplicados ao evento (com prioridade)
+- **Turma** - Turmas formadas
+- **Horario** - Horários das turmas
+
+### App: interessados
+- **Interessado** - Cadastro de pessoas (CPF, dados pessoais, PCD, NIS)
+- **Sexo** - Gênero
+- **Fototipo** - Tipo de pele (cotas raciais)
+
+### App: selecao
+- **Inscricao** - Inscrição em eventos
+- **StatusInscricao** - Status da inscrição
+- **Classificacao** - Resultado da classificação
+- **InscricaoCriterioAtendido** - Critérios que a inscrição atende
+
+### App: academico
+- **Matricula** - Matrícula em turma
+- **StatusMatricula** - Status da matrícula
+- **Avaliacao** - Avaliação final do aluno
+
+---
+
+## Autenticação
+
+### Sistema Duplo de Autenticação
+
+#### Staff (Administradores)
+- Login via Django Admin
+- Model: `accounts.Usuario`
+- Autenticação padrão Django (username/password)
+- Níveis de acesso configuráveis
+
+#### Interessados (Público)
+- Login customizado via CPF
+- Model: `interessados.Interessado`
+- Backend customizado: `InteressadoBackend`
+- Autenticação por CPF + senha
+
+---
+
+## Segurança
+
+### Implementado
+- Validação de CPF com regex
+- Hash de senhas (Django padrão)
+- Separação de autenticação (staff vs interessados)
+- CSRF protection (Django built-in)
+- Variáveis sensíveis em .env
+- .env não commitado (.gitignore)
+
+### Planejado
+- HTTPS obrigatório em produção
+- Rate limiting (limitar tentativas de login)
+- Headers de segurança (X-Frame-Options, CSP)
+- Auditoria de dependências
+- Validação de uploads
+
+---
+
+## Otimizações de Performance
+
+### Banco de Dados
+```python
+# Índices adicionados
+class Interessado(models.Model):
+    cpf = models.CharField(db_index=True)
+    email = models.EmailField(db_index=True)
+    nome = models.CharField(db_index=True)
+
+class Inscricao(models.Model):
+    evento = models.ForeignKey(db_index=True)
+    interessado = models.ForeignKey(db_index=True)
+    data_inscricao = models.DateTimeField(db_index=True)
+```
+
+### Queries Otimizadas
+```python
+# Select related para relacionamentos
+inscricoes = Inscricao.objects.select_related(
+    'evento', 
+    'interessado'
+).all()
+
+# Prefetch para múltiplos relacionamentos
+classificacoes = Classificacao.objects.select_related(
+    'inscricao',
+    'inscricao__interessado',
+    'inscricao__evento'
+).prefetch_related(
+    'inscricao__inscricaocriterioatendido_set'
+).all()
+```
+
+### Paginação
+```python
+from django.core.paginator import Paginator
+
+def lista_inscricoes(request, evento_id):
+    inscricoes = Inscricao.objects.filter(evento_id=evento_id)
+    paginator = Paginator(inscricoes, 50)  # 50 por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'inscricoes.html', {'page_obj': page_obj})
+```
+
+---
+
+## Git Workflow
+
+### Estrutura de Branches
+- **main** - Código em produção
+- **feature/nome-da-feature** - Novas funcionalidades
+- **fix/nome-do-bug** - Correções
+
+### Padrão de Commits
+- `feat:` nova funcionalidade
+- `fix:` correção de bug
+- `docs:` documentação
+- `refactor:` refatoração
+- `test:` testes
+
+### .gitignore
+```
+# Python
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Ambiente
+.env
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+```
+
+---
+
+## Comandos Úteis
+
+### Setup Inicial
+```bash
+# Criar ambiente virtual
+python -m venv venv
+
+# Ativar ambiente (Windows)
+venv\Scripts\activate
+
+# Instalar dependências
+pip install -r requirements.txt
+
+# Configurar banco
+python manage.py migrate
+
+# Criar superusuário
+python manage.py createsuperuser
+
+# Carregar fixtures
+python manage.py loaddata accounts/fixtures/*.json
+python manage.py loaddata eventos/fixtures/*.json
+python manage.py loaddata interessados/fixtures/*.json
+```
+
+### Desenvolvimento
+```bash
+# Rodar servidor
+python manage.py runserver
+
+# Criar migrations
+python manage.py makemigrations
+
+# Aplicar migrations
+python manage.py migrate
+
+# Shell Django
+python manage.py shell
+
+# Coletar arquivos estáticos
+python manage.py collectstatic
+```
+
+### Classificação
+```bash
+# Classificar evento via comando
+python manage.py classificar_evento --evento_id=1
+```
+
+### Testes
+```bash
+# Rodar todos os testes
+pytest
+
+# Com cobertura
+pytest --cov
+
+# Teste específico
+pytest apps/selecao/tests/test_classificacao.py
+```
+
+---
+
+## Exportação de Dados
+
+### Formatos Suportados
+- CSV (UTF-8 com BOM)
+- Excel (XLSX via openpyxl)
+- PDF (via reportlab - planejado)
+
+### Encoding
+- **Charset:** UTF-8
+- **Separador CSV:** Ponto e vírgula (;)
+- **BOM:** Incluído para compatibilidade Excel
+
+---
+
+## Ferramentas de Desenvolvimento
+
+### Debug
+- django-debug-toolbar - Barra de debug visual
+- django-silk - Profiling de performance
+
+### Qualidade de Código
+- black - Formatação automática
+- flake8 - Análise de código
+- isort - Organização de imports
+- autopep8 - Correção de estilo PEP8
+
+### Monitoramento
+- sentry-sdk - Monitoramento de erros em produção
+
+---
+
+## Próximas Implementações Técnicas
+
+### Curto Prazo
+- Cache (Redis) para dashboard
+- Fila de tarefas (Celery) para classificação
+- Testes unitários completos
+- CI/CD pipeline
+
+### Médio Prazo
+- API REST (Django REST Framework)
+- WebSockets para notificações em tempo real
+- Docker containers
+- Kubernetes para orquestração
+
+### Longo Prazo
+- Microserviços (separar classificação)
+- Machine Learning para predição de vagas
+- Analytics avançado
