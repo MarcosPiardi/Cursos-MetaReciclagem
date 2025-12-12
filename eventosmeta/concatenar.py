@@ -76,5 +76,34 @@ if __name__ == "__main__":
         # tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
                     #    'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
                           
-        arquivo_saida='Artefatos-Primarios-MetaReciclagem-26-11.txt'
+        arquivo_saida='Artefatos-Primarios-MetaReciclagem-12-12-2025.txt'
     )
+
+    concatenar_arquivos(
+        pasta_projeto=PASTA_PROJETO,
+        # tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
+        #                'forms.py', 'models.py', 'services.py', 
+        #                'urls.py', 'views.py', 'settings.py', 
+        #                '*.html', '*.css', '*.js'],
+
+        # tipos_arquivo=['models.py', 'views.py', 'settings.py'],
+
+        tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
+                       'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
+                          
+        arquivo_saida='Artefatos-Secundarios-MetaReciclagem-12-12-2025.txt'
+        )       
+
+
+
+    """
+    Arquivos gerados:
+    
+        Arquivo Artefatos-Primarios-projeto-data.txt tem 'models.py', 'views.py', 'settings.py'
+
+        Arquivo Artefatos-Secundarios-projeto-data.txt tem 'admin.py', 'apps.py', 'authentication.py',
+                                                           'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'
+        
+    """
+
+
