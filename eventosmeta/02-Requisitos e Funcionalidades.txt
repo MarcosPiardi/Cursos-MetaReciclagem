@@ -20,7 +20,7 @@ Gerenciar todo o ciclo de vida de eventos e cursos oferecidos pela MetaReciclage
 
 **Características:**
 - Representa os operadores do sistema (staff)
-- Níveis de acesso diferentes (admin, staff)
+- Níveis de acesso diferentes (admin, staff, professores)
 - Dados básicos de contato e identificação
 - Apenas admin pode criar novos usuários
 - Campos: nome, CPF, email, telefone, setor
