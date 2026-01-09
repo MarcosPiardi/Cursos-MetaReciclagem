@@ -1,0 +1,208 @@
+{% extends "admin/base.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    /* ==========================================
+       TOGGLE DO MENU LATERAL ESQUERDO (NATIVO)
+       ========================================== */
+    #nav-sidebar-toggle {
+        background: #3fdbdbff !important;
+        color: #ffffff !important;
+    }
+    
+    #nav-sidebar-toggle:hover {
+        background: #2bb8b8 !important;
+    }
+    
+    /* ==========================================
+       TOGGLE DE FILTROS (LADO DIREITO)
+       ========================================== */
+    #changelist-filter-toggle {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 100%;
+        background: #3fdbdbff;
+        border-left: 1px solid #3fdbdbff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        transition: background 0.2s;
+    }
+    
+    #changelist-filter-toggle:hover {
+        background: #2bb8b8;
+    }
+    
+    #changelist-filter-toggle-icon {
+        font-size: 16px;
+        color: #ffffff;
+        transform: rotate(0deg);
+        transition: transform 0.3s;
+    }
+    
+    /* Quando filtros estão escondidos */
+    body.filters-hidden #changelist-filter {
+        display: none !important;
+    }
+    
+    body.filters-hidden .results {
+        width: 100% !important;
+        margin-right: 0 !important;
+    }
+    
+    body.filters-hidden #changelist-filter-toggle {
+        right: 0;
+        border-left: none;
+        border-right: 1px solid #3fdbdbff;
+        position: fixed;
+        height: 100px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 4px 0 0 4px;
+        box-shadow: -2px 0 4px rgba(0,0,0,0.1);
+    }
+    
+    body.filters-hidden #changelist-filter-toggle-icon {
+        transform: rotate(180deg);
+    }
+    
+    /* Ajusta o container dos filtros */
+    #changelist-filter {
+        position: relative;
+        transition: all 0.3s ease-in-out;
+    }
+    
+    .results {
+        transition: all 0.3s ease-in-out;
+    }
+    
+    /* Estilo do toggle quando filtros visíveis */
+    #changelist-filter-wrapper {
+        position: relative;
+    }
+    
+    /* ==========================================
+       AUMENTAR CONTRASTE DAS TABELAS (MUITO MAIS)
+       ========================================== */
+    
+    /* Cabeçalho da tabela */
+    #result_list thead th {
+        background: #205067 !important;
+        color: #ffffff !important;
+        font-weight: bold !important;
+        border-bottom: 3px solid #154052 !important;
+        padding: 12px 10px !important;
+    }
+    
+    #result_list thead th a {
+        color: #ffffff !important;
+    }
+    
+    #result_list thead th a:hover {
+        color: #3fdbdbff !important;
+    }
+    
+    /* Linhas alternadas (CONTRASTE MUITO MAIOR) */
+    #result_list tbody tr:nth-child(odd) {
+        background: #f0f0f0 !important;  /* Cinza mais escuro */
+    }
+    
+    #result_list tbody tr:nth-child(even) {
+        background: #ffffff !important;  /* Branco puro */
+    }
+    
+    /* Hover nas linhas */
+    #result_list tbody tr:hover {
+        background: #d4edff !important;  /* Azul mais forte */
+    }
+    
+    /* Bordas das células */
+    #result_list td,
+    #result_list th {
+        border-bottom: 1px solid #cccccc !important;  /* Borda mais escura */
+        padding: 10px !important;
+    }
+    
+    /* ==========================================
+       CORRIGIR BARRA DE ROLAGEM E QUEBRA DE LINHA
+       ========================================== */
+    
+    /* Garantir que a barra de rolagem apareça quando necessário */
+    .results {
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+    }
+    
+    /* Evitar quebra de linha nas células */
+    #result_list td {
+        white-space: nowrap !important;
+    }
+    
+    /* Mostrar barra de rolagem sempre visível */
+    .results::-webkit-scrollbar {
+        height: 12px;
+    }
+    
+    .results::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    .results::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 6px;
+    }
+    
+    .results::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // ==========================================
+    // TOGGLE DA COLUNA DE FILTROS (DIREITA)
+    // ==========================================
+    var filterColumn = document.getElementById('changelist-filter');
+    
+    if (filterColumn) {
+        // Cria wrapper para o toggle
+        var wrapper = document.createElement('div');
+        wrapper.id = 'changelist-filter-wrapper';
+        filterColumn.parentNode.insertBefore(wrapper, filterColumn);
+        wrapper.appendChild(filterColumn);
+        
+        // Cria o botão toggle
+        var toggleBtn = document.createElement('div');
+        toggleBtn.id = 'changelist-filter-toggle';
+        toggleBtn.title = 'Mostrar/Ocultar Filtros';
+        
+        var toggleIcon = document.createElement('span');
+        toggleIcon.id = 'changelist-filter-toggle-icon';
+        toggleIcon.innerHTML = '»';
+        
+        toggleBtn.appendChild(toggleIcon);
+        wrapper.appendChild(toggleBtn);
+        
+        // Verifica estado salvo dos filtros
+        var filtersHidden = localStorage.getItem('adminFiltersHidden') === 'true';
+        if (filtersHidden) {
+            document.body.classList.add('filters-hidden');
+        }
+        
+        // Toggle dos filtros ao clicar
+        toggleBtn.addEventListener('click', function() {
+            document.body.classList.toggle('filters-hidden');
+            var isHidden = document.body.classList.contains('filters-hidden');
+            
+            // Salva estado
+            localStorage.setItem('adminFiltersHidden', isHidden);
+        });
+    }
+});
+</script>
+{% endblock %}

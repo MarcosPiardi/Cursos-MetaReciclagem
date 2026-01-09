@@ -1,6 +1,20 @@
 """
 Arquivo: apps/interessados/admin.py
 Caminho: apps/interessados/admin.py
+Alteração: Corrigido format_html dos ícones e adicionado white-space nowrap nos telefones
+Data: 11/12/2025
+"""
+
+"""
+Arquivo: apps/interessados/admin.py
+Caminho: apps/interessados/admin.py
+Alteração: Ajustado list_display com ordem, formatação de telefones e centralização
+Data: 11/12/2025
+"""
+
+"""
+Arquivo: apps/interessados/admin.py
+Caminho: apps/interessados/admin.py
 Alteração: Adicionado exportador de interessados com análise de critérios
 Data: 10/12/2025
 """
@@ -48,22 +62,23 @@ class FototipoAdmin(admin.ModelAdmin):
 class InteressadoAdmin(admin.ModelAdmin):
     """Administração de Interessados"""
     
-    # Listagem
+    # Listagem - Atualizado em 11/12/2025
     list_display = [
         'cpf',
         'nome',
-        'data_nascimento',
-        'cidade_residencia',
-        'uf_residencia',
-        'celular',
-        'necessidades_especiais',
-        'is_active_display',  # Adicionado em 05/12/2025
-        'criado_em'
+        'data_nascimento_formatada',
+        'sexo_display',
+        'fototipo_display',
+        'programa_social_display',
+        'necessidades_especiais_display',
+        'celular_formatado',
+        'telefone_formatado',
+        'email'
     ]
     
     # Filtros
     list_filter = [
-        'is_active',  # Adicionado em 05/12/2025
+        'is_active',
         'sexo',
         'uf_residencia',
         'necessidades_especiais',
@@ -190,6 +205,114 @@ class InteressadoAdmin(admin.ModelAdmin):
     
     # Actions
     actions = ['ativar_interessados', 'desativar_interessados', 'exportar_interessados_detalhado']
+    
+    # ==========================================
+    # MÉTODOS PERSONALIZADOS PARA LIST_DISPLAY
+    # Adicionados em 11/12/2025
+    # ==========================================
+    
+    def data_nascimento_formatada(self, obj):
+        """Exibe data de nascimento no formato dd/mm/yyyy centralizado"""
+        if obj.data_nascimento:
+            return format_html(
+                '<div style="text-align: center;">{}</div>',
+                obj.data_nascimento.strftime('%d/%m/%Y')
+            )
+        return format_html('<div style="text-align: center;">—</div>')
+    data_nascimento_formatada.short_description = 'Data Nascimento'
+    data_nascimento_formatada.admin_order_field = 'data_nascimento'
+    
+    def sexo_display(self, obj):
+        """Exibe o sexo"""
+        return obj.sexo.nome if obj.sexo else '—'
+    sexo_display.short_description = 'Sexo'
+    sexo_display.admin_order_field = 'sexo__nome'
+    
+    def fototipo_display(self, obj):
+        """Exibe o fototipo centralizado"""
+        fototipo = obj.fototipo.nome if obj.fototipo else '—'
+        return format_html(
+            '<div style="text-align: center;">{}</div>',
+            fototipo
+        )
+    fototipo_display.short_description = 'Fototipo'
+    fototipo_display.admin_order_field = 'fototipo__nome'
+    
+    def programa_social_display(self, obj):
+        """Exibe programa social com ícone colorido centralizado"""
+        if obj.programa_social:
+            return format_html(
+                '<div style="text-align: center;"><span style="color: #28a745; font-weight: bold;">✅</span></div>'
+            )
+        else:
+            return format_html(
+                '<div style="text-align: center;"><span style="color: #6c757d;">—</span></div>'
+            )
+    programa_social_display.short_description = 'Programa Social'
+    programa_social_display.admin_order_field = 'programa_social'
+    
+    def necessidades_especiais_display(self, obj):
+        """Exibe necessidades especiais com ícone colorido centralizado"""
+        if obj.necessidades_especiais or obj.tem_deficiencia:
+            return format_html(
+                '<div style="text-align: center;"><span style="color: #007bff; font-weight: bold;">♿</span></div>'
+            )
+        else:
+            return format_html(
+                '<div style="text-align: center;"><span style="color: #6c757d;">—</span></div>'
+            )
+    necessidades_especiais_display.short_description = 'Necessidades Especiais'
+    necessidades_especiais_display.admin_order_field = 'necessidades_especiais'
+    
+    def celular_formatado(self, obj):
+        """Formata celular como (99) 99999-0000 e centraliza sem quebra de linha"""
+        if obj.celular:
+            # Remove caracteres não numéricos
+            numeros = ''.join(filter(str.isdigit, obj.celular))
+            
+            if len(numeros) == 11:
+                # Formato: (99) 99999-0000
+                formatado = f'({numeros[:2]}) {numeros[2:7]}-{numeros[7:]}'
+            elif len(numeros) == 10:
+                # Formato: (99) 9999-0000
+                formatado = f'({numeros[:2]}) {numeros[2:6]}-{numeros[6:]}'
+            else:
+                formatado = obj.celular
+            
+            return format_html(
+                '<div style="text-align: center; white-space: nowrap;">{}</div>',
+                formatado
+            )
+        return format_html('<div style="text-align: center;">—</div>')
+    celular_formatado.short_description = 'Celular'
+    celular_formatado.admin_order_field = 'celular'
+    
+    def telefone_formatado(self, obj):
+        """Formata telefone como (99) 9999-0000 e centraliza sem quebra de linha"""
+        if obj.telefone:
+            # Remove caracteres não numéricos
+            numeros = ''.join(filter(str.isdigit, obj.telefone))
+            
+            if len(numeros) == 11:
+                # Formato: (99) 99999-0000
+                formatado = f'({numeros[:2]}) {numeros[2:7]}-{numeros[7:]}'
+            elif len(numeros) == 10:
+                # Formato: (99) 9999-0000
+                formatado = f'({numeros[:2]}) {numeros[2:6]}-{numeros[6:]}'
+            else:
+                formatado = obj.telefone
+            
+            return format_html(
+                '<div style="text-align: center; white-space: nowrap;">{}</div>',
+                formatado
+            )
+        return format_html('<div style="text-align: center;">—</div>')
+    telefone_formatado.short_description = 'Telefone'
+    telefone_formatado.admin_order_field = 'telefone'
+    
+    # ==========================================
+    # MÉTODOS EXISTENTES
+    # ==========================================
     
     def is_active_display(self, obj):
         """
@@ -440,4 +563,3 @@ class InteressadoAdmin(admin.ModelAdmin):
         return response
     
     exportar_interessados_detalhado.short_description = '📊 Exportar interessados com análise de critérios (Excel)'
-

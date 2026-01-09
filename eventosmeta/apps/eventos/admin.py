@@ -1,3 +1,16 @@
+"""
+Arquivo: admin.py
+Caminho: apps/eventos/admin.py
+Alteração: Adicionada visualização de cor no StatusAdmin
+Data: 11/12/2025
+"""
+
+"""
+Arquivo: admin.py
+Caminho: apps/eventos/admin.py
+Alteração: Melhorada action de classificação com feedback detalhado usando retorno do service
+Data: 11/12/2025
+"""
 
 """
 Arquivo: admin.py
@@ -30,6 +43,7 @@ Data: 09/12/2025
 from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpResponse
+from django.utils.html import format_html
 from datetime import date
 from decimal import Decimal
 import csv
@@ -39,9 +53,19 @@ from .models import Status, Criterio, Evento, EventoCriterio, Turma, Horario
 
 @admin.register(Status)
 class StatusAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'cor', 'ordem']
+    list_display = ['nome', 'cor_visual', 'ordem']
     list_editable = ['ordem']
     ordering = ['ordem']
+    
+    def cor_visual(self, obj):
+        """Mostra a cor visualmente com quadrado colorido"""
+        return format_html(
+            '<div style="display: inline-block; width: 20px; height: 20px; background-color: {}; border: 1px solid #ccc; border-radius: 3px; margin-right: 5px; vertical-align: middle;"></div> {}',
+            obj.cor,
+            obj.cor
+        )
+    cor_visual.short_description = 'Cor'
+    cor_visual.admin_order_field = 'cor'
 
 
 @admin.register(Criterio)
@@ -132,17 +156,17 @@ class EventoAdmin(admin.ModelAdmin):
     def classificar_inscricoes(self, request, queryset):
         """
         Action para classificar inscrições dos eventos selecionados
-        Delega toda a lógica para o ClassificadorService
+        Delega toda a lógica para o ClassificadorService e exibe feedback detalhado
         """
         from apps.selecao.services import ClassificadorService
-        from apps.selecao.models import Inscricao
+        from apps.eventos.models import EventoCriterio
         
-        total_eventos = 0
-        total_inscricoes = 0
+        total_eventos_processados = 0
+        total_eventos_com_erro = 0
+        total_geral_classificadas = 0
+        total_geral_lista_espera = 0
         
         for evento in queryset:
-            from apps.eventos.models import EventoCriterio
-            
             # Verificar se tem critérios ativos
             criterios_ativos = EventoCriterio.objects.filter(
                 evento=evento,
@@ -154,38 +178,79 @@ class EventoAdmin(admin.ModelAdmin):
                     request,
                     f'⚠️ Evento "{evento.nome}" não possui critérios ativos!'
                 )
-                continue
-            
-            # Contar inscrições para feedback
-            inscricoes_count = Inscricao.objects.filter(evento=evento).count()
-            
-            if inscricoes_count == 0:
-                messages.warning(
-                    request,
-                    f'⚠️ Evento "{evento.nome}" não possui inscrições!'
-                )
+                total_eventos_com_erro += 1
                 continue
             
             # Classificar usando o service
             try:
-                ClassificadorService.classificar_evento(evento)
-                total_eventos += 1
-                total_inscricoes += inscricoes_count
+                resultado = ClassificadorService.classificar_evento(evento)
                 
+                # Verifica se houve inscrições processadas
+                if resultado['total_processadas'] == 0:
+                    messages.warning(
+                        request,
+                        f'⚠️ Evento "{evento.nome}": Nenhuma inscrição elegível para classificar. '
+                        f'Verifique se existem inscrições com status: Pendente, Classificado ou Lista de Espera.'
+                    )
+                    continue
+                
+                # Acumula totais gerais
+                total_eventos_processados += 1
+                total_geral_classificadas += resultado['total_classificadas']
+                total_geral_lista_espera += resultado['total_lista_espera']
+                
+                # Mensagem de sucesso detalhada
                 messages.success(
                     request,
-                    f'✅ Evento "{evento.nome}": {inscricoes_count} inscrição(ões) classificada(s)!'
+                    f'✅ {evento.nome}: '
+                    f'{resultado["total_processadas"]} processada(s) | '
+                    f'🎯 {resultado["total_classificadas"]} classificada(s) | '
+                    f'⏳ {resultado["total_lista_espera"]} em lista de espera | '
+                    f'📊 Status do evento: Resultado Divulgado'
                 )
-            except Exception as e:
+                
+            except ValueError as e:
+                # Erro de validação (ex: status não encontrado)
                 messages.error(
                     request,
-                    f'❌ Erro ao classificar "{evento.nome}": {str(e)}'
+                    f'❌ {evento.nome}: {str(e)}'
                 )
+                total_eventos_com_erro += 1
+                
+            except Exception as e:
+                # Erro inesperado
+                messages.error(
+                    request,
+                    f'❌ {evento.nome}: Erro inesperado - {str(e)}'
+                )
+                total_eventos_com_erro += 1
         
-        if total_eventos > 0:
+        # Mensagem final resumida
+        total_eventos = queryset.count()
+        
+        if total_eventos_processados == total_eventos:
+            # Todos processados com sucesso
             messages.success(
                 request,
-                f'🎯 TOTAL: {total_eventos} evento(s) processado(s), {total_inscricoes} inscrição(ões) classificada(s)!'
+                f'🎉 SUCESSO TOTAL: {total_eventos_processados} evento(s) classificado(s) | '
+                f'🎯 {total_geral_classificadas} classificada(s) | '
+                f'⏳ {total_geral_lista_espera} em lista de espera'
+            )
+        elif total_eventos_processados > 0:
+            # Alguns processados, alguns com erro
+            messages.warning(
+                request,
+                f'⚠️ PARCIAL: {total_eventos_processados} de {total_eventos} evento(s) processado(s) | '
+                f'{total_eventos_com_erro} erro(s) ou avisos | '
+                f'🎯 {total_geral_classificadas} classificada(s) | '
+                f'⏳ {total_geral_lista_espera} em lista de espera'
+            )
+        else:
+            # Nenhum processado
+            messages.error(
+                request,
+                f'❌ Nenhum evento classificado. {total_eventos_com_erro} erro(s) ou avisos. '
+                f'Verifique as mensagens acima.'
             )
     
     classificar_inscricoes.short_description = '🎯 Classificar inscrições dos eventos selecionados'
@@ -304,5 +369,3 @@ class HorarioAdmin(admin.ModelAdmin):
     def dia_semana_display(self, obj):
         return obj.get_dia_semana_display()
     dia_semana_display.short_description = 'Dia da Semana'
-
-

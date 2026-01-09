@@ -1,17 +1,36 @@
-
-
 """
 Admin do app ACADÊMICO
+Arquivo: apps/academico/admin.py
+Alteração: Corrigido display da cor no StatusMatricula para exibir visualmente
+Data: 11/12/2025
 """
+
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import StatusMatricula, Matricula, Avaliacao
 
 
 @admin.register(StatusMatricula)
 class StatusMatriculaAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'cor', 'ordem']
+    list_display = ['nome', 'cor_display', 'ordem']
     search_fields = ['nome']
     ordering = ['ordem', 'nome']
+    
+    def cor_display(self, obj):
+        """Exibe a cor visualmente com um quadrado colorido"""
+        if obj.cor:
+            return format_html(
+                '<div style="display: flex; align-items: center; gap: 8px;">'
+                '<span style="display: inline-block; width: 20px; height: 20px; '
+                'background-color: {}; border: 1px solid #ccc; border-radius: 3px;"></span>'
+                '<span>{}</span>'
+                '</div>',
+                obj.cor,
+                obj.cor
+            )
+        return '—'
+    cor_display.short_description = 'Cor'
+    cor_display.admin_order_field = 'cor'
 
 
 class AvaliacaoInline(admin.StackedInline):
@@ -97,6 +116,5 @@ class AvaliacaoAdmin(admin.ModelAdmin):
         return obj.matricula.turma.nome
     get_turma.short_description = 'Turma'
     get_turma.admin_order_field = 'matricula__turma__nome'
-
 
     
