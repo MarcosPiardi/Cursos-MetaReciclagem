@@ -1,6 +1,13 @@
 """
 Arquivo: services.py
 Caminho: apps/selecao/services.py
+Alteração: Implementada nova regra de status após classificação + status do evento "Resultado Divulgado"
+Data: 08/01/2026
+"""
+
+"""
+Arquivo: services.py
+Caminho: apps/selecao/services.py
 Alteração: Corrigido erro fototipo.upper() para fototipo.nome e ampliado status válidos
 Data: 10/12/2025
 """
@@ -26,7 +33,17 @@ logger = logging.getLogger(__name__)
 class ClassificadorService:
     """
     Service responsável por classificar inscrições com base em critérios
+    
+    REGRA DE NEGÓCIO (11/12/2025):
+    - Apenas inscrições com status: Pendente, Classificado, Lista de Espera participam
+    - Após classificação, status da inscrição é atualizado para:
+      * Classificado (se posição <= total_vagas)
+      * Lista de Espera (se posição > total_vagas)
+    - Status do evento é alterado para "Resultado Divulgado" (ID=5)
     """
+    
+    # Status válidos para participar da classificação
+    STATUS_VALIDOS_CLASSIFICACAO = ['Pendente', 'Classificado', 'Lista de Espera']
     
     @staticmethod
     def calcular_pontuacao_inscricao(inscricao):
@@ -190,26 +207,66 @@ class ClassificadorService:
         - Critérios são aplicados conforme prioridade definida no evento
         - Pode ser: ORDENACAO primeiro, PONTUACAO primeiro, ou misturado
         
+        NOVA REGRA (11/12/2025):
+        - Apenas inscrições com status: Pendente, Classificado, Lista de Espera participam
+        - Após classificação:
+          * Inscrições classificadas recebem status "Classificado"
+          * Inscrições em lista de espera recebem status "Lista de Espera"
+          * Evento recebe status "Resultado Divulgado"
+        
         Args:
             evento: Objeto Evento
+            
+        Returns:
+            dict: Resultado da classificação com estatísticas
         """
+        logger.info(f"Iniciando classificação do evento: {evento.nome} (ID: {evento.id})")
+        
+        # Busca status válidos para classificação
         status_validos = StatusInscricao.objects.filter(
-            nome__in=['Aprovada', 'Pendente', 'APROVADA', 'PENDENTE', 'Confirmada', 'CONFIRMADA']
+            nome__in=ClassificadorService.STATUS_VALIDOS_CLASSIFICACAO
         )
         
+        # Validação: status devem existir
+        if not status_validos.exists():
+            mensagem = f"ERRO: Nenhum status válido encontrado. Verifique se existem os status: {ClassificadorService.STATUS_VALIDOS_CLASSIFICACAO}"
+            logger.error(mensagem)
+            raise ValueError(mensagem)
+        
+        logger.info(f"Status válidos para classificação: {[s.nome for s in status_validos]}")
+        
+        # Filtra inscrições elegíveis
         inscricoes = Inscricao.objects.filter(
             evento=evento,
             status__in=status_validos
         ).select_related('interessado')
         
+        total_inscricoes = inscricoes.count()
+        logger.info(f"Total de inscrições elegíveis: {total_inscricoes}")
+        
+        if total_inscricoes == 0:
+            logger.warning("Nenhuma inscrição elegível para classificar")
+            return {
+                'sucesso': True,
+                'total_processadas': 0,
+                'total_classificadas': 0,
+                'total_lista_espera': 0,
+                'mensagem': 'Nenhuma inscrição elegível para classificar'
+            }
+        
+        # Processa cada inscrição (calcula pontuação)
         for inscricao in inscricoes:
             ClassificadorService.processar_inscricao(inscricao)
         
+        logger.info("Pontuações calculadas para todas as inscrições")
+        
+        # Busca critérios de ordenação do evento
         criterios_evento = EventoCriterio.objects.filter(
             evento=evento,
             ativo=True
         ).select_related('criterio').order_by('prioridade')
         
+        # Monta ordem de classificação baseada nos critérios
         order_fields = []
         
         for evento_criterio in criterios_evento:
@@ -231,31 +288,97 @@ class ClassificadorService:
                 elif codigo == 'IDADE_DECRESCENTE':
                     order_fields.append('inscricao__interessado__data_nascimento')
         
+        # Garante ordem padrão se não houver critérios
         if not order_fields:
             order_fields = ['-pontuacao_total', 'inscricao__data_inscricao']
         
+        # Adiciona data de inscrição como desempate final
         if 'inscricao__data_inscricao' not in order_fields and '-inscricao__data_inscricao' not in order_fields:
             order_fields.append('inscricao__data_inscricao')
         
+        logger.info(f"Ordem de classificação: {order_fields}")
+        
+        # Ordena classificações
         classificacoes = Classificacao.objects.filter(
-            inscricao__evento=evento
+            inscricao__evento=evento,
+            inscricao__status__in=status_validos
         ).select_related('inscricao__interessado').order_by(*order_fields)
         
+        # Busca status "Classificado" e "Lista de Espera" para atualização
+        try:
+            status_classificado = StatusInscricao.objects.get(nome='Classificado')
+        except StatusInscricao.DoesNotExist:
+            mensagem = "ERRO: Status 'Classificado' não encontrado no banco de dados"
+            logger.error(mensagem)
+            raise ValueError(mensagem)
+        
+        try:
+            status_lista_espera = StatusInscricao.objects.get(nome='Lista de Espera')
+        except StatusInscricao.DoesNotExist:
+            mensagem = "ERRO: Status 'Lista de Espera' não encontrado no banco de dados"
+            logger.error(mensagem)
+            raise ValueError(mensagem)
+        
+        # Atualiza posições e status das inscrições
         total_vagas = evento.total_vagas
         posicao = 1
+        total_classificadas = 0
+        total_lista_espera = 0
         
         for classificacao in classificacoes:
+            # Atualiza posição na tabela Classificacao
             classificacao.posicao = posicao
             classificacao.classificado = (posicao <= total_vagas)
             classificacao.lista_espera = (posicao > total_vagas)
             classificacao.atualizado_em = timezone.now()
             classificacao.save()
             
+            # NOVA REGRA: Atualiza status da inscrição
+            inscricao = classificacao.inscricao
+            
+            if posicao <= total_vagas:
+                inscricao.status = status_classificado
+                total_classificadas += 1
+                logger.debug(f"Posição {posicao}: {inscricao.interessado.nome} - CLASSIFICADO")
+            else:
+                inscricao.status = status_lista_espera
+                total_lista_espera += 1
+                logger.debug(f"Posição {posicao}: {inscricao.interessado.nome} - LISTA DE ESPERA")
+            
+            inscricao.save()
+            
             posicao += 1
         
+        # NOVA REGRA: Atualiza status do evento para "Resultado Divulgado"
+        try:
+            from apps.eventos.models import Status
+            
+            status_resultado_divulgado = Status.objects.get(id=5)
+            evento.status = status_resultado_divulgado
+            evento.save()
+            
+            logger.info(f"Status do evento alterado para: {status_resultado_divulgado.nome}")
+        except Status.DoesNotExist:
+            logger.error("ERRO: Status 'Resultado Divulgado' (ID=5) não encontrado")
+        except Exception as e:
+            logger.warning(f"Não foi possível atualizar status do evento: {e}")
+        
+        # Log final
         logger.info(
-            f"Evento {evento.nome} classificado com critérios: {order_fields}. "
-            f"Total: {classificacoes.count()} inscrições"
+            f"Classificação concluída! "
+            f"Evento: {evento.nome} | "
+            f"Critérios: {order_fields} | "
+            f"Total: {total_inscricoes} | "
+            f"Classificadas: {total_classificadas} | "
+            f"Lista de Espera: {total_lista_espera}"
         )
         
-        return classificacoes
+        # Retorna resultado
+        return {
+            'sucesso': True,
+            'total_processadas': total_inscricoes,
+            'total_classificadas': total_classificadas,
+            'total_lista_espera': total_lista_espera,
+            'criterios_ordenacao': order_fields,
+            'mensagem': f'Classificação concluída com sucesso! {total_classificadas} classificados, {total_lista_espera} em lista de espera.'
+        }
