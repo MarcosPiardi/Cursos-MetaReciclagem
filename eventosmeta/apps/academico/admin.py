@@ -1,31 +1,49 @@
 """
 Admin do app ACADÊMICO
 Arquivo: apps/academico/admin.py
-Alteração: Corrigido display da cor no StatusMatricula para exibir visualmente
+Alteração: Adicionado seletor de cor visual e removido código hex da listagem
 Data: 11/12/2025
 """
 
+from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import StatusMatricula, Matricula, Avaliacao
 
 
+class StatusMatriculaForm(forms.ModelForm):
+    """Form personalizado com seletor de cor"""
+    class Meta:
+        model = StatusMatricula
+        fields = '__all__'
+        widgets = {
+            'cor': forms.TextInput(attrs={
+                'type': 'color',
+                'style': 'width: 100px; height: 40px; cursor: pointer; border: 2px solid #ccc; border-radius: 4px;'
+            })
+        }
+
+
 @admin.register(StatusMatricula)
 class StatusMatriculaAdmin(admin.ModelAdmin):
+    form = StatusMatriculaForm
     list_display = ['nome', 'cor_display', 'ordem']
     search_fields = ['nome']
     ordering = ['ordem', 'nome']
     
+    fieldsets = (
+        (None, {
+            'fields': ('nome', 'cor', 'ordem'),
+            'description': 'Clique no quadrado de cor para selecionar visualmente'
+        }),
+    )
+    
     def cor_display(self, obj):
-        """Exibe a cor visualmente com um quadrado colorido"""
+        """Exibe apenas o quadrado colorido (sem texto)"""
         if obj.cor:
             return format_html(
-                '<div style="display: flex; align-items: center; gap: 8px;">'
-                '<span style="display: inline-block; width: 20px; height: 20px; '
-                'background-color: {}; border: 1px solid #ccc; border-radius: 3px;"></span>'
-                '<span>{}</span>'
-                '</div>',
-                obj.cor,
+                '<span style="display: inline-block; width: 30px; height: 30px; '
+                'background-color: {}; border: 2px solid #ccc; border-radius: 4px;"></span>',
                 obj.cor
             )
         return '—'
@@ -118,3 +136,4 @@ class AvaliacaoAdmin(admin.ModelAdmin):
     get_turma.admin_order_field = 'matricula__turma__nome'
 
     
+

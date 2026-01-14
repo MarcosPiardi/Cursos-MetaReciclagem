@@ -1,6 +1,13 @@
 """
 Arquivo: services.py
 Caminho: apps/selecao/services.py
+Alteração: Adicionadas validações antes da classificação usando ClassificacaoValidator
+Data: 11/12/2025
+"""
+
+"""
+Arquivo: services.py
+Caminho: apps/selecao/services.py
 Alteração: Implementada nova regra de status após classificação + status do evento "Resultado Divulgado"
 Data: 08/01/2026
 """
@@ -26,6 +33,11 @@ from .models import Inscricao, Classificacao, InscricaoCriterioAtendido, StatusI
 from apps.eventos.models import Evento, EventoCriterio
 from decimal import Decimal
 import logging
+
+# ============================================================================
+# 🆕 NOVO: Import do validador
+# ============================================================================
+from apps.selecao.validators import ClassificacaoValidator
 
 logger = logging.getLogger(__name__)
 
@@ -219,8 +231,34 @@ class ClassificadorService:
             
         Returns:
             dict: Resultado da classificação com estatísticas
+            
+        Raises:
+            ValueError: Se validações falharem
         """
         logger.info(f"Iniciando classificação do evento: {evento.nome} (ID: {evento.id})")
+        
+        # ============================================================================
+        # 🆕 NOVO: VALIDAÇÕES ANTES DE CLASSIFICAR
+        # ============================================================================
+        
+        # 1. Validar evento
+        validacao_evento = ClassificacaoValidator.validar_evento(evento)
+        
+        if not validacao_evento['valido']:
+            erros_formatados = '\n• '.join(validacao_evento['erros'])
+            mensagem_erro = f'❌ VALIDAÇÃO FALHOU:\n• {erros_formatados}'
+            logger.error(mensagem_erro)
+            raise ValueError(mensagem_erro)
+        
+        # Exibir avisos (não bloqueiam, mas informam no log)
+        if validacao_evento['avisos']:
+            logger.warning(f"⚠️  AVISOS para evento {evento.nome}:")
+            for aviso in validacao_evento['avisos']:
+                logger.warning(f"   • {aviso}")
+        
+        # ============================================================================
+        # FIM DAS VALIDAÇÕES - Código original continua abaixo
+        # ============================================================================
         
         # Busca status válidos para classificação
         status_validos = StatusInscricao.objects.filter(
@@ -382,3 +420,5 @@ class ClassificadorService:
             'criterios_ordenacao': order_fields,
             'mensagem': f'Classificação concluída com sucesso! {total_classificadas} classificados, {total_lista_espera} em lista de espera.'
         }
+    
+    

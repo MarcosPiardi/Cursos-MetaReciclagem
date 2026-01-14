@@ -1,6 +1,20 @@
 """
 Arquivo: admin.py
 Caminho: apps/eventos/admin.py
+Alteração: Melhorada apresentação da grade de eventos (status colorido, datas formatadas, vagas/inscritos)
+Data: 12/01/2026
+"""
+
+"""
+Arquivo: admin.py
+Caminho: apps/eventos/admin.py
+Alteração: Adicionado seletor de cor visual e removido código hex da listagem no Status
+Data: 11/12/2025
+"""
+
+"""
+Arquivo: admin.py
+Caminho: apps/eventos/admin.py
 Alteração: Adicionada visualização de cor no StatusAdmin
 Data: 11/12/2025
 """
@@ -40,6 +54,7 @@ Alteração: EventoCriterio com campo prioridade e CriterioAdmin com tipo_criter
 Data: 09/12/2025
 """
 
+from django import forms
 from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpResponse
@@ -51,19 +66,42 @@ import csv
 from .models import Status, Criterio, Evento, EventoCriterio, Turma, Horario
 
 
+class StatusForm(forms.ModelForm):
+    """Form personalizado com seletor de cor"""
+    class Meta:
+        model = Status
+        fields = '__all__'
+        widgets = {
+            'cor': forms.TextInput(attrs={
+                'type': 'color',
+                'style': 'width: 100px; height: 40px; cursor: pointer; border: 2px solid #ccc; border-radius: 4px;'
+            })
+        }
+
+
 @admin.register(Status)
 class StatusAdmin(admin.ModelAdmin):
+    form = StatusForm
     list_display = ['nome', 'cor_visual', 'ordem']
     list_editable = ['ordem']
     ordering = ['ordem']
     
+    fieldsets = (
+        (None, {
+            'fields': ('nome', 'cor', 'ordem'),
+            'description': 'Clique no quadrado de cor para selecionar visualmente'
+        }),
+    )
+    
     def cor_visual(self, obj):
-        """Mostra a cor visualmente com quadrado colorido"""
-        return format_html(
-            '<div style="display: inline-block; width: 20px; height: 20px; background-color: {}; border: 1px solid #ccc; border-radius: 3px; margin-right: 5px; vertical-align: middle;"></div> {}',
-            obj.cor,
-            obj.cor
-        )
+        """Mostra apenas o quadrado colorido (sem texto)"""
+        if obj.cor:
+            return format_html(
+                '<span style="display: inline-block; width: 30px; height: 30px; '
+                'background-color: {}; border: 2px solid #ccc; border-radius: 4px;"></span>',
+                obj.cor
+            )
+        return '—'
     cor_visual.short_description = 'Cor'
     cor_visual.admin_order_field = 'cor'
 
@@ -134,7 +172,13 @@ class TurmaInline(admin.TabularInline):
 
 @admin.register(Evento)
 class EventoAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'status', 'total_vagas', 'data_inicio_evento', 'data_fim_evento']
+    list_display = [
+        'nome', 
+        'status_colorido', 
+        'vagas_inscritos', 
+        'data_inicio_evento_formatada', 
+        'data_fim_evento_formatada'
+    ]
     list_filter = ['status', 'data_inicio_evento']
     search_fields = ['nome', 'descricao']
     actions = ['classificar_inscricoes', 'exportar_classificacao_excel']
@@ -152,6 +196,82 @@ class EventoAdmin(admin.ModelAdmin):
     )
     
     inlines = [EventoCriterioInline, TurmaInline]
+    
+    # ==========================================
+    # MÉTODOS PERSONALIZADOS PARA LIST_DISPLAY
+    # Adicionados em 12/12/2025
+    # ==========================================
+    
+    def status_colorido(self, obj):
+        """Exibe o status com a cor definida no modelo Status"""
+        if obj.status:
+            return format_html(
+                '<span style="display: inline-block; padding: 5px 10px; '
+                'background-color: {}; color: #050505; border-radius: 4px; '
+                'font-weight: bold; text-align: center;">{}</span>',
+                obj.status.cor,
+                obj.status.nome
+            )
+        return '—'
+    status_colorido.short_description = 'Status'
+    status_colorido.admin_order_field = 'status__nome'
+    
+    def vagas_inscritos(self, obj):
+        """Exibe quantidade de vagas / quantidade de inscritos com cores"""
+        from apps.selecao.models import Inscricao
+        
+        total_vagas = obj.total_vagas or 0
+        total_inscritos = Inscricao.objects.filter(evento=obj).count()
+        
+        # Calcular percentual de ocupação
+        if total_vagas > 0:
+            percentual = (total_inscritos / total_vagas) * 100
+        else:
+            percentual = 0
+        
+        # Definir cor baseado no percentual
+        if percentual < 80:
+            cor = '#dc3545'  # Vermelho
+        elif percentual >= 100:
+            cor = '#28a745'  # Verde
+        else:
+            cor = '#ffc107'  # Laranja (80% a 99%)
+        
+        return format_html(
+            '<div style="text-align: center;">'
+            '<span style="font-weight: bold; color: {};">{} / {}</span>'
+            '</div>',
+            cor,
+            total_inscritos,
+            total_vagas
+        )
+    vagas_inscritos.short_description = 'Inscritos / Vagas'
+    
+    def data_inicio_evento_formatada(self, obj):
+        """Exibe data de início no formato dd/mm/yyyy"""
+        if obj.data_inicio_evento:
+            return format_html(
+                '<div style="text-align: center;">{}</div>',
+                obj.data_inicio_evento.strftime('%d/%m/%Y')
+            )
+        return '—'
+    data_inicio_evento_formatada.short_description = 'Data Início'
+    data_inicio_evento_formatada.admin_order_field = 'data_inicio_evento'
+    
+    def data_fim_evento_formatada(self, obj):
+        """Exibe data de fim no formato dd/mm/yyyy"""
+        if obj.data_fim_evento:
+            return format_html(
+                '<div style="text-align: center;">{}</div>',
+                obj.data_fim_evento.strftime('%d/%m/%Y')
+            )
+        return '—'
+    data_fim_evento_formatada.short_description = 'Data Fim'
+    data_fim_evento_formatada.admin_order_field = 'data_fim_evento'
+    
+    # ==========================================
+    # ACTIONS
+    # ==========================================
     
     def classificar_inscricoes(self, request, queryset):
         """
@@ -369,3 +489,4 @@ class HorarioAdmin(admin.ModelAdmin):
     def dia_semana_display(self, obj):
         return obj.get_dia_semana_display()
     dia_semana_display.short_description = 'Dia da Semana'
+

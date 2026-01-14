@@ -1,0 +1,482 @@
+<!--
+Arquivo: gestao_matricula.html
+Caminho: apps/academico/templates/academico/gestao_matricula.html
+Descrição: Template para interface de gestão de matrícula
+Data: 12/01/2026
+-->
+
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Gestão de Matrícula - {{ block.super }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .container-matricula {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .header-section {
+        background: linear-gradient(135deg, #205067 0%, #2d7a9b 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .header-section h1 {
+        margin: 0 0 10px 0;
+        font-size: 28px;
+    }
+    
+    .header-section p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+    
+    .selecao-evento {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+    }
+    
+    .selecao-evento label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #205067;
+        font-size: 16px;
+    }
+    
+    .selecao-evento select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 15px;
+        transition: border-color 0.3s;
+    }
+    
+    .selecao-evento select:focus {
+        border-color: #205067;
+        outline: none;
+    }
+    
+    .acoes-toolbar {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .acoes-toolbar h3 {
+        margin: 0 0 15px 0;
+        color: #205067;
+        font-size: 18px;
+    }
+    
+    .botoes-acao {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-acao {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-matricular {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-matricular:hover {
+        background: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-cancelar {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-cancelar:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-expirar {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-expirar:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    }
+    
+    .btn-desistente {
+        background: #ffc107;
+        color: #212529;
+    }
+    
+    .btn-desistente:hover {
+        background: #e0a800;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+    }
+    
+    .btn-nao-localizado {
+        background: #17a2b8;
+        color: white;
+    }
+    
+    .btn-nao-localizado:hover {
+        background: #138496;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+    }
+    
+    .tabela-classificacao {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .tabela-classificacao table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .tabela-classificacao thead {
+        background: #205067;
+        color: white;
+    }
+    
+    .tabela-classificacao th {
+        padding: 15px 10px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    .tabela-classificacao th:first-child {
+        width: 50px;
+        text-align: center;
+    }
+    
+    .tabela-classificacao td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #dee2e6;
+        font-size: 14px;
+    }
+    
+    .tabela-classificacao tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .tabela-classificacao tbody tr:nth-child(even) {
+        background: #fafafa;
+    }
+    
+    .badge-status {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .badge-aprovado {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-espera {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-confirmado {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .posicao-badge {
+        display: inline-block;
+        background: #205067;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 50%;
+        font-weight: bold;
+        min-width: 35px;
+        text-align: center;
+    }
+    
+    .info-vazia {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+    
+    .info-vazia svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+    
+    .contador-selecao {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        padding: 10px 15px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        display: none;
+    }
+    
+    .contador-selecao.ativo {
+        display: block;
+    }
+    
+    .contador-selecao strong {
+        color: #856404;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-matricula">
+    <!-- Cabeçalho -->
+    <div class="header-section">
+        <h1>🎓 Gestão de Matrícula</h1>
+        <p>Selecione um evento e gerencie as matrículas dos alunos classificados</p>
+    </div>
+    
+    <!-- Seleção de Evento -->
+    <div class="selecao-evento">
+        <form method="GET" action="{% url 'academico:gestao_matricula' %}">
+            <label for="evento_id">📅 Selecione o Evento:</label>
+            <select name="evento_id" id="evento_id" onchange="this.form.submit()" required>
+                <option value="">-- Escolha um evento --</option>
+                {% for evento in eventos_disponiveis %}
+                    <option value="{{ evento.id }}" {% if evento_selecionado and evento.id == evento_selecionado.id %}selected{% endif %}>
+                        {{ evento.nome }} - {{ evento.data_inicio_evento|date:"d/m/Y" }}
+                    </option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    
+    {% if evento_selecionado %}
+        <!-- Ações -->
+        <div class="acoes-toolbar">
+            <h3>⚡ Ações Disponíveis</h3>
+            
+            <div id="contador-selecao" class="contador-selecao">
+                <strong id="total-selecionados">0</strong> inscrito(s) selecionado(s)
+            </div>
+            
+            <div class="botoes-acao">
+                <!-- Matricular -->
+                <button type="button" class="btn-acao btn-matricular" onclick="confirmarAcao('matricular')">
+                    ✅ Matricular Selecionados
+                </button>
+                
+                <!-- Cancelar -->
+                <button type="button" class="btn-acao btn-cancelar" onclick="confirmarAcao('Cancelado')">
+                    ❌ Marcar como Cancelado
+                </button>
+                
+                <!-- Expirado -->
+                <button type="button" class="btn-acao btn-expirar" onclick="confirmarAcao('Expirado')">
+                    ⏰ Marcar como Expirado
+                </button>
+                
+                <!-- Desistente -->
+                <button type="button" class="btn-acao btn-desistente" onclick="confirmarAcao('Desistente')">
+                    🚫 Marcar como Desistente
+                </button>
+                
+                <!-- Não Localizado -->
+                <button type="button" class="btn-acao btn-nao-localizado" onclick="confirmarAcao('Não Localizado')">
+                    🔍 Marcar como Não Localizado
+                </button>
+            </div>
+        </div>
+        
+        <!-- Tabela de Classificação -->
+        {% if classificacoes %}
+        <div class="tabela-classificacao">
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selecionar-todos" onchange="selecionarTodos(this)"></th>
+                        <th>Posição</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Situação</th>
+                        <th>Status Inscrição</th>
+                        <th>Pontuação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in classificacoes %}
+                    <tr>
+                        <td style="text-align: center;">
+                            <input type="checkbox" class="checkbox-inscricao" name="inscricao" value="{{ c.inscricao.id }}">
+                        </td>
+                        <td style="text-align: center;">
+                            <span class="posicao-badge">{{ c.posicao }}</span>
+                        </td>
+                        <td>{{ c.inscricao.interessado.nome }}</td>
+                        <td>{{ c.inscricao.interessado.cpf }}</td>
+                        <td>
+                            {% if c.classificado %}
+                                <span class="badge-status badge-aprovado">✅ Aprovado</span>
+                            {% elif c.lista_espera %}
+                                <span class="badge-status badge-espera">⏳ Lista de Espera</span>
+                            {% else %}
+                                <span class="badge-status">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge-status badge-confirmado">{{ c.inscricao.status.nome }}</span>
+                        </td>
+                        <td style="text-align: center; font-weight: bold;">{{ c.pontuacao_total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="info-vazia">
+            <p><strong>Nenhuma classificação encontrada para este evento</strong></p>
+            <p>Execute a classificação primeiro para exibir os alunos.</p>
+        </div>
+        {% endif %}
+        
+        <!-- Formulário oculto para enviar ações -->
+        <form id="form-matricula" method="POST" action="{% url 'academico:processar_matricula' %}" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="evento_id" value="{{ evento_selecionado.id }}">
+            <div id="inscricoes-container"></div>
+        </form>
+        
+        <form id="form-status" method="POST" action="{% url 'academico:alterar_status_inscricao' %}" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="evento_id" value="{{ evento_selecionado.id }}">
+            <input type="hidden" name="novo_status" id="novo-status-input">
+            <div id="inscricoes-status-container"></div>
+        </form>
+    {% else %}
+        <div class="info-vazia">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p><strong>Selecione um evento para começar</strong></p>
+            <p>Escolha um evento na lista acima para visualizar os alunos classificados.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Contador de seleção
+    function atualizarContador() {
+        const checkboxes = document.querySelectorAll('.checkbox-inscricao:checked');
+        const total = checkboxes.length;
+        const contador = document.getElementById('contador-selecao');
+        const totalSpan = document.getElementById('total-selecionados');
+        
+        totalSpan.textContent = total;
+        
+        if (total > 0) {
+            contador.classList.add('ativo');
+        } else {
+            contador.classList.remove('ativo');
+        }
+    }
+    
+    // Selecionar todos
+    function selecionarTodos(checkbox) {
+        const checkboxes = document.querySelectorAll('.checkbox-inscricao');
+        checkboxes.forEach(cb => {
+            cb.checked = checkbox.checked;
+        });
+        atualizarContador();
+    }
+    
+    // Atualizar contador ao clicar em checkbox
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.checkbox-inscricao');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', atualizarContador);
+        });
+    });
+    
+    // Confirmar ação
+    function confirmarAcao(tipo) {
+        const checkboxes = document.querySelectorAll('.checkbox-inscricao:checked');
+        
+        if (checkboxes.length === 0) {
+            alert('⚠️ Selecione pelo menos uma inscrição!');
+            return;
+        }
+        
+        let mensagem = '';
+        let form = null;
+        let container = null;
+        
+        if (tipo === 'matricular') {
+            mensagem = `Confirma a matrícula de ${checkboxes.length} aluno(s)?`;
+            form = document.getElementById('form-matricula');
+            container = document.getElementById('inscricoes-container');
+        } else {
+            mensagem = `Confirma alterar status de ${checkboxes.length} inscrição(ões) para "${tipo}"?`;
+            form = document.getElementById('form-status');
+            container = document.getElementById('inscricoes-status-container');
+            document.getElementById('novo-status-input').value = tipo;
+        }
+        
+        if (!confirm(mensagem)) {
+            return;
+        }
+        
+        // Limpar container
+        container.innerHTML = '';
+        
+        // Adicionar inputs hidden
+        checkboxes.forEach(cb => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'inscricoes_selecionadas';
+            input.value = cb.value;
+            container.appendChild(input);
+        });
+        
+        // Enviar formulário
+        form.submit();
+    }
+</script>
+{% endblock %}
+

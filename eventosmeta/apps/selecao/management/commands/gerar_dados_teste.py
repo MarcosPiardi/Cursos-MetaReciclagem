@@ -1,8 +1,8 @@
 """
 Arquivo: gerar_dados_teste.py
 Caminho: apps/selecao/management/commands/gerar_dados_teste.py
-Alteração: Melhorado com nomes reais, mais campos preenchidos, garantia de PCD e programa social
-Data: 11/12/2025
+Alteração: Corrigido geração de nomes únicos e adicionado senha padrão '123'
+Data: 12/01/2026
 """
 
 from django.core.management.base import BaseCommand
@@ -77,7 +77,7 @@ class Command(BaseCommand):
         )
         
         # Resumo
-        total_pcd = sum(1 for i in interessados if i.tem_deficiencia)
+        total_pcd = sum(1 for i in interessados if i.necessidades_especiais)
         total_programa_social = sum(1 for i in interessados if i.programa_social)
         
         self.stdout.write(self.style.SUCCESS('✅ DADOS CRIADOS COM SUCESSO!'))
@@ -195,44 +195,94 @@ class Command(BaseCommand):
         
         return eventos
     
+    def _gerar_nome_unico(self, sexo, nomes_usados):
+        """Gera um nome completo único combinando nomes e sobrenomes aleatoriamente"""
+        
+        # Listas expandidas de nomes
+        primeiros_nomes_masc = [
+            'João', 'José', 'Carlos', 'Paulo', 'Pedro', 'Lucas', 'Fernando', 'Rafael',
+            'Gabriel', 'Bruno', 'Matheus', 'Thiago', 'Felipe', 'André', 'Leonardo',
+            'Rodrigo', 'Marcelo', 'Ricardo', 'Diego', 'Gustavo', 'Daniel', 'Eduardo',
+            'Fábio', 'Vinícius', 'Alexandre', 'Leandro', 'Renato', 'Sérgio', 'Marcos',
+            'Antônio', 'Júlio', 'César', 'Henrique', 'Márcio', 'Roberto', 'Jorge'
+        ]
+        
+        primeiros_nomes_fem = [
+            'Maria', 'Ana', 'Paula', 'Juliana', 'Carla', 'Fernanda', 'Patrícia', 'Aline',
+            'Camila', 'Beatriz', 'Amanda', 'Mariana', 'Larissa', 'Débora', 'Renata',
+            'Vanessa', 'Tatiane', 'Simone', 'Jéssica', 'Cláudia', 'Sandra', 'Cristina',
+            'Adriana', 'Priscila', 'Luciana', 'Daniela', 'Carolina', 'Bianca', 'Letícia',
+            'Viviane', 'Elaine', 'Mônica', 'Andreia', 'Raquel', 'Silvia', 'Rosana'
+        ]
+        
+        nomes_meio = [
+            'da Silva', 'dos Santos', 'de Oliveira', 'de Souza', 'da Costa', 'Ferreira',
+            'Rodrigues', 'de Almeida', 'do Nascimento', 'Lima', 'de Araújo', 'Fernandes',
+            'de Carvalho', 'Gomes', 'Martins', 'Rocha', 'Ribeiro', 'Alves', 'Pereira',
+            'de Melo', 'Barbosa', 'Cardoso', 'Teixeira', 'Reis', 'Correia', 'da Silva',
+            'Moreira', 'Pinto', 'Castro', 'Ramos', 'Monteiro', 'Nunes', 'Mendes'
+        ]
+        
+        sobrenomes_finais = [
+            'Junior', 'Neto', 'Filho', 'Silva', 'Santos', 'Oliveira', 'Souza', 'Costa',
+            'Lima', 'Alves', 'Pereira', 'Rocha', 'Dias', 'Moura', 'Cunha', 'Pires',
+            'Farias', 'Lopes', 'Soares', 'Duarte', 'Coelho', 'Freitas', 'Barros'
+        ]
+        
+        # Escolhe lista de nomes baseado no sexo
+        if sexo.nome == 'Masculino':
+            primeiros_nomes = primeiros_nomes_masc
+        else:
+            primeiros_nomes = primeiros_nomes_fem
+        
+        # Tenta gerar nome único (máximo 100 tentativas)
+        for _ in range(100):
+            # Gera combinação aleatória
+            primeiro = random.choice(primeiros_nomes)
+            meio = random.choice(nomes_meio)
+            final = random.choice(sobrenomes_finais) if random.random() < 0.5 else ''
+            
+            # Monta nome completo
+            if final:
+                nome_completo = f'{primeiro} {meio} {final}'
+            else:
+                nome_completo = f'{primeiro} {meio}'
+            
+            # Verifica se é único
+            if nome_completo not in nomes_usados:
+                # Verifica também no banco de dados
+                if not Interessado.objects.filter(nome=nome_completo).exists():
+                    nomes_usados.add(nome_completo)
+                    return nome_completo
+        
+        # Se não conseguiu, adiciona número ao final
+        base = f'{random.choice(primeiros_nomes)} {random.choice(nomes_meio)}'
+        contador = 1
+        while True:
+            nome_completo = f'{base} {contador}'
+            if nome_completo not in nomes_usados and not Interessado.objects.filter(nome=nome_completo).exists():
+                nomes_usados.add(nome_completo)
+                return nome_completo
+            contador += 1
+    
     def _criar_interessados(self, quantidade, fototipos, escolaridades, sexos):
-        """Cria interessados de teste com dados completos"""
-        
-        # Nomes completos realistas
-        nomes_masc = [
-            'João Pedro Silva', 'José Carlos Santos', 'Carlos Eduardo Oliveira', 'Paulo Roberto Souza',
-            'Pedro Henrique Alves', 'Lucas Gabriel Costa', 'Fernando José Lima', 'Rafael Augusto Pereira',
-            'Gabriel Luiz Rodrigues', 'Bruno César Fernandes', 'Matheus Vinícius Carvalho',
-            'Thiago Alexandre Martins', 'Felipe Henrique Ribeiro', 'André Luiz Gomes', 'Leonardo Antônio Dias',
-            'Rodrigo Fernando Silva', 'Marcelo José Santos', 'Ricardo Paulo Oliveira', 'Diego Lucas Souza',
-            'Gustavo Henrique Alves'
-        ]
-        
-        nomes_fem = [
-            'Maria Eduarda Silva', 'Ana Paula Santos', 'Paula Cristina Oliveira', 'Juliana Aparecida Souza',
-            'Carla Fernanda Alves', 'Fernanda Cristina Costa', 'Patrícia Regina Lima', 'Aline Maria Pereira',
-            'Camila Aparecida Rodrigues', 'Beatriz Helena Fernandes', 'Amanda Cristina Carvalho',
-            'Mariana Vitória Martins', 'Larissa Fernanda Ribeiro', 'Débora Cristina Gomes', 'Renata Maria Dias',
-            'Vanessa Aparecida Silva', 'Tatiane Cristina Santos', 'Simone Regina Oliveira', 'Jéssica Maria Souza',
-            'Cláudia Fernanda Alves'
-        ]
-        
-        sobrenomes = ['Silva', 'Santos', 'Oliveira', 'Souza', 'Costa', 'Ferreira', 'Rodrigues', 
-                     'Almeida', 'Nascimento', 'Lima', 'Araújo', 'Fernandes', 'Carvalho', 'Gomes',
-                     'Martins', 'Rocha', 'Ribeiro', 'Alves', 'Pereira', 'Melo']
+        """Cria interessados de teste com dados completos e nomes únicos"""
         
         ruas = ['Rua das Flores', 'Avenida Brasil', 'Rua São Paulo', 'Travessa do Comércio',
-                'Rua Santa Maria', 'Avenida Central', 'Rua do Progresso', 'Rua da Paz']
+                'Rua Santa Maria', 'Avenida Central', 'Rua do Progresso', 'Rua da Paz',
+                'Rua 7 de Setembro', 'Avenida Paulista', 'Rua XV de Novembro', 'Rua Dom Pedro']
         
         bairros = ['Centro', 'Jardim Primavera', 'Vila Nova', 'Parque Industrial',
-                   'Bela Vista', 'Santa Cruz', 'São José', 'Boa Esperança']
+                   'Bela Vista', 'Santa Cruz', 'São José', 'Boa Esperança', 'Jardim das Rosas',
+                   'Vila Mariana', 'Cidade Nova', 'Alto da Glória']
         
         cidades = ['São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Salvador',
-                   'Brasília', 'Curitiba', 'Porto Alegre', 'Recife']
+                   'Brasília', 'Curitiba', 'Porto Alegre', 'Recife', 'Fortaleza', 'Manaus']
         
-        ufs = ['SP', 'RJ', 'MG', 'BA', 'DF', 'PR', 'RS', 'PE']
+        ufs = ['SP', 'RJ', 'MG', 'BA', 'DF', 'PR', 'RS', 'PE', 'CE', 'AM']
         
         interessados = []
+        nomes_usados = set()
         
         # GARANTE que pelo menos 30% terão PCD e 40% programa social
         qtd_pcd = int(quantidade * 0.3)
@@ -242,16 +292,11 @@ class Command(BaseCommand):
         indices_programa_social = set(random.sample(range(quantidade), qtd_programa_social))
         
         for i in range(quantidade):
-            # Escolhe sexo e nome correspondente
+            # Escolhe sexo
             sexo = random.choice(sexos)
-            if sexo.nome == 'Masculino':
-                nome_completo = random.choice(nomes_masc)
-            else:
-                nome_completo = random.choice(nomes_fem)
             
-            # Adiciona sobrenome extra para mais variedade
-            if random.random() < 0.3:
-                nome_completo += ' ' + random.choice(sobrenomes)
+            # Gera nome único
+            nome_completo = self._gerar_nome_unico(sexo, nomes_usados)
             
             # Gera CPF fictício único
             cpf = ''.join([str(random.randint(0, 9)) for _ in range(11)])
@@ -278,6 +323,14 @@ class Command(BaseCommand):
             celular = f'{random.randint(11, 99)}9{random.randint(10000000, 99999999)}'
             telefone = f'{random.randint(11, 99)}{random.randint(20000000, 39999999)}'
             
+            # Email único baseado no nome
+            email_base = nome_completo.lower().replace(' ', '.').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ã', 'a').replace('õ', 'o').replace('ç', 'c')
+            email = f'{email_base}@email.com'
+            contador_email = 1
+            while Interessado.objects.filter(email=email).exists():
+                email = f'{email_base}{contador_email}@email.com'
+                contador_email += 1
+            
             interessado = Interessado.objects.create(
                 nome=nome_completo,
                 cpf=cpf,
@@ -291,7 +344,7 @@ class Command(BaseCommand):
                 endereco_residencial=random.choice(ruas),
                 num_endereco=str(random.randint(1, 9999)),
                 bairro=random.choice(bairros),
-                complemento=random.choice(['', 'Apto 101', 'Casa', 'Bloco A']) if random.random() < 0.3 else '',
+                complemento=random.choice(['', 'Apto 101', 'Casa', 'Bloco A', 'Fundos']) if random.random() < 0.3 else '',
                 cidade_residencia=cidade,
                 uf_residencia=uf,
                 cidade_nascimento=random.choice(cidades),
@@ -301,7 +354,7 @@ class Command(BaseCommand):
                 # Contatos
                 celular=celular,
                 telefone=telefone if random.random() < 0.5 else '',
-                email=f'{nome_completo.lower().replace(" ", ".")}@email.com',
+                email=email,
                 
                 # PCD - GARANTIDO para alguns
                 necessidades_especiais=tem_pcd,
@@ -314,8 +367,8 @@ class Command(BaseCommand):
                 programa_social=tem_programa_social,
                 num_nis=num_nis,
                 
-                # Campo obrigatório
-                senha=''
+                # Senha padrão: 123
+                senha='123'
             )
             
             interessados.append(interessado)
@@ -345,4 +398,5 @@ class Command(BaseCommand):
                     total += 1
         
         return total
+    
     
