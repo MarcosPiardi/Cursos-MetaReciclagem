@@ -100,7 +100,7 @@ def processar_matricula(request):
     # Redirecionar de volta com o evento selecionado
     evento_id = request.POST.get('evento_id')
     if evento_id:
-        return redirect(f"{request.path.replace('processar_matricula', 'gestao_matricula')}?evento_id={evento_id}")
+        return redirect(f"/academico/gestao-matricula/?evento_id={evento_id}")
     
     return redirect('academico:gestao_matricula')
 
@@ -150,7 +150,7 @@ def alterar_status_inscricao(request):
     # Redirecionar de volta com o evento selecionado
     evento_id = request.POST.get('evento_id')
     if evento_id:
-        return redirect(f"{request.path.replace('alterar_status_inscricao', 'gestao_matricula')}?evento_id={evento_id}")
+        return redirect(f"/academico/gestao-matricula/?evento_id={evento_id}")
     
     return redirect('academico:gestao_matricula')
 

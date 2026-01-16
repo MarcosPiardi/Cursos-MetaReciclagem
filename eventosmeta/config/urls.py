@@ -1,8 +1,8 @@
 """
 URL Configuration for Eventos MetaReciclagem
 Arquivo: eventosmeta/config/urls.py
-Alteração: Corrigir duplicação de namespace portal
-Data: 05/12/2025
+Alteração: Adicionado módulo acadêmico para gestão de matrícula
+Data: 12/01/2026
 """
 from django.contrib import admin
 from django.urls import path, include
@@ -21,9 +21,15 @@ urlpatterns = [
     path('inscricao/', include('apps.interessados.urls')),
     
     # SISTEMA 3: Portal Público (Dashboard e Consultas)
-    path('', include('apps.portal.urls')),  # ← APENAS UMA VEZ, na raiz
+    path('', include('apps.portal.urls')),
+
+    # 
+    # 🆕 NOVO: SISTEMA 4: Gestão Acadêmica (Matrículas)
+    # Adicionado em 12/01/2026
+    # 
+    path('academico/', include('apps.academico.urls')),
     
-    # SISTEMA 4: Cursos/Eventos (visualização pública)
+    # SISTEMA 5: Cursos/Eventos (visualização pública)
     # TODO: Descomentar na ETAPA 2 quando criar os models de Curso
     # path('cursos/', include('apps.cursoseoutros.urls')),
 ]
@@ -32,3 +38,4 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
