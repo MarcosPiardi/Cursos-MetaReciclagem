@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'apps.selecao',
     'apps.academico',
     'apps.portal',
+    'apps.scripts_admin',
 
     # Ferramentas
     'django_extensions', 
