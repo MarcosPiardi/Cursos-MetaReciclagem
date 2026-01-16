@@ -1,9 +1,10 @@
-
-
 """
-Comando para popular dados iniciais do sistema
-Uso: python manage.py popular_dados_iniciais
+Arquivo: popular_dados_iniciais.py
+Caminho: apps/scripts_admin/management/commands/popular_dados_iniciais.py
+Alteração: Corrigidos campos dos models Status, StatusInscricao e Criterio
+Data: 16/01/2026
 """
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from apps.eventos.models import Status, Criterio
@@ -24,20 +25,20 @@ class Command(BaseCommand):
         # 1. Status de Eventos
         self.stdout.write('1. Criando Status de Eventos...')
         status_eventos = [
-            {'nome': 'Planejamento', 'ordem': 1, 'ativo': True},
-            {'nome': 'Inscrições Abertas', 'ordem': 2, 'ativo': True},
-            {'nome': 'Inscrições Encerradas', 'ordem': 3, 'ativo': True},
-            {'nome': 'Em Classificação', 'ordem': 4, 'ativo': True},
-            {'nome': 'Resultado Divulgado', 'ordem': 5, 'ativo': True},
-            {'nome': 'Em Andamento', 'ordem': 6, 'ativo': True},
-            {'nome': 'Finalizado', 'ordem': 7, 'ativo': True},
-            {'nome': 'Cancelado', 'ordem': 8, 'ativo': False},
+            {'nome': 'Planejamento', 'cor': '#6c757d', 'ordem': 1},
+            {'nome': 'Inscrições Abertas', 'cor': '#28a745', 'ordem': 2},
+            {'nome': 'Inscrições Encerradas', 'cor': '#ffc107', 'ordem': 3},
+            {'nome': 'Em Classificação', 'cor': '#17a2b8', 'ordem': 4},
+            {'nome': 'Resultado Divulgado', 'cor': '#007bff', 'ordem': 5},
+            {'nome': 'Em Andamento', 'cor': '#20c997', 'ordem': 6},
+            {'nome': 'Finalizado', 'cor': '#6f42c1', 'ordem': 7},
+            {'nome': 'Cancelado', 'cor': '#dc3545', 'ordem': 8},
         ]
         
         for dados in status_eventos:
             status, created = Status.objects.get_or_create(
                 nome=dados['nome'],
-                defaults={'ordem': dados['ordem'], 'ativo': dados['ativo']}
+                defaults={'cor': dados['cor'], 'ordem': dados['ordem']}
             )
             if created:
                 self.stdout.write(f'   ✅ Criado: {status.nome}')
@@ -47,11 +48,14 @@ class Command(BaseCommand):
         # 2. Status de Inscrições
         self.stdout.write('\n2. Criando Status de Inscrições...')
         status_inscricoes = [
-            {'nome': 'Pendente', 'cor': '#FFA500', 'ordem': 1},
-            {'nome': 'Em Análise', 'cor': '#1E90FF', 'ordem': 2},
-            {'nome': 'Aprovada', 'cor': '#32CD32', 'ordem': 3},
-            {'nome': 'Reprovada', 'cor': '#DC143C', 'ordem': 4},
-            {'nome': 'Cancelada', 'cor': '#808080', 'ordem': 5},
+            {'nome': 'Pendente', 'cor': '#ffc107', 'ordem': 1},
+            {'nome': 'Classificado', 'cor': '#28a745', 'ordem': 2},
+            {'nome': 'Confirmada', 'cor': '#007bff', 'ordem': 3},
+            {'nome': 'Lista de Espera', 'cor': '#ffec1f', 'ordem': 4},
+            {'nome': 'Cancelada', 'cor': '#dc3545', 'ordem': 5},
+            {'nome': 'Expirada', 'cor': '#17a2b8', 'ordem': 6},
+            {'nome': 'Desistente', 'cor': '#9b4003', 'ordem': 7},
+            {'nome': 'Não localizado para confirmar matricula', 'cor': '#d360e2', 'ordem': 8},
         ]
         
         for dados in status_inscricoes:
@@ -88,74 +92,79 @@ class Command(BaseCommand):
         self.stdout.write('\n4. Criando Critérios de Seleção...')
         criterios = [
             {
-                'nome': 'Morador de Manaus',
-                'tipo': 'MORADOR_MANAUS',
-                'descricao': 'Reside em Manaus/AM',
-                'pontos': 10,
-                'requer_validacao_manual': False,
-                'ativo': True
-            },
-            {
+                'codigo': 'PCD',
                 'nome': 'Pessoa com Deficiência (PCD)',
-                'tipo': 'PCD',
+                'tipo_criterio': 'PCD',
+                'categoria': 'VULNERABILIDADE',
                 'descricao': 'Possui algum tipo de deficiência',
                 'pontos': 15,
-                'requer_validacao_manual': False,
                 'ativo': True
             },
             {
+                'codigo': 'PROGRAMA_SOCIAL',
                 'nome': 'Beneficiário de Programa Social',
-                'tipo': 'PROGRAMA_SOCIAL',
+                'tipo_criterio': 'PROGRAMA_SOCIAL',
+                'categoria': 'VULNERABILIDADE',
                 'descricao': 'Participa de programas sociais (Bolsa Família, etc.)',
                 'pontos': 10,
-                'requer_validacao_manual': False,
                 'ativo': True
             },
             {
+                'codigo': 'JOVEM',
                 'nome': 'Idade entre 16 e 24 anos',
-                'tipo': 'FAIXA_ETARIA',
+                'tipo_criterio': 'FAIXA_ETARIA',
+                'categoria': 'FAIXA_ETARIA',
                 'descricao': 'Público jovem prioritário',
                 'pontos': 5,
-                'ordem_idade': 1,
-                'requer_validacao_manual': True,
                 'ativo': True
             },
             {
+                'codigo': 'IDOSO',
                 'nome': 'Idade acima de 50 anos',
-                'tipo': 'FAIXA_ETARIA',
+                'tipo_criterio': 'FAIXA_ETARIA',
+                'categoria': 'FAIXA_ETARIA',
                 'descricao': 'Público idoso prioritário',
                 'pontos': 5,
-                'ordem_idade': 2,
-                'requer_validacao_manual': True,
                 'ativo': True
             },
             {
+                'codigo': 'ENSINO_FUNDAMENTAL',
                 'nome': 'Ensino Fundamental Completo',
-                'tipo': 'ESCOLARIDADE',
+                'tipo_criterio': 'ESCOLARIDADE',
+                'categoria': 'ESCOLARIDADE',
                 'descricao': 'Possui ensino fundamental completo',
                 'pontos': 3,
-                'requer_validacao_manual': True,
                 'ativo': True
             },
             {
+                'codigo': 'RENDA_BAIXA',
                 'nome': 'Renda Familiar até 2 salários mínimos',
-                'tipo': 'RENDA_FAMILIAR',
+                'tipo_criterio': 'RENDA_FAMILIAR',
+                'categoria': 'VULNERABILIDADE',
                 'descricao': 'Renda familiar de até R$ 2.640,00',
                 'pontos': 8,
-                'requer_validacao_manual': True,
+                'ativo': True
+            },
+            {
+                'codigo': 'COTA_RACIAL',
+                'nome': 'Cota Racial',
+                'tipo_criterio': 'COTA_RACIAL',
+                'categoria': 'COTA_RACIAL',
+                'descricao': 'Pessoa preta, parda ou indígena',
+                'pontos': 5,
                 'ativo': True
             },
         ]
         
         for dados in criterios:
             criterio, created = Criterio.objects.get_or_create(
-                tipo=dados['tipo'],
-                nome=dados['nome'],
+                codigo=dados['codigo'],
                 defaults={
+                    'nome': dados['nome'],
+                    'tipo_criterio': dados['tipo_criterio'],
+                    'categoria': dados['categoria'],
                     'descricao': dados['descricao'],
                     'pontos': dados['pontos'],
-                    'ordem_idade': dados.get('ordem_idade'),
-                    'requer_validacao_manual': dados['requer_validacao_manual'],
                     'ativo': dados['ativo']
                 }
             )
@@ -224,4 +233,4 @@ class Command(BaseCommand):
         self.stdout.write(f'  • Fototipos (IBGE): {Fototipo.objects.count()}')
         self.stdout.write('')
 
-        
+

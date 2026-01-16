@@ -1,4 +1,6 @@
 """
+Foi o primeiro que usei para popular dados.
+Não usar mais, tem um melhor: gerar_dados_teste.py
 Comando para criar dados de teste completos
 Uso: python manage.py criar_dados_teste
 """

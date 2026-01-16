@@ -1,16 +1,17 @@
 """
 Arquivo: gerar_dados_teste.py
 Caminho: apps/selecao/management/commands/gerar_dados_teste.py
-Alteração: Corrigido geração de nomes únicos e adicionado senha padrão '123'
-Data: 12/01/2026
+Alteração: Garantida unicidade de nomes, removido sufixo de turma dos eventos, criação automática de 3+ turmas por evento
+Data: 16/01/2026
 """
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import date, timedelta
 import random
+from dateutil.relativedelta import relativedelta
 
-from apps.eventos.models import Evento, Status, Criterio, EventoCriterio
+from apps.eventos.models import Evento, Status, Criterio, EventoCriterio, Turma
 from apps.interessados.models import Interessado, Fototipo, Sexo
 from apps.selecao.models import Inscricao, StatusInscricao
 
@@ -37,6 +38,12 @@ class Command(BaseCommand):
             default=30,
             help='Quantidade de inscrições por evento (padrão: 30)'
         )
+        parser.add_argument(
+            '--turmas-por-evento',
+            type=int,
+            default=3,
+            help='Quantidade mínima de turmas por evento (padrão: 3)'
+        )
     
     def handle(self, *args, **options):
         self.stdout.write(self.style.WARNING('🚀 Iniciando geração de dados de teste...'))
@@ -44,6 +51,7 @@ class Command(BaseCommand):
         qtd_eventos = options['eventos']
         qtd_interessados = options['interessados']
         qtd_inscricoes = options['inscricoes_por_evento']
+        qtd_turmas = options['turmas_por_evento']
         
         # Busca ou cria dados base
         self.stdout.write('📋 Verificando dados base...')
@@ -54,11 +62,15 @@ class Command(BaseCommand):
         sexos = self._garantir_sexos()
         criterios = self._garantir_criterios()
         
-        # Cria eventos
+        # Cria eventos SEM sufixo de turma
         self.stdout.write(f'🎓 Criando {qtd_eventos} eventos...')
         eventos = self._criar_eventos(qtd_eventos, status_evento, criterios)
         
-        # Cria interessados
+        # Cria turmas para cada evento (mínimo 3 por evento)
+        self.stdout.write(f'📅 Criando turmas ({qtd_turmas}+ por evento)...')
+        total_turmas = self._criar_turmas(eventos, qtd_turmas)
+        
+        # Cria interessados com NOMES ÚNICOS GARANTIDOS
         self.stdout.write(f'👥 Criando {qtd_interessados} interessados...')
         interessados = self._criar_interessados(
             qtd_interessados,
@@ -80,12 +92,13 @@ class Command(BaseCommand):
         total_pcd = sum(1 for i in interessados if i.necessidades_especiais)
         total_programa_social = sum(1 for i in interessados if i.programa_social)
         
-        self.stdout.write(self.style.SUCCESS('✅ DADOS CRIADOS COM SUCESSO!'))
+        self.stdout.write(self.style.SUCCESS('\n✅ DADOS CRIADOS COM SUCESSO!'))
         self.stdout.write(self.style.SUCCESS(f'   📊 {len(eventos)} eventos'))
+        self.stdout.write(self.style.SUCCESS(f'   📅 {total_turmas} turmas'))
         self.stdout.write(self.style.SUCCESS(f'   👥 {len(interessados)} interessados'))
         self.stdout.write(self.style.SUCCESS(f'   ♿ {total_pcd} com PCD'))
         self.stdout.write(self.style.SUCCESS(f'   🏠 {total_programa_social} em programa social'))
-        self.stdout.write(self.style.SUCCESS(f'   📝 {total_inscricoes} inscrições'))
+        self.stdout.write(self.style.SUCCESS(f'   📝 {total_inscricoes} inscrições\n'))
     
     def _garantir_status_evento(self):
         """Garante que status de evento existem"""
@@ -105,7 +118,7 @@ class Command(BaseCommand):
     
     def _garantir_fototipos(self):
         """Garante que fototipos existem"""
-        nomes = ['Branco', 'Preto', 'Pardo', 'Amarelo', 'Indígena']
+        nomes = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena']
         fototipos = []
         for nome in nomes:
             fototipo, _ = Fototipo.objects.get_or_create(nome=nome)
@@ -157,25 +170,47 @@ class Command(BaseCommand):
         return criterios
     
     def _criar_eventos(self, quantidade, status, criterios):
-        """Cria eventos de teste"""
-        cursos = [
-            'Informática Básica', 'Manutenção de Computadores', 'Excel Avançado',
-            'Programação Python', 'Design Gráfico', 'Edição de Vídeo',
-            'Marketing Digital', 'Redes de Computadores', 'Segurança da Informação',
-            'Desenvolvimento Web', 'Banco de Dados', 'Inglês Instrumental'
+        """
+        ATUALIZAÇÃO 1: Cria eventos SEM sufixo '- Turma X'
+        Lista limitada de cursos distintos
+        """
+        # Lista limitada de cursos (quantidade controlada)
+        cursos_disponiveis = [
+            'Informática Básica',
+            'Manutenção de Computadores',
+            'Excel Avançado',
+            'Programação Python',
+            'Design Gráfico',
+            'Edição de Vídeo',
+            'Marketing Digital',
+            'Redes de Computadores',
+            'Segurança da Informação',
+            'Desenvolvimento Web',
+            'Banco de Dados',
+            'Inglês Instrumental'
         ]
         
         eventos = []
         hoje = timezone.now()
+        cursos_usados = set()
         
         for i in range(quantidade):
-            nome_curso = random.choice(cursos)
+            # Escolhe curso único (sem repetição)
+            cursos_disponiveis_filtrados = [c for c in cursos_disponiveis if c not in cursos_usados]
             
+            if not cursos_disponiveis_filtrados:
+                # Se acabaram os cursos únicos, permite repetir
+                nome_curso = random.choice(cursos_disponiveis)
+            else:
+                nome_curso = random.choice(cursos_disponiveis_filtrados)
+                cursos_usados.add(nome_curso)
+            
+            # CRÍTICO: Nome do evento SEM sufixo "- Turma X"
             evento = Evento.objects.create(
-                nome=f'{nome_curso} - Turma {i+1}',
+                nome=nome_curso,  # ← SEM "- Turma {i+1}"
                 descricao=f'Curso de {nome_curso} para capacitação profissional',
                 status=status,
-                total_vagas=random.randint(20, 40),
+                total_vagas=random.randint(60, 120),  # Vagas totais para todas as turmas
                 data_inicio_inscricao=hoje - timedelta(days=30),
                 data_fim_inscricao=hoje + timedelta(days=30),
                 data_inicio_evento=hoje.date() + timedelta(days=60),
@@ -192,19 +227,80 @@ class Command(BaseCommand):
                 )
             
             eventos.append(evento)
+            self.stdout.write(f'   ✅ Evento criado: {evento.nome}')
         
         return eventos
     
-    def _gerar_nome_unico(self, sexo, nomes_usados):
-        """Gera um nome completo único combinando nomes e sobrenomes aleatoriamente"""
+    def _criar_turmas(self, eventos, minimo_turmas_por_evento):
+        """
+        ATUALIZAÇÃO 2: Cria pelo menos 3 turmas por evento
+        Formato: 'Turma X - Mês/Ano' baseado na data de início
+        """
+        turnos = ['MATUTINO', 'VESPERTINO', 'NOTURNO']
+        locais = [
+            'Laboratório 1', 'Laboratório 2', 'Laboratório 3',
+            'Sala A', 'Sala B', 'Sala C',
+            'Auditório Principal', 'Sala de Informática'
+        ]
         
+        meses_pt = {
+            1: 'Jan', 2: 'Fev', 3: 'Mar', 4: 'Abr',
+            5: 'Mai', 6: 'Jun', 7: 'Jul', 8: 'Ago',
+            9: 'Set', 10: 'Out', 11: 'Nov', 12: 'Dez'
+        }
+        
+        total_turmas = 0
+        
+        for evento in eventos:
+            # Gera entre minimo_turmas_por_evento e minimo_turmas_por_evento + 2 turmas
+            qtd_turmas_evento = random.randint(minimo_turmas_por_evento, minimo_turmas_por_evento + 2)
+            
+            # Data base para o evento
+            data_base_inicio = evento.data_inicio_evento
+            
+            for i in range(1, qtd_turmas_evento + 1):
+                # Calcula datas únicas para cada turma (espaçadas de 1-2 meses)
+                meses_adicionar = (i - 1) * random.randint(1, 2)
+                data_inicio_turma = data_base_inicio + relativedelta(months=meses_adicionar)
+                data_fim_turma = data_inicio_turma + timedelta(days=random.randint(60, 90))
+                
+                # Formata nome: 'Turma X - Mês/Ano'
+                mes_abrev = meses_pt[data_inicio_turma.month]
+                ano = data_inicio_turma.year
+                nome_turma = f'Turma {i} - {mes_abrev}/{ano}'
+                
+                # Capacidade proporcional às vagas totais do evento
+                capacidade_turma = evento.total_vagas // qtd_turmas_evento
+                
+                turma = Turma.objects.create(
+                    evento=evento,
+                    nome=nome_turma,
+                    turno=random.choice(turnos),
+                    capacidade=capacidade_turma,
+                    local=random.choice(locais),
+                    data_inicio=data_inicio_turma,
+                    data_fim=data_fim_turma
+                )
+                
+                total_turmas += 1
+                self.stdout.write(f'      📅 Turma criada: {evento.nome} - {nome_turma}')
+        
+        return total_turmas
+    
+    def _gerar_nome_unico(self, sexo, nomes_usados):
+        """
+        ATUALIZAÇÃO 3: Geração GARANTIDA de nomes únicos
+        Verifica contra set em memória E banco de dados
+        """
         # Listas expandidas de nomes
         primeiros_nomes_masc = [
             'João', 'José', 'Carlos', 'Paulo', 'Pedro', 'Lucas', 'Fernando', 'Rafael',
             'Gabriel', 'Bruno', 'Matheus', 'Thiago', 'Felipe', 'André', 'Leonardo',
             'Rodrigo', 'Marcelo', 'Ricardo', 'Diego', 'Gustavo', 'Daniel', 'Eduardo',
             'Fábio', 'Vinícius', 'Alexandre', 'Leandro', 'Renato', 'Sérgio', 'Marcos',
-            'Antônio', 'Júlio', 'César', 'Henrique', 'Márcio', 'Roberto', 'Jorge'
+            'Antônio', 'Júlio', 'César', 'Henrique', 'Márcio', 'Roberto', 'Jorge',
+            'Luiz', 'Francisco', 'Alessandro', 'Augusto', 'Caio', 'Danilo', 'Emerson',
+            'Fabiano', 'Guilherme', 'Hugo', 'Igor', 'Jair', 'Kevin', 'Luciano'
         ]
         
         primeiros_nomes_fem = [
@@ -212,21 +308,25 @@ class Command(BaseCommand):
             'Camila', 'Beatriz', 'Amanda', 'Mariana', 'Larissa', 'Débora', 'Renata',
             'Vanessa', 'Tatiane', 'Simone', 'Jéssica', 'Cláudia', 'Sandra', 'Cristina',
             'Adriana', 'Priscila', 'Luciana', 'Daniela', 'Carolina', 'Bianca', 'Letícia',
-            'Viviane', 'Elaine', 'Mônica', 'Andreia', 'Raquel', 'Silvia', 'Rosana'
+            'Viviane', 'Elaine', 'Mônica', 'Andreia', 'Raquel', 'Silvia', 'Rosana',
+            'Bruna', 'Fabiana', 'Gabriela', 'Helena', 'Isabela', 'Júlia', 'Karen',
+            'Laura', 'Natália', 'Olivia', 'Rafaela', 'Sabrina', 'Talita', 'Valéria'
         ]
         
         nomes_meio = [
             'da Silva', 'dos Santos', 'de Oliveira', 'de Souza', 'da Costa', 'Ferreira',
             'Rodrigues', 'de Almeida', 'do Nascimento', 'Lima', 'de Araújo', 'Fernandes',
             'de Carvalho', 'Gomes', 'Martins', 'Rocha', 'Ribeiro', 'Alves', 'Pereira',
-            'de Melo', 'Barbosa', 'Cardoso', 'Teixeira', 'Reis', 'Correia', 'da Silva',
-            'Moreira', 'Pinto', 'Castro', 'Ramos', 'Monteiro', 'Nunes', 'Mendes'
+            'de Melo', 'Barbosa', 'Cardoso', 'Teixeira', 'Reis', 'Correia',
+            'Moreira', 'Pinto', 'Castro', 'Ramos', 'Monteiro', 'Nunes', 'Mendes',
+            'Freitas', 'Barros', 'Dias', 'Cavalcanti', 'Duarte', 'Rezende', 'Azevedo'
         ]
         
         sobrenomes_finais = [
             'Junior', 'Neto', 'Filho', 'Silva', 'Santos', 'Oliveira', 'Souza', 'Costa',
             'Lima', 'Alves', 'Pereira', 'Rocha', 'Dias', 'Moura', 'Cunha', 'Pires',
-            'Farias', 'Lopes', 'Soares', 'Duarte', 'Coelho', 'Freitas', 'Barros'
+            'Farias', 'Lopes', 'Soares', 'Duarte', 'Coelho', 'Freitas', 'Barros',
+            'Campos', 'Vieira', 'Melo', 'Santana', 'Nogueira', 'Machado', 'Gonçalves'
         ]
         
         # Escolhe lista de nomes baseado no sexo
@@ -235,27 +335,26 @@ class Command(BaseCommand):
         else:
             primeiros_nomes = primeiros_nomes_fem
         
-        # Tenta gerar nome único (máximo 100 tentativas)
-        for _ in range(100):
+        # Tenta gerar nome único (máximo 200 tentativas)
+        for tentativa in range(200):
             # Gera combinação aleatória
             primeiro = random.choice(primeiros_nomes)
             meio = random.choice(nomes_meio)
-            final = random.choice(sobrenomes_finais) if random.random() < 0.5 else ''
             
-            # Monta nome completo
-            if final:
+            # 50% de chance de ter sobrenome final
+            if random.random() < 0.5:
+                final = random.choice(sobrenomes_finais)
                 nome_completo = f'{primeiro} {meio} {final}'
             else:
                 nome_completo = f'{primeiro} {meio}'
             
-            # Verifica se é único
+            # VERIFICAÇÃO DUPLA: memória E banco de dados
             if nome_completo not in nomes_usados:
-                # Verifica também no banco de dados
                 if not Interessado.objects.filter(nome=nome_completo).exists():
                     nomes_usados.add(nome_completo)
                     return nome_completo
         
-        # Se não conseguiu, adiciona número ao final
+        # Fallback: adiciona número sequencial ao final
         base = f'{random.choice(primeiros_nomes)} {random.choice(nomes_meio)}'
         contador = 1
         while True:
@@ -266,7 +365,7 @@ class Command(BaseCommand):
             contador += 1
     
     def _criar_interessados(self, quantidade, fototipos, escolaridades, sexos):
-        """Cria interessados de teste com dados completos e nomes únicos"""
+        """Cria interessados de teste com dados completos e NOMES ÚNICOS GARANTIDOS"""
         
         ruas = ['Rua das Flores', 'Avenida Brasil', 'Rua São Paulo', 'Travessa do Comércio',
                 'Rua Santa Maria', 'Avenida Central', 'Rua do Progresso', 'Rua da Paz',
@@ -295,7 +394,7 @@ class Command(BaseCommand):
             # Escolhe sexo
             sexo = random.choice(sexos)
             
-            # Gera nome único
+            # Gera nome único GARANTIDO
             nome_completo = self._gerar_nome_unico(sexo, nomes_usados)
             
             # Gera CPF fictício único
