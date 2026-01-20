@@ -1,3 +1,8 @@
+<!-- Arquivo: index.html -->
+<!-- Caminho: apps/portal/templates/portal/index.html -->
+<!-- Alteração: Cards de ações rápidas movidos para logo abaixo da hero-section -->
+<!-- Data: 19/01/2026 -->
+
 {% extends 'portal/base.html' %}
 
 {% block title %}Início - Portal MetaReciclagem{% endblock %}
@@ -11,29 +16,63 @@
                 <h1 class="display-4 mb-3">
                     <i class="bi bi-recycle"></i> Bem-vindo ao Portal MetaReciclagem
                 </h1>
-                <p class="lead mb-4">
+                <p class="lead mb-0">
                     Inscreva-se em nossos cursos e eventos. Transforme seu futuro através da tecnologia!
                 </p>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                    <a href="{% url 'portal:consulta_publica' %}" class="btn btn-light btn-lg">
-                        <i class="bi bi-search"></i> Consultar Resultado
-                    </a>
-                    {% if not request.session.interessado_id %}
-                        <a href="{% url 'portal:login' %}" class="btn btn-outline-light btn-lg">
-                            <i class="bi bi-box-arrow-in-right"></i> Fazer Login
-                        </a>
-                    {% else %}
-                        <a href="{% url 'portal:dashboard' %}" class="btn btn-outline-light btn-lg">
-                            <i class="bi bi-speedometer2"></i> Meu Painel
-                        </a>
-                    {% endif %}
-                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Eventos com Inscrições Abertas -->
+<!-- Cards de Ações Rápidas (MOVIDO PARA CÁ - logo abaixo da hero-section) -->
+<div class="row mb-5">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-search fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Consultar Resultado</h5>
+                <p class="card-text">Consulte sua classificação nos eventos usando seu CPF.</p>
+                <a href="{% url 'portal:consulta_publica' %}" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Consultar Agora
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-person-circle fs-1 text-success mb-3"></i>
+                <h5 class="card-title">Área do Interessado</h5>
+                <p class="card-text">Acesse seu painel para ver suas inscrições e resultados.</p>
+                {% if request.session.interessado_id %}
+                    <a href="{% url 'interessados:dashboard' %}" class="btn btn-success">
+                        <i class="bi bi-speedometer2"></i> Acessar Painel
+                    </a>
+                {% else %}
+                    <a href="{% url 'interessados:login' %}" class="btn btn-success">
+                        <i class="bi bi-box-arrow-in-right"></i> Fazer Login
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-question-circle fs-1 text-info mb-3"></i>
+                <h5 class="card-title">Dúvidas?</h5>
+                <p class="card-text">Entre em contato conosco para mais informações.</p>
+                <a href="#" class="btn btn-info">
+                    <i class="bi bi-envelope"></i> Fale Conosco
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Eventos com Inscrições Abertas (AGORA APARECE DEPOIS DOS CARDS) -->
 <div class="row mb-4">
     <div class="col-12">
         <h2 class="mb-4">
@@ -46,8 +85,8 @@
     <div class="row">
         {% for evento in eventos_abertos %}
             <div class="col-md-6 col-lg-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-header">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">{{ evento.nome }}</h5>
                     </div>
                     <div class="card-body">
@@ -89,52 +128,8 @@
     </div>
 {% endif %}
 
-<!-- Cards de Ações Rápidas -->
-<div class="row mt-5">
-    <div class="col-md-4 mb-3">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="bi bi-search fs-1 text-primary mb-3"></i>
-                <h5 class="card-title">Consultar Resultado</h5>
-                <p class="card-text">Consulte sua classificação nos eventos usando seu CPF.</p>
-                <a href="{% url 'portal:consulta_publica' %}" class="btn btn-primary">
-                    Consultar Agora
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="bi bi-person-circle fs-1 text-success mb-3"></i>
-                <h5 class="card-title">Área do Interessado</h5>
-                <p class="card-text">Acesse seu painel para ver suas inscrições e resultados.</p>
-                {% if request.session.interessado_id %}
-                    <a href="{% url 'portal:dashboard' %}" class="btn btn-success">
-                        Acessar Painel
-                    </a>
-                {% else %}
-                    <a href="{% url 'portal:login' %}" class="btn btn-success">
-                        Fazer Login
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4 mb-3">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="bi bi-question-circle fs-1 text-info mb-3"></i>
-                <h5 class="card-title">Dúvidas?</h5>
-                <p class="card-text">Entre em contato conosco para mais informações.</p>
-                <a href="#" class="btn btn-info">
-                    Fale Conosco
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- MENU TEMPORÁRIO DE DESENVOLVIMENTO - REMOVER EM PRODUÇÃO -->
+{% comment %} {% include "menu_temporario.html" %} {% endcomment %}
+
 {% endblock %}
 

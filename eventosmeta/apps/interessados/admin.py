@@ -1,36 +1,15 @@
 """
 Arquivo: apps/interessados/admin.py
 Caminho: apps/interessados/admin.py
+Alteração: Registrados todos os models no admin_site customizado (melhor prática)
+Data: 20/01/2026
+"""
+
+"""
+Arquivo: apps/interessados/admin.py
+Caminho: apps/interessados/admin.py
 Alteração: Corrigido format_html dos ícones e adicionado white-space nowrap nos telefones
 Data: 11/12/2025
-"""
-
-"""
-Arquivo: apps/interessados/admin.py
-Caminho: apps/interessados/admin.py
-Alteração: Ajustado list_display com ordem, formatação de telefones e centralização
-Data: 11/12/2025
-"""
-
-"""
-Arquivo: apps/interessados/admin.py
-Caminho: apps/interessados/admin.py
-Alteração: Adicionado exportador de interessados com análise de critérios
-Data: 10/12/2025
-"""
-
-"""
-Admin do app INTERESSADOS - Sistema MetaReciclagem
-Arquivo: apps/interessados/admin.py
-Alteração: Adicionar campos is_active, is_staff, is_superuser para autenticação completa
-Data: 05/12/2025
-"""
-
-"""
-Admin do app INTERESSADOS - Sistema MetaReciclagem
-Arquivo: apps/interessados/admin.py
-Alteração: Corrigir nomes dos campos de PCD (adicionar prefixo pcd_) e remover campo inexistente
-Data: 04/12/2025
 """
 
 from django.contrib import admin
@@ -40,6 +19,12 @@ from django.http import HttpResponse
 from datetime import date
 from decimal import Decimal
 import csv
+
+# ==========================================
+# IMPORT DO ADMIN CUSTOMIZADO
+# Adicionado em 20/01/2026
+# ==========================================
+from apps.accounts.admin import admin_site
 
 from .models import Interessado, Sexo, Fototipo
 
@@ -61,7 +46,7 @@ class FototipoAdmin(admin.ModelAdmin):
 @admin.register(Interessado)
 class InteressadoAdmin(admin.ModelAdmin):
     """Administração de Interessados"""
-    
+
     # Listagem - Atualizado em 11/12/2025
     list_display = [
         'cpf',
@@ -75,7 +60,7 @@ class InteressadoAdmin(admin.ModelAdmin):
         'telefone_formatado',
         'email'
     ]
-    
+
     # Filtros
     list_filter = [
         'is_active',
@@ -86,7 +71,7 @@ class InteressadoAdmin(admin.ModelAdmin):
         'fototipo',
         'criado_em'
     ]
-    
+
     # Busca
     search_fields = [
         'cpf',
@@ -96,10 +81,10 @@ class InteressadoAdmin(admin.ModelAdmin):
         'cidade_residencia',
         'bairro'
     ]
-    
+
     # Campos somente leitura
     readonly_fields = ['criado_em', 'atualizado_em', 'last_login']
-    
+
     # Organização do formulário
     fieldsets = (
         ('Dados Pessoais', {
@@ -196,21 +181,21 @@ class InteressadoAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         })
     )
-    
+
     # Ordenação
     ordering = ['nome']
-    
+
     # Quantidade de itens por página
     list_per_page = 25
-    
+
     # Actions
     actions = ['ativar_interessados', 'desativar_interessados', 'exportar_interessados_detalhado']
-    
+
     # ==========================================
     # MÉTODOS PERSONALIZADOS PARA LIST_DISPLAY
     # Adicionados em 11/12/2025
     # ==========================================
-    
+
     def data_nascimento_formatada(self, obj):
         """Exibe data de nascimento no formato dd/mm/yyyy centralizado"""
         if obj.data_nascimento:
@@ -221,13 +206,13 @@ class InteressadoAdmin(admin.ModelAdmin):
         return format_html('<div style="text-align: center;">—</div>')
     data_nascimento_formatada.short_description = 'Data Nascimento'
     data_nascimento_formatada.admin_order_field = 'data_nascimento'
-    
+
     def sexo_display(self, obj):
         """Exibe o sexo"""
         return obj.sexo.nome if obj.sexo else '—'
     sexo_display.short_description = 'Sexo'
     sexo_display.admin_order_field = 'sexo__nome'
-    
+
     def fototipo_display(self, obj):
         """Exibe o fototipo centralizado"""
         fototipo = obj.fototipo.nome if obj.fototipo else '—'
@@ -237,7 +222,7 @@ class InteressadoAdmin(admin.ModelAdmin):
         )
     fototipo_display.short_description = 'Fototipo'
     fototipo_display.admin_order_field = 'fototipo__nome'
-    
+
     def programa_social_display(self, obj):
         """Exibe programa social com ícone colorido centralizado"""
         if obj.programa_social:
@@ -250,7 +235,7 @@ class InteressadoAdmin(admin.ModelAdmin):
             )
     programa_social_display.short_description = 'Programa Social'
     programa_social_display.admin_order_field = 'programa_social'
-    
+
     def necessidades_especiais_display(self, obj):
         """Exibe necessidades especiais com ícone colorido centralizado"""
         if obj.necessidades_especiais or obj.tem_deficiencia:
@@ -263,13 +248,13 @@ class InteressadoAdmin(admin.ModelAdmin):
             )
     necessidades_especiais_display.short_description = 'Necessidades Especiais'
     necessidades_especiais_display.admin_order_field = 'necessidades_especiais'
-    
+
     def celular_formatado(self, obj):
         """Formata celular como (99) 99999-0000 e centraliza sem quebra de linha"""
         if obj.celular:
             # Remove caracteres não numéricos
             numeros = ''.join(filter(str.isdigit, obj.celular))
-            
+
             if len(numeros) == 11:
                 # Formato: (99) 99999-0000
                 formatado = f'({numeros[:2]}) {numeros[2:7]}-{numeros[7:]}'
@@ -278,7 +263,7 @@ class InteressadoAdmin(admin.ModelAdmin):
                 formatado = f'({numeros[:2]}) {numeros[2:6]}-{numeros[6:]}'
             else:
                 formatado = obj.celular
-            
+
             return format_html(
                 '<div style="text-align: center; white-space: nowrap;">{}</div>',
                 formatado
@@ -286,13 +271,13 @@ class InteressadoAdmin(admin.ModelAdmin):
         return format_html('<div style="text-align: center;">—</div>')
     celular_formatado.short_description = 'Celular'
     celular_formatado.admin_order_field = 'celular'
-    
+
     def telefone_formatado(self, obj):
         """Formata telefone como (99) 9999-0000 e centraliza sem quebra de linha"""
         if obj.telefone:
             # Remove caracteres não numéricos
             numeros = ''.join(filter(str.isdigit, obj.telefone))
-            
+
             if len(numeros) == 11:
                 # Formato: (99) 99999-0000
                 formatado = f'({numeros[:2]}) {numeros[2:7]}-{numeros[7:]}'
@@ -301,7 +286,7 @@ class InteressadoAdmin(admin.ModelAdmin):
                 formatado = f'({numeros[:2]}) {numeros[2:6]}-{numeros[6:]}'
             else:
                 formatado = obj.telefone
-            
+
             return format_html(
                 '<div style="text-align: center; white-space: nowrap;">{}</div>',
                 formatado
@@ -309,11 +294,11 @@ class InteressadoAdmin(admin.ModelAdmin):
         return format_html('<div style="text-align: center;">—</div>')
     telefone_formatado.short_description = 'Telefone'
     telefone_formatado.admin_order_field = 'telefone'
-    
+
     # ==========================================
     # MÉTODOS EXISTENTES
     # ==========================================
-    
+
     def is_active_display(self, obj):
         """
         Exibe o status ativo/inativo com ícone colorido
@@ -328,7 +313,7 @@ class InteressadoAdmin(admin.ModelAdmin):
         )
     is_active_display.short_description = 'Status'
     is_active_display.admin_order_field = 'is_active'
-    
+
     def save_model(self, request, obj, form, change):
         """
         Sobrescreve o método save_model para garantir que a senha seja criptografada
@@ -337,7 +322,7 @@ class InteressadoAdmin(admin.ModelAdmin):
             # Se o campo senha foi alterado, criptografa
             obj.set_password(form.cleaned_data['senha'])
         super().save_model(request, obj, form, change)
-    
+
     def ativar_interessados(self, request, queryset):
         """
         Action para ativar interessados selecionados
@@ -349,7 +334,7 @@ class InteressadoAdmin(admin.ModelAdmin):
             f'✅ {count} interessado(s) ativado(s) com sucesso! Agora podem fazer login.'
         )
     ativar_interessados.short_description = '✅ Ativar interessados selecionados'
-    
+
     def desativar_interessados(self, request, queryset):
         """
         Action para desativar interessados selecionados
@@ -362,29 +347,29 @@ class InteressadoAdmin(admin.ModelAdmin):
             level='WARNING'
         )
     desativar_interessados.short_description = '❌ Desativar interessados selecionados'
-    
+
     def exportar_interessados_detalhado(self, request, queryset):
         """
         Exporta interessados com análise detalhada de critérios que atendem
         Adicionado em 10/12/2025
         """
         from apps.eventos.models import Criterio
-        
+
         # Criar resposta HTTP com CSV
         response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
         response['Content-Disposition'] = 'attachment; filename="interessados_analise_criterios.csv"'
-        
+
         # Adicionar BOM para Excel reconhecer UTF-8
         response.write('\ufeff')
-        
+
         writer = csv.writer(response, delimiter=';')
-        
+
         # Buscar todos os critérios de PONTUACAO ativos
         criterios_pontuacao = Criterio.objects.filter(
             ativo=True,
             tipo_criterio='PONTUACAO'
         ).order_by('nome')
-        
+
         # Cabeçalho base
         cabecalho = [
             'CPF',
@@ -404,22 +389,22 @@ class InteressadoAdmin(admin.ModelAdmin):
             'NIS',
             'Status',
         ]
-        
+
         # Adicionar colunas para cada critério
         for criterio in criterios_pontuacao:
             cabecalho.append(f'{criterio.nome} ({criterio.pontos} pts)')
-        
+
         # Adicionar colunas finais
         cabecalho.extend([
             'Critérios Atendidos',
             'Pontuação Total Potencial'
         ])
-        
+
         writer.writerow(cabecalho)
-        
+
         # Processar cada interessado
         hoje = date.today()
-        
+
         for interessado in queryset.select_related('sexo', 'fototipo'):
             # Calcular idade
             if interessado.data_nascimento:
@@ -428,7 +413,7 @@ class InteressadoAdmin(admin.ModelAdmin):
                 )
             else:
                 idade = 'N/A'
-            
+
             # Tipos de PCD
             tipos_pcd = []
             if interessado.pcd_fisica:
@@ -443,9 +428,9 @@ class InteressadoAdmin(admin.ModelAdmin):
                 tipos_pcd.append('Psicossocial')
             if interessado.pcd_multiplas:
                 tipos_pcd.append('Múltiplas')
-            
+
             tipos_pcd_str = ', '.join(tipos_pcd) if tipos_pcd else 'Nenhuma'
-            
+
             # Linha base
             linha = [
                 interessado.cpf,
@@ -465,45 +450,45 @@ class InteressadoAdmin(admin.ModelAdmin):
                 interessado.num_nis or 'N/A',
                 'Ativo' if interessado.is_active else 'Inativo',
             ]
-            
+
             # Analisar cada critério
             criterios_atendidos = []
             pontuacao_total = 0
-            
+
             for criterio in criterios_pontuacao:
                 atende = False
-                
+
                 # PCD
                 if criterio.codigo == 'PCD':
                     if interessado.tem_deficiencia:
                         atende = True
-                
+
                 # NIS
                 elif criterio.codigo == 'NIS' or criterio.codigo == 'PROGRAMA_SOCIAL':
                     if interessado.programa_social and interessado.num_nis:
                         atende = True
-                
+
                 # JOVEM (16 a 24 anos)
-                elif criterio.codigo == 'JOVEM' or (criterio.categoria == 'FAIXA_ETARIA' and '16' in criterio.nome and '24' in criterio.nome):
+                elif criterio.codigo == 'JOVEM' or (criterio.categoria == 'FAIXA_ETARIA' and '16' in criterio.nome and '24' in criterio.nome):      
                     if isinstance(idade, int) and 16 <= idade <= 24:
                         atende = True
-                
+
                 # IDOSO (50+ anos)
-                elif criterio.codigo == 'IDOSO' or (criterio.categoria == 'FAIXA_ETARIA' and ('50' in criterio.nome or 'Idoso' in criterio.nome)):
+                elif criterio.codigo == 'IDOSO' or (criterio.categoria == 'FAIXA_ETARIA' and ('50' in criterio.nome or 'Idoso' in criterio.nome)):  
                     if isinstance(idade, int) and idade >= 50:
                         atende = True
-                
+
                 # IDOSO 60+
                 elif criterio.categoria == 'FAIXA_ETARIA' and '60' in criterio.nome:
                     if isinstance(idade, int) and idade >= 60:
                         atende = True
-                
+
                 # COTA RACIAL
                 elif criterio.categoria == 'COTA_RACIAL':
                     racas_cotistas = ['Preta', 'Parda', 'Indígena', 'Preto', 'Pardo', 'Indigena']
                     if interessado.fototipo and interessado.fototipo.nome in racas_cotistas:
                         atende = True
-                
+
                 # ESCOLARIDADE
                 elif criterio.categoria == 'ESCOLARIDADE':
                     niveis_ordem = [
@@ -515,7 +500,7 @@ class InteressadoAdmin(admin.ModelAdmin):
                         'SUPERIOR_COMPLETO',
                         'POS_GRADUACAO'
                     ]
-                    
+
                     # Identificar critério específico
                     if criterio.codigo == 'ESC_FUND_INC':
                         if interessado.escolaridade == 'FUNDAMENTAL_INCOMPLETO':
@@ -538,13 +523,13 @@ class InteressadoAdmin(admin.ModelAdmin):
                             nivel_minimo = 'MEDIO_COMPLETO'
                         elif 'Superior' in criterio.nome:
                             nivel_minimo = 'SUPERIOR_COMPLETO'
-                        
+
                         if nivel_minimo:
                             idx_interessado = niveis_ordem.index(interessado.escolaridade)
                             idx_minimo = niveis_ordem.index(nivel_minimo)
                             if idx_interessado >= idx_minimo:
                                 atende = True
-                
+
                 # Adicionar resultado
                 if atende:
                     linha.append('SIM')
@@ -552,14 +537,24 @@ class InteressadoAdmin(admin.ModelAdmin):
                     pontuacao_total += criterio.pontos or 0
                 else:
                     linha.append('NÃO')
-            
+
             # Adicionar totalizadores
             linha.append(', '.join(criterios_atendidos) if criterios_atendidos else 'Nenhum')
             linha.append(f'{pontuacao_total:.2f}')
-            
+
             writer.writerow(linha)
-        
+
         messages.success(request, f'✅ {queryset.count()} interessado(s) exportado(s) com sucesso!')
         return response
-    
+
     exportar_interessados_detalhado.short_description = '📊 Exportar interessados com análise de critérios (Excel)'
+
+
+# ==========================================
+# REGISTRAR NO ADMIN CUSTOMIZADO
+# Adicionado em 20/01/2026
+# ==========================================
+admin_site.register(Sexo, SexoAdmin)
+admin_site.register(Fototipo, FototipoAdmin)
+admin_site.register(Interessado, InteressadoAdmin)
+

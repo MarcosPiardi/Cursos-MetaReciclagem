@@ -1,0 +1,149 @@
+<!-- Arquivo: index.html -->
+<!-- Caminho: apps/portal/templates/portal/index.html -->
+<!-- Alteração: Adicionado menu temporário de desenvolvimento -->
+<!-- Data: 19/01/2026 -->
+
+{% extends 'portal/base.html' %}
+
+{% block title %}Início - Portal MetaReciclagem{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center py-5">
+                <h1 class="display-4 mb-3">
+                    <i class="bi bi-recycle"></i> Bem-vindo ao Portal MetaReciclagem
+                </h1>
+                <p class="lead mb-4">
+                    Inscreva-se em nossos cursos e eventos. Transforme seu futuro através da tecnologia!
+                </p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a href="{% url 'portal:consulta_publica' %}" class="btn btn-light btn-lg">
+                        <i class="bi bi-search"></i> Consultar Resultado
+                    </a>
+                    {% if not request.session.interessado_id %}
+                        <a href="{% url 'portal:login' %}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Fazer Login
+                        </a>
+                    {% else %}
+                        <a href="{% url 'portal:dashboard' %}" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-speedometer2"></i> Meu Painel
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Eventos com Inscrições Abertas -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="mb-4">
+            <i class="bi bi-calendar-event"></i> Eventos com Inscrições Abertas
+        </h2>
+    </div>
+</div>
+
+{% if eventos_abertos %}
+    <div class="row">
+        {% for evento in eventos_abertos %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ evento.nome }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ evento.descricao|truncatewords:20 }}</p>
+                        
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="bi bi-people text-primary"></i>
+                                <strong>Vagas:</strong> {{ evento.total_vagas }}
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-calendar-check text-success"></i>
+                                <strong>Inscrições até:</strong> {{ evento.data_fim_inscricao|date:"d/m/Y" }}
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-calendar-event text-info"></i>
+                                <strong>Início:</strong> {{ evento.data_inicio_evento|date:"d/m/Y" }}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <a href="{% url 'portal:resultado_evento' evento.id %}" class="btn btn-outline-primary btn-sm w-100">
+                            <i class="bi bi-info-circle"></i> Ver Detalhes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
+                <h4>Nenhum evento com inscrições abertas no momento</h4>
+                <p class="mb-0">Fique atento! Novos eventos serão divulgados em breve.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<!-- Cards de Ações Rápidas -->
+<div class="row mt-5">
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-search fs-1 text-primary mb-3"></i>
+                <h5 class="card-title">Consultar Resultado</h5>
+                <p class="card-text">Consulte sua classificação nos eventos usando seu CPF.</p>
+                <a href="{% url 'portal:consulta_publica' %}" class="btn btn-primary">
+                    Consultar Agora
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-person-circle fs-1 text-success mb-3"></i>
+                <h5 class="card-title">Área do Interessado</h5>
+                <p class="card-text">Acesse seu painel para ver suas inscrições e resultados.</p>
+                {% if request.session.interessado_id %}
+                    <a href="{% url 'portal:dashboard' %}" class="btn btn-success">
+                        Acessar Painel
+                    </a>
+                {% else %}
+                    <a href="{% url 'portal:login' %}" class="btn btn-success">
+                        Fazer Login
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="bi bi-question-circle fs-1 text-info mb-3"></i>
+                <h5 class="card-title">Dúvidas?</h5>
+                <p class="card-text">Entre em contato conosco para mais informações.</p>
+                <a href="#" class="btn btn-info">
+                    Fale Conosco
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MENU TEMPORÁRIO DE DESENVOLVIMENTO - REMOVER EM PRODUÇÃO -->
+{% include "menu_temporario.html" %}
+
+{% endblock %}
+

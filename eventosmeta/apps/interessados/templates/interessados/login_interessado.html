@@ -4,12 +4,22 @@ AÇÃO: CRIAR arquivo apps/interessados/templates/interessados/login_interessado
 MUDANÇA: Template de login com CSS embutido (NÃO precisa de CSS externo)
 OBSERVAÇÃO: Crie a pasta apps/interessados/templates/interessados/ se não existir
 -->
+
+
+
+<!--
+Arquivo: login_interessado.html
+Caminho: apps/interessados/templates/interessados/login_interessado.html
+Alteração: Login com CPF + SENHA (não data de nascimento)
+Data: 19/01/2026
+-->
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Eventos MetaReciclagem</title>
+    <title>Login Interessado - Eventos MetaReciclagem</title>
     <style>
         * {
             margin: 0;
@@ -24,14 +34,13 @@ OBSERVAÇÃO: Crie a pasta apps/interessados/templates/interessados/ se não exi
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
         
         .login-container {
             background: white;
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 400px;
         }
@@ -43,7 +52,7 @@ OBSERVAÇÃO: Crie a pasta apps/interessados/templates/interessados/ se não exi
         
         .login-header h1 {
             color: #11998e;
-            font-size: 28px;
+            font-size: 24px;
             margin-bottom: 10px;
         }
         
@@ -61,7 +70,6 @@ OBSERVAÇÃO: Crie a pasta apps/interessados/templates/interessados/ se não exi
             margin-bottom: 5px;
             color: #333;
             font-weight: 500;
-            font-size: 14px;
         }
         
         .form-control {
@@ -80,7 +88,7 @@ OBSERVAÇÃO: Crie a pasta apps/interessados/templates/interessados/ se não exi
         
         .btn-login {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
             color: white;
             border: none;
@@ -117,40 +125,61 @@ OBSERVAÇÃO: Crie a pasta apps/interessados/templates/interessados/ se não exi
             border: 1px solid #f5c6cb;
         }
         
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
         .alert-info {
             background: #d1ecf1;
             color: #0c5460;
             border: 1px solid #bee5eb;
         }
         
-        .links {
+        .back-link {
             text-align: center;
             margin-top: 20px;
         }
         
-        .links a {
+        .back-link a {
             color: #11998e;
             text-decoration: none;
             font-size: 14px;
-            margin: 0 10px;
         }
         
-        .links a:hover {
+        .back-link a:hover {
             text-decoration: underline;
         }
         
         .divider {
-            margin: 15px 0;
             text-align: center;
+            margin: 20px 0;
             color: #999;
+            font-size: 14px;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .register-link a {
+            color: #11998e;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="login-header">
-            <h1>🔑 Login</h1>
-            <p>Acesse sua área de inscrições</p>
+            <h1>🔑 Área do Interessado</h1>
+            <p>Eventos MetaReciclagem</p>
         </div>
         
         {% if messages %}
@@ -163,17 +192,32 @@ OBSERVAÇÃO: Crie a pasta apps/interessados/templates/interessados/ se não exi
         </div>
         {% endif %}
         
-        <form method="post">
+        <form method="post" action="{% url 'interessados:login' %}">
             {% csrf_token %}
             
             <div class="form-group">
-                {{ form.cpf.label_tag }}
-                {{ form.cpf }}
+                <label for="cpf">CPF</label>
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    id="cpf" 
+                    name="cpf" 
+                    placeholder="000.000.000-00"
+                    required
+                    autofocus
+                >
             </div>
             
             <div class="form-group">
-                {{ form.senha.label_tag }}
-                {{ form.senha }}
+                <label for="senha">Senha</label>
+                <input 
+                    type="password" 
+                    class="form-control" 
+                    id="senha" 
+                    name="senha" 
+                    placeholder="Digite sua senha"
+                    required
+                >
             </div>
             
             <button type="submit" class="btn-login">Entrar</button>
@@ -181,12 +225,16 @@ OBSERVAÇÃO: Crie a pasta apps/interessados/templates/interessados/ se não exi
         
         <div class="divider">ou</div>
         
-        <div class="links">
-            <a href="{% url 'interessados:cadastro' %}">Criar conta</a>
-            <span>|</span>
-            <a href="{% url 'home' %}">Voltar para início</a>
+        <div class="register-link">
+            <p>Ainda não tem cadastro?</p>
+            <a href="{% url 'interessados:cadastro' %}">Criar conta agora</a>
+        </div>
+        
+        <div class="back-link">
+            <a href="{% url 'portal:index' %}">← Voltar para página inicial</a>
         </div>
     </div>
 </body>
 </html>
+
 

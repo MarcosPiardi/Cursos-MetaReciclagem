@@ -1,6 +1,13 @@
 """
 Admin do app ACADÊMICO
 Arquivo: apps/academico/admin.py
+Alteração: Registrados todos os models no admin_site customizado (melhor prática)
+Data: 20/01/2026
+"""
+
+"""
+Admin do app ACADÊMICO
+Arquivo: apps/academico/admin.py
 Alteração: Adicionado seletor de cor visual e removido código hex da listagem
 Data: 11/12/2025
 """
@@ -8,6 +15,13 @@ Data: 11/12/2025
 from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
+
+# ==========================================
+# IMPORT DO ADMIN CUSTOMIZADO
+# Adicionado em 20/01/2026
+# ==========================================
+from apps.accounts.admin import admin_site
+
 from .models import StatusMatricula, Matricula, Avaliacao
 
 
@@ -30,14 +44,14 @@ class StatusMatriculaAdmin(admin.ModelAdmin):
     list_display = ['nome', 'cor_display', 'ordem']
     search_fields = ['nome']
     ordering = ['ordem', 'nome']
-    
+
     fieldsets = (
         (None, {
             'fields': ('nome', 'cor', 'ordem'),
             'description': 'Clique no quadrado de cor para selecionar visualmente'
         }),
     )
-    
+
     def cor_display(self, obj):
         """Exibe apenas o quadrado colorido (sem texto)"""
         if obj.cor:
@@ -67,13 +81,13 @@ class AvaliacaoInline(admin.StackedInline):
 class MatriculaAdmin(admin.ModelAdmin):
     list_display = ['interessado', 'turma', 'get_evento', 'status', 'data_matricula']
     list_filter = ['status', 'turma__evento', 'turma', 'data_matricula']
-    search_fields = ['interessado__nome', 'interessado__cpf', 'turma__nome', 
+    search_fields = ['interessado__nome', 'interessado__cpf', 'turma__nome',
                      'turma__evento__nome']
     date_hierarchy = 'data_matricula'
     ordering = ['-data_matricula']
-    
+
     inlines = [AvaliacaoInline]
-    
+
     fieldsets = (
         ('Dados da Matrícula', {
             'fields': ('turma', 'interessado', 'inscricao', 'status')
@@ -86,9 +100,9 @@ class MatriculaAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    
+
     readonly_fields = ['data_matricula', 'data_atualizacao']
-    
+
     def get_evento(self, obj):
         return obj.turma.evento.nome
     get_evento.short_description = 'Evento'
@@ -97,13 +111,13 @@ class MatriculaAdmin(admin.ModelAdmin):
 
 @admin.register(Avaliacao)
 class AvaliacaoAdmin(admin.ModelAdmin):
-    list_display = ['get_interessado', 'get_turma', 'nota_final', 'frequencia', 
+    list_display = ['get_interessado', 'get_turma', 'nota_final', 'frequencia',
                     'aprovado', 'certificado_emitido']
     list_filter = ['aprovado', 'certificado_emitido', 'matricula__turma__evento']
-    search_fields = ['matricula__interessado__nome', 'matricula__interessado__cpf', 
+    search_fields = ['matricula__interessado__nome', 'matricula__interessado__cpf',
                      'matricula__turma__nome']
     ordering = ['-avaliado_em']
-    
+
     fieldsets = (
         ('Matrícula', {
             'fields': ('matricula',)
@@ -122,18 +136,25 @@ class AvaliacaoAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-    
+
     readonly_fields = ['avaliado_em', 'atualizado_em']
-    
+
     def get_interessado(self, obj):
         return obj.matricula.interessado.nome
     get_interessado.short_description = 'Aluno'
     get_interessado.admin_order_field = 'matricula__interessado__nome'
-    
+
     def get_turma(self, obj):
         return obj.matricula.turma.nome
     get_turma.short_description = 'Turma'
     get_turma.admin_order_field = 'matricula__turma__nome'
 
-    
+
+# ==========================================
+# REGISTRAR NO ADMIN CUSTOMIZADO
+# Adicionado em 20/01/2026
+# ==========================================
+admin_site.register(StatusMatricula, StatusMatriculaAdmin)
+admin_site.register(Matricula, MatriculaAdmin)
+admin_site.register(Avaliacao, AvaliacaoAdmin)
 

@@ -1,9 +1,70 @@
+"""
+Arquivo: admin.py
+Caminho: apps/accounts/admin.py
+Alteração: Admin customizado com dashboard + UsuarioAdmin - IMPORT CORRIGIDO
+Data: 20/01/2026
+"""
+
+from datetime import date
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.urls import path
+from django.shortcuts import render
+
 from .models import Usuario
+from apps.eventos.models import Evento
+from apps.interessados.models import Interessado
+from apps.selecao.models import Inscricao
 
 
-@admin.register(Usuario)
+# ==========================================
+# ADMIN SITE CUSTOMIZADO COM DASHBOARD
+# ==========================================
+
+class CustomAdminSite(admin.AdminSite):
+    site_header = 'MetaReciclagem - Administração'
+    site_title = 'MetaReciclagem Admin'
+    index_title = 'Painel de Controle'
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('dashboard/', self.admin_view(self.dashboard_view), name='dashboard'),
+        ]
+        return custom_urls + urls
+    
+    def dashboard_view(self, request):
+        """View personalizada de dashboard"""
+        
+        # Estatísticas
+        total_eventos = Evento.objects.count()
+        total_interessados = Interessado.objects.count()
+        total_inscricoes = Inscricao.objects.count()
+        
+        eventos_abertos = Evento.objects.filter(
+            data_fim_inscricao__gte=date.today()
+        ).count()
+        
+        context = {
+            **self.each_context(request),
+            'title': 'Dashboard',
+            'total_eventos': total_eventos,
+            'total_interessados': total_interessados,
+            'total_inscricoes': total_inscricoes,
+            'eventos_abertos': eventos_abertos,
+        }
+        
+        return render(request, 'admin/dashboard.html', context)
+
+
+# Criar instância do admin customizado
+admin_site = CustomAdminSite(name='custom_admin')
+
+
+# ==========================================
+# CONFIGURAÇÃO DO USUARIO ADMIN
+# ==========================================
+
 class UsuarioAdmin(BaseUserAdmin):
     """
     Configuração do admin para o modelo Usuario customizado.
@@ -32,7 +93,7 @@ class UsuarioAdmin(BaseUserAdmin):
         }),
         ('Permissões', {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
-            'classes': ('collapse',),  # Deixa essa seção recolhível
+            'classes': ('collapse',),
         }),
         ('Datas Importantes', {
             'fields': ('last_login', 'date_joined'),
@@ -57,3 +118,7 @@ class UsuarioAdmin(BaseUserAdmin):
     )
     
     ordering = ['username']
+
+
+# Registrar Usuario no admin customizado
+admin_site.register(Usuario, UsuarioAdmin)

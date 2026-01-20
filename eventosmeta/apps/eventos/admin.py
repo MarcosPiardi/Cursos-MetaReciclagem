@@ -1,57 +1,15 @@
 """
 Arquivo: admin.py
 Caminho: apps/eventos/admin.py
+Alteração: Registrados todos os models no admin_site customizado (melhor prática)
+Data: 20/01/2026
+"""
+
+"""
+Arquivo: admin.py
+Caminho: apps/eventos/admin.py
 Alteração: Melhorada apresentação da grade de eventos (status colorido, datas formatadas, vagas/inscritos)
 Data: 12/01/2026
-"""
-
-"""
-Arquivo: admin.py
-Caminho: apps/eventos/admin.py
-Alteração: Adicionado seletor de cor visual e removido código hex da listagem no Status
-Data: 11/12/2025
-"""
-
-"""
-Arquivo: admin.py
-Caminho: apps/eventos/admin.py
-Alteração: Adicionada visualização de cor no StatusAdmin
-Data: 11/12/2025
-"""
-
-"""
-Arquivo: admin.py
-Caminho: apps/eventos/admin.py
-Alteração: Melhorada action de classificação com feedback detalhado usando retorno do service
-Data: 11/12/2025
-"""
-
-"""
-Arquivo: admin.py
-Caminho: apps/eventos/admin.py
-Alteração: Adicionado exportador de classificação detalhada para Excel/CSV
-Data: 10/12/2025
-"""
-
-"""
-Arquivo: admin.py
-Caminho: apps/eventos/admin.py
-Alteração: Simplificado para usar ClassificadorService (sem métodos _classificar_inscricao)
-Data: 10/12/2025
-"""
-
-"""
-Arquivo: admin.py
-Caminho: apps/eventos/admin.py
-Alteração: Campo codigo agora é editável (removido de readonly_fields)
-Data: 10/12/2025
-"""
-
-"""
-Arquivo: admin.py
-Caminho: apps/eventos/admin.py
-Alteração: EventoCriterio com campo prioridade e CriterioAdmin com tipo_criterio
-Data: 09/12/2025
 """
 
 from django import forms
@@ -62,6 +20,12 @@ from django.utils.html import format_html
 from datetime import date
 from decimal import Decimal
 import csv
+
+# ==========================================
+# IMPORT DO ADMIN CUSTOMIZADO
+# Adicionado em 20/01/2026
+# ==========================================
+from apps.accounts.admin import admin_site
 
 from .models import Status, Criterio, Evento, EventoCriterio, Turma, Horario
 
@@ -85,14 +49,14 @@ class StatusAdmin(admin.ModelAdmin):
     list_display = ['nome', 'cor_visual', 'ordem']
     list_editable = ['ordem']
     ordering = ['ordem']
-    
+
     fieldsets = (
         (None, {
             'fields': ('nome', 'cor', 'ordem'),
             'description': 'Clique no quadrado de cor para selecionar visualmente'
         }),
     )
-    
+
     def cor_visual(self, obj):
         """Mostra apenas o quadrado colorido (sem texto)"""
         if obj.cor:
@@ -113,7 +77,7 @@ class CriterioAdmin(admin.ModelAdmin):
     list_editable = ['ativo']
     search_fields = ['nome', 'codigo', 'descricao']
     readonly_fields = []
-    
+
     fieldsets = (
         ('IDENTIFICAÇÃO', {
             'fields': ('tipo_criterio', 'codigo', 'nome', 'descricao')
@@ -126,7 +90,7 @@ class CriterioAdmin(admin.ModelAdmin):
             'fields': ('ativo',)
         }),
     )
-    
+
     def has_delete_permission(self, request, obj=None):
         """Critérios fixos não podem ser deletados pelo admin"""
         return False
@@ -141,7 +105,7 @@ class EventoCriterioInline(admin.TabularInline):
     fields = ['criterio', 'prioridade', 'pontos_display', 'ativo']
     readonly_fields = ['pontos_display']
     ordering = ['prioridade', '-criterio__pontos']
-    
+
     def pontos_display(self, obj):
         """Mostra os pontos do critério (não editável)"""
         if obj.criterio:
@@ -150,11 +114,11 @@ class EventoCriterioInline(admin.TabularInline):
             return 'Ordenação'
         return '-'
     pontos_display.short_description = 'Pontuação'
-    
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related('criterio')
-    
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "criterio":
             kwargs["queryset"] = Criterio.objects.filter(ativo=True)
@@ -173,16 +137,16 @@ class TurmaInline(admin.TabularInline):
 @admin.register(Evento)
 class EventoAdmin(admin.ModelAdmin):
     list_display = [
-        'nome', 
-        'status_colorido', 
-        'vagas_inscritos', 
-        'data_inicio_evento_formatada', 
+        'nome',
+        'status_colorido',
+        'vagas_inscritos',
+        'data_inicio_evento_formatada',
         'data_fim_evento_formatada'
     ]
     list_filter = ['status', 'data_inicio_evento']
     search_fields = ['nome', 'descricao']
     actions = ['classificar_inscricoes', 'exportar_classificacao_excel']
-    
+
     fieldsets = (
         ('INFORMAÇÕES BÁSICAS', {
             'fields': ('nome', 'descricao', 'status')
@@ -194,14 +158,14 @@ class EventoAdmin(admin.ModelAdmin):
             'fields': ('data_inicio_evento', 'data_fim_evento')
         }),
     )
-    
+
     inlines = [EventoCriterioInline, TurmaInline]
-    
+
     # ==========================================
     # MÉTODOS PERSONALIZADOS PARA LIST_DISPLAY
     # Adicionados em 12/12/2025
     # ==========================================
-    
+
     def status_colorido(self, obj):
         """Exibe o status com a cor definida no modelo Status"""
         if obj.status:
@@ -219,16 +183,16 @@ class EventoAdmin(admin.ModelAdmin):
     def vagas_inscritos(self, obj):
         """Exibe quantidade de vagas / quantidade de inscritos com cores"""
         from apps.selecao.models import Inscricao
-        
+
         total_vagas = obj.total_vagas or 0
         total_inscritos = Inscricao.objects.filter(evento=obj).count()
-        
+
         # Calcular percentual de ocupação
         if total_vagas > 0:
             percentual = (total_inscritos / total_vagas) * 100
         else:
             percentual = 0
-        
+
         # Definir cor baseado no percentual
         if percentual < 80:
             cor = '#dc3545'  # Vermelho
@@ -236,7 +200,7 @@ class EventoAdmin(admin.ModelAdmin):
             cor = '#28a745'  # Verde
         else:
             cor = '#ffc107'  # Laranja (80% a 99%)
-        
+
         return format_html(
             '<div style="text-align: center;">'
             '<span style="font-weight: bold; color: {};">{} / {}</span>'
@@ -246,7 +210,7 @@ class EventoAdmin(admin.ModelAdmin):
             total_vagas
         )
     vagas_inscritos.short_description = 'Inscritos / Vagas'
-    
+
     def data_inicio_evento_formatada(self, obj):
         """Exibe data de início no formato dd/mm/yyyy"""
         if obj.data_inicio_evento:
@@ -257,7 +221,7 @@ class EventoAdmin(admin.ModelAdmin):
         return '—'
     data_inicio_evento_formatada.short_description = 'Data Início'
     data_inicio_evento_formatada.admin_order_field = 'data_inicio_evento'
-    
+
     def data_fim_evento_formatada(self, obj):
         """Exibe data de fim no formato dd/mm/yyyy"""
         if obj.data_fim_evento:
@@ -268,11 +232,11 @@ class EventoAdmin(admin.ModelAdmin):
         return '—'
     data_fim_evento_formatada.short_description = 'Data Fim'
     data_fim_evento_formatada.admin_order_field = 'data_fim_evento'
-    
+
     # ==========================================
     # ACTIONS
     # ==========================================
-    
+
     def classificar_inscricoes(self, request, queryset):
         """
         Action para classificar inscrições dos eventos selecionados
@@ -280,19 +244,19 @@ class EventoAdmin(admin.ModelAdmin):
         """
         from apps.selecao.services import ClassificadorService
         from apps.eventos.models import EventoCriterio
-        
+
         total_eventos_processados = 0
         total_eventos_com_erro = 0
         total_geral_classificadas = 0
         total_geral_lista_espera = 0
-        
+
         for evento in queryset:
             # Verificar se tem critérios ativos
             criterios_ativos = EventoCriterio.objects.filter(
                 evento=evento,
                 ativo=True
             )
-            
+
             if not criterios_ativos.exists():
                 messages.warning(
                     request,
@@ -300,11 +264,11 @@ class EventoAdmin(admin.ModelAdmin):
                 )
                 total_eventos_com_erro += 1
                 continue
-            
+
             # Classificar usando o service
             try:
                 resultado = ClassificadorService.classificar_evento(evento)
-                
+
                 # Verifica se houve inscrições processadas
                 if resultado['total_processadas'] == 0:
                     messages.warning(
@@ -313,12 +277,12 @@ class EventoAdmin(admin.ModelAdmin):
                         f'Verifique se existem inscrições com status: Pendente, Classificado ou Lista de Espera.'
                     )
                     continue
-                
+
                 # Acumula totais gerais
                 total_eventos_processados += 1
                 total_geral_classificadas += resultado['total_classificadas']
                 total_geral_lista_espera += resultado['total_lista_espera']
-                
+
                 # Mensagem de sucesso detalhada
                 messages.success(
                     request,
@@ -328,7 +292,7 @@ class EventoAdmin(admin.ModelAdmin):
                     f'⏳ {resultado["total_lista_espera"]} em lista de espera | '
                     f'📊 Status do evento: Resultado Divulgado'
                 )
-                
+
             except ValueError as e:
                 # Erro de validação (ex: status não encontrado)
                 messages.error(
@@ -336,7 +300,7 @@ class EventoAdmin(admin.ModelAdmin):
                     f'❌ {evento.nome}: {str(e)}'
                 )
                 total_eventos_com_erro += 1
-                
+
             except Exception as e:
                 # Erro inesperado
                 messages.error(
@@ -344,10 +308,10 @@ class EventoAdmin(admin.ModelAdmin):
                     f'❌ {evento.nome}: Erro inesperado - {str(e)}'
                 )
                 total_eventos_com_erro += 1
-        
+
         # Mensagem final resumida
         total_eventos = queryset.count()
-        
+
         if total_eventos_processados == total_eventos:
             # Todos processados com sucesso
             messages.success(
@@ -372,25 +336,25 @@ class EventoAdmin(admin.ModelAdmin):
                 f'❌ Nenhum evento classificado. {total_eventos_com_erro} erro(s) ou avisos. '
                 f'Verifique as mensagens acima.'
             )
-    
+
     classificar_inscricoes.short_description = '🎯 Classificar inscrições dos eventos selecionados'
-    
+
     def exportar_classificacao_excel(self, request, queryset):
         """
         Exporta classificação detalhada para CSV/Excel
         Inclui: pontuação calculada vs salva, critérios atendidos, dados pessoais
         """
         from apps.selecao.models import Classificacao, InscricaoCriterioAtendido
-        
+
         # Criar resposta HTTP com CSV
         response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
         response['Content-Disposition'] = 'attachment; filename="classificacao_detalhada.csv"'
-        
+
         # Adicionar BOM para Excel reconhecer UTF-8
         response.write('\ufeff')
-        
+
         writer = csv.writer(response, delimiter=';')
-        
+
         # Cabeçalho
         writer.writerow([
             'Evento',
@@ -407,7 +371,7 @@ class EventoAdmin(admin.ModelAdmin):
             'Classificado',
             'Detalhes Critérios'
         ])
-        
+
         for evento in queryset:
             classificacoes = Classificacao.objects.filter(
                 inscricao__evento=evento
@@ -415,43 +379,43 @@ class EventoAdmin(admin.ModelAdmin):
                 'inscricao__interessado',
                 'inscricao__status'
             ).order_by('posicao')
-            
+
             hoje = date.today()
-            
+
             for c in classificacoes:
                 interessado = c.inscricao.interessado
-                
+
                 # Calcular idade
                 dn = interessado.data_nascimento
                 idade = hoje.year - dn.year - ((hoje.month, hoje.day) < (dn.month, dn.day))
-                
+
                 # Buscar critérios atendidos
                 criterios_atendidos = InscricaoCriterioAtendido.objects.filter(
                     inscricao=c.inscricao
                 ).select_related('criterio')
-                
+
                 # Calcular pontuação manualmente
                 pontuacao_calculada = sum(
                     ca.pontos_atribuidos for ca in criterios_atendidos
                 )
-                
+
                 # Pontuação salva
                 pontuacao_salva = c.pontuacao_total
-                
+
                 # Diferença
                 diferenca = Decimal(str(pontuacao_calculada)) - pontuacao_salva
-                
+
                 # Detalhes dos critérios
                 detalhes_criterios = ' | '.join([
                     f"{ca.criterio.nome}: {ca.pontos_atribuidos} pts"
                     for ca in criterios_atendidos
                 ]) if criterios_atendidos.exists() else 'Nenhum'
-                
+
                 # Nome dos critérios
                 nomes_criterios = ', '.join([
                     ca.criterio.nome for ca in criterios_atendidos
                 ]) if criterios_atendidos.exists() else 'Nenhum'
-                
+
                 writer.writerow([
                     evento.nome,
                     c.posicao or 'N/A',
@@ -467,10 +431,10 @@ class EventoAdmin(admin.ModelAdmin):
                     'Sim' if c.classificado else 'Não',
                     detalhes_criterios
                 ])
-        
+
         messages.success(request, '✅ Classificação exportada com sucesso!')
         return response
-    
+
     exportar_classificacao_excel.short_description = '📊 Exportar classificação detalhada (Excel)'
 
 
@@ -485,8 +449,19 @@ class TurmaAdmin(admin.ModelAdmin):
 class HorarioAdmin(admin.ModelAdmin):
     list_display = ['turma', 'dia_semana_display', 'hora_inicio', 'hora_fim']
     list_filter = ['turma', 'dia_semana']
-    
+
     def dia_semana_display(self, obj):
         return obj.get_dia_semana_display()
     dia_semana_display.short_description = 'Dia da Semana'
+
+
+# ==========================================
+# REGISTRAR NO ADMIN CUSTOMIZADO
+# Adicionado em 20/01/2026
+# ==========================================
+admin_site.register(Status, StatusAdmin)
+admin_site.register(Criterio, CriterioAdmin)
+admin_site.register(Evento, EventoAdmin)
+admin_site.register(Turma, TurmaAdmin)
+admin_site.register(Horario, HorarioAdmin)
 
