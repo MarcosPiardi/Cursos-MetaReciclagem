@@ -28,7 +28,7 @@
     }
     
     .stat-number {
-        font-size: 2.5rem;
+        font-size: 1.8rem;
         font-weight: bold;
     }
     
@@ -45,77 +45,139 @@
     .inscricao-card:hover {
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
+    
+    /* Cards de ações com ícones ao lado */
+    .action-card .card-body {
+        padding: 1.25rem !important;
+    }
+    
+    .action-card .icon-text-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .action-card .icon-text-wrapper i {
+        font-size: 2.5rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .action-card .text-content h5 {
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .action-card .text-content p {
+        font-size: 0.95rem;
+        margin-bottom: 0;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- Cabeçalho de Boas-Vindas -->
-<div class="row mb-4">
+<div class="row mb-2">
     <div class="col-12">
-        <div class="card bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <div class="card-body py-4">
-                <h2 class="mb-2">
-                    <i class="bi bi-person-circle"></i> Olá, {{ interessado.nome }}!
-                </h2>
-                <p class="mb-0 lead">Bem-vindo ao seu painel de controle</p>
+        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+            <div class="card-body py-2">
+                <h5 class="mb-0 text-white">Olá, {{ interessado.nome }}! Bem-vindo ao seu painel</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações Rápidas -->
+<div class="row mb-2">
+    <div class="col-md-6 mb-2">
+        <div class="card action-card text-center h-100">
+            <div class="card-body">
+                <div class="icon-text-wrapper">
+                    <i class="bi bi-person-gear text-primary"></i>
+                    <div class="text-content text-start">
+                        <h5 class="card-title mb-0">Meus Dados</h5>
+                        <p class="card-text text-muted">Visualize e atualize suas informações</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" disabled>
+                    <i class="bi bi-gear"></i> Em Breve
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-2">
+        <div class="card action-card text-center h-100">
+            <div class="card-body">
+                <div class="icon-text-wrapper">
+                    <i class="bi bi-box-arrow-right text-danger"></i>
+                    <div class="text-content text-start">
+                        <h5 class="card-title mb-0">Sair</h5>
+                        <p class="card-text text-muted">Encerrar sua sessão com segurança</p>
+                    </div>
+                </div>
+                <a href="{% url 'interessados:logout' %}" class="btn btn-danger">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </a>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Cards de Estatísticas -->
-<div class="row mb-4">
-    <div class="col-md-4 mb-3">
+<div class="row mb-3">
+    <div class="col-md-4 mb-2">
         <div class="card stat-card primary h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-clipboard-check fs-1 text-primary mb-3"></i>
+            <div class="card-body text-center py-2">
+                <i class="bi bi-clipboard-check fs-3 text-primary mb-1"></i>
                 <div class="stat-number text-primary">{{ total_inscricoes }}</div>
-                <p class="mb-0 text-muted">Total de Inscrições</p>
+                <p class="mb-0 text-muted small">Total de Inscrições</p>
             </div>
         </div>
     </div>
     
-    <div class="col-md-4 mb-3">
+    <div class="col-md-4 mb-2">
         <div class="card stat-card success h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-check-circle fs-1 text-success mb-3"></i>
+            <div class="card-body text-center py-2">
+                <i class="bi bi-check-circle fs-3 text-success mb-1"></i>
                 <div class="stat-number text-success">{{ inscricoes_aprovadas }}</div>
-                <p class="mb-0 text-muted">Aprovações</p>
+                <p class="mb-0 text-muted small">Aprovações</p>
             </div>
         </div>
     </div>
     
-    <div class="col-md-4 mb-3">
+    <div class="col-md-4 mb-2">
         <div class="card stat-card warning h-100">
-            <div class="card-body text-center">
-                <i class="bi bi-hourglass-split fs-1 text-warning mb-3"></i>
+            <div class="card-body text-center py-2">
+                <i class="bi bi-hourglass-split fs-3 text-warning mb-1"></i>
                 <div class="stat-number text-warning">{{ inscricoes_pendentes }}</div>
-                <p class="mb-0 text-muted">Pendentes</p>
+                <p class="mb-0 text-muted small">Pendentes</p>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Minhas Inscrições -->
-<div class="row mb-4">
+<div class="row mb-3">
     <div class="col-12">
-        <h3 class="mb-3">
+        <h4 class="mb-2">
             <i class="bi bi-list-check"></i> Minhas Inscrições
-        </h3>
+        </h4>
     </div>
 </div>
 
 {% if inscricoes %}
     <div class="row">
         {% for inscricao in inscricoes %}
-            <div class="col-md-6 col-lg-4 mb-4">
+            <div class="col-md-6 col-lg-4 mb-3">
                 <div class="card inscricao-card h-100">
-                    <div class="card-header {% if inscricao.status == 'APROVADO' %}bg-success{% elif inscricao.status == 'REPROVADO' %}bg-danger{% else %}bg-primary{% endif %} text-white">
-                        <h5 class="mb-0">{{ inscricao.evento.nome }}</h5>
+                    <div class="card-header {% if inscricao.status == 'APROVADO' %}bg-success{% elif inscricao.status == 'REPROVADO' %}bg-danger{% else %}bg-primary{% endif %} text-white py-2">
+                        <h6 class="mb-0">{{ inscricao.evento.nome }}</h6>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body py-2">
                         <!-- Status -->
-                        <div class="mb-3 text-center">
+                        <div class="mb-2 text-center">
                             {% if inscricao.status == 'INSCRITO' %}
                                 <span class="badge badge-status bg-primary">
                                     <i class="bi bi-hourglass-split"></i> Inscrito
@@ -136,32 +198,32 @@
                         </div>
                         
                         <!-- Informações -->
-                        <ul class="list-unstyled">
-                            <li class="mb-2">
+                        <ul class="list-unstyled small">
+                            <li class="mb-1">
                                 <i class="bi bi-calendar text-primary"></i>
-                                <strong>Inscrito em:</strong> {{ inscricao.data_inscricao|date:"d/m/Y" }}
+                                <strong>Inscrito:</strong> {{ inscricao.data_inscricao|date:"d/m/Y" }}
                             </li>
                             
                             {% if inscricao.classificacao %}
-                                <li class="mb-2">
+                                <li class="mb-1">
                                     <i class="bi bi-trophy text-warning"></i>
-                                    <strong>Posição:</strong> {{ inscricao.classificacao.posicao }}º lugar
+                                    <strong>Posição:</strong> {{ inscricao.classificacao.posicao }}º
                                 </li>
-                                <li class="mb-2">
+                                <li class="mb-1">
                                     <i class="bi bi-star text-warning"></i>
-                                    <strong>Pontuação:</strong> {{ inscricao.classificacao.pontuacao_total }} pontos
+                                    <strong>Pontos:</strong> {{ inscricao.classificacao.pontuacao_total }}
                                 </li>
                             {% endif %}
                             
-                            <li class="mb-2">
+                            <li class="mb-1">
                                 <i class="bi bi-calendar-event text-info"></i>
-                                <strong>Início do evento:</strong> {{ inscricao.evento.data_inicio_evento|date:"d/m/Y" }}
+                                <strong>Início:</strong> {{ inscricao.evento.data_inicio_evento|date:"d/m/Y" }}
                             </li>
                         </ul>
                     </div>
-                    <div class="card-footer bg-transparent">
+                    <div class="card-footer bg-transparent py-1">
                         <a href="{% url 'interessados:detalhes' inscricao.pk %}" class="btn btn-outline-primary btn-sm w-100">
-                            <i class="bi bi-eye"></i> Ver Detalhes
+                            <i class="bi bi-eye"></i> Detalhes
                         </a>
                     </div>
                 </div>
@@ -171,10 +233,10 @@
 {% else %}
     <div class="row">
         <div class="col-12">
-            <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
-                <h5>Você ainda não possui inscrições</h5>
-                <p class="mb-0">Explore os eventos disponíveis abaixo e faça sua primeira inscrição!</p>
+            <div class="alert alert-info text-center py-2">
+                <i class="bi bi-info-circle fs-3 d-block mb-2"></i>
+                <h6>Você ainda não possui inscrições</h6>
+                <p class="mb-0 small">Explore os eventos disponíveis abaixo!</p>
             </div>
         </div>
     </div>
@@ -182,42 +244,42 @@
 
 <!-- Eventos Disponíveis para Inscrição -->
 {% if eventos_abertos %}
-    <div class="row mt-5 mb-4">
+    <div class="row mb-3">
         <div class="col-12">
-            <h3 class="mb-3">
-                <i class="bi bi-calendar-plus"></i> Eventos Disponíveis para Inscrição
-            </h3>
+            <h4 class="mb-2">
+                <i class="bi bi-calendar-plus"></i> Eventos Disponíveis
+            </h4>
         </div>
     </div>
     
     <div class="row">
         {% for evento in eventos_abertos %}
-            <div class="col-md-6 col-lg-4 mb-4">
+            <div class="col-md-6 col-lg-4 mb-3">
                 <div class="card h-100 shadow-sm">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">{{ evento.nome }}</h5>
+                    <div class="card-header bg-success text-white py-2">
+                        <h6 class="mb-0">{{ evento.nome }}</h6>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text">{{ evento.descricao|truncatewords:15 }}</p>
+                    <div class="card-body py-2">
+                        <p class="card-text small">{{ evento.descricao|truncatewords:15 }}</p>
                         
-                        <ul class="list-unstyled">
-                            <li class="mb-2">
+                        <ul class="list-unstyled small">
+                            <li class="mb-1">
                                 <i class="bi bi-people text-primary"></i>
                                 <strong>Vagas:</strong> {{ evento.total_vagas }}
                             </li>
-                            <li class="mb-2">
+                            <li class="mb-1">
                                 <i class="bi bi-calendar-check text-success"></i>
                                 <strong>Inscrições até:</strong> {{ evento.data_fim_inscricao|date:"d/m/Y" }}
                             </li>
-                            <li class="mb-2">
+                            <li class="mb-1">
                                 <i class="bi bi-calendar-event text-info"></i>
                                 <strong>Início:</strong> {{ evento.data_inicio_evento|date:"d/m/Y" }}
                             </li>
                         </ul>
                     </div>
-                    <div class="card-footer bg-transparent">
+                    <div class="card-footer bg-transparent py-1">
                         <a href="{% url 'portal:resultado_evento' evento.id %}" class="btn btn-success btn-sm w-100">
-                            <i class="bi bi-plus-circle"></i> Ver Detalhes e Inscrever-se
+                            <i class="bi bi-plus-circle"></i> Inscrever-se
                         </a>
                     </div>
                 </div>
@@ -226,34 +288,4 @@
     </div>
 {% endif %}
 
-<!-- Ações Rápidas -->
-<div class="row mt-5">
-    <div class="col-md-6 mb-3">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="bi bi-person-gear fs-1 text-primary mb-3"></i>
-                <h5 class="card-title">Meus Dados</h5>
-                <p class="card-text">Visualize e atualize suas informações pessoais</p>
-                <button class="btn btn-primary" disabled>
-                    <i class="bi bi-gear"></i> Em Breve
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6 mb-3">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="bi bi-box-arrow-right fs-1 text-danger mb-3"></i>
-                <h5 class="card-title">Sair</h5>
-                <p class="card-text">Encerrar sua sessão com segurança</p>
-                <a href="{% url 'interessados:logout' %}" class="btn btn-danger">
-                    <i class="bi bi-box-arrow-right"></i> Logout
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
 {% endblock %}
-

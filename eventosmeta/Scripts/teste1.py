@@ -167,3 +167,9 @@ apps/accounts/
     └── admin/                    ← NOVO
         ├── dashboard.html        ← CRIAR ESTE
         └── base_site.html        ← CRIAR ESTE (opcional)
+
+
+        
+
+
+        
