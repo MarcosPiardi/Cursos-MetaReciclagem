@@ -3,25 +3,9 @@ ARQUIVO: apps/interessados/models.py
 Models do app INTERESSADOS
 Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
 Arquivo: apps/interessados/models.py
-Alteração: Adicionar métodos de permissão para compatibilidade com autenticação Django
-Data: 05/12/2025
+Alteração: Adicionar campos CEP e Raça/Cor para cadastro completo
+Data: 26/01/2026
 """
-
-"""
-ARQUIVO: apps/interessados/models.py
-Models do app INTERESSADOS
-Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
-Arquivo: apps/interessados/models.py
-Alteração: Adicionar campos is_active, is_staff, is_superuser para autenticação
-Data: 05/12/2025
-"""
-
-"""
-ARQUIVO: apps/interessados/models.py
-Models do app INTERESSADOS
-Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
-"""
-
 
 from django.db import models
 from django.core.validators import RegexValidator
@@ -75,6 +59,14 @@ class Interessado(models.Model):
     nis_validator = RegexValidator(
         regex=r'^\d{11,15}$',
         message='NIS deve conter entre 11 e 15 dígitos'
+    )
+    
+    # ============================================================
+    # VALIDADOR CEP - ADICIONADO EM 26/01/2026
+    # ============================================================
+    cep_validator = RegexValidator(
+        regex=r'^\d{8}$',
+        message='CEP deve conter exatamente 8 dígitos'
     )
     
     # ============================================================
@@ -171,6 +163,7 @@ class Interessado(models.Model):
         default=''
     )
     
+    
     # ENDEREÇO
     endereco_residencial = models.CharField(
         'Endereço Residencial',
@@ -198,6 +191,18 @@ class Interessado(models.Model):
         max_length=50,
         blank=True,
         default=''
+    )
+    
+    # ============================================================
+    # CEP - ADICIONADO EM 26/01/2026
+    # ============================================================
+    cep = models.CharField(
+        'CEP',
+        max_length=8,
+        blank=True,
+        default='',
+        validators=[cep_validator],
+        help_text='Somente números (8 dígitos)'
     )
     
     cidade_residencia = models.CharField(
@@ -448,3 +453,4 @@ class Interessado(models.Model):
         verbose_name = 'Interessado'
         verbose_name_plural = 'Interessados'
 
+        

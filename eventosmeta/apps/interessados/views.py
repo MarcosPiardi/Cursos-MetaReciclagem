@@ -1,63 +1,83 @@
 """
 Arquivo: views.py
 Caminho: apps/interessados/views.py
-Alteração: Versão corrigida combinando o melhor dos dois códigos
-Data: 19/01/2026
+Alteração: View refatorada usando Django Forms (VERSÃO PROFISSIONAL)
+Data: 26/01/2026
 """
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from datetime import date
-
 from .models import Interessado
+from .forms import CadastroInteressadoForm, LoginInteressadoForm
 from .authentication import InteressadoBackend
 from apps.selecao.models import Inscricao
 from apps.eventos.models import Evento
 
 
 def cadastro(request):
-    """Cadastro de novo interessado - SIMPLIFICADO"""
+    """Cadastro de novo interessado - USANDO DJANGO FORMS"""
     
     if request.method == 'POST':
-        # Implementação básica - pode expandir depois
-        messages.info(request, 'Cadastro em desenvolvimento.')
-        return redirect('interessados:login')
+        form = CadastroInteressadoForm(request.POST)
+        
+        if form.is_valid():
+            try:
+                interessado = form.save()
+                
+                messages.success(request, f'Cadastro realizado com sucesso! Bem-vindo, {interessado.nome}!')
+                
+                # Login automático após cadastro
+                auth_login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
+                
+                return redirect('interessados:dashboard')
+                
+            except Exception as e:
+                messages.error(request, f'Erro ao realizar cadastro: {str(e)}')
+        else:
+            # Formulário inválido - Django automaticamente adiciona os erros ao form
+            messages.error(request, 'Por favor, corrija os erros abaixo.')
     
-    return render(request, 'interessados/cadastro.html')
+    else:
+        # GET request - formulário vazio
+        form = CadastroInteressadoForm()
+    
+    return render(request, 'interessados/cadastro.html', {'form': form})
 
 
 def login_interessado(request):
-    """Login do interessado usando CPF e SENHA"""
+    """Login do interessado usando Django Forms"""
     
     # Se já está logado, redireciona
     if hasattr(request.user, '__class__') and request.user.__class__.__name__ == 'Interessado':
         return redirect('interessados:dashboard')
     
     if request.method == 'POST':
-        cpf = request.POST.get('cpf', '').strip()
-        senha = request.POST.get('senha', '').strip()
+        form = LoginInteressadoForm(request.POST)
         
-        if not cpf or not senha:
-            messages.error(request, 'Por favor, preencha todos os campos.')
-            return render(request, 'interessados/login_interessado.html')
-        
-        try:
-            # Autenticar usando o backend customizado
-            backend = InteressadoBackend()
-            interessado = backend.authenticate(request, cpf=cpf, password=senha)
+        if form.is_valid():
+            cpf = form.cleaned_data['cpf']
+            senha = form.cleaned_data['senha']
             
-            if interessado:
-                auth_login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
-                messages.success(request, f'Bem-vindo de volta, {interessado.nome}!')
-                return redirect('interessados:dashboard')
-            else:
-                messages.error(request, 'CPF ou senha incorretos.')
+            try:
+                # Autenticar usando o backend customizado
+                backend = InteressadoBackend()
+                interessado = backend.authenticate(request, cpf=cpf, password=senha)
                 
-        except Exception as e:
-            messages.error(request, f'Erro ao fazer login: {str(e)}')
+                if interessado:
+                    auth_login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
+                    messages.success(request, f'Bem-vindo de volta, {interessado.nome}!')
+                    return redirect('interessados:dashboard')
+                else:
+                    messages.error(request, 'CPF ou senha incorretos.')
+                    
+            except Exception as e:
+                messages.error(request, f'Erro ao fazer login: {str(e)}')
+    else:
+        form = LoginInteressadoForm()
     
-    return render(request, 'interessados/login_interessado.html')
+    return render(request, 'interessados/login_interessado.html', {'form': form})
+
 
 def logout_interessado(request):
     """Logout do interessado"""
@@ -67,7 +87,7 @@ def logout_interessado(request):
 
 
 def dashboard(request):
-    """Dashboard do interessado logado - SIMPLIFICADO SEM ERROS"""
+    """Dashboard do interessado logado"""
     
     # Verifica se é um interessado logado
     if not hasattr(request.user, '__class__') or request.user.__class__.__name__ != 'Interessado':
@@ -77,12 +97,12 @@ def dashboard(request):
     interessado = request.user
     
     try:
-        # Buscar inscrições do interessado (SEM filtros complexos)
+        # Buscar inscrições do interessado
         inscricoes = Inscricao.objects.filter(
             interessado=interessado
         ).select_related('evento').order_by('-data_inscricao')
         
-        # Buscar eventos disponíveis (SEM filtro de status)
+        # Buscar eventos disponíveis
         eventos_abertos = Evento.objects.filter(
             data_inicio_inscricao__lte=date.today(),
             data_fim_inscricao__gte=date.today()
@@ -90,7 +110,7 @@ def dashboard(request):
             id__in=inscricoes.values_list('evento_id', flat=True)
         )
         
-        # Estatísticas SIMPLES (sem filtrar por status específico)
+        # Estatísticas
         total_inscricoes = inscricoes.count()
         
         context = {
@@ -98,8 +118,8 @@ def dashboard(request):
             'inscricoes': inscricoes,
             'eventos_abertos': eventos_abertos,
             'total_inscricoes': total_inscricoes,
-            'inscricoes_aprovadas': 0,  # Removido filtro problemático
-            'inscricoes_pendentes': 0,   # Removido filtro problemático
+            'inscricoes_aprovadas': 0,
+            'inscricoes_pendentes': 0,
         }
         
         return render(request, 'interessados/dashboard.html', context)
