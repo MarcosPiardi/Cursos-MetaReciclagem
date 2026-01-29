@@ -1,0 +1,10 @@
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\base.txt
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\admin\base_site.html
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\base.html
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal\base.html
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\backup_templates\20260119_160109\apps\interessados\templates\interessados\base.html
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\backup_templates\20260119_160109\apps\portal\templates\portal\base.html
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\backup_templates\20260119_160109\template\base.html
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\backup_templates\20260119_160109\template\admin\base_site.html
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\template\base.html
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\template\admin\base_site.html

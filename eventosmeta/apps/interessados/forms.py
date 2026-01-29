@@ -396,3 +396,84 @@ class LoginInteressadoForm(forms.Form):
         })
     )
 
+class EdicaoInteressadoForm(forms.ModelForm):
+    """
+    Formulário de EDIÇÃO de dados do interessado.
+    Permite alterar TUDO, EXCETO CPF (identificador único)
+    NÃO inclui senha (precisa de formulário separado para trocar senha)
+    """
+    
+    class Meta:
+        model = Interessado
+        fields = [
+            # DADOS PESSOAIS (SEM CPF - não pode mudar)
+            'nome',
+            'rg',
+            'data_nascimento',
+            'sexo',
+            'cidade_nascimento',
+            'uf_nascimento',
+            'nacionalidade',
+            'fototipo',
+            'escolaridade',
+            
+            # ENDEREÇO
+            'cep',
+            'endereco_residencial',
+            'num_endereco',
+            'bairro',
+            'complemento',
+            'cidade_residencia',
+            'uf_residencia',
+            
+            # CONTATO
+            'telefone',
+            'celular',
+            'email',
+            
+            # PROGRAMA SOCIAL / NIS
+            'programa_social',
+            'num_nis',
+            
+            # PCD - TODAS
+            'necessidades_especiais',
+            'pcd_fisica',
+            'pcd_visual',
+            'pcd_auditiva',
+            'pcd_intelectual',
+            'pcd_psicossocial',
+            'pcd_multiplas',
+            
+            # RESPONSÁVEL
+            'nome_responsavel',
+            'telefone_responsavel',
+            'celular_responsavel',
+            'email_responsavel',
+            
+            # OBSERVAÇÕES
+            'observacao',
+        ]
+        
+        # ✅ REUTILIZA OS MESMOS WIDGETS DO CADASTRO
+        widgets = CadastroInteressadoForm.Meta.widgets.copy()
+        labels = CadastroInteressadoForm.Meta.labels.copy()
+    
+    def __init__(self, *args, **kwargs):
+        """Inicializa o formulário de edição"""
+        super().__init__(*args, **kwargs)
+        
+        # Remove obrigatoriedade de alguns campos na edição
+        # (o usuário pode não querer alterar tudo)
+    
+    # ✅ REUTILIZA OS MESMOS MÉTODOS DE LIMPEZA
+    clean_cep = CadastroInteressadoForm.clean_cep
+    clean_telefone = CadastroInteressadoForm.clean_telefone
+    clean_celular = CadastroInteressadoForm.clean_celular
+    clean_num_nis = CadastroInteressadoForm.clean_num_nis
+    clean_telefone_responsavel = CadastroInteressadoForm.clean_telefone_responsavel
+    clean_celular_responsavel = CadastroInteressadoForm.clean_celular_responsavel
+    clean_uf_residencia = CadastroInteressadoForm.clean_uf_residencia
+    clean_uf_nascimento = CadastroInteressadoForm.clean_uf_nascimento
+    clean_rg = CadastroInteressadoForm.clean_rg
+
+    

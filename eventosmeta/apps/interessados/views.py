@@ -1,161 +1,142 @@
 """
 Arquivo: views.py
 Caminho: apps/interessados/views.py
-Alteração: View refatorada usando Django Forms (VERSÃO PROFISSIONAL)
-Data: 26/01/2026
+Alteração: Imports corrigidos + dashboard funcional
+Data: 29/01/2026
 """
+
+from datetime import date
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import login as auth_login, logout as auth_logout
-from datetime import date
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+
 from .models import Interessado
-from .forms import CadastroInteressadoForm, LoginInteressadoForm
-from .authentication import InteressadoBackend
+from .forms import CadastroInteressadoForm, LoginInteressadoForm, EdicaoInteressadoForm
 from apps.selecao.models import Inscricao
 from apps.eventos.models import Evento
 
 
-def cadastro(request):
-    """Cadastro de novo interessado - USANDO DJANGO FORMS"""
-    
+def cadastro_view(request):
+    """View de cadastro público de interessados"""
     if request.method == 'POST':
         form = CadastroInteressadoForm(request.POST)
         
         if form.is_valid():
             try:
                 interessado = form.save()
-                
-                messages.success(request, f'Cadastro realizado com sucesso! Bem-vindo, {interessado.nome}!')
-                
-                # Login automático após cadastro
-                auth_login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
-                
-                return redirect('interessados:dashboard')
-                
+                messages.success(request, '✅ Cadastro realizado com sucesso! Faça login para continuar.')
+                return redirect('interessados:login')
             except Exception as e:
-                messages.error(request, f'Erro ao realizar cadastro: {str(e)}')
+                messages.error(request, f'❌ Erro ao salvar cadastro: {str(e)}')
         else:
-            # Formulário inválido - Django automaticamente adiciona os erros ao form
-            messages.error(request, 'Por favor, corrija os erros abaixo.')
-    
+            messages.error(request, '❌ Corrija os erros abaixo para continuar.')
     else:
-        # GET request - formulário vazio
         form = CadastroInteressadoForm()
     
     return render(request, 'interessados/cadastro.html', {'form': form})
 
 
-def login_interessado(request):
-    """Login do interessado usando Django Forms"""
-    
-    # Se já está logado, redireciona
-    if hasattr(request.user, '__class__') and request.user.__class__.__name__ == 'Interessado':
-        return redirect('interessados:dashboard')
-    
+def login_view(request):
+    """View de login para interessados - Autentica usando CPF e senha"""
     if request.method == 'POST':
         form = LoginInteressadoForm(request.POST)
         
         if form.is_valid():
-            cpf = form.cleaned_data['cpf']
+            cpf = form.cleaned_data['cpf'].replace('.', '').replace('-', '')
             senha = form.cleaned_data['senha']
             
             try:
-                # Autenticar usando o backend customizado
-                backend = InteressadoBackend()
-                interessado = backend.authenticate(request, cpf=cpf, password=senha)
+                interessado = Interessado.objects.get(cpf=cpf)
                 
-                if interessado:
-                    auth_login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
-                    messages.success(request, f'Bem-vindo de volta, {interessado.nome}!')
+                if interessado.check_password(senha):
+                    login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
+                    messages.success(request, f'✅ Bem-vindo(a), {interessado.nome}!')
                     return redirect('interessados:dashboard')
                 else:
-                    messages.error(request, 'CPF ou senha incorretos.')
-                    
-            except Exception as e:
-                messages.error(request, f'Erro ao fazer login: {str(e)}')
+                    messages.error(request, '❌ CPF ou senha incorretos.')
+            except Interessado.DoesNotExist:
+                messages.error(request, '❌ CPF ou senha incorretos.')
     else:
         form = LoginInteressadoForm()
     
-    return render(request, 'interessados/login_interessado.html', {'form': form})
+    return render(request, 'interessados/login.html', {'form': form})
 
 
-def logout_interessado(request):
-    """Logout do interessado"""
-    auth_logout(request)
-    messages.success(request, 'Logout realizado com sucesso!')
-    return redirect('portal:index')
-
-
-def dashboard(request):
-    """Dashboard do interessado logado"""
-    
-    # Verifica se é um interessado logado
-    if not hasattr(request.user, '__class__') or request.user.__class__.__name__ != 'Interessado':
-        messages.error(request, 'Você precisa estar logado para acessar esta área.')
-        return redirect('interessados:login')
-    
+@login_required(login_url='interessados:login')
+def meus_dados_view(request):
+    """View de edição de dados do interessado logado"""
     interessado = request.user
     
-    try:
-        # Buscar inscrições do interessado
-        inscricoes = Inscricao.objects.filter(
-            interessado=interessado
-        ).select_related('evento').order_by('-data_inscricao')
+    if request.method == 'POST':
+        form = EdicaoInteressadoForm(request.POST, instance=interessado)
         
-        # Buscar eventos disponíveis
-        eventos_abertos = Evento.objects.filter(
-            data_inicio_inscricao__lte=date.today(),
-            data_fim_inscricao__gte=date.today()
-        ).exclude(
-            id__in=inscricoes.values_list('evento_id', flat=True)
-        )
-        
-        # Estatísticas
-        total_inscricoes = inscricoes.count()
-        
-        context = {
-            'interessado': interessado,
-            'inscricoes': inscricoes,
-            'eventos_abertos': eventos_abertos,
-            'total_inscricoes': total_inscricoes,
-            'inscricoes_aprovadas': 0,
-            'inscricoes_pendentes': 0,
-        }
-        
-        return render(request, 'interessados/dashboard.html', context)
-        
-    except Exception as e:
-        messages.error(request, f'Erro ao carregar dashboard: {str(e)}')
-        return redirect('portal:index')
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, '✅ Dados atualizados com sucesso!')
+                return redirect('interessados:meus_dados')
+            except Exception as e:
+                messages.error(request, f'❌ Erro ao atualizar dados: {str(e)}')
+        else:
+            messages.error(request, '❌ Corrija os erros abaixo para continuar.')
+    else:
+        form = EdicaoInteressadoForm(instance=interessado)
+    
+    return render(request, 'interessados/meus_dados.html', {
+        'form': form,
+        'interessado': interessado
+    })
+
+@login_required(login_url='interessados:login')
+def dashboard_view(request):
+    """Dashboard do interessado - Mostra inscrições, estatísticas e eventos disponíveis"""
+    interessado = request.user
+    
+    inscricoes = Inscricao.objects.filter(
+        interessado=interessado
+    ).select_related('evento', 'status').prefetch_related('classificacao')
+    
+    total_inscricoes = inscricoes.count()
+    inscricoes_aprovadas = inscricoes.filter(status__nome='APROVADO').count()
+    inscricoes_pendentes = inscricoes.filter(status__nome='INSCRITO').count()
+    
+    eventos_abertos = Evento.objects.filter(
+        data_fim_inscricao__gte=date.today()
+    ).exclude(
+        inscricoes__interessado=interessado
+    )
+    
+    context = {
+        'interessado': interessado,
+        'inscricoes': inscricoes,
+        'total_inscricoes': total_inscricoes,
+        'inscricoes_aprovadas': inscricoes_aprovadas,
+        'inscricoes_pendentes': inscricoes_pendentes,
+        'eventos_abertos': eventos_abertos,
+    }
+    
+    return render(request, 'interessados/dashboard.html', context)
 
 
-def detalhes_inscricao(request, inscricao_id):
+@login_required(login_url='interessados:login')
+def detalhes_view(request, inscricao_id):
     """Detalhes de uma inscrição específica"""
+    inscricao = get_object_or_404(
+        Inscricao,
+        pk=inscricao_id,
+        interessado=request.user
+    )
     
-    # Verifica se é um interessado logado
-    if not hasattr(request.user, '__class__') or request.user.__class__.__name__ != 'Interessado':
-        messages.error(request, 'Você precisa estar logado para acessar esta área.')
-        return redirect('interessados:login')
-    
-    interessado = request.user
-    
-    try:
-        # Buscar inscrição (garantindo que pertence ao interessado logado)
-        inscricao = get_object_or_404(
-            Inscricao.objects.select_related('evento'),
-            id=inscricao_id,
-            interessado=interessado
-        )
-        
-        context = {
-            'interessado': interessado,
-            'inscricao': inscricao,
-        }
-        
-        return render(request, 'interessados/detalhes.html', context)
-        
-    except Exception as e:
-        messages.error(request, f'Erro: {str(e)}')
-        return redirect('interessados:dashboard')
-    
-    
+    return render(request, 'interessados/detalhes_inscricao.html', {
+        'inscricao': inscricao
+    })
+
+
+@login_required(login_url='interessados:login')
+def logout_view(request):
+    """View de logout"""
+    logout(request)
+    messages.info(request, '👋 Você saiu do sistema.')
+    return redirect('interessados:login')
+

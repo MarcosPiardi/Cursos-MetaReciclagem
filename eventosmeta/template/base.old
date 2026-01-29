@@ -22,7 +22,7 @@
                     <!-- <li class="nav-item"><a class="nav-link" href="{% url 'eventos:index' %}">Eventos</a></li> -->
                     <li class="nav-item"><a class="nav-link" href="{% url 'interessados:lista_interessados' %}">Interessados</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'interessados:lista_interessados' %}">teste</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'interessados:login' %}">Login</a></li>
                 </ul>
             </div>
         </div>
