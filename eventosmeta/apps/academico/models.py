@@ -1,13 +1,17 @@
 """
 Models do app ACADÊMICO
 Arquivo: apps/academico/models.py
+Responsável por: Matrículas, avaliações, execução do curso
+
 Alteração: Adicionado numero_matricula auto-gerado (formato AAAANNN)
 Data: 14/01/2026
 
-Responsável por: Matrículas, avaliações, execução do curso
+Alteração: Mantidos interessado_id e inscricao_id com validação automática
+Data: 30/01/2026
 """
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from decimal import Decimal
 
@@ -37,9 +41,14 @@ class StatusMatricula(models.Model):
 
 
 class Matricula(models.Model):
-    """Matrículas de alunos em turmas"""
+    """
+    Matrículas de alunos em turmas
     
-    # 🆕 NOVO: Número de matrícula único e auto-gerado
+    IMPORTANTE: interessado e inscricao devem ser da mesma pessoa
+    A validação garante consistência entre os dois campos
+    """
+    
+    # Número de matrícula único e auto-gerado
     numero_matricula = models.CharField(
         max_length=10,
         unique=True,
@@ -54,12 +63,14 @@ class Matricula(models.Model):
         related_name='matriculas',
         verbose_name='Turma'
     )
+    
     interessado = models.ForeignKey(
         Interessado,
         on_delete=models.PROTECT,
         related_name='matriculas',
         verbose_name='Interessado'
     )
+    
     inscricao = models.ForeignKey(
         Inscricao,
         on_delete=models.PROTECT,
@@ -67,6 +78,7 @@ class Matricula(models.Model):
         verbose_name='Inscrição',
         help_text="Inscrição que originou esta matrícula"
     )
+    
     status = models.ForeignKey(
         StatusMatricula,
         on_delete=models.PROTECT,
@@ -98,17 +110,64 @@ class Matricula(models.Model):
         indexes = [
             models.Index(fields=['numero_matricula']),
             models.Index(fields=['turma', 'interessado']),
+            models.Index(fields=['inscricao']),
         ]
     
     def __str__(self):
         return f"{self.numero_matricula} - {self.interessado.nome}"
     
+    def clean(self):
+        """
+        Validações customizadas - CRÍTICO: interessado deve ser igual a inscricao.interessado
+        """
+        super().clean()
+        
+        # VALIDAÇÃO PRINCIPAL: Interessado deve corresponder à inscrição
+        if self.inscricao and self.interessado:
+            if self.inscricao.interessado != self.interessado:
+                raise ValidationError({
+                    'interessado': 'O interessado selecionado não corresponde ao interessado da inscrição.',
+                    'inscricao': f'Esta inscrição pertence a {self.inscricao.interessado.nome}, '
+                                f'não a {self.interessado.nome}.'
+                })
+        
+        # Validar que a inscrição pertence ao evento da turma
+        if self.inscricao and self.turma:
+            if self.inscricao.evento != self.turma.evento:
+                raise ValidationError({
+                    'inscricao': f'Esta inscrição é do evento "{self.inscricao.evento.nome}", '
+                                f'mas a turma é do evento "{self.turma.evento.nome}". '
+                                f'Escolha uma turma do mesmo evento.'
+                })
+        
+        # Validar que o interessado não está matriculado duas vezes na mesma turma
+        if self.pk is None:  # Apenas na criação
+            if Matricula.objects.filter(
+                turma=self.turma,
+                interessado=self.interessado
+            ).exists():
+                raise ValidationError({
+                    'interessado': f'O interessado {self.interessado.nome} '
+                                  f'já está matriculado nesta turma.'
+                })
+    
     def save(self, *args, **kwargs):
         """
-        Sobrescrita do save para gerar numero_matricula automaticamente
+        Sobrescrita do save para:
+        1. Validar consistência
+        2. Gerar numero_matricula automaticamente
+        3. Auto-preencher interessado se não fornecido
         """
+        # AUTO-PREENCHER: Se só inscricao foi fornecida, preenche interessado automaticamente
+        if self.inscricao and not self.interessado:
+            self.interessado = self.inscricao.interessado
+        
+        # Validações
+        self.full_clean()
+        
         if not self.numero_matricula:
             self.numero_matricula = self._gerar_numero_matricula()
+        
         super().save(*args, **kwargs)
     
     def _gerar_numero_matricula(self):
@@ -117,7 +176,7 @@ class Matricula(models.Model):
         
         Lógica:
         - AAAA = Ano atual (ex: 2026)
-        - NNN = Número sequencial de 4 dígitos (ex: 0001, 002, ..., 9999)
+        - NNNN = Número sequencial de 4 dígitos (ex: 0001, 0002, ..., 9999)
         
         Exemplos: 20260001, 20260002, 20269999, 20270001, ...
         

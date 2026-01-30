@@ -129,6 +129,11 @@ Data: 20/01/2026
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container">
+            <!-- Brasão (apenas imagem, sem texto) -->
+            <a class="navbar-brand" href="{% url 'portal:index' %}">
+                <img src="{% static 'images/logo-pms-header.png' %}" alt="MetaReciclagem" class="logo-img">
+            </a>
+
             <!-- Logo (apenas imagem, sem texto) -->
             <a class="navbar-brand" href="{% url 'portal:index' %}">
                 <img src="{% static 'images/metareciclagem.png' %}" alt="MetaReciclagem" class="logo-img">

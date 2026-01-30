@@ -17,4 +17,7 @@ urlpatterns = [
     path('meus-dados/', views.meus_dados_view, name='meus_dados'),
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('inscricao/<int:inscricao_id>/detalhes/', views.detalhes_view, name='detalhes'),
+    # Inscrever em evento
+    path('inscrever/<int:evento_id>/', views.inscrever_evento_view, name='inscrever_evento'),
+
 ]

@@ -2,19 +2,22 @@
 """
 Arquivo: forms.py
 Caminho: apps/interessados/forms.py
-Alteração: Valores padrão para UF Nascimento e Nacionalidade + Senha criptografada
-Data: 28/01/2026
-"""
+Alterações anteriores:
+- Valores padrão para UF Nascimento e Nacionalidade + Senha criptografada (28/01/2026)
+- REMOVIDO raca_cor (duplicado de fototipo) + Senha criptografada (26/01/2026)
 
-"""
-Arquivo: forms.py
-Caminho: apps/interessados/forms.py
 Alteração: REMOVIDO raca_cor (duplicado de fototipo) + Senha criptografada
 Data: 26/01/2026
+
+Alteração: Valores padrão para UF Nascimento e Nacionalidade + Senha criptografada
+Data: 28/01/2026
+
+Alteração: LoginInteressadoForm corrigido para validar erros no formulário
+Data: 30/01/2026
 """
 
-
 from django import forms
+from django.contrib.auth.hashers import check_password
 from .models import Interessado, Sexo, Fototipo
 
 
@@ -120,13 +123,13 @@ class CadastroInteressadoForm(forms.ModelForm):
             }),
             'uf_nascimento': forms.TextInput(attrs={
                 'class': 'form-control',
-                'value': 'SP',  # ✅ VALOR PADRÃO
+                'value': 'SP',
                 'maxlength': '2',
                 'style': 'text-transform: uppercase;'
             }),
             'nacionalidade': forms.TextInput(attrs={
                 'class': 'form-control',
-                'value': 'Brasileira'  # ✅ VALOR PADRÃO
+                'value': 'Brasileira'
             }),
             'fototipo': forms.Select(attrs={
                 'class': 'form-select'
@@ -280,7 +283,7 @@ class CadastroInteressadoForm(forms.ModelForm):
         """Define valores padrão no inicializador"""
         super().__init__(*args, **kwargs)
         
-        # ✅ VALORES PADRÃO - só aplica se for novo cadastro (sem dados POST)
+        # Valores padrão - só aplica se for novo cadastro (sem dados POST)
         if not self.data:
             self.initial['uf_nascimento'] = 'SP'
             self.initial['nacionalidade'] = 'Brasileira'
@@ -377,7 +380,10 @@ class CadastroInteressadoForm(forms.ModelForm):
 
 
 class LoginInteressadoForm(forms.Form):
-    """Formulário de login simples"""
+    """
+    Formulário de login com validação de CPF e senha
+    CORRIGIDO: Erros são exibidos no formulário, não em messages
+    """
     cpf = forms.CharField(
         label='CPF',
         max_length=14,
@@ -395,6 +401,37 @@ class LoginInteressadoForm(forms.Form):
             'placeholder': 'Digite sua senha'
         })
     )
+    
+    def clean(self):
+        """
+        Valida CPF e senha
+        Se houver erro, levanta ValidationError que será exibido em form.non_field_errors
+        """
+        cleaned_data = super().clean()
+        cpf = cleaned_data.get('cpf', '')
+        senha = cleaned_data.get('senha')
+        
+        # Remove formatação do CPF
+        cpf = ''.join(filter(str.isdigit, cpf))
+        
+        if cpf and senha:
+            try:
+                # Busca o interessado pelo CPF
+                interessado = Interessado.objects.get(cpf=cpf)
+                
+                # Verifica a senha usando check_password
+                if not check_password(senha, interessado.senha):
+                    raise forms.ValidationError('CPF ou senha incorretos.')
+                
+                # Armazena o interessado no formulário para a view usar
+                self.interessado = interessado
+                
+            except Interessado.DoesNotExist:
+                # CPF não existe no banco
+                raise forms.ValidationError('CPF ou senha incorretos.')
+        
+        return cleaned_data
+
 
 class EdicaoInteressadoForm(forms.ModelForm):
     """
@@ -454,18 +491,15 @@ class EdicaoInteressadoForm(forms.ModelForm):
             'observacao',
         ]
         
-        # ✅ REUTILIZA OS MESMOS WIDGETS DO CADASTRO
+        # Reutiliza os mesmos widgets do cadastro
         widgets = CadastroInteressadoForm.Meta.widgets.copy()
         labels = CadastroInteressadoForm.Meta.labels.copy()
     
     def __init__(self, *args, **kwargs):
         """Inicializa o formulário de edição"""
         super().__init__(*args, **kwargs)
-        
-        # Remove obrigatoriedade de alguns campos na edição
-        # (o usuário pode não querer alterar tudo)
     
-    # ✅ REUTILIZA OS MESMOS MÉTODOS DE LIMPEZA
+    # Reutiliza os mesmos métodos de limpeza
     clean_cep = CadastroInteressadoForm.clean_cep
     clean_telefone = CadastroInteressadoForm.clean_telefone
     clean_celular = CadastroInteressadoForm.clean_celular
@@ -476,4 +510,3 @@ class EdicaoInteressadoForm(forms.ModelForm):
     clean_uf_nascimento = CadastroInteressadoForm.clean_uf_nascimento
     clean_rg = CadastroInteressadoForm.clean_rg
 
-    

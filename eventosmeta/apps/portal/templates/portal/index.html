@@ -1,3 +1,10 @@
+<!--
+Arquivo: index.html
+Caminho: apps/portal/templates/portal/index.html
+Alteração: Exibir todos os eventos exceto FINALIZADOS e CANCELADOS
+Data: 29/01/2026
+-->
+
 <!-- Arquivo: index.html -->
 <!-- Caminho: apps/portal/templates/portal/index.html -->
 <!-- Alteração: Cards de ações rápidas movidos para logo abaixo da hero-section -->
@@ -9,14 +16,14 @@
 
 {% block content %}
 <!-- Hero Section -->
-<div class="row mb-5">
+<div class="row mb-4">
     <div class="col-12">
         <div class="card bg-primary text-white">
-            <div class="card-body text-center py-5">
-                <h1 class="display-4 mb-3">
+            <div class="card-body text-center py-3">
+                <h2 class="mb-2">
                     <i class="bi bi-recycle"></i> Bem-vindo ao Portal MetaReciclagem
-                </h1>
-                <p class="lead mb-0">
+                </h2>
+                <p class="mb-0">
                     Inscreva-se em nossos cursos e eventos. Transforme seu futuro através da tecnologia!
                 </p>
             </div>
@@ -24,66 +31,90 @@
     </div>
 </div>
 
-<!-- Cards de Ações Rápidas (MOVIDO PARA CÁ - logo abaixo da hero-section) -->
+<!-- Cards de Ações Rápidas -->
+<!-- Cards de Ações Rápidas (LAYOUT HORIZONTAL - ÍCONE AO LADO) -->
 <div class="row mb-5">
     <div class="col-md-4 mb-3">
-        <div class="card text-center h-100 shadow-sm">
+        <div class="card h-100 shadow-sm">
             <div class="card-body">
-                <i class="bi bi-search fs-1 text-primary mb-3"></i>
-                <h5 class="card-title">Consultar Resultado</h5>
-                <p class="card-text">Consulte sua classificação nos eventos usando seu CPF.</p>
-                <a href="{% url 'portal:consulta_publica' %}" class="btn btn-primary">
-                    <i class="bi bi-search"></i> Consultar Agora
-                </a>
+                <div class="row align-items-center">
+                    <div class="col-3 text-center">
+                        <i class="bi bi-search fs-1 text-primary"></i>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="card-title mb-2">Consultar Resultado</h5>
+                        <p class="card-text small mb-3">Consulte sua classificação nos eventos usando seu CPF.</p>
+                        <a href="{% url 'portal:consulta_publica' %}" class="btn btn-primary btn-sm">
+                            <i class="bi bi-search"></i> Consultar
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <div class="col-md-4 mb-3">
-        <div class="card text-center h-100 shadow-sm">
+        <div class="card h-100 shadow-sm">
             <div class="card-body">
-                <i class="bi bi-person-circle fs-1 text-success mb-3"></i>
-                <h5 class="card-title">Área do Interessado</h5>
-                <p class="card-text">Acesse seu painel para ver suas inscrições e resultados.</p>
-                {% if request.session.interessado_id %}
-                    <a href="{% url 'interessados:dashboard' %}" class="btn btn-success">
-                        <i class="bi bi-speedometer2"></i> Acessar Painel
-                    </a>
-                {% else %}
-                    <a href="{% url 'interessados:login' %}" class="btn btn-success">
-                        <i class="bi bi-box-arrow-in-right"></i> Fazer Login
-                    </a>
-                {% endif %}
+                <div class="row align-items-center">
+                    <div class="col-3 text-center">
+                        <i class="bi bi-person-circle fs-1 text-success"></i>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="card-title mb-2">Área do Interessado</h5>
+                        <p class="card-text small mb-3">Acesse seu painel para ver suas inscrições e resultados.</p>
+                        {% if request.session.interessado_id %}
+                            <a href="{% url 'interessados:dashboard' %}" class="btn btn-success btn-sm">
+                                <i class="bi bi-speedometer2"></i> Acessar
+                            </a>
+                        {% else %}
+                            <a href="{% url 'interessados:login' %}" class="btn btn-success btn-sm">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <div class="col-md-4 mb-3">
-        <div class="card text-center h-100 shadow-sm">
+        <div class="card h-100 shadow-sm">
             <div class="card-body">
-                <i class="bi bi-question-circle fs-1 text-info mb-3"></i>
-                <h5 class="card-title">Dúvidas?</h5>
-                <p class="card-text">Entre em contato conosco para mais informações.</p>
-                <a href="#" class="btn btn-info">
-                    <i class="bi bi-envelope"></i> Fale Conosco
-                </a>
+                <div class="row align-items-center">
+                    <div class="col-3 text-center">
+                        <i class="bi bi-question-circle fs-1 text-info"></i>
+                    </div>
+                    <div class="col-9">
+                        <h5 class="card-title mb-2">Dúvidas?</h5>
+                        <p class="card-text small mb-3">Entre em contato conosco para mais informações.</p>
+                        <a href="{% url 'portal:contato' %}" class="btn btn-info btn-sm">
+                            <i class="bi bi-envelope"></i> Fale Conosco
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Eventos com Inscrições Abertas (AGORA APARECE DEPOIS DOS CARDS) -->
+<!-- Eventos Disponíveis -->
 <div class="row mb-4">
     <div class="col-12">
         <h2 class="mb-4">
-            <i class="bi bi-calendar-event"></i> Eventos com Inscrições Abertas
+            <i class="bi bi-calendar-event"></i> Eventos e Cursos Disponíveis
         </h2>
+        {% if total_eventos > 0 %}
+        <p class="text-muted">
+            <i class="bi bi-info-circle"></i> Encontramos <strong>{{ total_eventos }}</strong> evento(s) disponível(is)
+        </p>
+        {% endif %}
     </div>
 </div>
 
-{% if eventos_abertos %}
+{% if eventos_disponiveis %}
     <div class="row">
-        {% for evento in eventos_abertos %}
+        {% for evento in eventos_disponiveis %}
             <div class="col-md-6 col-lg-4 mb-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-header bg-primary text-white">
@@ -105,12 +136,28 @@
                                 <i class="bi bi-calendar-event text-info"></i>
                                 <strong>Início:</strong> {{ evento.data_inicio_evento|date:"d/m/Y" }}
                             </li>
+                            {% if evento.status %}
+                            <li class="mb-2">
+                                <i class="bi bi-tag text-warning"></i>
+                                <strong>Status:</strong> 
+                                <span class="badge bg-info">{{ evento.status.nome }}</span>
+                            </li>
+                            {% endif %}
                         </ul>
                     </div>
                     <div class="card-footer bg-transparent">
-                        <a href="{% url 'portal:resultado_evento' evento.id %}" class="btn btn-outline-primary btn-sm w-100">
-                            <i class="bi bi-info-circle"></i> Ver Detalhes
-                        </a>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <a href="{% url 'portal:detalhes_evento' evento.id %}" class="btn btn-outline-info btn-sm w-100">
+                                    <i class="bi bi-info-circle"></i> Detalhes
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="{% url 'portal:resultado_evento' evento.id %}" class="btn btn-outline-success btn-sm w-100">
+                                    <i class="bi bi-trophy"></i> Classificação
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -121,15 +168,12 @@
         <div class="col-12">
             <div class="alert alert-info text-center">
                 <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
-                <h4>Nenhum evento com inscrições abertas no momento</h4>
+                <h4>Nenhum evento disponível no momento</h4>
                 <p class="mb-0">Fique atento! Novos eventos serão divulgados em breve.</p>
             </div>
         </div>
     </div>
 {% endif %}
-
-<!-- MENU TEMPORÁRIO DE DESENVOLVIMENTO - REMOVER EM PRODUÇÃO -->
-{% comment %} {% include "menu_temporario.html" %} {% endcomment %}
 
 {% endblock %}
 

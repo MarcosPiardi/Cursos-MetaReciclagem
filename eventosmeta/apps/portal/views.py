@@ -18,19 +18,16 @@ from apps.eventos.models import Evento
 def index(request):
     """
     Página inicial do portal
-    Mostra eventos com inscrições abertas
+    Mostra eventos ativos (exceto FINALIZADOS e CANCELADOS)
     """
-    agora = timezone.now()
-    
-    # Buscar eventos com inscrições abertas
-    eventos_abertos = Evento.objects.filter(
-        data_inicio_inscricao__lte=agora,
-        data_fim_inscricao__gte=agora
-    ).order_by('data_fim_inscricao')
+    # Buscar eventos que NÃO sejam FINALIZADOS (id=7) ou CANCELADOS (id=8)
+    eventos_disponiveis = Evento.objects.exclude(
+        status_id__in=[7, 8]
+    ).order_by('data_inicio_evento')
     
     context = {
-        'eventos_abertos': eventos_abertos,
-        'total_eventos': eventos_abertos.count()
+        'eventos_disponiveis': eventos_disponiveis,
+        'total_eventos': eventos_disponiveis.count()
     }
     
     return render(request, 'portal/index.html', context)
@@ -200,4 +197,61 @@ def resultado_evento(request, evento_id):
     }
     
     return render(request, 'portal/resultado_evento.html', context)
+
+def detalhes_evento(request, evento_id):
+    """
+    Exibe detalhes completos de um evento/curso
+    Informações sobre o curso, requisitos, datas, vagas, etc.
+    """
+    try:
+        evento = Evento.objects.get(id=evento_id)
+    except Evento.DoesNotExist:
+        messages.error(request, 'Evento não encontrado.')
+        return redirect('portal:index')
+    
+    # Calcular vagas disponíveis
+    inscricoes_confirmadas = Inscricao.objects.filter(
+        evento=evento,
+        status__nome__in=['INSCRITO', 'APROVADO', 'CONFIRMADO']
+    ).count()
+    
+    vagas_disponiveis = evento.total_vagas - inscricoes_confirmadas
+    
+    # Verificar se inscrições estão abertas
+    agora = timezone.now()
+    inscricoes_abertas = (
+        evento.data_inicio_inscricao <= agora <= evento.data_fim_inscricao
+    )
+    
+    context = {
+        'evento': evento,
+        'inscricoes_confirmadas': inscricoes_confirmadas,
+        'vagas_disponiveis': vagas_disponiveis,
+        'inscricoes_abertas': inscricoes_abertas,
+    }
+    
+    return render(request, 'portal/detalhes_evento.html', context)
+
+def contato(request):
+    """
+    Página de contatos da MetaReciclagem
+    Exibe informações de contato, endereço, redes sociais
+    """
+    context = {
+        'contatos': {
+            'telefone': '(15) 3261-8000',
+            'whatsapp': '(15) 99999-9999',
+            'email': 'contato@metareciclagem.sp.gov.br',
+            'endereco': 'Rua Exemplo, 123 - Centro - Sorocaba/SP',
+            'cep': '18000-000',
+            'horario': 'Segunda a Sexta, das 8h às 17h',
+        },
+        'redes_sociais': {
+            'facebook': 'https://facebook.com/metareciclagemsorocaba',
+            'instagram': 'https://instagram.com/metareciclagemsorocaba',
+            'youtube': 'https://youtube.com/metareciclagemsorocaba',
+        }
+    }
+    
+    return render(request, 'portal/contato.html', context)
 

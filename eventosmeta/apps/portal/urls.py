@@ -1,8 +1,15 @@
 """
 URLs do app PORTAL - Sistema MetaReciclagem
 Arquivo: apps/portal/urls.py
+Data: 29/01/2026
+"""
+
+"""
+URLs do app PORTAL - Sistema MetaReciclagem
+Arquivo: apps/portal/urls.py
 Data: 05/12/2025
 """
+
 from django.urls import path
 from . import views
 
@@ -22,4 +29,10 @@ urlpatterns = [
     # Consulta pública
     path('consulta/', views.consulta_publica, name='consulta_publica'),
     path('resultado/<int:evento_id>/', views.resultado_evento, name='resultado_evento'),
+    
+    # Detalhes do evento
+    path('evento/<int:evento_id>/', views.detalhes_evento, name='detalhes_evento'),
+
+     # Página de contato
+    path('contato/', views.contato, name='contato'),
 ]
