@@ -12,15 +12,23 @@ Alteração: Adicionada action de matrícula em lote na Classificação
 Alteração: Corrigido import ACTION_CHECKBOX_NAME para Django 5.2.4
 Alteração: Action de matrícula corrigida com validação melhorada
 Data: 30/01/2026
+
+Alteração: Corrigido reconstrução do queryset no POST da action
+Alteração: Correção definitiva da action com preservação de IDs
+Alteração: Versão final limpa e corrigida - matrícula em lote funcional
+Alteração: Busca case-insensitive para status (Ativa/ATIVA/ativa)
+Alteração: Versão final limpa - matrícula em lote funcional
+Data: 02/02/2026
 """
 
 from django import forms
 from django.contrib import admin
-from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME  # ← CORRIGIDO para Django 5.x
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction
 from django.utils.html import format_html
+from django.http import HttpResponseRedirect
 
 from apps.accounts.admin import admin_site
 from apps.eventos.models import Turma
@@ -35,6 +43,9 @@ from .models import StatusInscricao, Inscricao, Classificacao, InscricaoCriterio
 
 class MatricularAlunosForm(forms.Form):
     """Form intermediário para selecionar turma antes de matricular"""
+    
+    _selected_action = forms.CharField(widget=forms.MultipleHiddenInput, required=False)
+    action = forms.CharField(widget=forms.HiddenInput, initial='matricular_alunos_action')
     
     turma = forms.ModelChoiceField(
         queryset=Turma.objects.none(),
@@ -55,7 +66,6 @@ class MatricularAlunosForm(forms.Form):
                 evento=evento
             ).order_by('nome')
             
-            # Se não houver turmas, adicionar mensagem de erro
             if not self.fields['turma'].queryset.exists():
                 self.fields['turma'].widget.attrs['disabled'] = 'disabled'
                 self.fields['turma'].help_text = '⚠️ Nenhuma turma cadastrada para este evento. Crie uma turma primeiro.'
@@ -167,7 +177,6 @@ class ClassificacaoAdmin(admin.ModelAdmin):
     ]
     ordering = ['inscricao__evento', 'posicao']
     
-    # ACTION DE MATRÍCULA
     actions = ['matricular_alunos_action']
 
     fieldsets = (
@@ -211,178 +220,176 @@ class ClassificacaoAdmin(admin.ModelAdmin):
     get_status_inscricao.short_description = 'Status Inscrição'
     get_status_inscricao.admin_order_field = 'inscricao__status__nome'
 
-    # ==========================================
-    # ACTION: MATRICULAR ALUNOS SELECIONADOS
-    # ==========================================
-    
     def matricular_alunos_action(self, request, queryset):
         """
-        Action para matricular alunos selecionados
-        CORRIGIDO: Validação melhorada + import correto para Django 5.x
+        Action para matricular alunos selecionados em uma turma
         """
-        # Verificar se há classificações selecionadas
+        # POST: Processar matrícula com turma selecionada
+        if 'confirmar_matricula' in request.POST:
+            # Reconstruir queryset a partir dos IDs
+            ids = request.POST.getlist('_selected_action')
+            ids = [int(id) for id in ids if id.isdigit()]
+            
+            if not ids:
+                self.message_user(
+                    request,
+                    '❌ Nenhum aluno foi selecionado.',
+                    level=messages.ERROR
+                )
+                return HttpResponseRedirect(request.get_full_path())
+            
+            queryset = Classificacao.objects.filter(pk__in=ids)
+            queryset = queryset.select_related('inscricao__evento', 'inscricao__interessado')
+            
+            if queryset.count() == 0:
+                self.message_user(
+                    request,
+                    '❌ Classificações não encontradas.',
+                    level=messages.ERROR
+                )
+                return HttpResponseRedirect(request.get_full_path())
+            
+            evento = queryset.first().inscricao.evento
+            form = MatricularAlunosForm(request.POST, evento=evento)
+            
+            if not form.is_valid():
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        self.message_user(request, f'❌ {field}: {error}', level=messages.ERROR)
+                return HttpResponseRedirect(request.get_full_path())
+            
+            turma = form.cleaned_data['turma']
+            
+            # Validar que a turma pertence ao evento
+            if turma.evento != evento:
+                self.message_user(
+                    request,
+                    f'❌ A turma "{turma.nome}" não pertence ao evento "{evento.nome}".',
+                    level=messages.ERROR
+                )
+                return HttpResponseRedirect(request.get_full_path())
+            
+            # Buscar status necessários (CASE-INSENSITIVE)
+            try:
+                status_matricula_ativa = StatusMatricula.objects.get(nome__iexact='ativa')
+            except StatusMatricula.DoesNotExist:
+                self.message_user(
+                    request,
+                    '❌ Status de matrícula "Ativa" não encontrado. Crie-o no menu Acadêmico > Status de Matrículas.',
+                    level=messages.ERROR
+                )
+                return HttpResponseRedirect(request.get_full_path())
+            
+            try:
+                status_inscricao_confirmada = StatusInscricao.objects.get(nome__iexact='confirmada')
+            except StatusInscricao.DoesNotExist:
+                self.message_user(
+                    request,
+                    '❌ Status de inscrição "Confirmada" não encontrado. Crie-o no menu Seleção > Status de Inscrições.',
+                    level=messages.ERROR
+                )
+                return HttpResponseRedirect(request.get_full_path())
+            
+            # Processar matrículas
+            matriculas_criadas = 0
+            erros = []
+            
+            with transaction.atomic():
+                for classificacao in queryset:
+                    try:
+                        inscricao = classificacao.inscricao
+                        interessado = inscricao.interessado
+                        
+                        # Verificar se já existe matrícula
+                        if Matricula.objects.filter(turma=turma, interessado=interessado).exists():
+                            erros.append(f'{interessado.nome} já está matriculado nesta turma.')
+                            continue
+                        
+                        # Criar matrícula
+                        Matricula.objects.create(
+                            turma=turma,
+                            interessado=interessado,
+                            inscricao=inscricao,
+                            status=status_matricula_ativa
+                        )
+                        
+                        # Atualizar status da inscrição
+                        inscricao.status = status_inscricao_confirmada
+                        inscricao.save()
+                        
+                        matriculas_criadas += 1
+                        
+                    except Exception as e:
+                        erros.append(f'{interessado.nome}: {str(e)}')
+            
+            # Mensagens de feedback
+            if matriculas_criadas > 0:
+                self.message_user(
+                    request,
+                    f'✅ {matriculas_criadas} matrícula(s) criada(s) com sucesso na turma "{turma.nome}"!',
+                    level=messages.SUCCESS
+                )
+            
+            if erros:
+                for erro in erros:
+                    self.message_user(request, f'⚠️ {erro}', level=messages.WARNING)
+            
+            if matriculas_criadas == 0 and len(erros) == 0:
+                self.message_user(
+                    request,
+                    '⚠️ Nenhuma matrícula foi processada.',
+                    level=messages.WARNING
+                )
+            
+            return HttpResponseRedirect(request.get_full_path())
+        
+        # GET: Mostrar tela de seleção de turma
+        queryset = queryset.select_related('inscricao__evento', 'inscricao__interessado')
+        
         if queryset.count() == 0:
-            self.message_user(
-                request,
-                '❌ Nenhuma classificação foi selecionada.',
-                level=messages.ERROR
-            )
+            self.message_user(request, '❌ Nenhuma classificação selecionada.', level=messages.ERROR)
             return
         
-        # Pegar eventos únicos (usando select_related para otimizar)
-        queryset = queryset.select_related('inscricao__evento', 'inscricao__interessado')
+        # Verificar eventos únicos
         eventos_unicos = set()
-        
         for classificacao in queryset:
             if classificacao.inscricao and classificacao.inscricao.evento:
                 eventos_unicos.add(classificacao.inscricao.evento.id)
         
-        # Verificar se todos são do mesmo evento
-        if len(eventos_unicos) == 0:
-            self.message_user(
-                request,
-                '❌ As classificações selecionadas não possuem evento associado.',
-                level=messages.ERROR
-            )
-            return
-        
         if len(eventos_unicos) > 1:
-            eventos_nomes = []
-            for classificacao in queryset[:5]:  # Pegar até 5 para mostrar
-                eventos_nomes.append(classificacao.inscricao.evento.nome)
-            
             self.message_user(
                 request,
-                f'❌ Selecione apenas classificações do MESMO EVENTO. '
-                f'Foram detectados múltiplos eventos: {", ".join(set(eventos_nomes))}',
+                '❌ Selecione apenas classificações do MESMO EVENTO.',
                 level=messages.ERROR
             )
             return
         
-        # Pegar o evento (já sabemos que é único)
         evento = queryset.first().inscricao.evento
         
-        # Verificar se existem turmas para o evento
-        turmas_disponiveis = Turma.objects.filter(evento=evento).count()
-        if turmas_disponiveis == 0:
+        # Verificar turmas disponíveis
+        if Turma.objects.filter(evento=evento).count() == 0:
             self.message_user(
                 request,
-                f'❌ O evento "{evento.nome}" não possui turmas cadastradas. '
-                f'Crie uma turma primeiro em Eventos > Turmas.',
+                f'❌ O evento "{evento.nome}" não possui turmas cadastradas.',
                 level=messages.ERROR
             )
             return
         
-        # Se é POST, processar matrícula
-        if 'apply' in request.POST:
-            form = MatricularAlunosForm(request.POST, evento=evento)
-            
-            if form.is_valid():
-                turma = form.cleaned_data['turma']
-                
-                # Validar que a turma pertence ao evento
-                if turma.evento != evento:
-                    self.message_user(
-                        request,
-                        f'❌ A turma "{turma.nome}" não pertence ao evento "{evento.nome}".',
-                        level=messages.ERROR
-                    )
-                    return redirect(request.get_full_path())
-                
-                # Buscar status "ATIVA" e "CONFIRMADA"
-                try:
-                    status_matricula_ativa = StatusMatricula.objects.get(nome='ATIVA')
-                except StatusMatricula.DoesNotExist:
-                    self.message_user(
-                        request,
-                        '❌ Status de matrícula "ATIVA" não encontrado. Crie-o primeiro no menu Acadêmico > Status de Matrículas.',
-                        level=messages.ERROR
-                    )
-                    return redirect(request.get_full_path())
-                
-                try:
-                    status_inscricao_confirmada = StatusInscricao.objects.get(nome='CONFIRMADA')
-                except StatusInscricao.DoesNotExist:
-                    self.message_user(
-                        request,
-                        '❌ Status de inscrição "CONFIRMADA" não encontrado. Crie-o primeiro no menu Seleção > Status de Inscrições.',
-                        level=messages.ERROR
-                    )
-                    return redirect(request.get_full_path())
-                
-                # Processar matrículas
-                matriculas_criadas = 0
-                erros = []
-                
-                with transaction.atomic():
-                    for classificacao in queryset:
-                        try:
-                            inscricao = classificacao.inscricao
-                            interessado = inscricao.interessado
-                            
-                            # Verificar se já existe matrícula
-                            if Matricula.objects.filter(
-                                turma=turma,
-                                interessado=interessado
-                            ).exists():
-                                erros.append(f'{interessado.nome} já está matriculado nesta turma.')
-                                continue
-                            
-                            # Criar matrícula (interessado e inscricao são gravados automaticamente)
-                            matricula = Matricula.objects.create(
-                                turma=turma,
-                                interessado=interessado,
-                                inscricao=inscricao,
-                                status=status_matricula_ativa
-                            )
-                            
-                            # Atualizar status da inscrição para CONFIRMADA
-                            inscricao.status = status_inscricao_confirmada
-                            inscricao.save()
-                            
-                            matriculas_criadas += 1
-                            
-                        except Exception as e:
-                            erros.append(f'{interessado.nome}: {str(e)}')
-                
-                # Mensagens de feedback
-                if matriculas_criadas > 0:
-                    self.message_user(
-                        request,
-                        f'✅ {matriculas_criadas} matrícula(s) criada(s) com sucesso na turma "{turma.nome}"! '
-                        f'Números de matrícula gerados automaticamente.',
-                        level=messages.SUCCESS
-                    )
-                
-                if erros:
-                    for erro in erros:
-                        self.message_user(request, f'⚠️ {erro}', level=messages.WARNING)
-                
-                return redirect(request.get_full_path())
-            else:
-                # Form inválido - mostrar erros
-                for field, errors in form.errors.items():
-                    for error in errors:
-                        self.message_user(request, f'❌ {error}', level=messages.ERROR)
-        
-        # GET - Mostrar form de seleção de turma
-        else:
-            form = MatricularAlunosForm(evento=evento)
+        # Preparar formulário
+        form = MatricularAlunosForm(evento=evento)
+        ids = ','.join(str(c.pk) for c in queryset)
         
         context = {
             'title': 'Matricular Alunos Selecionados',
             'form': form,
             'classificacoes': queryset,
             'evento': evento,
+            'ids': ids,
             'opts': self.model._meta,
-            'action_checkbox_name': ACTION_CHECKBOX_NAME,  # ← CORRIGIDO
+            'action_checkbox_name': ACTION_CHECKBOX_NAME,
         }
         
-        return render(
-            request,
-            'admin/selecao/matricular_alunos.html',
-            context
-        )
+        return render(request, 'admin/selecao/matricular_alunos.html', context)
     
     matricular_alunos_action.short_description = '🎓 Matricular alunos selecionados'
 
@@ -428,4 +435,3 @@ class InscricaoCriterioAtendidoAdmin(admin.ModelAdmin):
     def get_evento(self, obj):
         return obj.inscricao.evento.nome
     get_evento.short_description = 'Evento'
-

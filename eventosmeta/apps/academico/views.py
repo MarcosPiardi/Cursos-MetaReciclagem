@@ -5,152 +5,121 @@ Descrição: Views para gestão de matrícula
 Data: 12/01/2026
 """
 
-from django.shortcuts import render, redirect
+"""
+Views do app ACADÊMICO
+Arquivo: apps/academico/views.py
+Data: 02/02/2026
+"""
+
+from django.http import HttpResponse, FileResponse
+from django.shortcuts import get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib import messages
-from django.http import JsonResponse
-from apps.eventos.models import Evento, Status
-from apps.selecao.models import Classificacao, Inscricao
-from .services import MatriculaService
+from django.views.decorators.http import require_http_methods
+import io
+import zipfile
+
+from .models import Avaliacao
+from .certificado import GeradorCertificado
 
 
 @staff_member_required
-def gestao_matricula(request):
+@require_http_methods(["GET"])
+def download_certificado_individual(request, avaliacao_id):
     """
-    View principal para gestão de matrícula
-    Exibe lista de eventos com classificação concluída
+    Download individual de certificado em PDF
     """
-    # Buscar eventos com status "Resultado Divulgado" (ID=5)
-    eventos_disponiveis = Evento.objects.filter(
-        status__id=5
-    ).order_by('-data_inicio_evento')
+    avaliacao = get_object_or_404(Avaliacao, pk=avaliacao_id)
     
-    evento_selecionado = None
-    classificacoes = None
+    # Verificar se está aprovado
+    if not avaliacao.aprovado:
+        return HttpResponse("❌ Certificado disponível apenas para alunos aprovados.", status=400)
     
-    # Se um evento foi selecionado
-    if request.GET.get('evento_id'):
-        evento_id = request.GET.get('evento_id')
-        try:
-            evento_selecionado = Evento.objects.get(id=evento_id)
+    # Gerar PDF
+    buffer = io.BytesIO()
+    gerador = GeradorCertificado(avaliacao)
+    gerador.gerar_pdf(buffer)
+    buffer.seek(0)
+    
+    # Nome do arquivo
+    aluno_nome = avaliacao.matricula.interessado.nome.replace(' ', '_')
+    curso_nome = avaliacao.matricula.turma.evento.nome.replace(' ', '_')
+    filename = f"Certificado_{aluno_nome}_{curso_nome}.pdf"
+    
+    # Retornar PDF para download
+    response = FileResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def preview_certificado(request, avaliacao_id):
+    """
+    Preview do certificado (visualizar no navegador)
+    """
+    avaliacao = get_object_or_404(Avaliacao, pk=avaliacao_id)
+    
+    # Verificar se está aprovado
+    if not avaliacao.aprovado:
+        return HttpResponse("❌ Certificado disponível apenas para alunos aprovados.", status=400)
+    
+    # Gerar PDF
+    buffer = io.BytesIO()
+    gerador = GeradorCertificado(avaliacao)
+    gerador.gerar_pdf(buffer)
+    buffer.seek(0)
+    
+    # Retornar PDF para visualização inline
+    response = FileResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline'
+    
+    return response
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def download_certificados_lote(request):
+    """
+    Download em lote de certificados (ZIP)
+    """
+    # Pegar IDs da query string
+    ids_str = request.GET.get('ids', '')
+    ids = [int(id) for id in ids_str.split(',') if id.strip().isdigit()]
+    
+    if not ids:
+        return HttpResponse("❌ Nenhuma avaliação selecionada.", status=400)
+    
+    # Buscar avaliações aprovadas
+    avaliacoes = Avaliacao.objects.filter(pk__in=ids, aprovado=True)
+    
+    if avaliacoes.count() == 0:
+        return HttpResponse("❌ Nenhum aluno aprovado foi selecionado.", status=400)
+    
+    # Criar ZIP em memória
+    zip_buffer = io.BytesIO()
+    
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for avaliacao in avaliacoes:
+            # Gerar PDF de cada certificado
+            pdf_buffer = io.BytesIO()
+            gerador = GeradorCertificado(avaliacao)
+            gerador.gerar_pdf(pdf_buffer)
+            pdf_buffer.seek(0)
             
-            # Buscar classificações do evento ordenadas por posição
-            classificacoes = Classificacao.objects.filter(
-                inscricao__evento=evento_selecionado
-            ).select_related(
-                'inscricao__interessado',
-                'inscricao__status'
-            ).order_by('posicao')
+            # Nome do arquivo dentro do ZIP
+            aluno_nome = avaliacao.matricula.interessado.nome.replace(' ', '_')
+            matricula_num = avaliacao.matricula.numero_matricula
+            filename = f"Certificado_{matricula_num}_{aluno_nome}.pdf"
             
-        except Evento.DoesNotExist:
-            messages.error(request, '❌ Evento não encontrado')
+            # Adicionar ao ZIP
+            zip_file.writestr(filename, pdf_buffer.read())
     
-    context = {
-        'eventos_disponiveis': eventos_disponiveis,
-        'evento_selecionado': evento_selecionado,
-        'classificacoes': classificacoes,
-        'title': 'Gestão de Matrícula'
-    }
+    zip_buffer.seek(0)
     
-    return render(request, 'academico/gestao_matricula.html', context)
-
-
-@staff_member_required
-def processar_matricula(request):
-    """
-    Processa ação de matrícula de múltiplos alunos
-    """
-    if request.method != 'POST':
-        return JsonResponse({'erro': 'Método não permitido'}, status=405)
+    # Retornar ZIP para download
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="Certificados_{len(avaliacoes)}_alunos.zip"'
     
-    # Obter IDs das inscrições selecionadas
-    inscricoes_ids = request.POST.getlist('inscricoes_selecionadas')
-    
-    if not inscricoes_ids:
-        messages.warning(request, '⚠️ Nenhuma inscrição selecionada')
-        return redirect('academico:gestao_matricula')
-    
-    # Processar matrícula
-    try:
-        resultado = MatriculaService.matricular_alunos(
-            inscricoes_ids=inscricoes_ids,
-            usuario=request.user
-        )
-        
-        # Mensagens de feedback
-        if resultado['total_sucesso'] > 0:
-            messages.success(
-                request,
-                f"✅ {resultado['total_sucesso']} matrícula(s) realizada(s) com sucesso!"
-            )
-        
-        if resultado['total_ja_matriculados'] > 0:
-            messages.info(
-                request,
-                f"ℹ️ {resultado['total_ja_matriculados']} aluno(s) já possuíam matrícula"
-            )
-        
-        if resultado['erros']:
-            for erro in resultado['erros']:
-                messages.error(request, f"❌ {erro}")
-        
-    except Exception as e:
-        messages.error(request, f"❌ Erro ao processar matrículas: {str(e)}")
-    
-    # Redirecionar de volta com o evento selecionado
-    evento_id = request.POST.get('evento_id')
-    if evento_id:
-        return redirect(f"/academico/gestao-matricula/?evento_id={evento_id}")
-    
-    return redirect('academico:gestao_matricula')
-
-
-@staff_member_required
-def alterar_status_inscricao(request):
-    """
-    Altera status de múltiplas inscrições
-    """
-    if request.method != 'POST':
-        return JsonResponse({'erro': 'Método não permitido'}, status=405)
-    
-    # Obter dados
-    inscricoes_ids = request.POST.getlist('inscricoes_selecionadas')
-    novo_status = request.POST.get('novo_status')
-    
-    if not inscricoes_ids:
-        messages.warning(request, '⚠️ Nenhuma inscrição selecionada')
-        return redirect('academico:gestao_matricula')
-    
-    if not novo_status:
-        messages.error(request, '❌ Status não informado')
-        return redirect('academico:gestao_matricula')
-    
-    # Processar alteração de status
-    try:
-        resultado = MatriculaService.alterar_status_inscricao(
-            inscricoes_ids=inscricoes_ids,
-            novo_status_nome=novo_status,
-            usuario=request.user
-        )
-        
-        # Mensagens de feedback
-        if resultado['total_atualizadas'] > 0:
-            messages.success(
-                request,
-                f"✅ {resultado['total_atualizadas']} inscrição(ões) atualizada(s) para '{novo_status}'"
-            )
-        
-        if resultado['erros']:
-            for erro in resultado['erros']:
-                messages.error(request, f"❌ {erro}")
-        
-    except Exception as e:
-        messages.error(request, f"❌ Erro ao alterar status: {str(e)}")
-    
-    # Redirecionar de volta com o evento selecionado
-    evento_id = request.POST.get('evento_id')
-    if evento_id:
-        return redirect(f"/academico/gestao-matricula/?evento_id={evento_id}")
-    
-    return redirect('academico:gestao_matricula')
+    return response
 

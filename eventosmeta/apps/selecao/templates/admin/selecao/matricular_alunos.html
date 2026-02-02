@@ -70,11 +70,30 @@
         margin-bottom: 5px;
     }
     
-    .form-row select {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
+.form-row select {
+    width: 100%;
+    padding: 10px 12px;  /* ← Aumentado o padding */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    height: 42px;  /* ← Altura fixa para garantir espaço */
+    line-height: 1.5;  /* ← Espaçamento entre linhas */
+    vertical-align: middle;  /* ← Alinhamento vertical */
+    background-color: white;
+    cursor: pointer;
+}
+
+/* Garantir que o texto selecionado não seja cortado */
+.form-row select option {
+    padding: 8px;
+    line-height: 1.5;
+}
+    
+    .form-row .helptext {
+        display: block;
+        margin-top: 5px;
+        color: #666;
+        font-size: 12px;
     }
     
     .submit-row {
@@ -105,6 +124,10 @@
         text-decoration: none;
         color: #666;
     }
+    
+    .btn-cancel:hover {
+        color: #333;
+    }
 </style>
 {% endblock %}
 
@@ -132,31 +155,35 @@
         {% endfor %}
     </div>
     
-    <form method="post">
+    <form method="post" action="{% url 'admin:selecao_classificacao_changelist' %}">
         {% csrf_token %}
         
-        <!-- Hidden inputs para manter seleção -->
+        <!-- CAMPO OBRIGATÓRIO: Indica qual action chamar -->
+        <input type="hidden" name="action" value="matricular_alunos_action">
+        
+        <!-- IDs dos alunos selecionados (formato compatível com Django admin) -->
         {% for classificacao in classificacoes %}
-        <input type="hidden" name="{{ action_checkbox_name }}" value="{{ classificacao.pk }}">
+            <input type="hidden" name="_selected_action" value="{{ classificacao.pk }}">
         {% endfor %}
         
         <div class="form-row">
             <label for="{{ form.turma.id_for_label }}">Selecione a Turma:</label>
             {{ form.turma }}
+            {% if form.turma.help_text %}
+                <span class="helptext">{{ form.turma.help_text }}</span>
+            {% endif %}
             {% if form.turma.errors %}
                 <p style="color: red; margin-top: 5px;">{{ form.turma.errors }}</p>
             {% endif %}
-            <small style="display: block; margin-top: 5px; color: #666;">
-                As turmas listadas pertencem ao evento selecionado.
-            </small>
         </div>
         
         <div class="submit-row">
-            <a href="{{ request.META.HTTP_REFERER }}" class="btn-cancel">Cancelar</a>
-            <button type="submit" name="apply" class="btn-submit">
+            <a href="{% url 'admin:selecao_classificacao_changelist' %}" class="btn-cancel">Cancelar</a>
+            <button type="submit" name="confirmar_matricula" value="1" class="btn-submit">
                 ✅ Confirmar Matrícula
             </button>
         </div>
     </form>
 </div>
 {% endblock %}
+

@@ -8,6 +8,11 @@ Data: 14/01/2026
 
 Alteração: Mantidos interessado_id e inscricao_id com validação automática
 Data: 30/01/2026
+
+Alteração: Adicionado signal para reverter status ao excluir matrícula
+Data: 02/02/2026
+
+Responsável por: Matrículas, avaliações, execução do curso
 """
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -276,4 +281,64 @@ class Avaliacao(models.Model):
     def __str__(self):
         status = "Aprovado" if self.aprovado else "Reprovado"
         return f"{self.matricula.numero_matricula} - {self.matricula.interessado.nome} - {status}"
-    
+
+
+# ==========================================
+# SIGNALS PARA ATUALIZAR STATUS DA INSCRIÇÃO
+# ==========================================
+
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from apps.selecao.models import StatusInscricao
+
+
+@receiver(post_delete, sender=Matricula)
+def reverter_status_inscricao(sender, instance, **kwargs):
+    """
+    Quando uma matrícula é excluída, reverte o status da inscrição para 'Pendente'
+    """
+    try:
+        # Buscar status "Pendente" (case-insensitive)
+        status_pendente = StatusInscricao.objects.get(nome__iexact='pendente')
+        
+        # Atualizar a inscrição relacionada
+        inscricao = instance.inscricao
+        inscricao.status = status_pendente
+        inscricao.save()
+        
+    except StatusInscricao.DoesNotExist:
+        # Se não encontrar o status Pendente, não faz nada
+        pass
+    except Exception as e:
+        # Log do erro (opcional)
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Erro ao reverter status da inscrição {instance.inscricao.id}: {str(e)}")
+
+# ==========================================
+# SIGNAL: CRIAR AVALIAÇÃO AUTOMATICAMENTE
+# ==========================================
+
+from django.db.models.signals import post_save
+
+
+@receiver(post_save, sender=Matricula)
+def criar_avaliacao_automatica(sender, instance, created, **kwargs):
+    """
+    Quando uma matrícula é criada, cria automaticamente uma avaliação vazia
+    """
+    if created:  # Apenas na criação da matrícula
+        try:
+            # Verifica se já existe avaliação (por segurança)
+            if not hasattr(instance, 'avaliacao'):
+                Avaliacao.objects.create(
+                    matricula=instance,
+                    frequencia=0.00,  # Frequência inicial zerada
+                    aprovado=False     # Inicialmente não aprovado
+                )
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Erro ao criar avaliação para matrícula {instance.numero_matricula}: {str(e)}")
+
+            
