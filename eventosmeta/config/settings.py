@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'apps.academico',
     'apps.portal',
     'apps.scripts_admin',
+    'dashboard',
 
     # Ferramentas
     'django_extensions', 

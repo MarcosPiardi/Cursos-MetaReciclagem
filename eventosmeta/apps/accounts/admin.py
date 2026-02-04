@@ -122,3 +122,20 @@ class UsuarioAdmin(BaseUserAdmin):
 
 # Registrar Usuario no admin customizado
 admin_site.register(Usuario, UsuarioAdmin)
+
+
+# No final do arquivo, ADICIONAR:
+
+from django.urls import reverse
+from django.utils.html import format_html
+
+class DashboardMenuAdmin(admin.ModelAdmin):
+    """Classe para adicionar item Dashboard no menu"""
+    
+    def has_module_permission(self, request):
+        return True
+
+# Registrar para aparecer no menu
+admin_site.register([], DashboardMenuAdmin)
+
+
