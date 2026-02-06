@@ -6,8 +6,10 @@ Data: 20/01/2026
 
 Alteração: Admin customizado + rotas de dashboard integradas
 Data: 03/02/2026
-"""
 
+Alteração: Adicionadas rotas PDF para todos os dashboards
+Data: 05/02/2026
+"""
 
 from django.contrib import admin
 from django.urls import path, include
@@ -18,20 +20,31 @@ from django.conf.urls.static import static
 # Admin customizado
 from apps.accounts.admin import admin_site
 
-# ✅ NOVO: Importar views de dashboard
+# Importar views de dashboard
 from dashboard import views as dashboard_views
 
 urlpatterns = [
     # ==========================================
     # DASHBOARDS CUSTOMIZADOS
     # Adicionado em 03/02/2026
+    # Atualizado em 05/02/2026: Adicionadas rotas PDF
     # ==========================================
     path('admin/dashboard/', include([
+        # Dashboard Acadêmico
         path('academico/', dashboard_views.dashboard_academico, name='dashboard_academico'),
+        path('academico/pdf/', dashboard_views.dashboard_academico_pdf, name='dashboard_academico_pdf'),
+        
+        # Dashboard Eventos
         path('eventos/', dashboard_views.dashboard_eventos, name='dashboard_eventos'),
+        path('eventos/pdf/', dashboard_views.dashboard_eventos_pdf, name='dashboard_eventos_pdf'),
+        
+        # Dashboard Interessados
         path('interessados/', dashboard_views.dashboard_interessados, name='dashboard_interessados'),
         path('interessados/pdf/', dashboard_views.dashboard_interessados_pdf, name='dashboard_interessados_pdf'),
+        
+        # Dashboard Processo Seletivo
         path('processo-seletivo/', dashboard_views.dashboard_processo_seletivo, name='dashboard_processo_seletivo'),
+        path('processo-seletivo/pdf/', dashboard_views.dashboard_processo_seletivo_pdf, name='dashboard_processo_seletivo_pdf'),
     ])),
     
     # ==========================================

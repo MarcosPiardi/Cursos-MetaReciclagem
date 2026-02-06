@@ -1,0 +1,54 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="{% static 'admin/img/favicon.ico' %}">
+
+<!-- Chart.js (se necessário) -->
+{% block extra_charts %}{% endblock %}
+
+{% block extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 style="margin: 0;">{% block dashboard_title %}Dashboard{% endblock %}</h1>
+        {% block dashboard_actions %}{% endblock %}
+    </div>
+    
+    {% block dashboard_content %}{% endblock %}
+</div>
+
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+    
+    .btn-pdf {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #2196F3;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
+    }
+    
+    .btn-pdf:hover {
+        background: #1976D2;
+        color: white;
+        box-shadow: 0 4px 8px rgba(33, 150, 243, 0.5);
+        transform: translateY(-2px);
+    }
+    
+    {% block extra_dashboard_css %}{% endblock %}
+</style>
+
+{% block extra_js %}{% endblock %}
+{% endblock %}
+
