@@ -3,6 +3,9 @@ Views do app DASHBOARD
 Arquivo: dashboard/views.py
 Alteração: Views customizadas para dashboards
 Data: 03/02/2026
+
+Alteração: Views customizadas para dashboards com geração de PDF
+Data: 05/02/2026
 """
 
 from django.shortcuts import render
@@ -41,6 +44,12 @@ def dashboard_academico(request):
         total=Count('id')
     ).order_by('-total')[:5]
     
+    # Avaliações recentes
+    avaliacoes_recentes = Avaliacao.objects.select_related(
+        'matricula__aluno',
+        'matricula__turma__evento'
+    ).order_by('-data_avaliacao')[:10]
+    
     context = {
         'title': 'Dashboard - Informações Acadêmicas',
         'site_title': admin_site.site_title,
@@ -56,6 +65,7 @@ def dashboard_academico(request):
         
         'avaliacoes_por_status': avaliacoes_por_status,
         'top_cursos_aprovados': top_cursos_aprovados,
+        'avaliacoes_recentes': avaliacoes_recentes,
     }
     
     return render(request, 'admin/dashboard/academico.html', context)
@@ -144,7 +154,6 @@ def dashboard_interessados(request):
     
     interessados_sem_matricula = total_interessados - interessados_matriculados
     
-  
     # ==========================================
     # DISTRIBUIÇÃO POR SEXO
     # ==========================================
@@ -376,6 +385,11 @@ def dashboard_processo_seletivo(request):
     
     return render(request, 'admin/dashboard/processo_seletivo.html', context)
 
+
+# ==========================================
+# FUNÇÕES DE GERAÇÃO DE PDF
+# ==========================================
+
 @staff_member_required
 def dashboard_interessados_pdf(request):
     """Gera PDF do dashboard de interessados"""
@@ -393,7 +407,6 @@ def dashboard_interessados_pdf(request):
     ).distinct().count()
     
     interessados_sem_matricula = total_interessados - interessados_matriculados
-    
     
     # Distribuição por sexo
     distribuicao_sexo = Interessado.objects.values('sexo__nome').annotate(
@@ -496,6 +509,10 @@ def dashboard_interessados_pdf(request):
     
     # Preparar context
     context = {
+        'title': 'Dashboard - Interessados',
+        'site_title': admin_site.site_title,
+        'site_header': admin_site.site_header,
+        
         'total_interessados': total_interessados,
         'interessados_matriculados': interessados_matriculados,
         'interessados_sem_matricula': interessados_sem_matricula,
@@ -508,15 +525,8 @@ def dashboard_interessados_pdf(request):
         'faixas_etarias': faixas_etarias,
     }
     
-    # Gerar PDF
-    pdf_buffer = gerar_pdf_interessados(context)
-    
-    # Retornar response
-    response = HttpResponse(pdf_buffer, content_type='application/pdf')
-    filename = f'dashboard_interessados_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
-    
-    return response
+    return render(request, 'admin/dashboard/interessados.html', context)
+
 
 @staff_member_required
 def dashboard_eventos_pdf(request):
@@ -578,6 +588,7 @@ def dashboard_eventos_pdf(request):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
     return response
+
 
 @staff_member_required
 def dashboard_academico_pdf(request):

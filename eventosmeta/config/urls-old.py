@@ -1,7 +1,14 @@
 """
-Utilidades para geração de PDF dos dashboards
-Arquivo: dashboard/utils_pdf.py
-Data: 05/02/2026
+URL Configuration for Eventos MetaReciclagem
+Arquivo: eventosmeta/config/urls.py
+Alteração: Admin customizado com dashboard + estrutura completa
+Data: 20/01/2026
+
+Alteração: Admin customizado + rotas de dashboard integradas
+Data: 03/02/2026
+
+Alteração: Utilidades para geração de PDF dos dashboards
+Data: 06/02/2026
 """
 
 from reportlab.lib.pagesizes import A4, landscape
@@ -189,8 +196,8 @@ def gerar_pdf_interessados(context):
         pagesize=landscape(A4),
         rightMargin=1.5*cm,
         leftMargin=1.5*cm,
-        topMargin=3*cm,    # Espaço para cabeçalho
-        bottomMargin=1.5*cm  # Espaço para rodapé
+        topMargin=3*cm,
+        bottomMargin=1.5*cm
     )
     
     styles = getSampleStyleSheet()
@@ -216,7 +223,6 @@ def gerar_pdf_interessados(context):
         ['Total de Interessados', str(context['total_interessados'])],
         ['Com Matrícula', str(context['interessados_matriculados'])],
         ['Sem Matrícula', str(context['interessados_sem_matricula'])]
-        # ['Cadastros (30 dias)', str(context['cadastros_recentes'])]
     ]
     
     metricas_table = Table(metricas_data, colWidths=[15*cm, 5*cm])
@@ -330,6 +336,7 @@ def gerar_pdf_interessados(context):
     
     buffer.seek(0)
     return buffer
+
 
 def gerar_pdf_eventos(context):
     """Gera PDF do dashboard de eventos com layout limpo"""
@@ -488,6 +495,168 @@ def gerar_pdf_eventos(context):
             **kwargs
         )
     )
+    
+    buffer.seek(0)
+    return buffer
+
+
+def gerar_pdf_academico(context):
+    """Gera PDF do dashboard acadêmico"""
+    buffer = BytesIO()
+    data_emissao = datetime.now().strftime('%d/%m/%Y às %H:%M')
+    
+    doc = SimpleDocTemplate(
+        buffer, pagesize=landscape(A4),
+        rightMargin=1.5*cm, leftMargin=1.5*cm,
+        topMargin=3*cm, bottomMargin=1.5*cm
+    )
+    
+    styles = getSampleStyleSheet()
+    style_subtitle = ParagraphStyle(
+        'CustomSubtitle', parent=styles['Heading2'],
+        fontSize=11, textColor=colors.HexColor('#2196F3'),
+        spaceAfter=8, spaceBefore=12, fontName='Helvetica-Bold'
+    )
+    
+    story = []
+    
+    # Métricas
+    metricas_data = [
+        ['Métrica', 'Valor'],
+        ['Total de Avaliações', str(context['total_avaliacoes'])],
+        ['Aprovados', str(context['total_aprovados'])],
+        ['Reprovados', str(context['total_reprovados'])],
+        ['Taxa de Aprovação (%)', f"{context['taxa_aprovacao']}%"],
+        ['Média de Notas', str(context['media_notas'])],
+        ['Certificados Emitidos', str(context['certificados_emitidos'])]
+    ]
+    
+    metricas_table = Table(metricas_data, colWidths=[15*cm, 5*cm])
+    metricas_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2196F3')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+    ]))
+    
+    story.append(metricas_table)
+    story.append(Spacer(1, 0.6*cm))
+    
+    # Top Cursos
+    story.append(Paragraph("Top 5 Cursos com Mais Aprovados", style_subtitle))
+    
+    top_data = [['Curso', 'Aprovados']]
+    for item in context['top_cursos_aprovados']:
+        top_data.append([item['matricula__turma__evento__nome'], str(item['total'])])
+    
+    if len(top_data) == 1:
+        top_data.append(['Nenhum dado disponível', '-'])
+    
+    top_table = Table(top_data, colWidths=[15*cm, 5*cm])
+    top_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2196F3')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+    ]))
+    
+    story.append(top_table)
+    
+    doc.build(story, canvasmaker=lambda *args, **kwargs: DashboardCanvas(
+        *args, titulo_dashboard='DASHBOARD - INFORMAÇÕES ACADÊMICAS',
+        data_emissao=data_emissao, **kwargs
+    ))
+    
+    buffer.seek(0)
+    return buffer
+
+
+def gerar_pdf_processo_seletivo(context):
+    """Gera PDF do dashboard de processo seletivo"""
+    buffer = BytesIO()
+    data_emissao = datetime.now().strftime('%d/%m/%Y às %H:%M')
+    
+    doc = SimpleDocTemplate(
+        buffer, pagesize=landscape(A4),
+        rightMargin=1.5*cm, leftMargin=1.5*cm,
+        topMargin=3*cm, bottomMargin=1.5*cm
+    )
+    
+    styles = getSampleStyleSheet()
+    style_subtitle = ParagraphStyle(
+        'CustomSubtitle', parent=styles['Heading2'],
+        fontSize=11, textColor=colors.HexColor('#2196F3'),
+        spaceAfter=8, spaceBefore=12, fontName='Helvetica-Bold'
+    )
+    
+    story = []
+    
+    # Métricas
+    metricas_data = [
+        ['Métrica', 'Valor'],
+        ['Total de Inscrições', str(context['total_inscricoes'])],
+        ['Inscrições Recentes (30 dias)', str(context['inscricoes_recentes'])],
+        ['Total de Classificações', str(context['total_classificacoes'])],
+        ['Classificados', str(context['classificados'])],
+        ['Lista de Espera', str(context['lista_espera'])],
+        ['Taxa de Classificação (%)', f"{context['taxa_classificacao']}%"]
+    ]
+    
+    metricas_table = Table(metricas_data, colWidths=[15*cm, 5*cm])
+    metricas_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2196F3')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+    ]))
+    
+    story.append(metricas_table)
+    story.append(Spacer(1, 0.6*cm))
+    
+    # Top Eventos
+    story.append(Paragraph("Top 5 Eventos com Mais Inscrições", style_subtitle))
+    
+    top_data = [['Evento', 'Inscrições']]
+    for item in context['top_eventos_inscricoes']:
+        top_data.append([item['evento__nome'], str(item['total'])])
+    
+    if len(top_data) == 1:
+        top_data.append(['Nenhum dado disponível', '-'])
+    
+    top_table = Table(top_data, colWidths=[15*cm, 5*cm])
+    top_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2196F3')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+    ]))
+    
+    story.append(top_table)
+    
+    doc.build(story, canvasmaker=lambda *args, **kwargs: DashboardCanvas(
+        *args, titulo_dashboard='DASHBOARD - PROCESSO SELETIVO',
+        data_emissao=data_emissao, **kwargs
+    ))
     
     buffer.seek(0)
     return buffer

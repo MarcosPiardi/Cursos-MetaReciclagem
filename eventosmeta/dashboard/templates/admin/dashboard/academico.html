@@ -11,12 +11,12 @@
 {% block content %}
 <div class="dashboard-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-        <h1 style="margin: 0;">📊 Informações Acadêmicas</h1>
+        <h1 style="margin: 0;">📚 Dashboard - Informações Acadêmicas</h1>
         
         <!-- Botões à direita -->
         <div style="display: flex; gap: 10px;">
             <a href="{% url 'admin:index' %}" class="btn-voltar">
-                ⬅️ Voltar
+                ⬅️ Voltar ao Admin
             </a>
             <a href="{% url 'dashboard_academico_pdf' %}" class="btn-pdf" target="_blank">
                 📄 Gerar PDF
@@ -24,60 +24,90 @@
         </div>
     </div>
     
+    <!-- Cards de Métricas Gerais -->
     <div class="dashboard-cards">
-        <!-- Card 1 -->
         <div class="card">
             <h3>Total de Avaliações</h3>
             <p class="big-number">{{ total_avaliacoes }}</p>
         </div>
         
-        <!-- Card 2 -->
         <div class="card card-success">
             <h3>Aprovados</h3>
             <p class="big-number">{{ total_aprovados }}</p>
-            <small>{{ taxa_aprovacao }}% de aprovação</small>
         </div>
         
-        <!-- Card 3 -->
-        <div class="card card-danger">
+        <div class="card card-warning">
             <h3>Reprovados</h3>
             <p class="big-number">{{ total_reprovados }}</p>
         </div>
         
-        <!-- Card 4 -->
         <div class="card card-info">
-            <h3>Certificados Emitidos</h3>
-            <p class="big-number">{{ certificados_emitidos }}</p>
-        </div>
-        
-        <!-- Card 5 -->
-        <div class="card">
-            <h3>Média de Notas</h3>
-            <p class="big-number">{{ media_notas }}</p>
-        </div>
-        
-        <!-- Card 6 -->
-        <div class="card">
-            <h3>Média de Frequência</h3>
-            <p class="big-number">{{ media_frequencia }}%</p>
+            <h3>Taxa de Aprovação</h3>
+            <p class="big-number">{{ taxa_aprovacao }}%</p>
         </div>
     </div>
     
+    <!-- Métricas Acadêmicas -->
+    <h2 style="margin: 30px 0 20px 0; color: #333;">📊 Indicadores Acadêmicos</h2>
+    
     <div class="dashboard-charts">
+        <div class="chart-box">
+            <h2>📈 Médias Gerais</h2>
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Indicador</th>
+                        <th style="text-align: center;">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Média de Notas</td>
+                        <td style="text-align: center;"><strong>{{ media_notas }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Média de Frequência</td>
+                        <td style="text-align: center;"><strong>{{ media_frequencia }}%</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Certificados Emitidos</td>
+                        <td style="text-align: center;"><strong>{{ certificados_emitidos }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #f5f5f5; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-around; text-align: center;">
+                    <div>
+                        <div style="font-size: 24px; font-weight: bold; color: #4CAF50;">{{ total_aprovados }}</div>
+                        <div style="font-size: 11px; color: #666;">Aprovados</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 24px; font-weight: bold; color: #F44336;">{{ total_reprovados }}</div>
+                        <div style="font-size: 11px; color: #666;">Reprovados</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 24px; font-weight: bold; color: #2196F3;">{{ certificados_emitidos }}</div>
+                        <div style="font-size: 11px; color: #666;">Certificados</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="chart-box">
             <h2>🏆 Top 5 Cursos com Mais Aprovados</h2>
             <table class="dashboard-table">
                 <thead>
                     <tr>
                         <th>Curso</th>
-                        <th>Total</th>
+                        <th style="text-align: center;">Aprovados</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in top_cursos_aprovados %}
                     <tr>
                         <td>{{ item.matricula__turma__evento__nome }}</td>
-                        <td><strong>{{ item.total }}</strong></td>
+                        <td style="text-align: center;"><strong>{{ item.total }}</strong></td>
                     </tr>
                     {% empty %}
                     <tr>
@@ -88,6 +118,46 @@
             </table>
         </div>
     </div>
+    
+    <!-- Avaliações Recentes -->
+    <h2 style="margin: 30px 0 20px 0; color: #333;">📝 Avaliações Recentes</h2>
+    
+    <div class="chart-box">
+        <table class="dashboard-table">
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>Curso</th>
+                    <th style="text-align: center;">Nota</th>
+                    <th style="text-align: center;">Frequência</th>
+                    <th style="text-align: center;">Status</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for avaliacao in avaliacoes_recentes %}
+                <tr>
+                    <td>{{ avaliacao.matricula.aluno.nome }}</td>
+                    <td>{{ avaliacao.matricula.turma.evento.nome }}</td>
+                    <td style="text-align: center;"><strong>{{ avaliacao.nota_final }}</strong></td>
+                    <td style="text-align: center;">{{ avaliacao.frequencia }}%</td>
+                    <td style="text-align: center;">
+                        {% if avaliacao.aprovado %}
+                            <span style="color: #4CAF50; font-weight: bold;">✓ Aprovado</span>
+                        {% else %}
+                            <span style="color: #F44336; font-weight: bold;">✗ Reprovado</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ avaliacao.data_avaliacao|date:"d/m/Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #999;">Nenhuma avaliação recente</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <style>
@@ -97,7 +167,7 @@
     
     .dashboard-cards {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 20px;
         margin-bottom: 30px;
     }
@@ -114,7 +184,7 @@
         border-left-color: #4caf50;
     }
     
-    .card-danger {
+    .card-warning {
         border-left-color: #f44336;
     }
     
@@ -124,27 +194,29 @@
     
     .card h3 {
         margin: 0 0 10px 0;
-        font-size: 14px;
+        font-size: 13px;
         color: #666;
         text-transform: uppercase;
     }
     
     .big-number {
-        font-size: 36px;
+        font-size: 32px;
         font-weight: bold;
         margin: 10px 0;
         color: #333;
     }
     
-    .card small {
-        color: #999;
-        font-size: 12px;
-    }
-    
     .dashboard-charts {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 1024px) {
+        .dashboard-charts {
+            grid-template-columns: 1fr;
+        }
     }
     
     .chart-box {
@@ -156,8 +228,9 @@
     
     .chart-box h2 {
         margin-top: 0;
-        font-size: 18px;
+        font-size: 15px;
         color: #333;
+        margin-bottom: 15px;
     }
     
     .dashboard-table {
@@ -172,9 +245,10 @@
     
     .dashboard-table th,
     .dashboard-table td {
-        padding: 12px;
+        padding: 10px;
         text-align: left;
         border-bottom: 1px solid #ddd;
+        font-size: 13px;
     }
     
     .dashboard-table th {
@@ -190,42 +264,40 @@
     .btn-pdf {
         display: inline-block;
         padding: 10px 20px;
-        background: #F44336;
-        color: #000000 !important;
-        text-decoration: none !important;
+        background: #2196F3;
+        color: #000000;
+        text-decoration: none;
         border-radius: 5px;
         font-weight: bold;
         font-size: 14px;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(244, 67, 54, 0.3);
+        box-shadow: 0 2px 5px rgba(33, 150, 243, 0.3);
     }
     
     .btn-pdf:hover {
-        background: #D32F2F !important;
-        color: #FFFFFF !important;
-        text-decoration: none !important;
-        box-shadow: 0 4px 8px rgba(244, 67, 54, 0.5);
+        background: #1976D2;
+        color: #FFFFFF;
+        box-shadow: 0 4px 8px rgba(33, 150, 243, 0.5);
         transform: translateY(-2px);
     }
     
     .btn-voltar {
         display: inline-block;
         padding: 10px 20px;
-        background: #05f5f5;
-        color: #000000 !important;
-        text-decoration: none !important;
+        background: #417690;
+        color: #000000;
+        text-decoration: none;
         border-radius: 5px;
         font-weight: bold;
         font-size: 14px;
         transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(5, 245, 245, 0.3);
+        box-shadow: 0 2px 5px rgba(65, 118, 144, 0.3);
     }
     
     .btn-voltar:hover {
-        background: #04d4d4 !important;
-        color: #FFFFFF !important;
-        text-decoration: none !important;
-        box-shadow: 0 4px 8px rgba(5, 245, 245, 0.5);
+        background: #2E5266;
+        color: #FFFFFF;
+        box-shadow: 0 4px 8px rgba(65, 118, 144, 0.5);
         transform: translateY(-2px);
     }
 </style>

@@ -8,7 +8,7 @@ Alteração: Admin customizado + rotas de dashboard integradas
 Data: 03/02/2026
 
 Alteração: Adicionadas rotas PDF para todos os dashboards
-Data: 09/02/2026
+Data: 05/02/2026
 """
 
 from django.contrib import admin
@@ -27,7 +27,7 @@ urlpatterns = [
     # ==========================================
     # DASHBOARDS CUSTOMIZADOS
     # Adicionado em 03/02/2026
-    # Atualizado em 09/02/2026: Rotas PDF adicionadas
+    # Atualizado em 05/02/2026: Adicionadas rotas PDF
     # ==========================================
     path('admin/dashboard/', include([
         # Dashboard Acadêmico
