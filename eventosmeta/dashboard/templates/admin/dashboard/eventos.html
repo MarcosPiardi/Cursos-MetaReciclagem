@@ -1,10 +1,28 @@
 {% extends "admin/base_site.html" %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extrahead %}
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+{% endblock %}
+
 {% block content %}
 <div class="dashboard-container">
-    <h1>📅 Painel de Eventos e Cursos</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h1 style="margin: 0;">📅 Painel de Eventos e Cursos</h1>
+        
+        <!-- Botões à direita -->
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'admin:index' %}" class="btn-voltar">
+                ⬅️ Voltar
+            </a>
+            <a href="{% url 'dashboard_eventos_pdf' %}" class="btn-pdf" target="_blank">
+                📄 Gerar PDF
+            </a>
+        </div>
+    </div>
     
     <div class="dashboard-cards">
         <div class="card">
@@ -13,8 +31,8 @@
         </div>
         
         <div class="card card-success">
-            <h3>Eventos Ativos</h3>
-            <p class="big-number">{{ eventos_ativos }}</p>
+            <h3>Eventos com Inscrições Abertas</h3>
+            <p class="big-number">{{ eventos_inscricoes_abertas }}</p>
         </div>
         
         <div class="card">
@@ -22,37 +40,56 @@
             <p class="big-number">{{ total_turmas }}</p>
         </div>
         
-        <div class="card card-success">
-            <h3>Turmas Ativas</h3>
-            <p class="big-number">{{ turmas_ativas }}</p>
-        </div>
-        
         <div class="card card-info">
             <h3>Turmas Futuras</h3>
             <p class="big-number">{{ turmas_futuras }}</p>
         </div>
         
-        <div class="card">
+        <div class="card card-success">
             <h3>Turmas em Andamento</h3>
             <p class="big-number">{{ turmas_em_andamento }}</p>
         </div>
+        
+        <div class="card">
+            <h3>Turmas Encerradas</h3>
+            <p class="big-number">{{ turmas_encerradas }}</p>
+        </div>
+    </div>
+    
+    <!-- Segmentação por Status -->
+    <h2 style="margin: 30px 0 20px 0; color: #333;">📊 Eventos por Status</h2>
+    <div class="dashboard-cards">
+        {% for item in eventos_por_status %}
+        <div class="card">
+            <h3>{{ item.status__nome }}</h3>
+            <p class="big-number">{{ item.total }}</p>
+        </div>
+        {% empty %}
+        <div class="card">
+            <p style="text-align: center; color: #999; margin: 0;">Nenhum dado disponível</p>
+        </div>
+        {% endfor %}
     </div>
     
     <div class="dashboard-charts">
         <div class="chart-box">
-            <h2>🏆 Top 5 Eventos com Mais Turmas</h2>
+            <h2>🏆 Top 5 Eventos com Mais Inscrições</h2>
             <table class="dashboard-table">
                 <thead>
                     <tr>
                         <th>Evento</th>
-                        <th>Nº Turmas</th>
+                        <th style="text-align: center;">Nº Inscrições</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for evento in top_eventos_turmas %}
+                    {% for evento in top_eventos_inscricoes %}
                     <tr>
-                        <td>{{ evento.nome }}</td>
-                        <td><strong>{{ evento.num_turmas }}</strong></td>
+                        <td>{{ evento.evento__nome }}</td>
+                        <td style="text-align: center;"><strong>{{ evento.total_inscricoes }}</strong></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" style="text-align: center; color: #999;">Nenhum dado disponível</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -65,7 +102,7 @@
                 <thead>
                     <tr>
                         <th>Evento</th>
-                        <th>Tipo</th>
+                        <th>Status</th>
                         <th>Data de Criação</th>
                     </tr>
                 </thead>
@@ -73,8 +110,12 @@
                     {% for evento in eventos_recentes %}
                     <tr>
                         <td>{{ evento.nome }}</td>
-                        <td>{{ evento.tipo.nome }}</td>
+                        <td>{{ evento.status.nome }}</td>
                         <td>{{ evento.criado_em|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: #999;">Nenhum evento recente</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -131,6 +172,12 @@
         gap: 20px;
     }
     
+    @media (max-width: 768px) {
+        .dashboard-charts {
+            grid-template-columns: 1fr;
+        }
+    }
+    
     .chart-box {
         background: white;
         padding: 20px;
@@ -168,6 +215,49 @@
     
     .dashboard-table tbody tr:hover {
         background: #f9f9f9;
+    }
+    
+    /* Botões de ação */
+    .btn-pdf {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #F44336;
+        color: #000000 !important;
+        text-decoration: none !important;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(244, 67, 54, 0.3);
+    }
+    
+    .btn-pdf:hover {
+        background: #D32F2F !important;
+        color: #FFFFFF !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 8px rgba(244, 67, 54, 0.5);
+        transform: translateY(-2px);
+    }
+    
+    .btn-voltar {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #05f5f5;
+        color: #000000 !important;
+        text-decoration: none !important;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(5, 245, 245, 0.3);
+    }
+    
+    .btn-voltar:hover {
+        background: #04d4d4 !important;
+        color: #FFFFFF !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 8px rgba(5, 245, 245, 0.5);
+        transform: translateY(-2px);
     }
 </style>
 {% endblock %}

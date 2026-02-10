@@ -60,39 +60,28 @@ def dashboard_academico(request):
     
     return render(request, 'admin/dashboard/academico.html', context)
 
-
 @staff_member_required
 def dashboard_eventos(request):
     """Dashboard de Eventos e Cursos"""
     from apps.eventos.models import Evento, Turma
+    from apps.selecao.models import Inscricao
     from apps.accounts.admin import admin_site
+    from django.db.models import Count
     
     # Métricas gerais
     total_eventos = Evento.objects.count()
     
-    # Eventos ativos (ajuste conforme seu modelo - não há campo 'ativo')
-    # Usando eventos com inscrições abertas como proxy de "ativo"
+    # Eventos com inscrições abertas
     hoje = timezone.now()
-    eventos_ativos = Evento.objects.filter(
+    eventos_inscricoes_abertas = Evento.objects.filter(
         data_inicio_inscricao__lte=hoje,
         data_fim_inscricao__gte=hoje
     ).count()
     
     total_turmas = Turma.objects.count()
     
-    # Turmas ativas baseado em datas
+    # Turmas por status temporal
     hoje_data = date.today()
-    turmas_ativas = Turma.objects.filter(
-        data_inicio__lte=hoje_data,
-        data_fim__gte=hoje_data
-    ).count()
-    
-    # Eventos por status
-    eventos_por_status = Evento.objects.values('status__nome').annotate(
-        total=Count('id')
-    ).order_by('-total')
-    
-    # Turmas por período
     turmas_futuras = Turma.objects.filter(data_inicio__gt=hoje_data).count()
     turmas_em_andamento = Turma.objects.filter(
         data_inicio__lte=hoje_data,
@@ -100,13 +89,20 @@ def dashboard_eventos(request):
     ).count()
     turmas_encerradas = Turma.objects.filter(data_fim__lt=hoje_data).count()
     
-    # Top 5 eventos com mais turmas
-    top_eventos_turmas = Evento.objects.annotate(
-        num_turmas=Count('turmas')
-    ).order_by('-num_turmas')[:5]
+    # Eventos por status
+    eventos_por_status = Evento.objects.values('status__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Top 5 eventos com mais inscrições
+    top_eventos_inscricoes = Inscricao.objects.values(
+        'evento__nome'
+    ).annotate(
+        total_inscricoes=Count('id')
+    ).order_by('-total_inscricoes')[:5]
     
     # Eventos recentes
-    eventos_recentes = Evento.objects.order_by('-criado_em')[:5]
+    eventos_recentes = Evento.objects.select_related('status').order_by('-criado_em')[:5]
     
     context = {
         'title': 'Dashboard - Eventos e Cursos',
@@ -114,21 +110,19 @@ def dashboard_eventos(request):
         'site_header': admin_site.site_header,
         
         'total_eventos': total_eventos,
-        'eventos_ativos': eventos_ativos,
+        'eventos_inscricoes_abertas': eventos_inscricoes_abertas,
         'total_turmas': total_turmas,
-        'turmas_ativas': turmas_ativas,
         
-        'eventos_por_status': eventos_por_status,
         'turmas_futuras': turmas_futuras,
         'turmas_em_andamento': turmas_em_andamento,
         'turmas_encerradas': turmas_encerradas,
         
-        'top_eventos_turmas': top_eventos_turmas,
+        'eventos_por_status': eventos_por_status,
+        'top_eventos_inscricoes': top_eventos_inscricoes,
         'eventos_recentes': eventos_recentes,
     }
     
     return render(request, 'admin/dashboard/eventos.html', context)
-
 
 @staff_member_required
 def dashboard_interessados(request):
@@ -150,11 +144,7 @@ def dashboard_interessados(request):
     
     interessados_sem_matricula = total_interessados - interessados_matriculados
     
-    trinta_dias_atras = date.today() - timedelta(days=30)
-    cadastros_recentes = Interessado.objects.filter(
-        criado_em__gte=trinta_dias_atras
-    ).count()
-    
+  
     # ==========================================
     # DISTRIBUIÇÃO POR SEXO
     # ==========================================
@@ -302,18 +292,6 @@ def dashboard_interessados(request):
                 'percentual': round((count / total_interessados * 100), 1) if total_interessados > 0 else 0
             })
     
-    # ==========================================
-    # TOP 5 COM MAIS MATRÍCULAS
-    # ==========================================
-    top_interessados_matriculas = Interessado.objects.annotate(
-        num_matriculas=Count('matriculas')
-    ).filter(num_matriculas__gt=0).order_by('-num_matriculas')[:5]
-    
-    # ==========================================
-    # ÚLTIMOS CADASTROS
-    # ==========================================
-    ultimos_cadastros = Interessado.objects.order_by('-criado_em')[:10]
-    
     context = {
         'title': 'Dashboard - Interessados',
         'site_title': admin_site.site_title,
@@ -323,7 +301,6 @@ def dashboard_interessados(request):
         'total_interessados': total_interessados,
         'interessados_matriculados': interessados_matriculados,
         'interessados_sem_matricula': interessados_sem_matricula,
-        'cadastros_recentes': cadastros_recentes,
         
         # Distribuições demográficas
         'distribuicao_sexo': distribuicao_sexo,
@@ -333,14 +310,9 @@ def dashboard_interessados(request):
         'distribuicao_deficiencia': distribuicao_deficiencia,
         'tipos_deficiencia': tipos_deficiencia,
         'faixas_etarias': faixas_etarias,
-        
-        # Listas
-        'top_interessados_matriculas': top_interessados_matriculas,
-        'ultimos_cadastros': ultimos_cadastros,
     }
     
     return render(request, 'admin/dashboard/interessados.html', context)
-
 
 
 @staff_member_required
@@ -422,10 +394,6 @@ def dashboard_interessados_pdf(request):
     
     interessados_sem_matricula = total_interessados - interessados_matriculados
     
-    trinta_dias_atras = date.today() - timedelta(days=30)
-    cadastros_recentes = Interessado.objects.filter(
-        criado_em__gte=trinta_dias_atras
-    ).count()
     
     # Distribuição por sexo
     distribuicao_sexo = Interessado.objects.values('sexo__nome').annotate(
@@ -531,7 +499,6 @@ def dashboard_interessados_pdf(request):
         'total_interessados': total_interessados,
         'interessados_matriculados': interessados_matriculados,
         'interessados_sem_matricula': interessados_sem_matricula,
-        'cadastros_recentes': cadastros_recentes,
         'distribuicao_sexo': list(distribuicao_sexo),
         'distribuicao_fototipo': list(distribuicao_fototipo),
         'distribuicao_escolaridade': list(distribuicao_escolaridade),
@@ -549,5 +516,144 @@ def dashboard_interessados_pdf(request):
     filename = f'dashboard_interessados_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
+    return response
+
+@staff_member_required
+def dashboard_eventos_pdf(request):
+    """Gera PDF do dashboard de eventos"""
+    from apps.eventos.models import Evento, Turma
+    from apps.selecao.models import Inscricao
+    from django.http import HttpResponse
+    from django.db.models import Count
+    from .utils_pdf import gerar_pdf_eventos
+    from datetime import datetime
+    
+    # Métricas gerais
+    total_eventos = Evento.objects.count()
+    
+    hoje = timezone.now()
+    eventos_inscricoes_abertas = Evento.objects.filter(
+        data_inicio_inscricao__lte=hoje,
+        data_fim_inscricao__gte=hoje
+    ).count()
+    
+    total_turmas = Turma.objects.count()
+    
+    hoje_data = date.today()
+    turmas_futuras = Turma.objects.filter(data_inicio__gt=hoje_data).count()
+    turmas_em_andamento = Turma.objects.filter(
+        data_inicio__lte=hoje_data,
+        data_fim__gte=hoje_data
+    ).count()
+    turmas_encerradas = Turma.objects.filter(data_fim__lt=hoje_data).count()
+    
+    eventos_por_status = Evento.objects.values('status__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    top_eventos_inscricoes = Inscricao.objects.values(
+        'evento__nome'
+    ).annotate(
+        total_inscricoes=Count('id')
+    ).order_by('-total_inscricoes')[:5]
+    
+    # Preparar context
+    context = {
+        'total_eventos': total_eventos,
+        'eventos_inscricoes_abertas': eventos_inscricoes_abertas,
+        'total_turmas': total_turmas,
+        'turmas_futuras': turmas_futuras,
+        'turmas_em_andamento': turmas_em_andamento,
+        'turmas_encerradas': turmas_encerradas,
+        'eventos_por_status': list(eventos_por_status),
+        'top_eventos_inscricoes': list(top_eventos_inscricoes),
+    }
+    
+    # Gerar PDF
+    pdf_buffer = gerar_pdf_eventos(context)
+    
+    # Retornar response
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_eventos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+@staff_member_required
+def dashboard_academico_pdf(request):
+    """Gera PDF do dashboard acadêmico"""
+    from apps.academico.models import Avaliacao
+    from django.http import HttpResponse
+    from django.db.models import Avg, Count
+    from .utils_pdf import gerar_pdf_academico
+    from datetime import datetime
+    
+    total_avaliacoes = Avaliacao.objects.count()
+    total_aprovados = Avaliacao.objects.filter(aprovado=True).count()
+    total_reprovados = total_avaliacoes - total_aprovados
+    media_notas = Avaliacao.objects.aggregate(Avg('nota_final'))['nota_final__avg'] or 0
+    media_frequencia = Avaliacao.objects.aggregate(Avg('frequencia'))['frequencia__avg'] or 0
+    certificados_emitidos = Avaliacao.objects.filter(certificado_emitido=True).count()
+    taxa_aprovacao = (total_aprovados / total_avaliacoes * 100) if total_avaliacoes > 0 else 0
+    
+    top_cursos_aprovados = Avaliacao.objects.filter(aprovado=True).values(
+        'matricula__turma__evento__nome'
+    ).annotate(total=Count('id')).order_by('-total')[:5]
+    
+    context = {
+        'total_avaliacoes': total_avaliacoes,
+        'total_aprovados': total_aprovados,
+        'total_reprovados': total_reprovados,
+        'taxa_aprovacao': round(taxa_aprovacao, 1),
+        'media_notas': round(media_notas, 2),
+        'media_frequencia': round(media_frequencia, 1),
+        'certificados_emitidos': certificados_emitidos,
+        'top_cursos_aprovados': list(top_cursos_aprovados),
+    }
+    
+    pdf_buffer = gerar_pdf_academico(context)
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_academico_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+
+@staff_member_required
+def dashboard_processo_seletivo_pdf(request):
+    """Gera PDF do dashboard de processo seletivo"""
+    from apps.selecao.models import Inscricao, Classificacao
+    from django.http import HttpResponse
+    from django.db.models import Count
+    from .utils_pdf import gerar_pdf_processo_seletivo
+    from datetime import datetime
+    
+    total_inscricoes = Inscricao.objects.count()
+    
+    trinta_dias_atras = date.today() - timedelta(days=30)
+    inscricoes_recentes = Inscricao.objects.filter(data_inscricao__gte=trinta_dias_atras).count()
+    
+    total_classificacoes = Classificacao.objects.count()
+    classificados = Classificacao.objects.filter(classificado=True).count()
+    lista_espera = Classificacao.objects.filter(lista_espera=True).count()
+    taxa_classificacao = (classificados / total_classificacoes * 100) if total_classificacoes > 0 else 0
+    
+    top_eventos_inscricoes = Inscricao.objects.values('evento__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')[:5]
+    
+    context = {
+        'total_inscricoes': total_inscricoes,
+        'inscricoes_recentes': inscricoes_recentes,
+        'total_classificacoes': total_classificacoes,
+        'classificados': classificados,
+        'lista_espera': lista_espera,
+        'taxa_classificacao': round(taxa_classificacao, 1),
+        'top_eventos_inscricoes': list(top_eventos_inscricoes),
+    }
+    
+    pdf_buffer = gerar_pdf_processo_seletivo(context)
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_processo_seletivo_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
 

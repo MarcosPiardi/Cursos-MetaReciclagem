@@ -3,9 +3,26 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extrahead %}
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+{% endblock %}
+
 {% block content %}
 <div class="dashboard-container">
-    <h1>📊 Informações Acadêmicas</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h1 style="margin: 0;">📊 Informações Acadêmicas</h1>
+        
+        <!-- Botões à direita -->
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'admin:index' %}" class="btn-voltar">
+                ⬅️ Voltar
+            </a>
+            <a href="{% url 'dashboard_academico_pdf' %}" class="btn-pdf" target="_blank">
+                📄 Gerar PDF
+            </a>
+        </div>
+    </div>
     
     <div class="dashboard-cards">
         <!-- Card 1 -->
@@ -64,7 +81,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="2">Nenhum dado disponível</td>
+                        <td colspan="2" style="text-align: center; color: #999;">Nenhum dado disponível</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -168,5 +185,49 @@
     .dashboard-table tbody tr:hover {
         background: #f9f9f9;
     }
+    
+    /* Botões de ação */
+    .btn-pdf {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #F44336;
+        color: #000000 !important;
+        text-decoration: none !important;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(244, 67, 54, 0.3);
+    }
+    
+    .btn-pdf:hover {
+        background: #D32F2F !important;
+        color: #FFFFFF !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 8px rgba(244, 67, 54, 0.5);
+        transform: translateY(-2px);
+    }
+    
+    .btn-voltar {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #05f5f5;
+        color: #000000 !important;
+        text-decoration: none !important;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(5, 245, 245, 0.3);
+    }
+    
+    .btn-voltar:hover {
+        background: #04d4d4 !important;
+        color: #FFFFFF !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 8px rgba(5, 245, 245, 0.5);
+        transform: translateY(-2px);
+    }
 </style>
 {% endblock %}
+

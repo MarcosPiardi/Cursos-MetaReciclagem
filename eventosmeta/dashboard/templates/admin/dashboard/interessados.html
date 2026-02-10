@@ -4,21 +4,29 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block extrahead %}
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 {% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
-    <h1>👥 Dashboard - Interessados</h1>
-    <div class="dashboard-container">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
         <h1 style="margin: 0;">👥 Dashboard - Interessados</h1>
-        <a href="{% url 'dashboard_interessados_pdf' %}" class="btn-pdf" target="_blank">
-            📄 Gerar PDF
-        </a>
+        
+        <!-- Botões à direita -->
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'admin:index' %}" class="btn-voltar">
+                ⬅️ Voltar
+            </a>
+            <a href="{% url 'dashboard_interessados_pdf' %}" class="btn-pdf" target="_blank">
+                📄 Gerar PDF
+            </a>
+        </div>
     </div>
-     
+    
     <!-- Cards de Métricas Gerais -->
     <div class="dashboard-cards">
         <div class="card">
@@ -34,11 +42,6 @@
         <div class="card">
             <h3>Sem Matrícula</h3>
             <p class="big-number">{{ interessados_sem_matricula }}</p>
-        </div>
-        
-        <div class="card card-info">
-            <h3>Cadastros (30 dias)</h3>
-            <p class="big-number">{{ cadastros_recentes }}</p>
         </div>
     </div>
     
@@ -109,57 +112,6 @@
         <h2>📅 Distribuição por Faixa Etária</h2>
         <div class="chart-container-bar">
             <canvas id="chartFaixasEtarias"></canvas>
-        </div>
-    </div>
-    
-    <!-- Top Interessados e Últimos Cadastros -->
-    <div class="dashboard-charts" style="margin-top: 20px;">
-        <div class="chart-box">
-            <h2>🏆 Top 5 com Mais Matrículas</h2>
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th style="text-align: center;">Matrículas</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for interessado in top_interessados_matriculas %}
-                    <tr>
-                        <td>{{ interessado.nome }}</td>
-                        <td style="text-align: center;"><strong>{{ interessado.num_matriculas }}</strong></td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="2" style="text-align: center; color: #999;">Nenhum dado disponível</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="chart-box">
-            <h2>🆕 Últimos Cadastros</h2>
-            <table class="dashboard-table">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Data</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for interessado in ultimos_cadastros %}
-                    <tr>
-                        <td>{{ interessado.nome }}</td>
-                        <td>{{ interessado.criado_em|date:"d/m/Y H:i" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="2" style="text-align: center; color: #999;">Nenhum cadastro recente</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
         </div>
     </div>
 </div>
@@ -269,54 +221,48 @@
         font-size: 14px;
     }
     
-    /* Tabelas */
-    .dashboard-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-    
-    .dashboard-table thead {
-        background: #f5f5f5;
-    }
-    
-    .dashboard-table th,
-    .dashboard-table td {
-        padding: 10px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-        font-size: 13px;
-    }
-    
-    .dashboard-table th {
-        font-weight: 600;
-        color: #666;
-    }
-    
-    .dashboard-table tbody tr:hover {
-        background: #f9f9f9;
-    }
-
-
+    /* Botões de ação */
     .btn-pdf {
         display: inline-block;
         padding: 10px 20px;
         background: #F44336;
-        color: white;
-        text-decoration: none;
+        color: #000000 !important;
+        text-decoration: none !important;
         border-radius: 5px;
         font-weight: bold;
         font-size: 14px;
-        transition: background 0.3s ease;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(244, 67, 54, 0.3);
     }
-
+    
     .btn-pdf:hover {
-        background: #D32F2F;
-        color: white;
+        background: #D32F2F !important;
+        color: #FFFFFF !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 8px rgba(244, 67, 54, 0.5);
+        transform: translateY(-2px);
     }
-
-
-
+    
+    .btn-voltar {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #05f5f5;
+        color: #000000 !important;
+        text-decoration: none !important;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(5, 245, 245, 0.3);
+    }
+    
+    .btn-voltar:hover {
+        background: #04d4d4 !important;
+        color: #FFFFFF !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 8px rgba(5, 245, 245, 0.5);
+        transform: translateY(-2px);
+    }
 </style>
 
 <script>
