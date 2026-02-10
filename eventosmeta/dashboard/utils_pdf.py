@@ -2,6 +2,8 @@
 Utilidades para geração de PDF dos dashboards
 Arquivo: dashboard/utils_pdf.py
 Data: 05/02/2026
+
+Atualização: 09/02/2026 - Cabeçalhos e rodapés personalizados
 """
 
 from reportlab.lib.pagesizes import A4, landscape
@@ -16,7 +18,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from datetime import datetime
-import os
 
 
 def criar_grafico_pizza(labels, values, title):
@@ -79,12 +80,9 @@ def criar_grafico_barras(labels, values, title):
     return img_buffer
 
 
-class DashboardCanvas(canvas.Canvas):
-    """Canvas personalizado com cabeçalho e rodapé limpos"""
-    
+class NumberedCanvas(canvas.Canvas):
+    """Canvas com numeração de páginas (legado - usado apenas para compatibilidade)"""
     def __init__(self, *args, **kwargs):
-        self.titulo_dashboard = kwargs.pop('titulo_dashboard', 'DASHBOARD')
-        self.data_emissao = kwargs.pop('data_emissao', datetime.now().strftime('%d/%m/%Y %H:%M'))
         canvas.Canvas.__init__(self, *args, **kwargs)
         self._saved_page_states = []
 
@@ -96,127 +94,111 @@ class DashboardCanvas(canvas.Canvas):
         num_pages = len(self._saved_page_states)
         for state in self._saved_page_states:
             self.__dict__.update(state)
-            self.draw_page(num_pages)
+            self.draw_page_number(num_pages)
             canvas.Canvas.showPage(self)
         canvas.Canvas.save(self)
 
-    def draw_page(self, page_count):
-        """Desenha cabeçalho e rodapé em cada página"""
-        from django.conf import settings
-        
-        page_width, page_height = landscape(A4)
-        
-        # ==========================================
-        # CABEÇALHO
-        # ==========================================
-        
-        # Brasão (esquerda)
-        try:
-            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-2.png')
-            if os.path.exists(brasao_path):
-                self.drawImage(
-                    brasao_path, 
-                    1.5*cm, 
-                    page_height - 2*cm, 
-                    width=1.8*cm, 
-                    height=1.8*cm, 
-                    preserveAspectRatio=True, 
-                    mask='auto'
-                )
-        except Exception as e:
-            # Fallback: círculo com texto
-            self.setFillColor(colors.HexColor('#2196F3'))
-            self.circle(2.4*cm, page_height - 1.3*cm, 0.5*cm, stroke=1, fill=1)
-            self.setFillColor(colors.white)
-            self.setFont("Helvetica-Bold", 7)
-            self.drawCentredString(2.4*cm, page_height - 1.35*cm, "PMS")
-        
-        # Logo MetaReciclagem (direita)
-        try:
-            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
-            if os.path.exists(logo_path):
-                self.drawImage(
-                    logo_path, 
-                    page_width - 4.5*cm, 
-                    page_height - 2*cm, 
-                    width=3*cm, 
-                    height=1.8*cm, 
-                    preserveAspectRatio=True, 
-                    mask='auto'
-                )
-        except Exception as e:
-            # Fallback: retângulo com texto
-            self.setFillColor(colors.HexColor('#4CAF50'))
-            self.rect(page_width - 4*cm, page_height - 1.6*cm, 2.5*cm, 0.7*cm, fill=1, stroke=0)
-            self.setFillColor(colors.white)
-            self.setFont("Helvetica-Bold", 9)
-            self.drawCentredString(page_width - 2.75*cm, page_height - 1.35*cm, "MetaReciclagem")
-        
-        # Título centralizado
-        self.setFillColor(colors.HexColor('#1976D2'))
-        self.setFont("Helvetica-Bold", 14)
-        self.drawCentredString(page_width / 2, page_height - 1.3*cm, self.titulo_dashboard)
-        
-        # ==========================================
-        # LINHA SIMPLES (única linha - abaixo do título)
-        # ==========================================
-        self.setStrokeColor(colors.HexColor('#2196F3'))
-        self.setLineWidth(1)
-        self.line(1.5*cm, page_height - 2.3*cm, page_width - 1.5*cm, page_height - 2.3*cm)
-        
-        # ==========================================
-        # RODAPÉ (sem linhas)
-        # ==========================================
-        
-        # Data de emissão (esquerda)
-        self.setFillColor(colors.HexColor('#666666'))
+    def draw_page_number(self, page_count):
         self.setFont("Helvetica", 8)
-        self.drawString(1.5*cm, 0.8*cm, f"Emitido em: {self.data_emissao}")
-        
-        # Paginação (direita)
-        self.drawRightString(page_width - 1.5*cm, 0.8*cm, f"Página {self._pageNumber} / {page_count}")
+        self.drawRightString(
+            landscape(A4)[0] - 1*cm, 0.8*cm,
+            f"Página {self._pageNumber} de {page_count}"
+        )
+        self.drawString(1*cm, 0.8*cm, f"Gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
 
 
 def gerar_pdf_interessados(context):
-    """Gera PDF do dashboard de interessados com layout limpo"""
+    """Gera PDF do dashboard de interessados com cabeçalho e rodapé personalizados"""
+    import os
+    from django.conf import settings
+    
     buffer = BytesIO()
     
-    # Data de emissão
-    data_emissao = datetime.now().strftime('%d/%m/%Y às %H:%M')
+    # Classe customizada para cabeçalho e rodapé
+    class CustomNumberedCanvas(canvas.Canvas):
+        def __init__(self, *args, **kwargs):
+            canvas.Canvas.__init__(self, *args, **kwargs)
+            self._saved_page_states = []
+
+        def showPage(self):
+            self._saved_page_states.append(dict(self.__dict__))
+            self._startPage()
+
+        def save(self):
+            num_pages = len(self._saved_page_states)
+            for state in self._saved_page_states:
+                self.__dict__.update(state)
+                self.draw_header_footer(num_pages)
+                canvas.Canvas.showPage(self)
+            canvas.Canvas.save(self)
+
+        def draw_header_footer(self, page_count):
+            # Dimensões da página
+            page_width = landscape(A4)[0]
+            page_height = landscape(A4)[1]
+            
+            # ==========================================
+            # CABEÇALHO COMPACTO
+            # ==========================================
+            # Brasão à esquerda
+            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-2.png')
+            if os.path.exists(brasao_path):
+                self.drawImage(brasao_path, 1*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
+            
+            # Logo à direita
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
+            if os.path.exists(logo_path):
+                self.drawImage(logo_path, page_width - 2.5*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
+            
+            # Título ao centro
+            self.setFont("Helvetica-Bold", 12)
+            self.setFillColor(colors.HexColor('#2196F3'))
+            titulo = "Dashboard - Interessados"
+            titulo_width = self.stringWidth(titulo, "Helvetica-Bold", 12)
+            self.drawString((page_width - titulo_width) / 2, page_height - 1.3*cm, titulo)
+            
+            # Linha separadora
+            self.setStrokeColor(colors.HexColor('#2196F3'))
+            self.setLineWidth(0.5)
+            self.line(1*cm, page_height - 2.3*cm, page_width - 1*cm, page_height - 2.3*cm)
+            
+            # ==========================================
+            # RODAPÉ
+            # ==========================================
+            self.setFont("Helvetica", 8)
+            self.setFillColor(colors.grey)
+            
+            # Data de emissão à esquerda
+            data_emissao = f"Emitido em: {datetime.now().strftime('%d/%m/%Y às %H:%M')}"
+            self.drawString(1*cm, 0.8*cm, data_emissao)
+            
+            # Numeração de páginas à direita
+            pagina_texto = f"Página {self._pageNumber} / {page_count}"
+            self.drawRightString(page_width - 1*cm, 0.8*cm, pagina_texto)
     
+    # Configurar documento
     doc = SimpleDocTemplate(
-        buffer,
-        pagesize=landscape(A4),
-        rightMargin=1.5*cm,
-        leftMargin=1.5*cm,
-        topMargin=3*cm,    # Espaço para cabeçalho
-        bottomMargin=1.5*cm  # Espaço para rodapé
+        buffer, pagesize=landscape(A4),
+        rightMargin=1.5*cm, leftMargin=1.5*cm,
+        topMargin=2.8*cm, bottomMargin=2*cm
     )
     
     styles = getSampleStyleSheet()
     
-    # Estilos personalizados
     style_subtitle = ParagraphStyle(
-        'CustomSubtitle',
-        parent=styles['Heading2'],
-        fontSize=11,
-        textColor=colors.HexColor('#2196F3'),
-        spaceAfter=8,
-        spaceBefore=12,
-        fontName='Helvetica-Bold'
+        'CustomSubtitle', parent=styles['Heading2'],
+        fontSize=12, textColor=colors.HexColor('#333333'),
+        spaceAfter=8, spaceBefore=12, fontName='Helvetica-Bold'
     )
     
     story = []
     
-    # ==========================================
-    # CARDS DE MÉTRICAS
-    # ==========================================
+    # Métricas
     metricas_data = [
         ['Métrica', 'Valor'],
         ['Total de Interessados', str(context['total_interessados'])],
         ['Com Matrícula', str(context['interessados_matriculados'])],
         ['Sem Matrícula', str(context['interessados_sem_matricula'])]
-        # ['Cadastros (30 dias)', str(context['cadastros_recentes'])]
     ]
     
     metricas_table = Table(metricas_data, colWidths=[15*cm, 5*cm])
@@ -229,16 +211,13 @@ def gerar_pdf_interessados(context):
         ('FONTSIZE', (0, 0), (-1, 0), 10),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
         ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
     ]))
     
     story.append(metricas_table)
     story.append(Spacer(1, 0.6*cm))
     
-    # ==========================================
-    # GRÁFICOS - LINHA 1
-    # ==========================================
+    # Gráficos - Linha 1
     story.append(Paragraph("Perfil Demográfico", style_subtitle))
     
     graficos_linha1 = []
@@ -272,9 +251,7 @@ def gerar_pdf_interessados(context):
         story.append(table_graficos)
         story.append(Spacer(1, 0.6*cm))
     
-    # ==========================================
-    # GRÁFICOS - LINHA 2
-    # ==========================================
+    # Gráficos - Linha 2
     graficos_linha2 = []
     
     # Programas Sociais
@@ -306,9 +283,7 @@ def gerar_pdf_interessados(context):
         story.append(table_graficos2)
         story.append(Spacer(1, 0.6*cm))
     
-    # ==========================================
-    # GRÁFICO DE BARRAS - FAIXAS ETÁRIAS
-    # ==========================================
+    # Faixas Etárias (Barras)
     if context['faixas_etarias']:
         story.append(Paragraph("Distribuição por Faixa Etária", style_subtitle))
         labels = [item['faixa'] for item in context['faixas_etarias']]
@@ -317,60 +292,107 @@ def gerar_pdf_interessados(context):
         if img:
             story.append(Image(img, width=24*cm, height=8*cm))
     
-    # Gerar PDF com canvas personalizado
-    doc.build(
-        story,
-        canvasmaker=lambda *args, **kwargs: DashboardCanvas(
-            *args,
-            titulo_dashboard='DASHBOARD - INTERESSADOS',
-            data_emissao=data_emissao,
-            **kwargs
-        )
-    )
-    
+    # Gerar PDF
+    doc.build(story, canvasmaker=CustomNumberedCanvas)
     buffer.seek(0)
     return buffer
 
+
 def gerar_pdf_eventos(context):
-    """Gera PDF do dashboard de eventos com layout limpo"""
+    """Gera PDF do dashboard de eventos com cabeçalho e rodapé personalizados"""
+    import os
+    from django.conf import settings
+    
     buffer = BytesIO()
     
-    # Data de emissão
-    data_emissao = datetime.now().strftime('%d/%m/%Y às %H:%M')
+    # Classe customizada para cabeçalho e rodapé
+    class CustomNumberedCanvas(canvas.Canvas):
+        def __init__(self, *args, **kwargs):
+            canvas.Canvas.__init__(self, *args, **kwargs)
+            self._saved_page_states = []
+
+        def showPage(self):
+            self._saved_page_states.append(dict(self.__dict__))
+            self._startPage()
+
+        def save(self):
+            num_pages = len(self._saved_page_states)
+            for state in self._saved_page_states:
+                self.__dict__.update(state)
+                self.draw_header_footer(num_pages)
+                canvas.Canvas.showPage(self)
+            canvas.Canvas.save(self)
+
+        def draw_header_footer(self, page_count):
+            # Dimensões da página
+            page_width = landscape(A4)[0]
+            page_height = landscape(A4)[1]
+            
+            # ==========================================
+            # CABEÇALHO COMPACTO
+            # ==========================================
+            # Brasão à esquerda
+            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-2.png')
+            if os.path.exists(brasao_path):
+                self.drawImage(brasao_path, 1*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
+            
+            # Logo à direita
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
+            if os.path.exists(logo_path):
+                self.drawImage(logo_path, page_width - 2.5*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
+            
+            # Título ao centro
+            self.setFont("Helvetica-Bold", 12)
+            self.setFillColor(colors.HexColor('#2196F3'))
+            titulo = "Dashboard - Eventos e Cursos"
+            titulo_width = self.stringWidth(titulo, "Helvetica-Bold", 12)
+            self.drawString((page_width - titulo_width) / 2, page_height - 1.3*cm, titulo)
+            
+            # Linha separadora
+            self.setStrokeColor(colors.HexColor('#2196F3'))
+            self.setLineWidth(0.5)
+            self.line(1*cm, page_height - 2.3*cm, page_width - 1*cm, page_height - 2.3*cm)
+            
+            # ==========================================
+            # RODAPÉ
+            # ==========================================
+            self.setFont("Helvetica", 8)
+            self.setFillColor(colors.grey)
+            
+            # Data de emissão à esquerda
+            data_emissao = f"Emitido em: {datetime.now().strftime('%d/%m/%Y às %H:%M')}"
+            self.drawString(1*cm, 0.8*cm, data_emissao)
+            
+            # Numeração de páginas à direita
+            pagina_texto = f"Página {self._pageNumber} / {page_count}"
+            self.drawRightString(page_width - 1*cm, 0.8*cm, pagina_texto)
     
+    # Configurar documento
     doc = SimpleDocTemplate(
-        buffer,
-        pagesize=landscape(A4),
-        rightMargin=1.5*cm,
-        leftMargin=1.5*cm,
-        topMargin=3*cm,
-        bottomMargin=1.5*cm
+        buffer, pagesize=landscape(A4),
+        rightMargin=1.5*cm, leftMargin=1.5*cm,
+        topMargin=2.8*cm, bottomMargin=2*cm
     )
     
     styles = getSampleStyleSheet()
     
-    # Estilos personalizados
     style_subtitle = ParagraphStyle(
-        'CustomSubtitle',
-        parent=styles['Heading2'],
-        fontSize=11,
-        textColor=colors.HexColor('#2196F3'),
-        spaceAfter=8,
-        spaceBefore=12,
-        fontName='Helvetica-Bold'
+        'CustomSubtitle', parent=styles['Heading2'],
+        fontSize=12, textColor=colors.HexColor('#333333'),
+        spaceAfter=8, spaceBefore=12, fontName='Helvetica-Bold'
     )
     
     story = []
     
-    # ==========================================
-    # CARDS DE MÉTRICAS
-    # ==========================================
+    # Métricas Gerais
     metricas_data = [
         ['Métrica', 'Valor'],
         ['Total de Eventos', str(context['total_eventos'])],
-        ['Inscrições Abertas', str(context['eventos_inscricoes_abertas'])],
+        ['Eventos com Inscrições Abertas', str(context['eventos_inscricoes_abertas'])],
         ['Total de Turmas', str(context['total_turmas'])],
-        ['Turmas em Andamento', str(context['turmas_em_andamento'])]
+        ['Turmas Futuras', str(context['turmas_futuras'])],
+        ['Turmas em Andamento', str(context['turmas_em_andamento'])],
+        ['Turmas Encerradas', str(context['turmas_encerradas'])]
     ]
     
     metricas_table = Table(metricas_data, colWidths=[15*cm, 5*cm])
@@ -383,112 +405,347 @@ def gerar_pdf_eventos(context):
         ('FONTSIZE', (0, 0), (-1, 0), 10),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
         ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
     ]))
     
     story.append(metricas_table)
     story.append(Spacer(1, 0.6*cm))
     
-    # ==========================================
-    # EVENTOS POR STATUS
-    # ==========================================
-    story.append(Paragraph("Eventos por Status", style_subtitle))
+    # Eventos por Status
+    if context.get('eventos_por_status'):
+        story.append(Paragraph("Eventos por Status", style_subtitle))
+        
+        status_data = [['Status', 'Total']]
+        for item in context['eventos_por_status']:
+            status_data.append([item.get('status__nome', 'Não informado'), str(item['total'])])
+        
+        status_table = Table(status_data, colWidths=[15*cm, 5*cm])
+        status_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4CAF50')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+        ]))
+        
+        story.append(status_table)
+        story.append(Spacer(1, 0.6*cm))
     
-    eventos_status_data = [['Status', 'Total', '%']]
-    for item in context['eventos_por_status']:
-        percentual = round((item['total'] / context['total_eventos'] * 100), 1) if context['total_eventos'] > 0 else 0
-        eventos_status_data.append([
-            item['status__nome'],
-            str(item['total']),
-            f"{percentual}%"
-        ])
-    
-    eventos_status_table = Table(eventos_status_data, colWidths=[12*cm, 4*cm, 4*cm])
-    eventos_status_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2196F3')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
-        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
-    ]))
-    
-    story.append(eventos_status_table)
-    story.append(Spacer(1, 0.6*cm))
-    
-    # ==========================================
-    # STATUS TEMPORAL DAS TURMAS
-    # ==========================================
-    story.append(Paragraph("Status Temporal das Turmas", style_subtitle))
-    
-    turmas_status_data = [
-        ['Status', 'Total'],
-        ['Futuras (Não iniciadas)', str(context['turmas_futuras'])],
-        ['Em Andamento', str(context['turmas_em_andamento'])],
-        ['Encerradas', str(context['turmas_encerradas'])]
-    ]
-    
-    turmas_status_table = Table(turmas_status_data, colWidths=[15*cm, 5*cm])
-    turmas_status_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2196F3')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
-        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
-    ]))
-    
-    story.append(turmas_status_table)
-    story.append(Spacer(1, 0.6*cm))
-    
-    # ==========================================
-    # TOP 5 CURSOS COM MAIS INSCRIÇÕES
-    # ==========================================
-    story.append(Paragraph("Top 5 Cursos com Mais Inscrições", style_subtitle))
-    
-    top_inscricoes_data = [['Curso/Evento', 'Inscrições']]
-    for item in context['top_eventos_inscricoes']:
-        top_inscricoes_data.append([
-            item['evento__nome'],
-            str(item['total_inscricoes'])
-        ])
-    
-    if len(top_inscricoes_data) == 1:
-        top_inscricoes_data.append(['Nenhuma inscrição registrada', '-'])
-    
-    top_inscricoes_table = Table(top_inscricoes_data, colWidths=[15*cm, 5*cm])
-    top_inscricoes_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2196F3')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
-        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
-        ('FONTSIZE', (0, 1), (-1, -1), 9),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
-    ]))
-    
-    story.append(top_inscricoes_table)
+    # Top 5 Eventos com Mais Inscrições
+    if context.get('top_eventos_inscricoes'):
+        story.append(Paragraph("Top 5 Eventos com Mais Inscrições", style_subtitle))
+        
+        top_data = [['Evento', 'Nº Inscrições']]
+        for evento in context['top_eventos_inscricoes']:
+            nome_evento = evento.get('evento__nome', 'Não informado')
+            total = evento.get('total_inscricoes', 0)
+            top_data.append([nome_evento, str(total)])
+        
+        top_table = Table(top_data, colWidths=[15*cm, 5*cm])
+        top_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#FF9800')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+        ]))
+        
+        story.append(top_table)
     
     # Gerar PDF
-    doc.build(
-        story,
-        canvasmaker=lambda *args, **kwargs: DashboardCanvas(
-            *args,
-            titulo_dashboard='DASHBOARD - EVENTOS E CURSOS',
-            data_emissao=data_emissao,
-            **kwargs
-        )
-    )
-    
+    doc.build(story, canvasmaker=CustomNumberedCanvas)
     buffer.seek(0)
     return buffer
 
+
+def gerar_pdf_academico(context):
+    """Gera PDF do dashboard acadêmico com cabeçalho e rodapé personalizados"""
+    import os
+    from django.conf import settings
+    
+    buffer = BytesIO()
+    
+    # Classe customizada para cabeçalho e rodapé
+    class CustomNumberedCanvas(canvas.Canvas):
+        def __init__(self, *args, **kwargs):
+            canvas.Canvas.__init__(self, *args, **kwargs)
+            self._saved_page_states = []
+
+        def showPage(self):
+            self._saved_page_states.append(dict(self.__dict__))
+            self._startPage()
+
+        def save(self):
+            num_pages = len(self._saved_page_states)
+            for state in self._saved_page_states:
+                self.__dict__.update(state)
+                self.draw_header_footer(num_pages)
+                canvas.Canvas.showPage(self)
+            canvas.Canvas.save(self)
+
+        def draw_header_footer(self, page_count):
+            # Dimensões da página
+            page_width = landscape(A4)[0]
+            page_height = landscape(A4)[1]
+            
+            # ==========================================
+            # CABEÇALHO COMPACTO
+            # ==========================================
+            # Brasão à esquerda
+            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-2.png')
+            if os.path.exists(brasao_path):
+                self.drawImage(brasao_path, 1*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
+            
+            # Logo à direita
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
+            if os.path.exists(logo_path):
+                self.drawImage(logo_path, page_width - 2.5*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
+            
+            # Título ao centro
+            self.setFont("Helvetica-Bold", 12)
+            self.setFillColor(colors.HexColor('#2196F3'))
+            titulo = "Dashboard - Informações Acadêmicas"
+            titulo_width = self.stringWidth(titulo, "Helvetica-Bold", 12)
+            self.drawString((page_width - titulo_width) / 2, page_height - 1.3*cm, titulo)
+            
+            # Linha separadora
+            self.setStrokeColor(colors.HexColor('#2196F3'))
+            self.setLineWidth(0.5)
+            self.line(1*cm, page_height - 2.3*cm, page_width - 1*cm, page_height - 2.3*cm)
+            
+            # ==========================================
+            # RODAPÉ
+            # ==========================================
+            self.setFont("Helvetica", 8)
+            self.setFillColor(colors.grey)
+            
+            # Data de emissão à esquerda
+            data_emissao = f"Emitido em: {datetime.now().strftime('%d/%m/%Y às %H:%M')}"
+            self.drawString(1*cm, 0.8*cm, data_emissao)
+            
+            # Numeração de páginas à direita
+            pagina_texto = f"Página {self._pageNumber} / {page_count}"
+            self.drawRightString(page_width - 1*cm, 0.8*cm, pagina_texto)
+    
+    # Configurar documento
+    doc = SimpleDocTemplate(
+        buffer, pagesize=landscape(A4),
+        rightMargin=1.5*cm, leftMargin=1.5*cm,
+        topMargin=2.8*cm, bottomMargin=2*cm
+    )
+    
+    styles = getSampleStyleSheet()
+    
+    style_subtitle = ParagraphStyle(
+        'CustomSubtitle', parent=styles['Heading2'],
+        fontSize=12, textColor=colors.HexColor('#333333'),
+        spaceAfter=8, spaceBefore=12, fontName='Helvetica-Bold'
+    )
+    
+    story = []
+    
+    # Métricas
+    metricas_data = [
+        ['Métrica', 'Valor'],
+        ['Total de Avaliações', str(context['total_avaliacoes'])],
+        ['Aprovados', str(context['total_aprovados'])],
+        ['Reprovados', str(context['total_reprovados'])],
+        ['Taxa de Aprovação', f"{context['taxa_aprovacao']}%"],
+        ['Média de Notas', str(context['media_notas'])],
+        ['Média de Frequência', f"{context['media_frequencia']}%"],
+        ['Certificados Emitidos', str(context['certificados_emitidos'])]
+    ]
+    
+    metricas_table = Table(metricas_data, colWidths=[15*cm, 5*cm])
+    metricas_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2196F3')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+    ]))
+    
+    story.append(metricas_table)
+    story.append(Spacer(1, 0.6*cm))
+    
+    # Top 5 Cursos Aprovados
+    if context.get('top_cursos_aprovados'):
+        story.append(Paragraph("Top 5 Cursos com Mais Aprovados", style_subtitle))
+        
+        top_data = [['Curso', 'Aprovados']]
+        for curso in context['top_cursos_aprovados']:
+            nome_curso = curso.get('matricula__turma__evento__nome', 'Não informado')
+            total = curso.get('total', 0)
+            top_data.append([nome_curso, str(total)])
+        
+        top_table = Table(top_data, colWidths=[15*cm, 5*cm])
+        top_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4CAF50')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+        ]))
+        
+        story.append(top_table)
+    
+    # Gerar PDF
+    doc.build(story, canvasmaker=CustomNumberedCanvas)
+    buffer.seek(0)
+    return buffer
+
+
+def gerar_pdf_processo_seletivo(context):
+    """Gera PDF do dashboard de processo seletivo com cabeçalho e rodapé personalizados"""
+    import os
+    from django.conf import settings
+    
+    buffer = BytesIO()
+    
+    # Classe customizada para cabeçalho e rodapé
+    class CustomNumberedCanvas(canvas.Canvas):
+        def __init__(self, *args, **kwargs):
+            canvas.Canvas.__init__(self, *args, **kwargs)
+            self._saved_page_states = []
+
+        def showPage(self):
+            self._saved_page_states.append(dict(self.__dict__))
+            self._startPage()
+
+        def save(self):
+            num_pages = len(self._saved_page_states)
+            for state in self._saved_page_states:
+                self.__dict__.update(state)
+                self.draw_header_footer(num_pages)
+                canvas.Canvas.showPage(self)
+            canvas.Canvas.save(self)
+
+        def draw_header_footer(self, page_count):
+            # Dimensões da página
+            page_width = landscape(A4)[0]
+            page_height = landscape(A4)[1]
+            
+            # ==========================================
+            # CABEÇALHO COMPACTO
+            # ==========================================
+            # Brasão à esquerda
+            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-2.png')
+            if os.path.exists(brasao_path):
+                self.drawImage(brasao_path, 1*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
+            
+            # Logo à direita
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
+            if os.path.exists(logo_path):
+                self.drawImage(logo_path, page_width - 2.5*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
+            
+            # Título ao centro
+            self.setFont("Helvetica-Bold", 12)
+            self.setFillColor(colors.HexColor('#2196F3'))
+            titulo = "Dashboard - Processo Seletivo"
+            titulo_width = self.stringWidth(titulo, "Helvetica-Bold", 12)
+            self.drawString((page_width - titulo_width) / 2, page_height - 1.3*cm, titulo)
+            
+            # Linha separadora
+            self.setStrokeColor(colors.HexColor('#2196F3'))
+            self.setLineWidth(0.5)
+            self.line(1*cm, page_height - 2.3*cm, page_width - 1*cm, page_height - 2.3*cm)
+            
+            # ==========================================
+            # RODAPÉ
+            # ==========================================
+            self.setFont("Helvetica", 8)
+            self.setFillColor(colors.grey)
+            
+            # Data de emissão à esquerda
+            data_emissao = f"Emitido em: {datetime.now().strftime('%d/%m/%Y às %H:%M')}"
+            self.drawString(1*cm, 0.8*cm, data_emissao)
+            
+            # Numeração de páginas à direita
+            pagina_texto = f"Página {self._pageNumber} / {page_count}"
+            self.drawRightString(page_width - 1*cm, 0.8*cm, pagina_texto)
+    
+    # Configurar documento
+    doc = SimpleDocTemplate(
+        buffer, pagesize=landscape(A4),
+        rightMargin=1.5*cm, leftMargin=1.5*cm,
+        topMargin=2.8*cm, bottomMargin=2*cm
+    )
+    
+    styles = getSampleStyleSheet()
+    
+    style_subtitle = ParagraphStyle(
+        'CustomSubtitle', parent=styles['Heading2'],
+        fontSize=12, textColor=colors.HexColor('#333333'),
+        spaceAfter=8, spaceBefore=12, fontName='Helvetica-Bold'
+    )
+    
+    story = []
+    
+    # Métricas
+    metricas_data = [
+        ['Métrica', 'Valor'],
+        ['Total de Inscrições', str(context['total_inscricoes'])],
+        ['Inscrições Recentes (30 dias)', str(context['inscricoes_recentes'])],
+        ['Total de Classificações', str(context['total_classificacoes'])],
+        ['Classificados', str(context['classificados'])],
+        ['Lista de Espera', str(context['lista_espera'])],
+        ['Taxa de Classificação', f"{context['taxa_classificacao']}%"]
+    ]
+    
+    metricas_table = Table(metricas_data, colWidths=[15*cm, 5*cm])
+    metricas_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2196F3')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+    ]))
+    
+    story.append(metricas_table)
+    story.append(Spacer(1, 0.6*cm))
+    
+    # Top 5 Eventos com Mais Inscrições
+    if context.get('top_eventos_inscricoes'):
+        story.append(Paragraph("Top 5 Eventos com Mais Inscrições", style_subtitle))
+        
+        top_data = [['Evento', 'Inscrições']]
+        for evento in context['top_eventos_inscricoes']:
+            nome_evento = evento.get('evento__nome', 'Não informado')
+            total = evento.get('total', 0)
+            top_data.append([nome_evento, str(total)])
+        
+        top_table = Table(top_data, colWidths=[15*cm, 5*cm])
+        top_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4CAF50')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 10),
+            ('GRID', (0, 0), (-1, -1), 1, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F5F5F5')])
+        ]))
+        
+        story.append(top_table)
+    
+    # Gerar PDF
+    doc.build(story, canvasmaker=CustomNumberedCanvas)
+    buffer.seek(0)
+    return buffer

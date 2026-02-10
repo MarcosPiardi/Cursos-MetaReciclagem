@@ -1,0 +1,61 @@
+3acf2ca - 10/02/2026 14:24 - MarcosPiardi : Mantendo versão local - conflitos resolvidos
+a02a8ad - 10/02/2026 13:39 - MarcosPiardi : Voltei backup até antes da pergunta #150 e atualizei todos os dashboards
+01ea2e5 - 06/02/2026 17:01 - MarcosPiardi : Montagem dos Dashboards
+afdc53d - 04/02/2026 18:31 - MarcosPiardi : Relatório de acadêmico e opção de dashboards
+0dba37c - 02/02/2026 18:18 - MarcosPiardi : Arranjo para digitação mais fácil de avaliação/acadêmico, emissão de certificado e correção da rotina de matrícula
+db7ca69 - 30/01/2026 17:02 - MarcosPiardi : Varias correções de design e dashboard interessados corrigido
+4a255ff - 29/01/2026 18:33 - MarcosPiardi : Correções dos HTMLs para ter o favicon no topo de todas as abas do sistema
+d831194 - 29/01/2026 16:35 - MarcosPiardi : Correção para que os HTMLs chamassem sempre o mesmo base.html em eventosmeta\templates, correção de todas as chamadas para esse base.html e correção para dashboard de interessado e alteração de cadastro.
+bf70444 - 28/01/2026 14:45 - MarcosPiardi : Inclusão de dados no cadastro de interessados via HTML
+c603ce1 - 23/01/2026 18:04 - MarcosPiardi : Atualizações de Script para gerar arquivos textos de códigos feitos
+712f125 - 21/01/2026 18:27 - MarcosPiardi : Dashboard.html de interessados atualizado
+36676bc - 20/01/2026 17:35 - MarcosPiardi : Muitas correções para adequar a mudança de admin padrão para admin customizado, criação/atualização de vários scripts para ajudar no desenvolvimmento e limpeza de código tirando arquivos redundantes e não usados no sistema.
+7a8f81d - 16/01/2026 18:34 - MarcosPiardi : gerador automático de dados para popular BD
+e3a6a68 - 16/01/2026 15:36 - MarcosPiardi : Criada a estrutura e movemos todos programas e scripts auxiliares fpara as respectivas pastas
+d1c00c1 - 16/01/2026 13:37 - MarcosPiardi : Fazer backup do BD para apaga-lo e começar de novo, popular tabelas e fazer testes
+9de46c0 - 14/01/2026 15:11 - MarcosPiardi : Atualização de classificação com a inclusão de opções de relatórios e exportação para pdf, geração de dados de testes, formatar relatórios
+97a63cd - 09/01/2026 19:08 - MarcosPiardi : Corrigido admin de academico, eventos e interessados, além de base_site para mehor apresentar as grades e programa para gerar dados de teste
+fd80d53 - 09/01/2026 13:09 - MarcosPiardi : Atualização do Services.py com as regras de negócios atualizadas
+dde3f02 - 08/01/2026 18:07 - MarcosPiardi : Alterações em arquivos que não são importantes
+791a0b3 - 12/12/2025 18:52 - MarcosPiardi : Incluindo arquivos txt criados pela IA para instrução do Claude na conta para dar continuidade no desenvolvimento.
+679749a - 12/12/2025 15:05 - MarcosPiardi : Novos arquivos txt gerados para orientação da IA em 12-12-2025
+156ca4f - 12/12/2025 13:42 - MarcosPiardi : Arquivos txt  de 03/12 para orientação da IA apagados
+19ee3a3 - 10/12/2025 20:41 - MarcosPiardi : Correções para fazer classificação e gerar arquivos csv
+1de98a3 - 09/12/2025 15:22 - MarcosPiardi : Artefatos do portal inclusos
+d7fe6f5 - 05/12/2025 17:09 - MarcosPiardi : Limpeza de arquivos antigos e inclusão das novas migrations
+f1b2557 - 05/12/2025 16:48 - MarcosPiardi : Atualização models e admin - interessados
+a8586b2 - 05/12/2025 16:36 - MarcosPiardi : Apagar arquivos que foram removidos para outra pasta e não necessários agora
+d670723 - 04/12/2025 18:04 - MarcosPiardi : Geração de estrutura e modelo do que já estav pronto e ajutes na classificação dos inscritos
+3c7208a - 02/12/2025 18:53 - MarcosPiardi : Mudança de conceito para critérios/classificação
+ed09fca - 02/12/2025 14:52 - MarcosPiardi : Populando tabelas, corrigindo models, testando classificação
+438532c - 01/12/2025 15:20 - MarcosPiardi : Feito camada services.py
+26afd13 - 27/11/2025 14:00 - MarcosPiardi : Apagar APP cursoseoutros que ficou obsoleto
+57ce566 - 27/11/2025 13:31 - MarcosPiardi : Após mega mudança como zerar banco de dados e mudar alguns conceitos para adequação de boas práticas
+c501c67 - 25/11/2025 15:48 - MarcosPiardi : Colocar ícone na aba
+452d003 - 19/11/2025 18:38 - MarcosPiardi : Backup para rodar em casa
+a7aadda - 19/11/2025 17:00 - MarcosPiardi : Atualização de models, admin, settings e no banco de dados: status de char para FK
+4986a64 - 17/11/2025 17:21 - MarcosPiardi : Recompor estrutura e fixtures de status
+da11495 - 07/11/2025 13:39 - MarcosPiardi : Criação de alguns scripts de apoio e popular bd com json
+e6f414b - 04/11/2025 16:20 - MarcosPiardi : Atualização após muitas perguntas do Claude para configuração geral do sistema
+80a2dda - 29/10/2025 19:36 - MarcosPiardi : Criação forms e services para cursoseoutros
+05964ea - 29/10/2025 14:27 - MarcosPiardi : Alteração models e admin de cursoseoutros com migrate
+80d1124 - 24/10/2025 18:47 - MarcosPiardi : Atualização  diagrama.md
+d3ed77a - 24/10/2025 18:16 - MarcosPiardi : Incluindo diagrama.md
+f22cec3 - 22/10/2025 18:08 - MarcosPiardi : Atualização do Redme.md
+98a7c6f - 22/10/2025 16:31 - MarcosPiardi : Altera README para um HTML
+9d66f2f - 22/10/2025 16:31 - MarcosPiardi : Adiciona foto no README
+979bcd7 - 21/10/2025 17:50 - MarcosPiardi : Incluir arquivos ps1 no github
+0f55330 - 21/10/2025 15:27 - MarcosPiardi : Projeto inicial - estrutura completa
+b4e3372 - 16/09/2025 12:14 - MarcosPiardi : Update settings.cpython-313.pyc
+46d3968 - 08/08/2025 16:41 - MarcosPiardi : Código funcionando
+12a2f3a - 06/08/2025 18:39 - MarcosPiardi : Update 06-08
+283b9d3 - 01/08/2025 12:20 - MarcosPiardi : após mais algumas correções
+fadc217 - 01/08/2025 09:10 - MarcosPiardi : Após acertar programas com ajuda do claude
+635ffb3 - 30/07/2025 14:55 - MarcosPiardi : Atualização de 30/07
+aae0532 - 25/07/2025 18:45 - MarcosPiardi : Após aulas da Hashtag montando projeto de questões
+5911a86 - 22/07/2025 16:11 - MarcosPiardi : Alterações conforme andamento do curso web Alura/Hashtag
+e9be5c0 - 17/07/2025 14:48 - MarcosPiardi : Update Meu_codigo.txt no github
+00addd5 - 17/07/2025 14:44 - MarcosPiardi : Primeiro commit arquivo txt 22222
+99ef058 - 17/07/2025 14:39 - MarcosPiardi : Create Meu_codigo.txt
+3891408 - 17/07/2025 13:09 - MarcosPiardi : Update README.md
+ac0b780 - 17/07/2025 13:08 - MarcosPiardi : Initial commit

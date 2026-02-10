@@ -6,13 +6,15 @@ Data: 03/02/2026
 
 Alteração: Views customizadas para dashboards com geração de PDF
 Data: 05/02/2026
+
+Atualização: 10/02/2026 - Correções de imports
 """
 
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count, Avg, F
 from django.utils import timezone
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 
 @staff_member_required
@@ -44,12 +46,6 @@ def dashboard_academico(request):
         total=Count('id')
     ).order_by('-total')[:5]
     
-    # Avaliações recentes
-    avaliacoes_recentes = Avaliacao.objects.select_related(
-        'matricula__aluno',
-        'matricula__turma__evento'
-    ).order_by('-data_avaliacao')[:10]
-    
     context = {
         'title': 'Dashboard - Informações Acadêmicas',
         'site_title': admin_site.site_title,
@@ -65,10 +61,10 @@ def dashboard_academico(request):
         
         'avaliacoes_por_status': avaliacoes_por_status,
         'top_cursos_aprovados': top_cursos_aprovados,
-        'avaliacoes_recentes': avaliacoes_recentes,
     }
     
     return render(request, 'admin/dashboard/academico.html', context)
+
 
 @staff_member_required
 def dashboard_eventos(request):
@@ -76,7 +72,6 @@ def dashboard_eventos(request):
     from apps.eventos.models import Evento, Turma
     from apps.selecao.models import Inscricao
     from apps.accounts.admin import admin_site
-    from django.db.models import Count
     
     # Métricas gerais
     total_eventos = Evento.objects.count()
@@ -134,6 +129,7 @@ def dashboard_eventos(request):
     
     return render(request, 'admin/dashboard/eventos.html', context)
 
+
 @staff_member_required
 def dashboard_interessados(request):
     """Dashboard de Interessados com dados demográficos detalhados"""
@@ -141,7 +137,6 @@ def dashboard_interessados(request):
     from apps.academico.models import Matricula
     from apps.accounts.admin import admin_site
     from django.db.models import Q, Count, Case, When, IntegerField, Value, F
-    from datetime import date
     
     # ==========================================
     # MÉTRICAS GERAIS
@@ -387,7 +382,7 @@ def dashboard_processo_seletivo(request):
 
 
 # ==========================================
-# FUNÇÕES DE GERAÇÃO DE PDF
+# VIEWS PDF
 # ==========================================
 
 @staff_member_required
@@ -397,7 +392,6 @@ def dashboard_interessados_pdf(request):
     from django.http import HttpResponse
     from django.db.models import Count
     from .utils_pdf import gerar_pdf_interessados
-    from datetime import datetime
     
     # Reutilizar a mesma lógica da view normal
     total_interessados = Interessado.objects.count()
@@ -509,10 +503,6 @@ def dashboard_interessados_pdf(request):
     
     # Preparar context
     context = {
-        'title': 'Dashboard - Interessados',
-        'site_title': admin_site.site_title,
-        'site_header': admin_site.site_header,
-        
         'total_interessados': total_interessados,
         'interessados_matriculados': interessados_matriculados,
         'interessados_sem_matricula': interessados_sem_matricula,
@@ -525,7 +515,15 @@ def dashboard_interessados_pdf(request):
         'faixas_etarias': faixas_etarias,
     }
     
-    return render(request, 'admin/dashboard/interessados.html', context)
+    # Gerar PDF
+    pdf_buffer = gerar_pdf_interessados(context)
+    
+    # Retornar response
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_interessados_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
 
 
 @staff_member_required
@@ -536,7 +534,6 @@ def dashboard_eventos_pdf(request):
     from django.http import HttpResponse
     from django.db.models import Count
     from .utils_pdf import gerar_pdf_eventos
-    from datetime import datetime
     
     # Métricas gerais
     total_eventos = Evento.objects.count()
@@ -597,7 +594,6 @@ def dashboard_academico_pdf(request):
     from django.http import HttpResponse
     from django.db.models import Avg, Count
     from .utils_pdf import gerar_pdf_academico
-    from datetime import datetime
     
     total_avaliacoes = Avaliacao.objects.count()
     total_aprovados = Avaliacao.objects.filter(aprovado=True).count()
@@ -636,7 +632,6 @@ def dashboard_processo_seletivo_pdf(request):
     from django.http import HttpResponse
     from django.db.models import Count
     from .utils_pdf import gerar_pdf_processo_seletivo
-    from datetime import datetime
     
     total_inscricoes = Inscricao.objects.count()
     

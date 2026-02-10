@@ -1,0 +1,1195 @@
+commit 3acf2ca078d71af3feb526a801c2a857138ebf55
+Merge: a02a8ad 01ea2e5
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-02-10
+
+    Mantendo versão local - conflitos resolvidos
+
+commit a02a8ade73c8d836d686a9ecf7f0120cd8919846
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-02-10
+
+    Voltei backup até antes da pergunta #150 e atualizei todos os dashboards
+
+ eventosmeta/config/urls.py                         |  18 +-
+ .../templates/admin/dashboard/academico.html       |  67 ++-
+ .../templates/admin/dashboard/eventos.html         | 122 ++++-
+ .../templates/admin/dashboard/interessados.html    | 146 ++----
+ .../admin/dashboard/processo_seletivo.html         |  73 ++-
+ eventosmeta/dashboard/utils_pdf.py                 | 541 ++++++++++++++++++++-
+ eventosmeta/dashboard/views.py                     | 210 ++++++--
+ 7 files changed, 985 insertions(+), 192 deletions(-)
+
+commit 01ea2e5770abb256ab6d8b82332afea909de037e
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-02-06
+
+    Montagem dos Dashboards
+
+ eventosmeta/config/urls-old.py                     | 663 +++++++++++++++++++++
+ eventosmeta/config/urls.py                         |  17 +-
+ .../templates/admin/dashboard/academico.html       | 207 +++++--
+ .../templates/admin/dashboard/base_dashboard.html  |  54 ++
+ .../templates/admin/dashboard/eventos.html         | 249 +++++++-
+ .../templates/admin/dashboard/interessados.html    | 211 ++-----
+ .../admin/dashboard/processo_seletivo.html         | 228 +++++--
+ eventosmeta/dashboard/utils_pdf.py                 | 320 ++++++++--
+ eventosmeta/dashboard/views.py                     | 225 +++++--
+ 9 files changed, 1813 insertions(+), 361 deletions(-)
+
+commit afdc53d5243f008df7c73dc92f9625c334713635
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-02-04
+
+    Relatório de acadêmico e opção de dashboards
+
+ eventosmeta/apps/academico/admin.py                | 480 ++++++++++++--
+ .../admin/academico/avaliacao/change_list.html     | 338 ++++++++++
+ eventosmeta/apps/accounts/admin.py                 |  17 +
+ eventosmeta/config/settings.py                     |   1 +
+ eventosmeta/config/urls.py                         |  41 +-
+ eventosmeta/dashboard/__init__.py                  |   0
+ eventosmeta/dashboard/admin.py                     |   0
+ eventosmeta/dashboard/apps.py                      |   6 +
+ eventosmeta/dashboard/migrations/__init__.py       |   0
+ eventosmeta/dashboard/models.py                    |   3 +
+ .../templates/admin/dashboard/academico.html       | 172 +++++
+ .../templates/admin/dashboard/eventos.html         | 174 +++++
+ .../templates/admin/dashboard/interessados.html    | 699 +++++++++++++++++++++
+ .../admin/dashboard/processo_seletivo.html         | 225 +++++++
+ eventosmeta/dashboard/tests.py                     |   3 +
+ eventosmeta/dashboard/utils_pdf.py                 | 242 +++++++
+ eventosmeta/dashboard/views.py                     | 553 ++++++++++++++++
+ eventosmeta/requirements03022026.txt               |  46 ++
+ eventosmeta/template/admin/index.html              |  33 +
+ 19 files changed, 2979 insertions(+), 54 deletions(-)
+
+commit 0dba37cf067bfbba7a96007a823ffad94ce97650
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-02-02
+
+    Arranjo para digitação mais fácil de avaliação/acadêmico, emissão de certificado e correção da rotina de matrícula
+
+ eventosmeta/apps/academico/admin.py                | 251 ++++++++++++++----
+ eventosmeta/apps/academico/certificado.py          | 255 ++++++++++++++++++
+ eventosmeta/apps/academico/models.py               |  67 ++++-
+ eventosmeta/apps/academico/urls.py                 |  35 ++-
+ eventosmeta/apps/academico/views.py                | 229 +++++++---------
+ eventosmeta/apps/selecao/admin.py                  | 290 +++++++++++----------
+ .../templates/admin/selecao/matricular_alunos.html |  53 +++-
+ 7 files changed, 819 insertions(+), 361 deletions(-)
+
+commit db7ca698fd2cdb306cd2d981d45e04afcfb6148f
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-30
+
+    Varias correções de design e dashboard interessados corrigido
+
+ eventosmeta/Arqs-Favicon.txt                       |  1757 ----
+ ...tefatos-Primarios-MetaReciclagem-22-01-2026.txt |  2086 ----
+ ...fatos-Secundarios-MetaReciclagem-22-01-2026.txt | 10396 -------------------
+ eventosmeta/Base-HTML.txt                          |  1094 --
+ eventosmeta/apps/academico/models.py               |    69 +-
+ eventosmeta/apps/interessados/forms.py             |    67 +-
+ .../templates/interessados/dashboard.html          |     2 +-
+ .../interessados/templates/interessados/login.html |   168 +-
+ eventosmeta/apps/interessados/urls.py              |     3 +
+ eventosmeta/apps/interessados/views.py             |   115 +-
+ .../portal/templates/portal/consulta_publica.html  |   328 +-
+ .../apps/portal/templates/portal/contato.html      |   267 +
+ .../portal/templates/portal/detalhes_evento.html   |   162 +
+ .../apps/portal/templates/portal/index.html        |   132 +-
+ eventosmeta/apps/portal/urls.py                    |    13 +
+ eventosmeta/apps/portal/views.py                   |    74 +-
+ eventosmeta/apps/selecao/admin.py                  |   609 +-
+ .../templates/admin/selecao/matricular_alunos.html |   162 +
+ eventosmeta/base.txt                               |    10 -
+ eventosmeta/dirMeta_22-01-2026.txt                 |   315 -
+ eventosmeta/estrutura-atual-28-01-2026.txt         |   396 -
+ eventosmeta/estrutura-completa.txt                 |   331 -
+ eventosmeta/estrutura_22-01-2026.txt               |   386 -
+ eventosmeta/mapeamento_urls.txt                    |    45 -
+ eventosmeta/template/base.html                     |     5 +
+ eventosmeta/template/base_auth.html                |    84 +-
+ 26 files changed, 1724 insertions(+), 17352 deletions(-)
+
+commit 4a255ff9df507fb208e630fdd4cd67f5430c126a
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-29
+
+    Correções dos HTMLs para ter o favicon no topo de todas as abas do sistema
+
+ eventosmeta/Arqs-Favicon.txt                       | 1757 ++++++++++++++++++++
+ eventosmeta/Scripts/concatenar_base.py             |    4 +-
+ .../accounts/templates/accounts/login_staff.html   |  296 ++--
+ .../templates/interessados/cadastro.html           | 1375 +++++++--------
+ .../interessados/templates/interessados/login.html |  393 ++---
+ .../templates/interessados/meus_dados.html         | 1154 +++++++------
+ eventosmeta/static/images/favicon.png              |  Bin 0 -> 314004 bytes
+ eventosmeta/template/admin/base_site.html          |    4 +-
+ eventosmeta/template/base.html                     |    4 +
+ eventosmeta/template/base_auth.html                |   48 +
+ 10 files changed, 3291 insertions(+), 1744 deletions(-)
+
+commit d83119452c69b5141d7d9ecaa2517a599e529cfb
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-29
+
+    Correção para que os HTMLs chamassem sempre o mesmo base.html em eventosmeta\templates, correção de todas as chamadas para esse base.html e correção para dashboard de interessado e alteração de cadastro.
+
+ eventosmeta/Base-HTML.txt                          | 1094 ++++++++++++++++++++
+ eventosmeta/Scripts/concatenar_base.py             |   81 ++
+ eventosmeta/apps/interessados/forms.py             |   81 ++
+ .../interessados/templates/interessados/base.html  |   42 -
+ .../templates/interessados/dashboard.html          |    8 +-
+ .../{login_interessado.html => login.html}         |    0
+ .../templates/interessados/meus_dados.html         |  635 ++++++++++++
+ eventosmeta/apps/interessados/urls.py              |   36 +-
+ eventosmeta/apps/interessados/views.py             |  207 ++--
+ eventosmeta/apps/portal/templates/portal/base.html |  194 ----
+ .../portal/templates/portal/consulta_publica.html  |    2 +-
+ .../apps/portal/templates/portal/index.html        |    2 +-
+ .../portal/templates/portal/resultado_evento.html  |    2 +-
+ .../templates/academico/gestao_matricula.html      |  482 ---------
+ .../templates/accounts/dashboard_staff.html        |    0
+ .../accounts/templates/accounts/login_staff.html   |  172 ---
+ .../interessados/templates/interessados/base.html  |   42 -
+ .../templates/interessados/cadastro.html           |  237 -----
+ .../templates/interessados/dashboard.html          |  254 -----
+ .../templates/interessados/detalhes.html           |    5 -
+ .../templates/interessados/login_interessado.html  |  192 ----
+ .../templates/interessados/sucesso.html            |    4 -
+ .../apps/portal/templates/portal/base.html         |  225 ----
+ .../portal/templates/portal/consulta_publica.html  |  154 ---
+ .../apps/portal/templates/portal/index.html        |  149 ---
+ .../portal/templates/portal/resultado_evento.html  |  181 ----
+ .../selecao/relatorio_aprovados_mural.html         |  181 ----
+ .../selecao/relatorio_aprovados_staff.html         |  203 ----
+ .../20260119_160109/template/admin/base_site.html  |  208 ----
+ .../20260119_160109/template/menu_temporario.html  |  158 ---
+ .../20260119_160109/visualizador_templates.html    |  527 ----------
+ eventosmeta/base.txt                               |   10 +
+ eventosmeta/estrutura-atual-28-01-2026.txt         |  396 +++++++
+ eventosmeta/estrutura-completa.txt                 |  331 ++++++
+ eventosmeta/template/base.html                     |  197 +++-
+ .../template/base.html => template/base.old}       |    2 +-
+ 36 files changed, 2913 insertions(+), 3781 deletions(-)
+
+commit bf70444682f22cf9ae11ee29babab17a65643d77
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-28
+
+    Inclusão de dados no cadastro de interessados via HTML
+
+ eventosmeta/Scripts/teste1.py                      |   4 -
+ eventosmeta/apps/interessados/forms.py             | 467 +++++++---
+ .../0002_interessado_cep_interessado_raca_cor.py   |  48 ++
+ .../migrations/0003_remove_interessado_raca_cor.py |  16 +
+ eventosmeta/apps/interessados/models.py            |  42 +-
+ .../templates/interessados/cadastro-old.html       | 237 ++++++
+ .../templates/interessados/cadastro.html           | 939 +++++++++++++++++----
+ eventosmeta/apps/interessados/views.py             |  90 +-
+ eventosmeta/template/menu_temporario.html          | 158 ----
+ 9 files changed, 1496 insertions(+), 505 deletions(-)
+
+commit c603ce1f5835cdb974490131a92acd64f002377b
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-23
+
+    Atualizações de Script para gerar arquivos textos de códigos feitos
+
+ ...efatos-Primarios-MetaReciclagem-22-01-2026.txt} |   234 +-
+ ...fatos-Secundarios-MetaReciclagem-19-01-2026.txt |  7509 --------------
+ ...fatos-Secundarios-MetaReciclagem-22-01-2026.txt | 10396 +++++++++++++++++++
+ eventosmeta/Scripts/concatenar.py                  |     6 +-
+ eventosmeta/Scripts/gerar_menu_temporario.py       |   149 -
+ eventosmeta/Scripts/teste1.py                      |   166 -
+ eventosmeta/Scripts/visualizar_htmls.py            |   521 -
+ eventosmeta/dirMeta_22-01-2026.txt                 |   315 +
+ eventosmeta/estrutura_22-01-2026.txt               |   386 +
+ eventosmeta/estrutura_banco.sql                    |  1648 +++
+ eventosmeta/visualizador_templates.html            |   527 -
+ indice_htmls.html                                  |  3288 ------
+ relatorio_htmls.txt                                |   570 -
+ 13 files changed, 12874 insertions(+), 12841 deletions(-)
+
+commit 712f125dceaeade9a8373eae4496a72b13e4b635
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-21
+
+    Dashboard.html de interessados atualizado
+
+ eventosmeta/Scripts/teste1.py                      |   8 +-
+ .../templates/interessados/dashboard.html          | 210 ++++++++++++---------
+ 2 files changed, 128 insertions(+), 90 deletions(-)
+
+commit 36676bc1236971bae097c5a1f6870e86b49334bd
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-20
+
+    Muitas correções para adequar a mudança de admin padrão para admin customizado, criação/atualização de vários scripts para ajudar no desenvolvimmento e limpeza de código tirando arquivos redundantes e não usados no sistema.
+
+ .../01-Stack e Configura\303\247\303\265es.txt"    |  412 ---
+ eventosmeta/02-Requisitos e Funcionalidades.txt    |  546 ----
+ "eventosmeta/03-Diretrizes e Padr\303\265es.txt"   |  718 -----
+ ...fil do Desenvolvedor e Prefer\303\252ncias.txt" |  448 ---
+ ...303\247\303\265es e Conhecimento Acumulado.txt" |  610 ----
+ ...efatos-Primarios-MetaReciclagem-19-01-2026.txt} |  295 +-
+ ...atos-Secundarios-MetaReciclagem-19-01-2026.txt} | 2297 +++++++++++++-
+ eventosmeta/{ => Scripts}/backup_tabelas.py        |    0
+ eventosmeta/{ => Scripts}/concatenar.py            |    4 +-
+ eventosmeta/Scripts/corrigir_urls_templates.py     |  128 +
+ eventosmeta/Scripts/gerar_menu_temporario.py       |  149 +
+ eventosmeta/Scripts/limpar_sessoes.py              |   37 +
+ eventosmeta/Scripts/listar_todos_htmls.py          |  514 +++
+ eventosmeta/Scripts/teste1.py                      |  169 +
+ eventosmeta/Scripts/verificar_templates.py         |   43 +
+ eventosmeta/Scripts/visualizar_htmls.py            |  521 ++++
+ eventosmeta/apagardepois.txt                       |    0
+ eventosmeta/apps/academico/admin.py                |   49 +-
+ eventosmeta/apps/accounts/admin.py                 |   71 +-
+ .../accounts/templates/accounts/login_staff.html   |    2 +-
+ .../apps/accounts/templates/admin/base_site.html   |   15 +
+ .../apps/accounts/templates/admin/dashboard.html   |   46 +
+ eventosmeta/apps/accounts/urls.py                  |    2 +-
+ eventosmeta/apps/accounts/views.py                 |   67 +-
+ eventosmeta/apps/eventos/admin.py                  |  175 +-
+ eventosmeta/apps/interessados/admin.py             |  159 +-
+ eventosmeta/apps/interessados/forms.py             |  235 +-
+ .../interessados/templates/interessados/base.html  |    2 +-
+ .../templates/interessados/cadastro.html           |    2 +-
+ .../templates/interessados/dashboard.html          |  487 +--
+ .../templates/interessados/form_interessados.html  |  155 -
+ .../templates/interessados/lista_interessados.html |  581 ----
+ .../templates/interessados/login_interessado.html  |   94 +-
+ eventosmeta/apps/interessados/urls.py              |   31 +-
+ eventosmeta/apps/interessados/views.py             |  165 +-
+ eventosmeta/apps/portal/templates/portal/base.html |  261 +-
+ .../apps/portal/templates/portal/dashboard.html    |  182 --
+ .../apps/portal/templates/portal/index.html        |  123 +-
+ .../apps/portal/templates/portal/login.html        |  105 -
+ eventosmeta/apps/selecao/admin.py                  |  195 +-
+ .../templates/academico/gestao_matricula.html      |  482 +++
+ .../templates/accounts/dashboard_staff.html        |    0
+ .../accounts/templates/accounts/login_staff.html   |  172 +
+ .../interessados/templates/interessados/base.html  |   42 +
+ .../templates/interessados/cadastro.html           |  237 ++
+ .../templates/interessados/dashboard.html          |  254 ++
+ .../templates/interessados/detalhes.html           |    5 +
+ .../templates/interessados/login_interessado.html  |  192 ++
+ .../templates/interessados/sucesso.html            |    4 +
+ .../apps/portal/templates/portal/base.html         |  225 ++
+ .../portal/templates/portal/consulta_publica.html  |  154 +
+ .../apps/portal/templates/portal/index.html        |  149 +
+ .../portal/templates/portal/resultado_evento.html  |  181 ++
+ .../selecao/relatorio_aprovados_mural.html         |  181 ++
+ .../selecao/relatorio_aprovados_staff.html         |  203 ++
+ .../20260119_160109/template/admin/base_site.html  |  208 ++
+ .../20260119_160109/template/base.html             |   43 +
+ .../20260119_160109/template/menu_temporario.html  |  158 +
+ .../20260119_160109/visualizador_templates.html    |  527 ++++
+ eventosmeta/config/urls.py                         |   17 +-
+ eventosmeta/diagrama-atual-12-12-2025.pdf          |  Bin 54048 -> 0 bytes
+ eventosmeta/dirMeta-12-12-2025.txt                 |  257 --
+ eventosmeta/estrutura-12-12-2025.txt               |  311 --
+ eventosmeta/estrutura-atual-14-01-2026.txt         |  351 ---
+ eventosmeta/mapeamento_urls.txt                    |   45 +
+ eventosmeta/static/images/metareciclagem.jpg       |  Bin 55884 -> 66479 bytes
+ eventosmeta/static/images/metareciclagem.png       |  Bin 245134 -> 314004 bytes
+ eventosmeta/template/base.html                     |    4 +-
+ eventosmeta/template/index.html                    |   61 -
+ eventosmeta/template/menu_temporario.html          |  158 +
+ eventosmeta/templates                              |  158 +
+ eventosmeta/teste1.py                              |    5 -
+ eventosmeta/visualizador_templates.html            |  527 ++++
+ indice_htmls.html                                  | 3288 ++++++++++++++++++++
+ relatorio_htmls.txt                                |  570 ++++
+ 75 files changed, 13445 insertions(+), 5819 deletions(-)
+
+commit 7a8f81d87591eca877a88475e62e1ca11124fcf1
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-16
+
+    gerador automático de dados para popular BD
+
+ estrutura-16-01.txt                                | 3251 --------------------
+ .../management/commands/criar_dados_teste.py       |    2 +
+ .../management/commands/gerar_dados_teste.py       |  167 +-
+ .../management/commands/popular_dados_iniciais.py  |   99 +-
+ 4 files changed, 189 insertions(+), 3330 deletions(-)
+
+commit e3a6a686d6122c3f9432393cda83c4b062899874
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-16
+
+    Criada a estrutura e movemos todos programas e scripts auxiliares fpara as respectivas pastas
+
+ estrutura-16-01.txt                                | 3251 ++++++++++++++++++++
+ eventosmeta/apps/scripts_admin/README.md           |   45 +
+ eventosmeta/apps/scripts_admin/__init__.py         |    0
+ .../apps/scripts_admin/management/__init__.py      |    0
+ .../scripts_admin/management/commands/__init__.py  |    0
+ .../management/commands/classificar_evento.py      |    0
+ .../commands/configurar_criterios_evento.py        |    0
+ .../management/commands/criar_dados_teste.py       |    0
+ .../management/commands/gerar_dados_teste.py       |    0
+ .../management/commands/popular_criterios.py       |    0
+ .../management/commands/popular_dados_iniciais.py  |    0
+ .../limpar_migrations_postgres old1.ps1            |    0
+ .../powershell}/limpar_migrations_postgres.ps1     |    0
+ .../powershell}/limpar_migrations_sqlite3.ps1      |    0
+ eventosmeta/config/settings.py                     |    1 +
+ 15 files changed, 3297 insertions(+)
+
+commit d1c00c19cda5a99eda95b3ccaa43533cea793138
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-16
+
+    Fazer backup do BD para apaga-lo e começar de novo, popular tabelas e fazer testes
+
+ .../apps/academico/migrations/0001_initial.py      |  91 ++++-
+ eventosmeta/apps/academico/models.py               | 134 ++++++--
+ eventosmeta/apps/academico/services.py             | 287 +++++++---------
+ eventosmeta/apps/academico/urls.py                 |  18 +
+ eventosmeta/apps/academico/views.py                |   4 +-
+ .../apps/accounts/migrations/0001_initial.py       |   2 +-
+ .../apps/eventos/migrations/0001_initial.py        | 327 ++++++++++++------
+ ...iterio_options_alter_evento_options_and_more.py | 379 ---------------------
+ .../0003_alter_eventocriterio_options.py           |  20 --
+ .../migrations/0004_evento_modo_classificacao.py   |  27 --
+ .../0005_alter_eventocriterio_options_and_more.py  |  24 --
+ ...erio_options_criterio_tipo_criterio_and_more.py |  78 -----
+ .../apps/interessados/migrations/0001_initial.py   |  55 ++-
+ ...0002_interessado_escolaridade_interessado_rg.py |  43 ---
+ .../migrations/0003_interessado_is_active.py       |  21 --
+ ...o_is_staff_interessado_is_superuser_and_more.py |  39 ---
+ .../apps/selecao/migrations/0001_initial.py        |   4 +-
+ .../migrations/0002_alter_classificacao_posicao.py |  17 -
+ .../migrations/0003_statusinscricao_descricao.py   |  17 -
+ .../0004_remove_statusinscricao_descricao.py       |  16 -
+ eventosmeta/backup_tabelas.py                      | 140 ++++++++
+ eventosmeta/config/urls.py                         |  17 +-
+ eventosmeta/estrutura-atual-14-01-2026.txt         | 351 +++++++++++++++++++
+ eventosmeta/limpar_migrations_postgres old1.ps1    |  79 +++++
+ eventosmeta/limpar_migrations_postgres.ps1         |  65 +++-
+ eventosmeta/static/images/brasao-1024x937.png      | Bin 0 -> 455279 bytes
+ eventosmeta/teste1.py                              |  13 -
+ 27 files changed, 1253 insertions(+), 1015 deletions(-)
+
+commit 9de46c08d1d5b0323486d04654b9a3fb6b33ee26
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-14
+
+    Atualização de classificação com a inclusão de opções de relatórios e exportação para pdf, geração de dados de testes, formatar relatórios
+
+ eventosmeta/apps/academico/admin.py                |  37 +-
+ eventosmeta/apps/academico/services.py             | 190 +++++-
+ .../templates/academico/gestao_matricula.html      | 482 ++++++++++++++
+ eventosmeta/apps/academico/urls.py                 |  18 +
+ eventosmeta/apps/academico/views.py                | 157 ++++-
+ eventosmeta/apps/eventos/admin.py                  | 137 +++-
+ eventosmeta/apps/selecao/admin.py                  | 316 ++++++++-
+ .../management/commands/gerar_dados_teste.py       | 132 ++--
+ eventosmeta/apps/selecao/reports.py                | 712 +++++++++++++++++++++
+ eventosmeta/apps/selecao/services.py               |  42 +-
+ .../selecao/relatorio_aprovados_mural.html         | 181 ++++++
+ .../selecao/relatorio_aprovados_staff.html         | 203 ++++++
+ eventosmeta/apps/selecao/validators.py             | 217 +++++++
+ "eventosmeta/static/images/Bras\303\243o-PMS.png"  | Bin 0 -> 232596 bytes
+ eventosmeta/static/images/brasao.gif               | Bin 0 -> 2954 bytes
+ "eventosmeta/static/images/bras\303\243o 2.jpg"    | Bin 0 -> 85511 bytes
+ "eventosmeta/static/images/bras\303\243o-2.png"    | Bin 0 -> 227153 bytes
+ eventosmeta/static/images/logo-pms-header.png      | Bin 0 -> 21502 bytes
+ .../static/images/logo-pms-horizontal-colorido.png | Bin 0 -> 1084184 bytes
+ .../static/images/logo-pms-horizontal-colorido.svg | 520 +++++++++++++++
+ eventosmeta/static/images/metareciclagem.png       | Bin 0 -> 245134 bytes
+ eventosmeta/static/images/metareciclagem.svg       | 173 +++++
+ eventosmeta/teste1.py                              |  12 +
+ 23 files changed, 3462 insertions(+), 67 deletions(-)
+
+commit 97a63cda6aedce4eafd0ae852542a935a369c578
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-09
+
+    Corrigido admin de academico, eventos e interessados, além de base_site para mehor apresentar as grades e programa para gerar dados de teste
+
+ eventosmeta/apps/academico/admin.py                |  26 +-
+ eventosmeta/apps/eventos/admin.py                  | 117 +++++--
+ eventosmeta/apps/interessados/admin.py             | 144 ++++++++-
+ .../management/commands/gerar_dados_teste.py       | 348 +++++++++++++++++++++
+ eventosmeta/template/admin/base_site.html          | 208 ++++++++++++
+ 5 files changed, 801 insertions(+), 42 deletions(-)
+
+commit fd80d535f7f97da5ef2e81d04b2e5eba754131d7
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-09
+
+    Atualização do Services.py com as regras de negócios atualizadas
+
+ eventosmeta/apps/selecao/services.py | 133 +++++++++++++++++++++++++++++++++--
+ eventosmeta/teste1.py                |  36 ----------
+ 2 files changed, 128 insertions(+), 41 deletions(-)
+
+commit dde3f0205ef5475d88cccf58951952c258204a8b
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2026-01-08
+
+    Alterações em arquivos que não são importantes
+
+ eventosmeta/02-Requisitos e Funcionalidades.txt |  2 +-
+ eventosmeta/apagardepois.txt                    |  0
+ eventosmeta/desktop.ini                         |  2 +-
+ eventosmeta/teste1.py                           | 42 ++++++++++++++++++++++
+ piplist-23-12-2025.txt                          | 46 +++++++++++++++++++++++++
+ 5 files changed, 90 insertions(+), 2 deletions(-)
+
+commit 791a0b346bc12e06e788a5216d05e49ea5cd7ad9
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-12
+
+    Incluindo arquivos txt criados pela IA para instrução do Claude na conta para dar continuidade no desenvolvimento.
+
+ .../01-Stack e Configura\303\247\303\265es.txt"    | 412 ++++++++++++
+ eventosmeta/02-Requisitos e Funcionalidades.txt    | 546 ++++++++++++++++
+ "eventosmeta/03-Diretrizes e Padr\303\265es.txt"   | 718 +++++++++++++++++++++
+ ...fil do Desenvolvedor e Prefer\303\252ncias.txt" | 448 +++++++++++++
+ ...303\247\303\265es e Conhecimento Acumulado.txt" | 610 +++++++++++++++++
+ 5 files changed, 2734 insertions(+)
+
+commit 679749aef269e09f6ca3cac92cad147b2c9bde54
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-12
+
+    Novos arquivos txt gerados para orientação da IA em 12-12-2025
+
+ ...tefatos-Primarios-MetaReciclagem-12-12-2025.txt | 1817 +++++++
+ ...fatos-Secundarios-MetaReciclagem-12-12-2025.txt | 5384 ++++++++++++++++++++
+ eventosmeta/concatenar.py                          |   33 +-
+ eventosmeta/diagrama-atual-12-12-2025.pdf          |  Bin 0 -> 54048 bytes
+ eventosmeta/dirMeta-12-12-2025.txt                 |  257 +
+ eventosmeta/estrutura-12-12-2025.txt               |  311 ++
+ 6 files changed, 7800 insertions(+), 2 deletions(-)
+
+commit 156ca4fbb46550e7e0862fd3df9ef483f77eb980
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-12
+
+    Arquivos txt  de 03/12 para orientação da IA apagados
+
+ Resumo_sistema_11-12-2025.md                       |  582 +++
+ ...tefatos-Primarios-MetaReciclagem-03-12-2025.txt | 1472 --------
+ ...fatos-Secundarios-MetaReciclagem-03-12-2025.txt | 3905 --------------------
+ eventosmeta/admin-eventos-atual-03-12-2025.txt     |  355 --
+ eventosmeta/admin-selecao-atual-03-12-2025.txt     |  135 -
+ eventosmeta/diagrama-atual-03-12-2025.pdf          |  Bin 31021 -> 0 bytes
+ eventosmeta/dirMeta-03-12-2025.txt                 |  232 --
+ eventosmeta/estrutura-atual-03-12-2025.txt         |  282 --
+ eventosmeta/estrutura.txt                          |  175 -
+ eventosmeta/migrations-eventos-03-12-2025.txt      |    3 -
+ eventosmeta/migrations-selecao-03-12-2025.txt      |    3 -
+ eventosmeta/models-eventos-atual-03-12-2025.txt    |  244 --
+ .../models-interessados-atual-03-12-2025.txt       |  359 --
+ eventosmeta/models-matriculas-atual-03-12-2025.txt |    0
+ eventosmeta/models-selecao-atual-03-12-2025.txt    |  151 -
+ 15 files changed, 582 insertions(+), 7316 deletions(-)
+
+commit 19ee3a32fde99ce47ea67f4291707e49de2bc2cf
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-10
+
+    Correções para fazer classificação e gerar arquivos csv
+
+ eventosmeta/apps/eventos/admin.py                  | 383 +++++++++------------
+ ...erio_options_criterio_tipo_criterio_and_more.py |  78 +++++
+ eventosmeta/apps/eventos/models.py                 |  46 ++-
+ eventosmeta/apps/interessados/admin.py             | 218 +++++++++++-
+ .../management/commands/classificar_evento.py      |  62 ++--
+ eventosmeta/apps/selecao/services.py               | 140 ++++----
+ 6 files changed, 610 insertions(+), 317 deletions(-)
+
+commit 1de98a3c0b0875e4d9bb3c9694d8ac04cce186c4
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-09
+
+    Artefatos do portal inclusos
+
+ eventosmeta/apps/portal/__init__.py                |   5 +
+ eventosmeta/apps/portal/admin.py                   |  13 ++
+ eventosmeta/apps/portal/apps.py                    |  12 ++
+ eventosmeta/apps/portal/forms.py                   | 101 +++++++++
+ eventosmeta/apps/portal/migrations/__init__.py     |   0
+ eventosmeta/apps/portal/models.py                  |  16 ++
+ eventosmeta/apps/portal/templates/portal/base.html | 225 +++++++++++++++++++++
+ .../portal/templates/portal/consulta_publica.html  | 154 ++++++++++++++
+ .../apps/portal/templates/portal/dashboard.html    | 182 +++++++++++++++++
+ .../apps/portal/templates/portal/index.html        | 140 +++++++++++++
+ .../apps/portal/templates/portal/login.html        | 105 ++++++++++
+ .../portal/templates/portal/resultado_evento.html  | 181 +++++++++++++++++
+ eventosmeta/apps/portal/tests.py                   |   3 +
+ eventosmeta/apps/portal/urls.py                    |  25 +++
+ eventosmeta/apps/portal/views.py                   | 203 +++++++++++++++++++
+ eventosmeta/config/settings.py                     |   6 +-
+ eventosmeta/config/urls.py                         |  13 +-
+ 17 files changed, 1374 insertions(+), 10 deletions(-)
+
+commit d7fe6f50a2f826d986fc23e92139b4330b95d2af
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-05
+
+    Limpeza de arquivos antigos e inclusão das novas migrations
+
+ eventosmeta/Artefatos-MetaReciclagem-30-10.txt     | 6463 --------------------
+ .../Artefatos-Primarios-MetaReciclagem-26-11.txt   | 2159 -------
+ .../Artefatos-Principais-MetaReciclagem-03-11.txt  | 2029 ------
+ .../Artefatos-Secundarios-MetaReciclagem-03-11.txt | 4440 --------------
+ .../Artefatos-Secundarios-MetaReciclagem-26-11.txt | 4463 --------------
+ eventosmeta/Arvore de menus.png                    |  Bin 991178 -> 0 bytes
+ eventosmeta/Diagrama-MetaReciclagem.png            |  Bin 1418054 -> 0 bytes
+ eventosmeta/Diagrama26-11.pdf                      |  Bin 79579 -> 0 bytes
+ .../0005_alter_eventocriterio_options_and_more.py  |   24 +
+ .../migrations/0003_interessado_is_active.py       |   21 +
+ ...o_is_staff_interessado_is_superuser_and_more.py |   39 +
+ .../0004_remove_statusinscricao_descricao.py       |   16 +
+ eventosmeta/db.sqlite3                             |  Bin 286720 -> 0 bytes
+ eventosmeta/diagrama.md                            |  167 -
+ eventosmeta/diagrama26-11.dot                      | 1840 ------
+ eventosmeta/dirMeta1.txt                           |  130 -
+ eventosmeta/dirMeta26-11.txt                       |  160 -
+ eventosmeta/estrutura26-11.txt                     |  188 -
+ eventosmeta/estrutura_banco.txt                    |  342 --
+ eventosmeta/meu_projeto_django-MetaReciclagem.txt  | 1587 -----
+ eventosmeta/models-xxxx.txt                        |   10 -
+ eventosmeta/requirements-dev.txt                   |  Bin 590 -> 0 bytes
+ eventosmeta/requirements-full.txt                  |  Bin 130 -> 0 bytes
+ eventosmeta/requirements-installed.txt             |  Bin 1176 -> 0 bytes
+ eventosmeta/requirements.txt                       |  Bin 1176 -> 0 bytes
+ eventosmeta/requirements19112025.txt               |   25 -
+ eventosmeta/vscode-extensions.txt                  |   29 -
+ 27 files changed, 100 insertions(+), 24032 deletions(-)
+
+commit f1b255788fecc7ea88424c549fd466b97d568bdb
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-05
+
+    Atualização models e admin - interessados
+
+ eventosmeta/apps/interessados/admin.py  | 123 ++++++++++++++++++++++++++++----
+ eventosmeta/apps/interessados/models.py | 105 +++++++++++++++++++++++++--
+ 2 files changed, 208 insertions(+), 20 deletions(-)
+
+commit a8586b2c7a6b23cabefc54a81fe4b535917ab72a
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-05
+
+    Apagar arquivos que foram removidos para outra pasta e não necessários agora
+
+ eventosmeta/dump.dump | Bin 87776 -> 0 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit d670723056382f043eb115cbd057bddc2936b898
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-04
+
+    Geração de estrutura e modelo do que já estav pronto e ajutes na classificação dos inscritos
+
+ ...tefatos-Primarios-MetaReciclagem-03-12-2025.txt | 1472 ++++++++
+ ...fatos-Secundarios-MetaReciclagem-03-12-2025.txt | 3905 ++++++++++++++++++++
+ eventosmeta/admin-eventos-atual-03-12-2025.txt     |  355 ++
+ eventosmeta/admin-selecao-atual-03-12-2025.txt     |  135 +
+ eventosmeta/apps/eventos/admin.py.backup           |  355 ++
+ .../0003_alter_eventocriterio_options.py           |   20 +
+ .../migrations/0004_evento_modo_classificacao.py   |   27 +
+ eventosmeta/apps/selecao/admin.py.backup           |  397 ++
+ .../migrations/0003_statusinscricao_descricao.py   |   17 +
+ eventosmeta/diagrama-atual-03-12-2025.pdf          |  Bin 0 -> 31021 bytes
+ eventosmeta/dirMeta-03-12-2025.txt                 |  232 ++
+ eventosmeta/estrutura-atual-03-12-2025.txt         |  282 ++
+ eventosmeta/migrations-eventos-03-12-2025.txt      |    3 +
+ eventosmeta/migrations-selecao-03-12-2025.txt      |    3 +
+ eventosmeta/models-eventos-atual-03-12-2025.txt    |  244 ++
+ .../models-interessados-atual-03-12-2025.txt       |  359 ++
+ eventosmeta/models-matriculas-atual-03-12-2025.txt |    0
+ eventosmeta/models-selecao-atual-03-12-2025.txt    |  151 +
+ eventosmeta/models-xxxx.txt                        |   10 +
+ 19 files changed, 7967 insertions(+)
+
+commit 3c7208a7632b0f923dc44510653322f5e9525dfb
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-02
+
+    Mudança de conceito para critérios/classificação
+
+ eventosmeta/apps/eventos/admin.py                  | 343 ++++++++++++++++---
+ .../commands/configurar_criterios_evento.py        |  93 +++++
+ .../management/commands/popular_criterios.py       | 119 +++++++
+ ...iterio_options_alter_evento_options_and_more.py | 379 +++++++++++++++++++++
+ eventosmeta/apps/eventos/models.py                 | 283 ++++++++-------
+ .../management/commands/criar_dados_teste.py       | 150 ++++++--
+ ...0002_interessado_escolaridade_interessado_rg.py |  43 +++
+ eventosmeta/apps/interessados/models.py            |  32 +-
+ .../management/commands/classificar_evento.py      | 275 +++++++++++++--
+ eventosmeta/apps/selecao/services.py               |  99 +++++-
+ 10 files changed, 1572 insertions(+), 244 deletions(-)
+
+commit ed09fca22807ea02f195d69a320e0d166d08355e
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-02
+
+    Populando tabelas, corrigindo models, testando classificação
+
+ .../apps/interessados/management/__init__.py       |   0
+ .../interessados/management/commands/__init__.py   |   0
+ .../management/commands/criar_dados_teste.py       |  91 +++++++
+ eventosmeta/apps/selecao/management/__init__.py    |   0
+ .../apps/selecao/management/commands/__init__.py   |   0
+ .../management/commands/classificar_evento.py      |  58 +++++
+ .../migrations/0002_alter_classificacao_posicao.py |  17 ++
+ eventosmeta/apps/selecao/models.py                 |  15 +-
+ eventosmeta/fixtures/01_interessados.json          | 282 +++++++++++++++++++++
+ eventosmeta/fixtures/02_evento.json                |  22 ++
+ eventosmeta/fixtures/03_evento_criterios.json      |  58 +++++
+ eventosmeta/fixtures/04_turmas.json                |  36 +++
+ eventosmeta/fixtures/05_inscricoes.json            | 113 +++++++++
+ 13 files changed, 689 insertions(+), 3 deletions(-)
+
+commit 438532c24f330fca49c539f7dd49b0b957d5f2e2
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-12-01
+
+    Feito camada services.py
+
+ eventosmeta/apps/academico/services.py             | 241 +++++++++++++++++++++
+ eventosmeta/apps/eventos/management/__init__.py    |   0
+ .../apps/eventos/management/commands/__init__.py   |   0
+ .../management/commands/popular_dados_iniciais.py  | 227 +++++++++++++++++++
+ eventosmeta/apps/selecao/services.py               | 190 ++++++++++++++++
+ 5 files changed, 658 insertions(+)
+
+commit 26afd1369a2187b9b299ee4284ea2f2dcdc7a41f
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-11-27
+
+    Apagar APP cursoseoutros que ficou obsoleto
+
+ eventosmeta/apps/cursoseoutros/__init__.py         |   0
+ eventosmeta/apps/cursoseoutros/admin.py            | 592 -----------------
+ eventosmeta/apps/cursoseoutros/apps.py             |   7 -
+ .../cursoseoutros/fixtures/01_dados_basicos.json   | 126 ----
+ .../apps/cursoseoutros/fixtures/02_criterios.json  |  82 ---
+ .../cursoseoutros/fixtures/status_inicial.json     |  47 --
+ .../fixtures/status_inscricao_matricula.json       |  82 ---
+ eventosmeta/apps/cursoseoutros/forms.py            | 562 ----------------
+ .../apps/cursoseoutros/migrations/__init__.py      |   0
+ eventosmeta/apps/cursoseoutros/models.py           | 738 ---------------------
+ eventosmeta/apps/cursoseoutros/services.py         | 498 --------------
+ .../templates/cursoseoutros/lista_cursos.html      |  15 -
+ .../templates/cursoseoutros/settings.ico           | Bin 67664 -> 0 bytes
+ eventosmeta/apps/cursoseoutros/tests.py            |   3 -
+ eventosmeta/apps/cursoseoutros/urls.py             |  13 -
+ eventosmeta/apps/cursoseoutros/views.py            | 549 ---------------
+ 16 files changed, 3314 deletions(-)
+
+commit 57ce56699a780e9193a413a24a959a1d1d294e32
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-11-27
+
+    Após mega mudança como zerar banco de dados e mudar alguns conceitos para adequação de boas práticas
+
+ .../Artefatos-Primarios-MetaReciclagem-26-11.txt   | 2159 ++++++++++
+ .../Artefatos-Secundarios-MetaReciclagem-26-11.txt | 4463 ++++++++++++++++++++
+ eventosmeta/Arvore de menus.png                    |  Bin 0 -> 991178 bytes
+ eventosmeta/Diagrama26-11.pdf                      |  Bin 0 -> 79579 bytes
+ eventosmeta/apps/academico/__init__.py             |    0
+ eventosmeta/apps/academico/admin.py                |  102 +
+ eventosmeta/apps/academico/apps.py                 |   11 +
+ .../apps/academico/migrations/0001_initial.py      |  163 +
+ eventosmeta/apps/academico/migrations/__init__.py  |    0
+ eventosmeta/apps/academico/models.py               |  124 +
+ eventosmeta/apps/academico/tests.py                |    3 +
+ eventosmeta/apps/academico/views.py                |    3 +
+ .../apps/accounts/migrations/0001_initial.py       |  199 +-
+ .../apps/cursoseoutros/migrations/0001_initial.py  |  219 -
+ .../0002_statusinscricao_statusmatricula.py        |   58 -
+ ...tions_alter_statusinscricao_options_and_more.py |   55 -
+ eventosmeta/apps/eventos/__init__.py               |    0
+ eventosmeta/apps/eventos/admin.py                  |   88 +
+ eventosmeta/apps/eventos/apps.py                   |   11 +
+ .../apps/eventos/migrations/0001_initial.py        |  257 ++
+ eventosmeta/apps/eventos/migrations/__init__.py    |    0
+ eventosmeta/apps/eventos/models.py                 |  215 +
+ eventosmeta/apps/eventos/tests.py                  |    3 +
+ eventosmeta/apps/eventos/views.py                  |    3 +
+ .../apps/interessados/migrations/0001_initial.py   |  396 +-
+ eventosmeta/apps/interessados/models.py            |   59 +-
+ eventosmeta/apps/selecao/__init__.py               |    0
+ eventosmeta/apps/selecao/admin.py                  |  135 +
+ eventosmeta/apps/selecao/apps.py                   |   11 +
+ .../apps/selecao/migrations/0001_initial.py        |  190 +
+ eventosmeta/apps/selecao/migrations/__init__.py    |    0
+ eventosmeta/apps/selecao/models.py                 |  142 +
+ eventosmeta/apps/selecao/tests.py                  |    3 +
+ eventosmeta/apps/selecao/views.py                  |    3 +
+ eventosmeta/concatenar.py                          |    8 +-
+ eventosmeta/config/settings.py                     |    9 +-
+ eventosmeta/desktop.ini                            |    2 +-
+ eventosmeta/diagrama26-11.dot                      | 1840 ++++++++
+ eventosmeta/dirMeta26-11.txt                       |  160 +
+ eventosmeta/estrutura26-11.txt                     |  188 +
+ eventosmeta/limpar_migrations_postgres.ps1         |   79 +
+ ...igrations.ps1 => limpar_migrations_sqlite3.ps1} |    0
+ eventosmeta/static/css/style.css                   |    3 +-
+ 43 files changed, 10918 insertions(+), 446 deletions(-)
+
+commit c501c67a6e1da74f7f4285b45a2b6f5863865161
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-11-25
+
+    Colocar ícone na aba
+
+ eventosmeta/static/images/metareciclagem.ico | Bin 0 -> 152126 bytes
+ eventosmeta/template/index.html              |  13 +++++++++++++
+ 2 files changed, 13 insertions(+)
+
+commit 452d003f337c51624cfd387cff41030ee10c5ea5
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-11-19
+
+    Backup para rodar em casa
+
+ eventosmeta/dump.dump                | Bin 0 -> 87776 bytes
+ eventosmeta/requirements19112025.txt |  25 +++++++++++++++++++++++++
+ eventosmeta/vscode-extensions.txt    |  29 +++++++++++++++++++++++++++++
+ 3 files changed, 54 insertions(+)
+
+commit a7aadda459fb24f051bc0f60973430159f068b10
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-11-19
+
+    Atualização de models, admin, settings e no banco de dados: status de char para FK
+
+ ativarvenv.ps1                                     |   5 +
+ eventosmeta/apps/cursoseoutros/admin.py            |  55 ++--
+ .../fixtures/status_inscricao_matricula.json       |  82 +++++
+ .../0002_statusinscricao_statusmatricula.py        |  58 ++++
+ ...tions_alter_statusinscricao_options_and_more.py |  55 ++++
+ eventosmeta/apps/cursoseoutros/models.py           | 107 +++++--
+ eventosmeta/config/settings.py                     |   5 +-
+ eventosmeta/estrutura_banco.txt                    | 342 +++++++++++++++++++++
+ 8 files changed, 651 insertions(+), 58 deletions(-)
+
+commit 4986a64f3d13479194e80a82a0206477ca34760d
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-11-17
+
+    Recompor estrutura e fixtures de status
+
+ .../cursoseoutros/fixtures/01_dados_basicos.json   |   0
+ .../cursoseoutros/fixtures/02_criterios.json       |   0
+ .../cursoseoutros/fixtures/status_inicial.json     |  47 +++
+ eventosmeta/conversas.html                         | 322 ---------------------
+ eventosmeta/estrutura.txt                          | 175 +++++++++++
+ eventosmeta/html--pdf.py                           |  55 ----
+ eventosmeta/teste.py                               |   9 -
+ 7 files changed, 222 insertions(+), 386 deletions(-)
+
+commit da114954746c4e2bf8e05b5aed058e6abb7b29f2
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-11-07
+
+    Criação de alguns scripts de apoio e popular bd com json
+
+ eventosmeta/config/settings.py                     |  26 +-
+ eventosmeta/conversas.html                         | 322 +++++++++++++++++++++
+ .../cursoseoutros/fixtures/01_dados_basicos.json   | 126 ++++++++
+ .../cursoseoutros/fixtures/02_criterios.json       |  82 ++++++
+ eventosmeta/html--pdf.py                           |  55 ++++
+ eventosmeta/teste.py                               |   9 +
+ 6 files changed, 613 insertions(+), 7 deletions(-)
+
+commit e6f414bdc9c9faec99f5df527152f46515c6c183
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-11-04
+
+    Atualização após muitas perguntas do Claude para configuração geral do sistema
+
+ eventosmeta/.gitignore                             |   44 +-
+ eventosmeta/Artefatos-MetaReciclagem-30-10.txt     | 6463 ++++++++++++++++++++
+ .../Artefatos-Principais-MetaReciclagem-03-11.txt  | 2029 ++++++
+ .../Artefatos-Secundarios-MetaReciclagem-03-11.txt | 4440 ++++++++++++++
+ eventosmeta/apps/cursoseoutros/views.py            |  553 +-
+ eventosmeta/concatenar.py                          |   17 +-
+ eventosmeta/config/settings.py                     |  147 +-
+ eventosmeta/dirMeta1.txt                           |  130 +
+ eventosmeta/meu_projeto_django-MetaReciclagem.txt  | 1587 +++++
+ eventosmeta/requirements-dev.txt                   |  Bin 0 -> 590 bytes
+ eventosmeta/requirements-full.txt                  |  Bin 0 -> 130 bytes
+ eventosmeta/requirements-installed.txt             |  Bin 0 -> 1176 bytes
+ eventosmeta/requirements.txt                       |  Bin 0 -> 1176 bytes
+ 13 files changed, 15361 insertions(+), 49 deletions(-)
+
+commit 80a2ddad7e008bab1a5864705ba24b71dd8e3e46
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-10-29
+
+    Criação forms e services para cursoseoutros
+
+ Meu_codigo.txt                             |   4 -
+ dirmeta2.xlsx                              | Bin 139664 -> 0 bytes
+ eventosmeta/apps/cursoseoutros/forms.py    | 562 +++++++++++++++++++++++++++++
+ eventosmeta/apps/cursoseoutros/services.py | 498 +++++++++++++++++++++++++
+ 4 files changed, 1060 insertions(+), 4 deletions(-)
+
+commit 05964ea0a645f5a21f7b2bfc80fc79eb41544c0f
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-10-29
+
+    Alteração models e admin de cursoseoutros com migrate
+
+ eventosmeta/Diagrama-MetaReciclagem.png            | Bin 0 -> 1418054 bytes
+ eventosmeta/apps/cursoseoutros/admin.py            | 584 ++++++++++++++++-
+ .../apps/cursoseoutros/migrations/0001_initial.py  | 219 +++++++
+ eventosmeta/apps/cursoseoutros/models.py           | 696 ++++++++++++++++++++-
+ eventosmeta/config/settings.py                     |   2 +-
+ eventosmeta/db.sqlite3                             | Bin 163840 -> 286720 bytes
+ 6 files changed, 1494 insertions(+), 7 deletions(-)
+
+commit 80d11249eb1b615f48650b072735d14b6bd5a143
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-10-24
+
+    Atualização  diagrama.md
+
+ eventosmeta/diagrama.md | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+commit d3ed77a859fcb48bea166cfe479cf4c69487fc79
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-10-24
+
+    Incluindo diagrama.md
+
+ eventosmeta/diagrama.md | 168 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 168 insertions(+)
+
+commit f22cec332882757b50f21b75d544f424a5b18aa6
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-10-22
+
+    Atualização do Redme.md
+
+ README.md | 22 +++++++++++++++++++---
+ 1 file changed, 19 insertions(+), 3 deletions(-)
+
+commit 98a7c6ff1225d31628ad41c64cd735b4e1b5af8f
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-10-22
+
+    Altera README para um HTML
+
+ README.md | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+commit 9d66f2ff78b0e107c91279c771f5748f7a4890f3
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-10-22
+
+    Adiciona foto no README
+
+ Foto-Marcos-2.jpg | Bin 0 -> 161459 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 979bcd779b1cf55d63ea9cb087ed62dc39156df8
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-10-21
+
+    Incluir arquivos ps1 no github
+
+ eventosmeta/.gitignore            |  1 -
+ eventosmeta/limpar_migrations.ps1 | 25 +++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 1 deletion(-)
+
+commit 0f55330203dea44889b4a3b432bb06c94079cf35
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-10-21
+
+    Projeto inicial - estrutura completa
+
+ dirmeta2.xlsx                                      | Bin 0 -> 139664 bytes
+ eventosmeta/.gitignore                             |   9 +
+ eventosmeta/{eventos => apps}/__init__.py          |   0
+ .../migrations => apps/accounts}/__init__.py       |   0
+ eventosmeta/apps/accounts/admin.py                 |  59 +++
+ eventosmeta/apps/accounts/apps.py                  |   7 +
+ eventosmeta/apps/accounts/forms.py                 |  26 +
+ .../apps/accounts/migrations/0001_initial.py       |  50 ++
+ .../accounts/migrations}/__init__.py               |   0
+ eventosmeta/apps/accounts/models.py                |  76 +++
+ .../templates/accounts/dashboard_staff.html        |   0
+ .../accounts/templates/accounts/login_staff.html   | 172 ++++++
+ eventosmeta/{eventos => apps/accounts}/tests.py    |   0
+ eventosmeta/apps/accounts/urls.py                  |  10 +
+ eventosmeta/apps/accounts/views.py                 |  64 +++
+ eventosmeta/apps/cursoseoutros/__init__.py         |   0
+ .../{eventos => apps/cursoseoutros}/admin.py       |   6 +-
+ .../{eventos => apps/cursoseoutros}/apps.py        |   4 +-
+ .../apps/cursoseoutros/migrations/__init__.py      |   0
+ eventosmeta/apps/cursoseoutros/models.py           |   9 +
+ .../templates/cursoseoutros/lista_cursos.html      |  15 +
+ .../templates/cursoseoutros}/settings.ico          | Bin
+ eventosmeta/apps/cursoseoutros/tests.py            |   3 +
+ eventosmeta/apps/cursoseoutros/urls.py             |  13 +
+ eventosmeta/apps/cursoseoutros/views.py            |   6 +
+ eventosmeta/apps/interessados/__init__.py          |   0
+ eventosmeta/apps/interessados/admin.py             | 134 +++++
+ eventosmeta/apps/interessados/apps.py              |  13 +
+ eventosmeta/apps/interessados/authentication.py    |  66 +++
+ eventosmeta/apps/interessados/forms.py             | 104 ++++
+ .../apps/interessados/migrations/0001_initial.py   |  85 +++
+ .../apps/interessados/migrations/__init__.py       |   0
+ eventosmeta/apps/interessados/models.py            | 322 ++++++++++++
+ .../static/interessados/formStyles.css             |  78 +++
+ .../interessados/templates/interessados/base.html  |  42 ++
+ .../templates/interessados/cadastro.html           | 237 +++++++++
+ .../templates/interessados/dashboard.html          | 254 +++++++++
+ .../templates/interessados/detalhes.html           |   5 +
+ .../templates/interessados/form_interessados.html  | 155 ++++++
+ .../templates/interessados/lista_interessados.html | 581 +++++++++++++++++++++
+ .../templates/interessados/login_interessado.html  | 192 +++++++
+ .../templates/interessados/sucesso.html            |   4 +
+ eventosmeta/apps/interessados/tests.py             |   3 +
+ eventosmeta/apps/interessados/urls.py              |  17 +
+ eventosmeta/apps/interessados/views.py             | 106 ++++
+ eventosmeta/concatenar.py                          |  69 +++
+ eventosmeta/config/__init__.py                     |   0
+ eventosmeta/config/asgi.py                         |  16 +
+ eventosmeta/{eventosmeta => config}/settings.py    |  73 ++-
+ eventosmeta/config/urls.py                         |  31 ++
+ eventosmeta/config/wsgi.py                         |  16 +
+ eventosmeta/db.sqlite3                             | Bin 147456 -> 163840 bytes
+ eventosmeta/desktop.ini                            |   6 +
+ .../eventos/__pycache__/__init__.cpython-313.pyc   | Bin 186 -> 0 bytes
+ .../eventos/__pycache__/admin.cpython-313.pyc      | Bin 365 -> 0 bytes
+ .../eventos/__pycache__/apps.cpython-313.pyc       | Bin 552 -> 0 bytes
+ .../eventos/__pycache__/models.cpython-313.pyc     | Bin 2278 -> 0 bytes
+ .../eventos/__pycache__/urls.cpython-313.pyc       | Bin 570 -> 0 bytes
+ .../eventos/__pycache__/views.cpython-313.pyc      | Bin 1850 -> 0 bytes
+ eventosmeta/eventos/migrations/0001_initial.py     |  32 --
+ eventosmeta/eventos/migrations/0002_status.py      |  20 -
+ .../__pycache__/0001_initial.cpython-313.pyc       | Bin 1620 -> 0 bytes
+ .../__pycache__/0002_status.cpython-313.pyc        | Bin 944 -> 0 bytes
+ .../__pycache__/__init__.cpython-313.pyc           | Bin 197 -> 0 bytes
+ eventosmeta/eventos/models.py                      |  29 -
+ eventosmeta/eventos/templates/eventos/index.html   |  24 -
+ eventosmeta/eventos/templates/eventos/results.html |  25 -
+ eventosmeta/eventos/templates/eventos/vote.html    |  43 --
+ eventosmeta/eventos/urls.py                        |  11 -
+ eventosmeta/eventos/views.py                       |  48 --
+ .../__pycache__/__init__.cpython-313.pyc           | Bin 190 -> 0 bytes
+ .../__pycache__/settings.cpython-313.pyc           | Bin 2579 -> 0 bytes
+ .../eventosmeta/__pycache__/urls.cpython-313.pyc   | Bin 1389 -> 0 bytes
+ .../eventosmeta/__pycache__/wsgi.cpython-313.pyc   | Bin 686 -> 0 bytes
+ eventosmeta/eventosmeta/asgi.py                    |  16 -
+ eventosmeta/eventosmeta/urls.py                    |  30 --
+ eventosmeta/eventosmeta/wsgi.py                    |  16 -
+ eventosmeta/manage.py                              |   4 +-
+ eventosmeta/static/css/style.css                   | 212 ++++++++
+ eventosmeta/static/images/metareciclagem.jpg       | Bin 0 -> 55884 bytes
+ eventosmeta/static/js/script.js                    |  23 +
+ eventosmeta/template/base.html                     |  43 ++
+ eventosmeta/template/index.html                    |  48 ++
+ 83 files changed, 3436 insertions(+), 326 deletions(-)
+
+commit b4e3372a1d6dd08cd98400300572cf7ebd0bbd81
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-09-16
+
+    Update settings.cpython-313.pyc
+
+ .../eventosmeta/__pycache__/settings.cpython-313.pyc  | Bin 2579 -> 2579 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 46d39689f76f4651d0d0deda2ffac8b4fa04ec99
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-08-08
+
+    Código funcionando
+
+ eventosmeta/db.sqlite3                             | Bin 147456 -> 147456 bytes
+ .../eventos/__pycache__/urls.cpython-313.pyc       | Bin 570 -> 570 bytes
+ eventosmeta/eventos/templates/eventos/index.html   |   5 +++--
+ eventosmeta/eventos/templates/eventos/results.html |   9 ++++++---
+ eventosmeta/eventos/templates/eventos/settings.ico | Bin 0 -> 67664 bytes
+ eventosmeta/eventos/templates/eventos/vote.html    |  16 ++++++++++++++--
+ .../eventosmeta/__pycache__/urls.cpython-313.pyc   | Bin 1389 -> 1389 bytes
+ eventosmeta/eventosmeta/urls.py                    |   5 +++--
+ 8 files changed, 26 insertions(+), 9 deletions(-)
+
+commit 12a2f3a144a76f406505457350ade5db9d54bab9
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-08-06
+
+    Update 06-08
+
+ eventosmeta/db.sqlite3                             | Bin 143360 -> 147456 bytes
+ .../eventos/__pycache__/models.cpython-313.pyc     | Bin 1856 -> 2278 bytes
+ .../eventos/__pycache__/views.cpython-313.pyc      | Bin 2140 -> 1850 bytes
+ eventosmeta/eventos/migrations/0002_status.py      |  20 ++++++++++++++++++++
+ .../__pycache__/0002_status.cpython-313.pyc        | Bin 0 -> 944 bytes
+ eventosmeta/eventos/models.py                      |   9 ++++++++-
+ eventosmeta/eventos/templates/eventos/index.html   |   2 +-
+ eventosmeta/eventos/templates/eventos/results.html |   3 +--
+ eventosmeta/eventos/views.py                       |   7 ++++---
+ .../__pycache__/settings.cpython-313.pyc           | Bin 2579 -> 2579 bytes
+ .../eventosmeta/__pycache__/urls.cpython-313.pyc   | Bin 1389 -> 1389 bytes
+ eventosmeta/eventosmeta/settings.py                |   1 +
+ eventosmeta/eventosmeta/urls.py                    |   1 +
+ 13 files changed, 36 insertions(+), 7 deletions(-)
+
+commit 283b9d3b53af2f77e5b729966d96c9b79ddadd55
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-08-01
+
+    após mais algumas correções
+
+ eventosmeta/db.sqlite3                             | Bin 143360 -> 143360 bytes
+ .../eventos/__pycache__/admin.cpython-313.pyc      | Bin 365 -> 365 bytes
+ .../eventos/__pycache__/apps.cpython-313.pyc       | Bin 552 -> 552 bytes
+ .../eventos/__pycache__/models.cpython-313.pyc     | Bin 1856 -> 1856 bytes
+ .../eventos/__pycache__/urls.cpython-313.pyc       | Bin 570 -> 570 bytes
+ .../eventos/__pycache__/views.cpython-313.pyc      | Bin 1823 -> 2140 bytes
+ eventosmeta/eventos/templates/eventos/results.html |  10 +++++-----
+ eventosmeta/eventos/views.py                       |   9 +++++++--
+ .../__pycache__/settings.cpython-313.pyc           | Bin 2579 -> 2579 bytes
+ 9 files changed, 12 insertions(+), 7 deletions(-)
+
+commit fadc217d0d9a252cacd2881800484452375648fb
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-08-01
+
+    Após acertar programas com ajuda do claude
+
+ eventosmeta/db.sqlite3                             | Bin 143360 -> 143360 bytes
+ .../eventos/__pycache__/urls.cpython-313.pyc       | Bin 362 -> 570 bytes
+ .../eventos/__pycache__/views.cpython-313.pyc      | Bin 1248 -> 1823 bytes
+ eventosmeta/eventos/templates/eventos/results.html |   3 ++-
+ eventosmeta/eventos/urls.py                        |   7 +++----
+ eventosmeta/eventos/views.py                       |   6 +++---
+ .../eventosmeta/__pycache__/urls.cpython-313.pyc   | Bin 1146 -> 1389 bytes
+ eventosmeta/eventosmeta/urls.py                    |   5 +++++
+ 8 files changed, 13 insertions(+), 8 deletions(-)
+
+commit 635ffb30a109e8c8f9be0e426bea1abc206fdb8f
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-07-30
+
+    Atualização de 30/07
+
+ eventosmeta/eventos/templates/eventos/index.html   |  4 +--
+ eventosmeta/eventos/templates/eventos/results.html | 22 +++++++++++++
+ eventosmeta/eventos/templates/eventos/vote.html    | 31 ++++++++++++++++++
+ eventosmeta/eventos/urls.py                        |  5 +++
+ eventosmeta/eventos/views.py                       | 38 ++++++++++++++++++----
+ 5 files changed, 91 insertions(+), 9 deletions(-)
+
+commit aae053210de5de2f0f300d2b2ad50293f77684e2
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-07-25
+
+    Após aulas da Hashtag montando projeto de questões
+
+ eventosmeta/db.sqlite3                             | Bin 0 -> 143360 bytes
+ .../eventos/__pycache__/__init__.cpython-313.pyc   | Bin 0 -> 186 bytes
+ .../eventos/__pycache__/admin.cpython-313.pyc      | Bin 0 -> 365 bytes
+ .../eventos/__pycache__/apps.cpython-313.pyc       | Bin 0 -> 552 bytes
+ .../eventos/__pycache__/models.cpython-313.pyc     | Bin 0 -> 1856 bytes
+ .../eventos/__pycache__/urls.cpython-313.pyc       | Bin 0 -> 362 bytes
+ .../eventos/__pycache__/views.cpython-313.pyc      | Bin 0 -> 1248 bytes
+ eventosmeta/eventos/admin.py                       |   4 +++
+ eventosmeta/eventos/apps.py                        |   1 +
+ eventosmeta/eventos/migrations/0001_initial.py     |  32 +++++++++++++++++++++
+ .../__pycache__/0001_initial.cpython-313.pyc       | Bin 0 -> 1620 bytes
+ .../__pycache__/__init__.cpython-313.pyc           | Bin 0 -> 197 bytes
+ eventosmeta/eventos/models.py                      |  19 ++++++++++++
+ eventosmeta/eventos/templates/eventos/index.html   |  23 +++++++++++++++
+ eventosmeta/eventos/urls.py                        |   7 +++++
+ eventosmeta/eventos/views.py                       |  15 ++++++++++
+ .../__pycache__/settings.cpython-313.pyc           | Bin 2537 -> 2579 bytes
+ .../eventosmeta/__pycache__/urls.cpython-313.pyc   | Bin 1061 -> 1146 bytes
+ eventosmeta/eventosmeta/settings.py                |   3 +-
+ eventosmeta/eventosmeta/urls.py                    |   3 +-
+ 20 files changed, 105 insertions(+), 2 deletions(-)
+
+commit 5911a86355bc1b194d5e60c103093aad6bae08cc
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-07-22
+
+    Alterações conforme andamento do curso web Alura/Hashtag
+
+ eventosmeta/db.sqlite3                             |   0
+ eventosmeta/eventos/__init__.py                    |   0
+ eventosmeta/eventos/admin.py                       |   3 +
+ eventosmeta/eventos/apps.py                        |   6 +
+ eventosmeta/eventos/migrations/__init__.py         |   0
+ eventosmeta/eventos/models.py                      |   3 +
+ eventosmeta/eventos/tests.py                       |   3 +
+ eventosmeta/eventos/views.py                       |   3 +
+ eventosmeta/eventosmeta/__init__.py                |   0
+ .../__pycache__/__init__.cpython-313.pyc           | Bin 0 -> 190 bytes
+ .../__pycache__/settings.cpython-313.pyc           | Bin 0 -> 2537 bytes
+ .../eventosmeta/__pycache__/urls.cpython-313.pyc   | Bin 0 -> 1061 bytes
+ .../eventosmeta/__pycache__/wsgi.cpython-313.pyc   | Bin 0 -> 686 bytes
+ eventosmeta/eventosmeta/asgi.py                    |  16 +++
+ eventosmeta/eventosmeta/settings.py                | 122 +++++++++++++++++++++
+ eventosmeta/eventosmeta/urls.py                    |  22 ++++
+ eventosmeta/eventosmeta/wsgi.py                    |  16 +++
+ eventosmeta/manage.py                              |  22 ++++
+ 18 files changed, 216 insertions(+)
+
+commit e9be5c04544fa2a83a26727c9b0deb8978e2e85c
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-07-17
+
+    Update Meu_codigo.txt no github
+    
+    texto editado dentro do github
+
+ Meu_codigo.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+commit 00addd57d49c9b1df9fcbdf2d6b1ef5c7b21daad
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-07-17
+
+    Primeiro commit arquivo txt 22222
+    
+    criei um arquivo txt e agora estou fazendo o commit
+
+ Meu_codigo.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+commit 99ef058b6a0e03d87820ce5caeaaebbb3936b370
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-07-17
+
+    Create Meu_codigo.txt
+
+ Meu_codigo.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 38914083194e5d4db933c8e165a054e17e422c80
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-07-17
+
+    Update README.md
+
+ README.md | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit ac0b78083c556b9037479a06750ed999f69b954d
+Author: MarcosPiardi <165842479+MarcosPiardi@users.noreply.github.com>
+Date:   2025-07-17
+
+    Initial commit
+
+ README.md | 2 ++
+ 1 file changed, 2 insertions(+)
