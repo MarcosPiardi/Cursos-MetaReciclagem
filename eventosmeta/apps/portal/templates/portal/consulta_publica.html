@@ -3,6 +3,8 @@ Arquivo: consulta_publica.html
 Caminho: apps/portal/templates/portal/consulta_publica.html
 Alteração: Layout moderno + Máscara CPF + Remoção de duplicação
 Data: 30/01/2026
+
+Atualização: 10/02/2026 - Ocultar formulário quando houver resultados + Nome no resultado + Botão Nova Consulta alinhado
 -->
 
 {% extends 'base.html' %}
@@ -90,6 +92,33 @@ Data: 30/01/2026
         font-weight: bold;
         color: #667eea;
     }
+    
+    .resultado-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .resultado-info {
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .btn-nova-consulta {
+        white-space: nowrap;
+    }
+    
+    @media (max-width: 768px) {
+        .resultado-header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .btn-nova-consulta {
+            width: 100%;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -110,7 +139,8 @@ Data: 30/01/2026
     </div>
 </div>
 
-<!-- Formulário de Consulta -->
+<!-- Formulário de Consulta (oculto quando há resultados) -->
+{% if not resultados %}
 <div class="row justify-content-center mb-5">
     <div class="col-md-8 col-lg-6">
         <div class="card card-consulta">
@@ -160,21 +190,40 @@ Data: 30/01/2026
         </div>
     </div>
 </div>
+{% endif %}
 
 <!-- Resultados -->
 {% if resultados %}
+    <!-- Cabeçalho dos Resultados com Botão Nova Consulta na Mesma Linha -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="alert alert-success">
-                <i class="bi bi-check-circle"></i> 
-                <strong>CPF consultado:</strong> <span id="cpf-formatado"></span>
-                <span class="float-end">
-                    <strong>{{ resultados.count }}</strong> resultado(s) encontrado(s)
-                </span>
+            <div class="resultado-header">
+                <div class="resultado-info">
+                    <div class="alert alert-success mb-0">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap">
+                            <div>
+                                <i class="bi bi-check-circle"></i> 
+                                <strong>Nome:</strong> {{ nome_interessado }}<br>
+                                <strong>CPF:</strong> <span id="cpf-formatado"></span>
+                            </div>
+                            <div class="mt-2 mt-sm-0">
+                                <span class="badge bg-primary fs-6">
+                                    <strong>{{ resultados.count }}</strong> resultado(s) encontrado(s)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <a href="{% url 'portal:consulta_publica' %}" class="btn btn-secondary btn-lg btn-nova-consulta">
+                        <i class="bi bi-arrow-left"></i> Nova Consulta
+                    </a>
+                </div>
             </div>
         </div>
     </div>
     
+    <!-- Lista de Resultados -->
     <div class="row">
         {% for classificacao in resultados %}
         <div class="col-12 mb-4">
@@ -244,15 +293,6 @@ Data: 30/01/2026
         </div>
         {% endfor %}
     </div>
-    
-    <!-- Botão Voltar -->
-    <div class="row">
-        <div class="col-12 text-center">
-            <a href="{% url 'portal:consulta_publica' %}" class="btn btn-secondary btn-lg">
-                <i class="bi bi-arrow-left"></i> Nova Consulta
-            </a>
-        </div>
-    </div>
 {% endif %}
 {% endblock %}
 
@@ -269,13 +309,16 @@ Data: 30/01/2026
     }
     
     // REMOVER MÁSCARA ANTES DO ENVIO (enviar apenas números)
-    document.getElementById('formConsulta').addEventListener('submit', function(e) {
-        const cpfField = document.getElementById('id_cpf');
-        if (cpfField && cpfField.value) {
-            // Remove tudo que não é número
-            cpfField.value = cpfField.value.replace(/\D/g, '');
-        }
-    });
+    const formConsulta = document.getElementById('formConsulta');
+    if (formConsulta) {
+        formConsulta.addEventListener('submit', function(e) {
+            const cpfField = document.getElementById('id_cpf');
+            if (cpfField && cpfField.value) {
+                // Remove tudo que não é número
+                cpfField.value = cpfField.value.replace(/\D/g, '');
+            }
+        });
+    }
     
     // FORMATAR CPF EXIBIDO NO RESULTADO
     const cpfConsultado = '{{ cpf_consultado|default:"" }}';
@@ -288,3 +331,4 @@ Data: 30/01/2026
     }
 </script>
 {% endblock %}
+

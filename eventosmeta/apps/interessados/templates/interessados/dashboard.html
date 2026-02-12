@@ -9,67 +9,58 @@
         border-left: 4px solid;
         transition: all 0.3s ease;
     }
-    
     .stat-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     }
-    
     .stat-card.primary {
         border-left-color: #3498db;
     }
-    
     .stat-card.success {
         border-left-color: #27ae60;
     }
-    
     .stat-card.warning {
         border-left-color: #f39c12;
     }
-    
     .stat-number {
         font-size: 1.8rem;
         font-weight: bold;
     }
-    
     .badge-status {
         padding: 0.5rem 1rem;
         border-radius: 20px;
         font-weight: 600;
     }
-    
     .inscricao-card {
         transition: all 0.3s ease;
     }
-    
     .inscricao-card:hover {
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    
-    /* Cards de ações com ícones ao lado */
-    .action-card .card-body {
-        padding: 1.25rem !important;
+    .action-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e0e0e0;
     }
-    
-    .action-card .icon-text-wrapper {
+    .action-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+    }
+    .icon-text-wrapper {
         display: flex;
         align-items: center;
-        justify-content: center;
-        margin-bottom: 1rem;
+        gap: 15px;
+        margin-bottom: 15px;
     }
-    
-    .action-card .icon-text-wrapper i {
+    .icon-text-wrapper i {
         font-size: 2.5rem;
-        margin-right: 1rem;
-        flex-shrink: 0;
     }
-    
-    .action-card .text-content h5 {
+    .text-content {
+        flex: 1;
+    }
+    .card-title {
         font-size: 1.1rem;
-        margin-bottom: 0.25rem;
     }
-    
-    .action-card .text-content p {
+    .card-text {
         font-size: 0.95rem;
         margin-bottom: 0;
     }
@@ -100,13 +91,12 @@
                         <p class="card-text text-muted">Visualize e atualize suas informações</p>
                     </div>
                 </div>
-                    <a href="{% url 'interessados:meus_dados' %}" class="btn btn-primary">
-                        <i class="bi bi-gear"></i> Editar Dados
-                    </a>
+                <a href="{% url 'interessados:meus_dados' %}" class="btn btn-primary">
+                    <i class="bi bi-gear"></i> Editar Dados
+                </a>
             </div>
         </div>
     </div>
-    
     <div class="col-md-6 mb-2">
         <div class="card action-card text-center h-100">
             <div class="card-body">
@@ -118,51 +108,46 @@
                     </div>
                 </div>
                 <a href="{% url 'interessados:logout' %}" class="btn btn-danger">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+                    <i class="bi bi-box-arrow-right"></i> Sair do Sistema
                 </a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Cards de Estatísticas -->
+<!-- Estatísticas -->
 <div class="row mb-3">
     <div class="col-md-4 mb-2">
-        <div class="card stat-card primary h-100">
-            <div class="card-body text-center py-2">
-                <i class="bi bi-clipboard-check fs-3 text-primary mb-1"></i>
+        <div class="card stat-card primary">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-2">Total de Inscrições</h6>
                 <div class="stat-number text-primary">{{ total_inscricoes }}</div>
-                <p class="mb-0 text-muted small">Total de Inscrições</p>
             </div>
         </div>
     </div>
-    
     <div class="col-md-4 mb-2">
-        <div class="card stat-card success h-100">
-            <div class="card-body text-center py-2">
-                <i class="bi bi-check-circle fs-3 text-success mb-1"></i>
-                <div class="stat-number text-success">{{ inscricoes_aprovadas }}</div>
-                <p class="mb-0 text-muted small">Aprovações</p>
+        <div class="card stat-card success">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-2">Classificações</h6>
+                <div class="stat-number text-success">{{ total_classificacoes }}</div>
             </div>
         </div>
     </div>
-    
     <div class="col-md-4 mb-2">
-        <div class="card stat-card warning h-100">
-            <div class="card-body text-center py-2">
-                <i class="bi bi-hourglass-split fs-3 text-warning mb-1"></i>
-                <div class="stat-number text-warning">{{ inscricoes_pendentes }}</div>
-                <p class="mb-0 text-muted small">Pendentes</p>
+        <div class="card stat-card warning">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-2">Eventos Abertos</h6>
+                <div class="stat-number text-warning">{{ eventos_abertos.count }}</div>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Minhas Inscrições -->
-<div class="row mb-3">
+<div class="row mt-4 mb-3">
     <div class="col-12">
-        <h4 class="mb-2">
-            <i class="bi bi-list-check"></i> Minhas Inscrições
+        <h4>
+            <i class="bi bi-list-check text-primary"></i> Minhas Inscrições
         </h4>
     </div>
 </div>
@@ -170,61 +155,28 @@
 {% if inscricoes %}
     <div class="row">
         {% for inscricao in inscricoes %}
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card inscricao-card h-100">
-                    <div class="card-header {% if inscricao.status == 'APROVADO' %}bg-success{% elif inscricao.status == 'REPROVADO' %}bg-danger{% else %}bg-primary{% endif %} text-white py-2">
-                        <h6 class="mb-0">{{ inscricao.evento.nome }}</h6>
-                    </div>
-                    <div class="card-body py-2">
-                        <!-- Status -->
-                        <div class="mb-2 text-center">
-                            {% if inscricao.status == 'INSCRITO' %}
-                                <span class="badge badge-status bg-primary">
-                                    <i class="bi bi-hourglass-split"></i> Inscrito
-                                </span>
-                            {% elif inscricao.status == 'APROVADO' %}
-                                <span class="badge badge-status bg-success">
-                                    <i class="bi bi-check-circle"></i> Aprovado
-                                </span>
-                            {% elif inscricao.status == 'REPROVADO' %}
-                                <span class="badge badge-status bg-danger">
-                                    <i class="bi bi-x-circle"></i> Não Classificado
-                                </span>
-                            {% elif inscricao.status == 'MATRICULADO' %}
-                                <span class="badge badge-status bg-info">
-                                    <i class="bi bi-check2-all"></i> Matriculado
-                                </span>
-                            {% endif %}
+            <div class="col-md-6 mb-3">
+                <div class="card inscricao-card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ inscricao.evento.nome }}</h5>
+                        <p class="card-text small text-muted">
+                            <i class="bi bi-calendar"></i> Inscrito em: {{ inscricao.data_inscricao|date:"d/m/Y" }}
+                        </p>
+                        
+                        <div class="mb-2">
+                            <span class="badge badge-status 
+                                {% if inscricao.status.nome == 'Confirmada' %}bg-success
+                                {% elif inscricao.status.nome == 'Pendente' %}bg-warning
+                                {% elif inscricao.status.nome == 'Cancelada' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ inscricao.status.nome }}
+                            </span>
                         </div>
                         
-                        <!-- Informações -->
-                        <ul class="list-unstyled small">
-                            <li class="mb-1">
-                                <i class="bi bi-calendar text-primary"></i>
-                                <strong>Inscrito:</strong> {{ inscricao.data_inscricao|date:"d/m/Y" }}
-                            </li>
-                            
-                            {% if inscricao.classificacao %}
-                                <li class="mb-1">
-                                    <i class="bi bi-trophy text-warning"></i>
-                                    <strong>Posição:</strong> {{ inscricao.classificacao.posicao }}º
-                                </li>
-                                <li class="mb-1">
-                                    <i class="bi bi-star text-warning"></i>
-                                    <strong>Pontos:</strong> {{ inscricao.classificacao.pontuacao_total }}
-                                </li>
-                            {% endif %}
-                            
-                            <li class="mb-1">
-                                <i class="bi bi-calendar-event text-info"></i>
-                                <strong>Início:</strong> {{ inscricao.evento.data_inicio_evento|date:"d/m/Y" }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="card-footer bg-transparent py-1">
-                        <a href="{% url 'interessados:detalhes' inscricao.pk %}" class="btn btn-outline-primary btn-sm w-100">
-                            <i class="bi bi-eye"></i> Detalhes
+                        <a href="{% url 'portal:detalhes_evento' inscricao.evento.id %}" class="btn btn-outline-info btn-sm w-100">
+                            <i class="bi bi-info-circle"></i> Detalhes
                         </a>
+                        
                     </div>
                 </div>
             </div>
@@ -233,59 +185,111 @@
 {% else %}
     <div class="row">
         <div class="col-12">
-            <div class="alert alert-info text-center py-2">
-                <i class="bi bi-info-circle fs-3 d-block mb-2"></i>
-                <h6>Você ainda não possui inscrições</h6>
-                <p class="mb-0 small">Explore os eventos disponíveis abaixo!</p>
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Você ainda não tem inscrições registradas.
             </div>
         </div>
     </div>
 {% endif %}
 
-<!-- Eventos Disponíveis para Inscrição -->
-{% if eventos_abertos %}
-    <div class="row mb-3">
-        <div class="col-12">
-            <h4 class="mb-2">
-                <i class="bi bi-calendar-plus"></i> Eventos Disponíveis
-            </h4>
-        </div>
+
+<!-- Eventos Abertos para Inscrição -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3">
+            <i class="bi bi-calendar-event text-success"></i> Eventos Abertos para Inscrição
+        </h4>
     </div>
-    
-    <div class="row">
-        {% for evento in eventos_abertos %}
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-header bg-success text-white py-2">
-                        <h6 class="mb-0">{{ evento.nome }}</h6>
+</div>
+
+<div class="row">
+    {% for evento in eventos_abertos %}
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-header bg-success text-white py-2">
+                    <h6 class="mb-0">{{ evento.nome }}</h6>
+                </div>
+                <div class="card-body py-2">
+                    <p class="card-text small">{{ evento.descricao|truncatewords:15 }}</p>
+                    
+                    <ul class="list-unstyled small">
+                        <li class="mb-1">
+                            <i class="bi bi-people text-primary"></i>
+                            <strong>Vagas:</strong> {{ evento.total_vagas }}
+                        </li>
+                        <li class="mb-1">
+                            <i class="bi bi-calendar-check text-success"></i>
+                            <strong>Inscrições até:</strong> {{ evento.data_fim_inscricao|date:"d/m/Y" }}
+                        </li>
+                        <li class="mb-1">
+                            <i class="bi bi-calendar-event text-info"></i>
+                            <strong>Início:</strong> {{ evento.data_inicio_evento|date:"d/m/Y" }}
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent py-2">
+                    <!-- Botões Detalhes e Classificação -->
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <a href="{% url 'portal:detalhes_evento' evento.id %}" class="btn btn-outline-info btn-sm w-100">
+                                <i class="bi bi-info-circle"></i> Detalhes
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'portal:resultado_evento' evento.id %}" class="btn btn-outline-success btn-sm w-100">
+                                <i class="bi bi-trophy"></i> Classificação
+                            </a>
+                        </div>
                     </div>
-                    <div class="card-body py-2">
-                        <p class="card-text small">{{ evento.descricao|truncatewords:15 }}</p>
-                        
-                        <ul class="list-unstyled small">
-                            <li class="mb-1">
-                                <i class="bi bi-people text-primary"></i>
-                                <strong>Vagas:</strong> {{ evento.total_vagas }}
-                            </li>
-                            <li class="mb-1">
-                                <i class="bi bi-calendar-check text-success"></i>
-                                <strong>Inscrições até:</strong> {{ evento.data_fim_inscricao|date:"d/m/Y" }}
-                            </li>
-                            <li class="mb-1">
-                                <i class="bi bi-calendar-event text-info"></i>
-                                <strong>Início:</strong> {{ evento.data_inicio_evento|date:"d/m/Y" }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="card-footer bg-transparent py-1">
-                        <a href="{% url 'interessados:inscrever_evento' evento.id %}" class="btn btn-success btn-sm w-100">
-                            <i class="bi bi-plus-circle"></i> Inscrever-se
-                        </a>
+                    
+                    <!-- Botão Inscrever-se -->
+                    <a href="{% url 'interessados:inscrever_evento' evento.id %}" class="btn btn-success btn-sm w-100">
+                        <i class="bi bi-plus-circle"></i> Inscrever-se
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
+<!-- Minhas Classificações -->
+{% if classificacoes %}
+<div class="row mt-4 mb-3">
+    <div class="col-12">
+        <h4>
+            <i class="bi bi-trophy text-warning"></i> Minhas Classificações
+        </h4>
+    </div>
+</div>
+
+<div class="row">
+    {% for classificacao in classificacoes %}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ classificacao.inscricao.evento.nome }}</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1"><strong>Posição:</strong> {{ classificacao.posicao }}º</p>
+                            <p class="mb-1"><strong>Pontuação:</strong> {{ classificacao.pontuacao_total }}</p>
+                        </div>
+                        <div class="col-6 text-end">
+                            {% if classificacao.classificado %}
+                                <span class="badge bg-success">Classificado</span>
+                            {% elif classificacao.lista_espera %}
+                                <span class="badge bg-warning">Lista de Espera</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Não Classificado</span>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-        {% endfor %}
-    </div>
+        </div>
+    {% endfor %}
+</div>
 {% endif %}
 
 {% endblock %}
+

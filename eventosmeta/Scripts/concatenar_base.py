@@ -73,9 +73,9 @@ if __name__ == "__main__":
 
         # tipos_arquivo=['models.py', 'views.py', 'settings.py'],
 
-        tipos_arquivo=['login.html', 'meus_dados.html', 'cadastro.html'],            
+        tipos_arquivo=['index.html', 'dashboard.html'],            
                           
-        arquivo_saida='Arqs-Favicon.txt'
+        arquivo_saida='Arqs-index-dashboard.txt'
         )       
 
 # Comando para rodar esse Script:  python scripts\concatenar_base.py        

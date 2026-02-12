@@ -25,7 +25,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Interessado
 from .forms import CadastroInteressadoForm, LoginInteressadoForm, EdicaoInteressadoForm
-from apps.selecao.models import Inscricao, StatusInscricao
+from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
 from apps.eventos.models import Evento
 
 
@@ -106,18 +106,23 @@ def dashboard_view(request):
     """Dashboard do interessado - Mostra inscrições, estatísticas e eventos disponíveis"""
     interessado = request.user
     
-    # CORRIGIDO: select_related para FK, sem prefetch_related desnecessário
+    # Inscrições do interessado
     inscricoes = Inscricao.objects.filter(
         interessado=interessado
-    ).select_related('evento', 'status', 'classificacao')
+    ).select_related('evento', 'status')
+    
+    # Classificações do interessado
+    classificacoes = Classificacao.objects.filter(
+        inscricao__interessado=interessado
+    ).select_related('inscricao__evento').order_by('-processado_em')
     
     # Estatísticas
     total_inscricoes = inscricoes.count()
+    total_classificacoes = classificacoes.count()  # ← ADICIONADO
     inscricoes_aprovadas = inscricoes.filter(status__nome='APROVADO').count()
     inscricoes_pendentes = inscricoes.filter(status__nome='INSCRITO').count()
     
     # Eventos disponíveis (que ainda aceitam inscrições e o interessado NÃO está inscrito)
-    # CORRIGIDO: inscricoes (plural) e conversão de datetime para date
     eventos_abertos = Evento.objects.filter(
         data_fim_inscricao__date__gte=date.today()
     ).exclude(
@@ -127,7 +132,9 @@ def dashboard_view(request):
     context = {
         'interessado': interessado,
         'inscricoes': inscricoes,
+        'classificacoes': classificacoes,  # ← ADICIONADO
         'total_inscricoes': total_inscricoes,
+        'total_classificacoes': total_classificacoes,  # ← ADICIONADO
         'inscricoes_aprovadas': inscricoes_aprovadas,
         'inscricoes_pendentes': inscricoes_pendentes,
         'eventos_abertos': eventos_abertos,
@@ -145,7 +152,7 @@ def detalhes_view(request, inscricao_id):
         interessado=request.user
     )
     
-    return render(request, 'interessados/detalhes_inscricao.html', {
+    return render(request, 'portal/detalhes_evento.html', {
         'inscricao': inscricao
     })
 

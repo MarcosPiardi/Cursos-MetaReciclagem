@@ -160,6 +160,7 @@ def consulta_publica(request):
     context = {
         'form': form,
         'resultados': resultados,
+        'nome_interessado': resultados.first().inscricao.interessado.nome if resultados and resultados.exists() else '',
         'cpf_consultado': cpf_consultado
     }
     
@@ -239,17 +240,18 @@ def contato(request):
     """
     context = {
         'contatos': {
-            'telefone': '(15) 3261-8000',
+            'telefone': '(15) 3417-3825',
             'whatsapp': '(15) 99999-9999',
-            'email': 'contato@metareciclagem.sp.gov.br',
-            'endereco': 'Rua Exemplo, 123 - Centro - Sorocaba/SP',
+            'email': 'meta.recicla@gmail.com',
+            'endereco': 'Avenida Armando Sales de Oliveira, 762 – Sorocaba/SP',
             'cep': '18000-000',
-            'horario': 'Segunda a Sexta, das 8h às 17h',
+            'horario': 'Segunda a Sexta, das 8h às 16h',
         },
         'redes_sociais': {
             'facebook': 'https://facebook.com/metareciclagemsorocaba',
             'instagram': 'https://instagram.com/metareciclagemsorocaba',
             'youtube': 'https://youtube.com/metareciclagemsorocaba',
+            'blog' : 'https://metareciclagemdesorocaba.blogspot.com/'
         }
     }
     
