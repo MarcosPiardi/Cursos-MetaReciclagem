@@ -2,16 +2,10 @@
 Admin do app SELEÇÃO
 Arquivo: apps/selecao/admin.py
 
-Alteração: Adicionados relatórios PDF e Excel com opções de ordenação
-Data: 12/01/2026
-
-Alteração: Registrados todos os models no admin_site customizado (melhor prática)
-Data: 20/01/2026
-
-Alteração: Adicionada action de matrícula em lote na Classificação
-Alteração: Corrigido import ACTION_CHECKBOX_NAME para Django 5.2.4
-Alteração: Action de matrícula corrigida com validação melhorada
-Data: 30/01/2026
+Histórico de Alterações:
+- 12/01/2026: Adicionados relatórios PDF e Excel com opções de ordenação
+- 20/01/2026: Registrados todos os models no admin_site customizado (melhor prática)
+- 30/01/2026: Adicionada action de matrícula em lote + correção ACTION_CHECKBOX_NAME
 
 Alteração: Corrigido reconstrução do queryset no POST da action
 Alteração: Correção definitiva da action com preservação de IDs
@@ -19,8 +13,21 @@ Alteração: Versão final limpa e corrigida - matrícula em lote funcional
 Alteração: Busca case-insensitive para status (Ativa/ATIVA/ativa)
 Alteração: Versão final limpa - matrícula em lote funcional
 Data: 02/02/2026
+
+- 12/02/2026: Mesclagem final: matrícula + relatórios + boas práticas
+
+Funcionalidades:
+- Gestão de Status de Inscrição (com seletor de cor)
+- Gestão de Inscrições (com inline de critérios atendidos)
+- Gestão de Classificações (matrícula em lote + relatórios PDF/Excel)
+- Gestão de Critérios Atendidos (somente leitura)
 """
 
+# ==========================================
+# IMPORTS
+# ==========================================
+
+# Django core
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
@@ -28,24 +35,40 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import transaction
 from django.utils.html import format_html
-from django.http import HttpResponseRedirect
 
+# Apps internos
 from apps.accounts.admin import admin_site
-from apps.eventos.models import Turma
+from apps.eventos.models import Turma, Evento
 from apps.academico.models import Matricula, StatusMatricula
 
+# Models locais
 from .models import StatusInscricao, Inscricao, Classificacao, InscricaoCriterioAtendido
 
+# Services
+from .reports import RelatorioAprovadosService
+
 
 # ==========================================
-# FORM INTERMEDIÁRIO PARA SELEÇÃO DE TURMA
+# FORMS
 # ==========================================
+
+class StatusInscricaoForm(forms.ModelForm):
+    """Form personalizado com seletor de cor para Status de Inscrição"""
+    
+    class Meta:
+        model = StatusInscricao
+        fields = '__all__'
+        widgets = {
+            'cor': forms.TextInput(attrs={
+                'type': 'color',
+                'style': 'width: 100px; height: 40px; cursor: pointer; '
+                         'border: 2px solid #ccc; border-radius: 4px;'
+            })
+        }
+
 
 class MatricularAlunosForm(forms.Form):
-    """Form intermediário para selecionar turma antes de matricular"""
-    
-    _selected_action = forms.CharField(widget=forms.MultipleHiddenInput, required=False)
-    action = forms.CharField(widget=forms.HiddenInput, initial='matricular_alunos_action')
+    """Form intermediário para seleção de turma antes de matricular alunos"""
     
     turma = forms.ModelChoiceField(
         queryset=Turma.objects.none(),
@@ -68,65 +91,84 @@ class MatricularAlunosForm(forms.Form):
             
             if not self.fields['turma'].queryset.exists():
                 self.fields['turma'].widget.attrs['disabled'] = 'disabled'
-                self.fields['turma'].help_text = '⚠️ Nenhuma turma cadastrada para este evento. Crie uma turma primeiro.'
+                self.fields['turma'].help_text = (
+                    '⚠️ Nenhuma turma cadastrada para este evento. '
+                    'Crie uma turma primeiro.'
+                )
 
 
 # ==========================================
-# STATUS INSCRIÇÃO
+# INLINES
 # ==========================================
 
-class StatusInscricaoForm(forms.ModelForm):
-    """Form personalizado com seletor de cor"""
-    class Meta:
-        model = StatusInscricao
-        fields = '__all__'
-        widgets = {
-            'cor': forms.TextInput(attrs={
-                'type': 'color',
-                'style': 'width: 100px; height: 40px; cursor: pointer; border: 2px solid #ccc; border-radius: 4px;'
-            })
-        }
+class InscricaoCriterioAtendidoInline(admin.TabularInline):
+    """
+    Inline para exibir critérios atendidos por uma inscrição
+    (Somente leitura - criado automaticamente pelo ClassificadorService)
+    """
+    
+    model = InscricaoCriterioAtendido
+    extra = 0
+    can_delete = False
+    fields = ['criterio', 'pontos_atribuidos', 'validado', 'observacao_validacao']
+    readonly_fields = ['criterio', 'pontos_atribuidos']
+    
+    def has_add_permission(self, request, obj=None):
+        # Apenas sistema pode criar (via ClassificadorService)
+        return False
 
+
+# ==========================================
+# ADMIN: STATUS INSCRIÇÃO
+# ==========================================
 
 @admin.register(StatusInscricao, site=admin_site)
 class StatusInscricaoAdmin(admin.ModelAdmin):
+    """Admin para gerenciar Status de Inscrição com seletor visual de cor"""
+    
     form = StatusInscricaoForm
     list_display = ['nome', 'cor_display', 'ordem']
     search_fields = ['nome']
     ordering = ['ordem', 'nome']
-
+    
     fieldsets = (
         (None, {
             'fields': ('nome', 'cor', 'ordem'),
             'description': 'Clique no quadrado de cor para selecionar visualmente'
         }),
     )
-
+    
     def cor_display(self, obj):
-        """Exibe apenas o quadrado colorido (sem texto)"""
+        """Exibe quadrado colorido representando a cor do status"""
         if obj.cor:
             return format_html(
                 '<span style="display: inline-block; width: 30px; height: 30px; '
-                'background-color: {}; border: 2px solid #ccc; border-radius: 4px;"></span>',
+                'background-color: {}; border: 2px solid #ccc; '
+                'border-radius: 4px;"></span>',
                 obj.cor
             )
         return '—'
+    
     cor_display.short_description = 'Cor'
     cor_display.admin_order_field = 'cor'
 
 
 # ==========================================
-# INSCRIÇÃO
+# ADMIN: INSCRIÇÃO
 # ==========================================
 
 @admin.register(Inscricao, site=admin_site)
 class InscricaoAdmin(admin.ModelAdmin):
+    """Admin para gerenciar Inscrições de interessados em eventos"""
+    
     list_display = ['get_interessado', 'evento', 'status', 'data_inscricao']
     list_filter = ['status', 'evento', 'data_inscricao']
     search_fields = ['interessado__nome', 'interessado__cpf', 'evento__nome']
     date_hierarchy = 'data_inscricao'
     ordering = ['-data_inscricao']
-
+    
+    inlines = [InscricaoCriterioAtendidoInline]
+    
     fieldsets = (
         ('Dados da Inscrição', {
             'fields': ('interessado', 'evento', 'status')
@@ -139,21 +181,32 @@ class InscricaoAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-
+    
     readonly_fields = ['data_inscricao', 'data_atualizacao']
-
+    
     def get_interessado(self, obj):
+        """Retorna nome do interessado"""
         return obj.interessado.nome
+    
     get_interessado.short_description = 'Interessado'
     get_interessado.admin_order_field = 'interessado__nome'
 
 
 # ==========================================
-# CLASSIFICAÇÃO (COM ACTION DE MATRÍCULA)
+# ADMIN: CLASSIFICAÇÃO
 # ==========================================
 
 @admin.register(Classificacao, site=admin_site)
 class ClassificacaoAdmin(admin.ModelAdmin):
+    """
+    Admin para gerenciar Classificações de interessados
+    
+    Funcionalidades:
+    - Matrícula em lote de alunos classificados
+    - Geração de relatórios PDF (Staff e Mural)
+    - Exportação para Excel (Staff e Mural)
+    """
+    
     list_display = [
         'posicao',
         'get_interessado',
@@ -164,21 +217,34 @@ class ClassificacaoAdmin(admin.ModelAdmin):
         'lista_espera',
         'get_status_inscricao'
     ]
+    
     list_filter = [
         'classificado',
         'lista_espera',
         'inscricao__evento',
         'inscricao__status'
     ]
+    
     search_fields = [
         'inscricao__interessado__nome',
         'inscricao__interessado__cpf',
         'inscricao__evento__nome'
     ]
+    
     ordering = ['inscricao__evento', 'posicao']
     
-    actions = ['matricular_alunos_action']
-
+    actions = [
+        'matricular_alunos_action',
+        'gerar_relatorio_staff_classificacao',
+        'gerar_relatorio_staff_nome',
+        'gerar_relatorio_mural_classificacao',
+        'gerar_relatorio_mural_nome',
+        'exportar_excel_staff_classificacao',
+        'exportar_excel_staff_nome',
+        'exportar_excel_mural_classificacao',
+        'exportar_excel_mural_nome'
+    ]
+    
     fieldsets = (
         ('Inscrição', {
             'fields': ('inscricao',)
@@ -191,215 +257,547 @@ class ClassificacaoAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
-
-    readonly_fields = ['processado_em', 'atualizado_em']
-
+    
+    readonly_fields = [
+        'inscricao', 'posicao', 'pontuacao_total',
+        'classificado', 'lista_espera',
+        'processado_em', 'atualizado_em'
+    ]
+    
+    # ==========================================
+    # MÉTODOS PARA LIST_DISPLAY
+    # ==========================================
+    
     def get_interessado(self, obj):
+        """Retorna nome do interessado"""
         return obj.inscricao.interessado.nome
+    
     get_interessado.short_description = 'Interessado'
     get_interessado.admin_order_field = 'inscricao__interessado__nome'
-
+    
     def get_cpf(self, obj):
+        """Retorna CPF formatado"""
         cpf = obj.inscricao.interessado.cpf
         return f"{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}"
+    
     get_cpf.short_description = 'CPF'
-
+    
     def get_evento(self, obj):
+        """Retorna nome do evento"""
         return obj.inscricao.evento.nome
+    
     get_evento.short_description = 'Evento'
     get_evento.admin_order_field = 'inscricao__evento__nome'
-
+    
     def get_status_inscricao(self, obj):
+        """Retorna badge colorido com status da inscrição"""
         status = obj.inscricao.status
         return format_html(
             '<span style="display: inline-block; padding: 3px 8px; '
-            'background-color: {}; color: white; border-radius: 3px; font-size: 11px;">{}</span>',
+            'background-color: {}; color: white; border-radius: 3px; '
+            'font-size: 11px;">{}</span>',
             status.cor,
             status.nome
         )
+    
     get_status_inscricao.short_description = 'Status Inscrição'
     get_status_inscricao.admin_order_field = 'inscricao__status__nome'
-
+    
+    # ==========================================
+    # ACTION: MATRICULAR ALUNOS EM LOTE
+    # ==========================================
+    
     def matricular_alunos_action(self, request, queryset):
         """
-        Action para matricular alunos selecionados em uma turma
+        Action para matricular alunos classificados em uma turma
+        
+        Validações:
+        - Apenas classificações do mesmo evento
+        - Evento deve ter turmas cadastradas
+        - Verifica duplicidade de matrículas
+        - Atualiza status da inscrição para CONFIRMADA
         """
-        # POST: Processar matrícula com turma selecionada
-        if 'confirmar_matricula' in request.POST:
-            # Reconstruir queryset a partir dos IDs
-            ids = request.POST.getlist('_selected_action')
-            ids = [int(id) for id in ids if id.isdigit()]
-            
-            if not ids:
-                self.message_user(
-                    request,
-                    '❌ Nenhum aluno foi selecionado.',
-                    level=messages.ERROR
-                )
-                return HttpResponseRedirect(request.get_full_path())
-            
-            queryset = Classificacao.objects.filter(pk__in=ids)
-            queryset = queryset.select_related('inscricao__evento', 'inscricao__interessado')
-            
-            if queryset.count() == 0:
-                self.message_user(
-                    request,
-                    '❌ Classificações não encontradas.',
-                    level=messages.ERROR
-                )
-                return HttpResponseRedirect(request.get_full_path())
-            
-            evento = queryset.first().inscricao.evento
-            form = MatricularAlunosForm(request.POST, evento=evento)
-            
-            if not form.is_valid():
-                for field, errors in form.errors.items():
-                    for error in errors:
-                        self.message_user(request, f'❌ {field}: {error}', level=messages.ERROR)
-                return HttpResponseRedirect(request.get_full_path())
-            
-            turma = form.cleaned_data['turma']
-            
-            # Validar que a turma pertence ao evento
-            if turma.evento != evento:
-                self.message_user(
-                    request,
-                    f'❌ A turma "{turma.nome}" não pertence ao evento "{evento.nome}".',
-                    level=messages.ERROR
-                )
-                return HttpResponseRedirect(request.get_full_path())
-            
-            # Buscar status necessários (CASE-INSENSITIVE)
-            try:
-                status_matricula_ativa = StatusMatricula.objects.get(nome__iexact='ativa')
-            except StatusMatricula.DoesNotExist:
-                self.message_user(
-                    request,
-                    '❌ Status de matrícula "Ativa" não encontrado. Crie-o no menu Acadêmico > Status de Matrículas.',
-                    level=messages.ERROR
-                )
-                return HttpResponseRedirect(request.get_full_path())
-            
-            try:
-                status_inscricao_confirmada = StatusInscricao.objects.get(nome__iexact='confirmada')
-            except StatusInscricao.DoesNotExist:
-                self.message_user(
-                    request,
-                    '❌ Status de inscrição "Confirmada" não encontrado. Crie-o no menu Seleção > Status de Inscrições.',
-                    level=messages.ERROR
-                )
-                return HttpResponseRedirect(request.get_full_path())
-            
-            # Processar matrículas
-            matriculas_criadas = 0
-            erros = []
-            
-            with transaction.atomic():
-                for classificacao in queryset:
-                    try:
-                        inscricao = classificacao.inscricao
-                        interessado = inscricao.interessado
-                        
-                        # Verificar se já existe matrícula
-                        if Matricula.objects.filter(turma=turma, interessado=interessado).exists():
-                            erros.append(f'{interessado.nome} já está matriculado nesta turma.')
-                            continue
-                        
-                        # Criar matrícula
-                        Matricula.objects.create(
-                            turma=turma,
-                            interessado=interessado,
-                            inscricao=inscricao,
-                            status=status_matricula_ativa
-                        )
-                        
-                        # Atualizar status da inscrição
-                        inscricao.status = status_inscricao_confirmada
-                        inscricao.save()
-                        
-                        matriculas_criadas += 1
-                        
-                    except Exception as e:
-                        erros.append(f'{interessado.nome}: {str(e)}')
-            
-            # Mensagens de feedback
-            if matriculas_criadas > 0:
-                self.message_user(
-                    request,
-                    f'✅ {matriculas_criadas} matrícula(s) criada(s) com sucesso na turma "{turma.nome}"!',
-                    level=messages.SUCCESS
-                )
-            
-            if erros:
-                for erro in erros:
-                    self.message_user(request, f'⚠️ {erro}', level=messages.WARNING)
-            
-            if matriculas_criadas == 0 and len(erros) == 0:
-                self.message_user(
-                    request,
-                    '⚠️ Nenhuma matrícula foi processada.',
-                    level=messages.WARNING
-                )
-            
-            return HttpResponseRedirect(request.get_full_path())
-        
-        # GET: Mostrar tela de seleção de turma
-        queryset = queryset.select_related('inscricao__evento', 'inscricao__interessado')
-        
+        # Verificar se há seleção
         if queryset.count() == 0:
-            self.message_user(request, '❌ Nenhuma classificação selecionada.', level=messages.ERROR)
+            self.message_user(
+                request,
+                '❌ Nenhuma classificação foi selecionada.',
+                level=messages.ERROR
+            )
             return
         
-        # Verificar eventos únicos
+        # Otimizar queryset
+        queryset = queryset.select_related(
+            'inscricao__evento',
+            'inscricao__interessado'
+        )
+        
+        # Validar evento único
         eventos_unicos = set()
         for classificacao in queryset:
             if classificacao.inscricao and classificacao.inscricao.evento:
                 eventos_unicos.add(classificacao.inscricao.evento.id)
         
-        if len(eventos_unicos) > 1:
+        if len(eventos_unicos) == 0:
             self.message_user(
                 request,
-                '❌ Selecione apenas classificações do MESMO EVENTO.',
+                '❌ As classificações selecionadas não possuem evento associado.',
                 level=messages.ERROR
             )
             return
         
+        if len(eventos_unicos) > 1:
+            eventos_nomes = [
+                c.inscricao.evento.nome for c in queryset[:5]
+            ]
+            self.message_user(
+                request,
+                f'❌ Selecione apenas classificações do MESMO EVENTO. '
+                f'Eventos detectados: {", ".join(set(eventos_nomes))}',
+                level=messages.ERROR
+            )
+            return
+        
+        # Pegar evento
         evento = queryset.first().inscricao.evento
         
         # Verificar turmas disponíveis
-        if Turma.objects.filter(evento=evento).count() == 0:
+        if not Turma.objects.filter(evento=evento).exists():
             self.message_user(
                 request,
-                f'❌ O evento "{evento.nome}" não possui turmas cadastradas.',
+                f'❌ O evento "{evento.nome}" não possui turmas cadastradas. '
+                f'Crie uma turma em Eventos > Turmas.',
                 level=messages.ERROR
             )
             return
         
-        # Preparar formulário
-        form = MatricularAlunosForm(evento=evento)
-        ids = ','.join(str(c.pk) for c in queryset)
+        # POST: Processar matrícula
+        if 'apply' in request.POST:
+            form = MatricularAlunosForm(request.POST, evento=evento)
+            
+            if form.is_valid():
+                turma = form.cleaned_data['turma']
+                
+                # Validar turma pertence ao evento
+                if turma.evento != evento:
+                    self.message_user(
+                        request,
+                        f'❌ A turma "{turma.nome}" não pertence ao evento "{evento.nome}".',
+                        level=messages.ERROR
+                    )
+                    return redirect(request.get_full_path())
+                
+                # Buscar status necessários
+                try:
+                    status_matricula = StatusMatricula.objects.get(nome='ATIVA')
+                except StatusMatricula.DoesNotExist:
+                    self.message_user(
+                        request,
+                        '❌ Status "ATIVA" não encontrado em Status de Matrículas.',
+                        level=messages.ERROR
+                    )
+                    return redirect(request.get_full_path())
+                
+                try:
+                    status_inscricao = StatusInscricao.objects.get(nome='CONFIRMADA')
+                except StatusInscricao.DoesNotExist:
+                    self.message_user(
+                        request,
+                        '❌ Status "CONFIRMADA" não encontrado em Status de Inscrições.',
+                        level=messages.ERROR
+                    )
+                    return redirect(request.get_full_path())
+                
+                # Processar matrículas
+                matriculas_criadas = 0
+                erros = []
+                
+                with transaction.atomic():
+                    for classificacao in queryset:
+                        try:
+                            inscricao = classificacao.inscricao
+                            interessado = inscricao.interessado
+                            
+                            # Verificar duplicidade
+                            if Matricula.objects.filter(
+                                turma=turma,
+                                interessado=interessado
+                            ).exists():
+                                erros.append(
+                                    f'{interessado.nome} já está matriculado nesta turma.'
+                                )
+                                continue
+                            
+                            # Criar matrícula
+                            Matricula.objects.create(
+                                turma=turma,
+                                interessado=interessado,
+                                inscricao=inscricao,
+                                status=status_matricula
+                            )
+                            
+                            # Atualizar status da inscrição
+                            inscricao.status = status_inscricao
+                            inscricao.save()
+                            
+                            matriculas_criadas += 1
+                            
+                        except Exception as e:
+                            erros.append(f'{interessado.nome}: {str(e)}')
+                
+                # Feedback
+                if matriculas_criadas > 0:
+                    self.message_user(
+                        request,
+                        f'✅ {matriculas_criadas} matrícula(s) criada(s) na turma "{turma.nome}"!',
+                        level=messages.SUCCESS
+                    )
+                
+                if erros:
+                    for erro in erros:
+                        self.message_user(request, f'⚠️ {erro}', level=messages.WARNING)
+                
+                return redirect(request.get_full_path())
+            
+            else:
+                # Form inválido
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        self.message_user(
+                            request,
+                            f'❌ {error}',
+                            level=messages.ERROR
+                        )
+        
+        # GET: Exibir form
+        else:
+            form = MatricularAlunosForm(evento=evento)
         
         context = {
             'title': 'Matricular Alunos Selecionados',
             'form': form,
             'classificacoes': queryset,
             'evento': evento,
-            'ids': ids,
             'opts': self.model._meta,
             'action_checkbox_name': ACTION_CHECKBOX_NAME,
         }
         
-        return render(request, 'admin/selecao/matricular_alunos.html', context)
+        return render(
+            request,
+            'admin/selecao/matricular_alunos.html',
+            context
+        )
     
     matricular_alunos_action.short_description = '🎓 Matricular alunos selecionados'
+    
+    # ==========================================
+    # MÉTODOS AUXILIARES PARA RELATÓRIOS
+    # ==========================================
+    
+    def _validar_e_gerar_relatorio(self, request, queryset, tipo_relatorio, ordem):
+        """
+        Método auxiliar para validação e geração de relatórios PDF
+        
+        Args:
+            request: HttpRequest
+            queryset: QuerySet de Classificacao
+            tipo_relatorio: 'staff' (com telefones) ou 'mural' (público)
+            ordem: 'classificacao' (por posição) ou 'nome' (alfabético)
+        
+        Returns:
+            HttpResponse com PDF ou None (se erro)
+        """
+        # Validar evento único
+        eventos_ids = queryset.values_list('inscricao__evento', flat=True).distinct()
+        total_eventos = len(set(eventos_ids))
+        
+        if total_eventos == 0:
+            self.message_user(
+                request,
+                '⚠️ Nenhuma classificação selecionada',
+                level=messages.ERROR
+            )
+            return
+        
+        if total_eventos > 1:
+            self.message_user(
+                request,
+                f'⚠️ Você selecionou classificações de {total_eventos} eventos. '
+                f'Use o filtro "Evento" e selecione APENAS UM evento.',
+                level=messages.ERROR
+            )
+            return
+        
+        # Pegar evento
+        evento = Evento.objects.get(id=list(eventos_ids)[0])
+        
+        # Validar quantidade
+        if queryset.count() == 0:
+            self.message_user(
+                request,
+                '⚠️ Nenhuma classificação encontrada',
+                level=messages.WARNING
+            )
+            return
+        
+        # Aplicar ordenação
+        if ordem == 'classificacao':
+            queryset_ordenado = queryset.order_by('posicao')
+            texto_ordem = 'por classificação'
+        else:  # nome
+            queryset_ordenado = queryset.order_by('inscricao__interessado__nome')
+            texto_ordem = 'por nome'
+        
+        # Estatísticas
+        total = queryset.count()
+        aprovados = queryset.filter(classificado=True).count()
+        lista_espera = queryset.filter(lista_espera=True).count()
+        
+        # Gerar PDF
+        try:
+            if tipo_relatorio == 'staff':
+                response = RelatorioAprovadosService.gerar_relatorio_staff(
+                    evento,
+                    queryset_ordenado,
+                    ordem=ordem
+                )
+            else:  # mural
+                response = RelatorioAprovadosService.gerar_relatorio_mural(
+                    evento,
+                    queryset_ordenado,
+                    ordem=ordem
+                )
+            
+            self.message_user(
+                request,
+                f'✅ Relatório {tipo_relatorio.upper()} gerado ({texto_ordem})! '
+                f'Evento: {evento.nome} | Total: {total} | '
+                f'Aprovados: {aprovados} | Lista de Espera: {lista_espera}',
+                level=messages.SUCCESS
+            )
+            
+            return response
+        
+        except Exception as e:
+            self.message_user(
+                request,
+                f'❌ Erro ao gerar relatório: {str(e)}',
+                level=messages.ERROR
+            )
+    
+    def _validar_e_exportar_excel(self, request, queryset, tipo_relatorio, ordem):
+        """
+        Método auxiliar para validação e exportação Excel
+        
+        Args:
+            request: HttpRequest
+            queryset: QuerySet de Classificacao
+            tipo_relatorio: 'staff' ou 'mural'
+            ordem: 'classificacao' ou 'nome'
+        
+        Returns:
+            HttpResponse com Excel ou None (se erro)
+        """
+        # Validar evento único
+        eventos_ids = queryset.values_list('inscricao__evento', flat=True).distinct()
+        total_eventos = len(set(eventos_ids))
+        
+        if total_eventos == 0:
+            self.message_user(
+                request,
+                '⚠️ Nenhuma classificação selecionada',
+                level=messages.ERROR
+            )
+            return
+        
+        if total_eventos > 1:
+            self.message_user(
+                request,
+                f'⚠️ Você selecionou classificações de {total_eventos} eventos. '
+                f'Use o filtro "Evento" e selecione APENAS UM evento.',
+                level=messages.ERROR
+            )
+            return
+        
+        # Pegar evento
+        evento = Evento.objects.get(id=list(eventos_ids)[0])
+        
+        # Validar quantidade
+        if queryset.count() == 0:
+            self.message_user(
+                request,
+                '⚠️ Nenhuma classificação encontrada',
+                level=messages.WARNING
+            )
+            return
+        
+        # Aplicar ordenação
+        if ordem == 'classificacao':
+            queryset_ordenado = queryset.order_by('posicao')
+            texto_ordem = 'por classificação'
+        else:  # nome
+            queryset_ordenado = queryset.order_by('inscricao__interessado__nome')
+            texto_ordem = 'por nome'
+        
+        # Estatísticas
+        total = queryset.count()
+        aprovados = queryset.filter(classificado=True).count()
+        lista_espera = queryset.filter(lista_espera=True).count()
+        
+        # Gerar Excel
+        try:
+            if tipo_relatorio == 'staff':
+                response = RelatorioAprovadosService.gerar_excel_staff(
+                    evento,
+                    queryset_ordenado,
+                    ordem=ordem
+                )
+            else:  # mural
+                response = RelatorioAprovadosService.gerar_excel_mural(
+                    evento,
+                    queryset_ordenado,
+                    ordem=ordem
+                )
+            
+            self.message_user(
+                request,
+                f'✅ Excel {tipo_relatorio.upper()} gerado ({texto_ordem})! '
+                f'Evento: {evento.nome} | Total: {total} | '
+                f'Aprovados: {aprovados} | Lista de Espera: {lista_espera}',
+                level=messages.SUCCESS
+            )
+            
+            return response
+        
+        except Exception as e:
+            self.message_user(
+                request,
+                f'❌ Erro ao gerar Excel: {str(e)}',
+                level=messages.ERROR
+            )
+    
+    # ==========================================
+    # ACTIONS: RELATÓRIOS PDF
+    # ==========================================
+    
+    def gerar_relatorio_staff_classificacao(self, request, queryset):
+        """Gera relatório STAFF ordenado por CLASSIFICAÇÃO (posição)"""
+        return self._validar_e_gerar_relatorio(
+            request, queryset, 'staff', 'classificacao'
+        )
+    
+    gerar_relatorio_staff_classificacao.short_description = (
+        '📞 PDF STAFF: Por Classificação (com telefones)'
+    )
+    
+    def gerar_relatorio_staff_nome(self, request, queryset):
+        """Gera relatório STAFF ordenado por NOME alfabético"""
+        return self._validar_e_gerar_relatorio(
+            request, queryset, 'staff', 'nome'
+        )
+    
+    gerar_relatorio_staff_nome.short_description = (
+        '📞 PDF STAFF: Por Nome (com telefones)'
+    )
+    
+    def gerar_relatorio_mural_classificacao(self, request, queryset):
+        """Gera relatório MURAL ordenado por CLASSIFICAÇÃO (posição)"""
+        return self._validar_e_gerar_relatorio(
+            request, queryset, 'mural', 'classificacao'
+        )
+    
+    gerar_relatorio_mural_classificacao.short_description = (
+        '📋 PDF MURAL: Por Classificação (público)'
+    )
+    
+    def gerar_relatorio_mural_nome(self, request, queryset):
+        """Gera relatório MURAL ordenado por NOME alfabético"""
+        return self._validar_e_gerar_relatorio(
+            request, queryset, 'mural', 'nome'
+        )
+    
+    gerar_relatorio_mural_nome.short_description = (
+        '📋 PDF MURAL: Por Nome (público)'
+    )
+    
+    # ==========================================
+    # ACTIONS: EXPORTAÇÃO EXCEL
+    # ==========================================
+    
+    def exportar_excel_staff_classificacao(self, request, queryset):
+        """Exporta Excel STAFF ordenado por CLASSIFICAÇÃO"""
+        return self._validar_e_exportar_excel(
+            request, queryset, 'staff', 'classificacao'
+        )
+    
+    exportar_excel_staff_classificacao.short_description = (
+        '📊 EXCEL STAFF: Por Classificação'
+    )
+    
+    def exportar_excel_staff_nome(self, request, queryset):
+        """Exporta Excel STAFF ordenado por NOME"""
+        return self._validar_e_exportar_excel(
+            request, queryset, 'staff', 'nome'
+        )
+    
+    exportar_excel_staff_nome.short_description = (
+        '📊 EXCEL STAFF: Por Nome'
+    )
+    
+    def exportar_excel_mural_classificacao(self, request, queryset):
+        """Exporta Excel MURAL ordenado por CLASSIFICAÇÃO"""
+        return self._validar_e_exportar_excel(
+            request, queryset, 'mural', 'classificacao'
+        )
+    
+    exportar_excel_mural_classificacao.short_description = (
+        '📊 EXCEL MURAL: Por Classificação'
+    )
+    
+    def exportar_excel_mural_nome(self, request, queryset):
+        """Exporta Excel MURAL ordenado por NOME"""
+        return self._validar_e_exportar_excel(
+            request, queryset, 'mural', 'nome'
+        )
+    
+    exportar_excel_mural_nome.short_description = (
+        '📊 EXCEL MURAL: Por Nome'
+    )
+    
+    # ==========================================
+    # PERMISSÕES
+    # ==========================================
+    
+    def has_add_permission(self, request):
+        """
+        Apenas sistema pode criar classificações (via ClassificadorService)
+        """
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        """
+        Apenas superuser pode editar classificações manualmente
+        """
+        return request.user.is_superuser
+    
+    def has_delete_permission(self, request, obj=None):
+        """
+        Apenas superuser pode deletar classificações
+        """
+        return request.user.is_superuser
 
 
 # ==========================================
-# CRITÉRIOS ATENDIDOS
+# ADMIN: CRITÉRIOS ATENDIDOS
 # ==========================================
 
 @admin.register(InscricaoCriterioAtendido, site=admin_site)
 class InscricaoCriterioAtendidoAdmin(admin.ModelAdmin):
+    """
+    Admin para gerenciar Critérios Atendidos por Inscrições
+    (Criado automaticamente pelo ClassificadorService)
+    """
+    
     list_display = [
         'get_interessado',
         'get_evento',
@@ -407,31 +805,50 @@ class InscricaoCriterioAtendidoAdmin(admin.ModelAdmin):
         'pontos_atribuidos',
         'validado'
     ]
+    
     list_filter = [
         'validado',
         'criterio',
         'inscricao__evento'
     ]
+    
     search_fields = [
         'inscricao__interessado__nome',
         'inscricao__interessado__cpf',
         'criterio__nome'
     ]
+    
     ordering = ['inscricao__evento', 'inscricao__interessado__nome']
-
+    
     fieldsets = (
         ('Inscrição e Critério', {
             'fields': ('inscricao', 'criterio', 'pontos_atribuidos')
         }),
-        ('Validação', {
+        ('Validação Manual', {
             'fields': ('validado', 'observacao_validacao')
         }),
     )
-
+    
+    readonly_fields = ['inscricao', 'criterio', 'pontos_atribuidos']
+    
     def get_interessado(self, obj):
+        """Retorna nome do interessado"""
         return obj.inscricao.interessado.nome
+    
     get_interessado.short_description = 'Interessado'
-
+    
     def get_evento(self, obj):
+        """Retorna nome do evento"""
         return obj.inscricao.evento.nome
+    
     get_evento.short_description = 'Evento'
+    
+    def has_add_permission(self, request):
+        """Apenas sistema pode criar (via ClassificadorService)"""
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        """Apenas superuser pode deletar"""
+        return request.user.is_superuser
+    
+
