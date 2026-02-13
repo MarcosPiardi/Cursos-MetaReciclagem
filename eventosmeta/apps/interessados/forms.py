@@ -1,4 +1,3 @@
-
 """
 Arquivo: forms.py
 Caminho: apps/interessados/forms.py
@@ -14,6 +13,9 @@ Data: 28/01/2026
 
 Alteração: LoginInteressadoForm corrigido para validar erros no formulário
 Data: 30/01/2026
+
+Alteração: Adicionada verificação de is_active no LoginInteressadoForm
+Data: 13/02/2026
 """
 
 from django import forms
@@ -383,6 +385,7 @@ class LoginInteressadoForm(forms.Form):
     """
     Formulário de login com validação de CPF e senha
     CORRIGIDO: Erros são exibidos no formulário, não em messages
+    ADICIONADO: Verificação de is_active em 13/02/2026
     """
     cpf = forms.CharField(
         label='CPF',
@@ -405,6 +408,7 @@ class LoginInteressadoForm(forms.Form):
     def clean(self):
         """
         Valida CPF e senha
+        ADICIONADO: Verificação de is_active em 13/02/2026
         Se houver erro, levanta ValidationError que será exibido em form.non_field_errors
         """
         cleaned_data = super().clean()
@@ -418,6 +422,15 @@ class LoginInteressadoForm(forms.Form):
             try:
                 # Busca o interessado pelo CPF
                 interessado = Interessado.objects.get(cpf=cpf)
+                
+                # ============================================================
+                # VALIDAÇÃO CRÍTICA: VERIFICAR SE ESTÁ ATIVO
+                # Data: 13/02/2026
+                # ============================================================
+                if not interessado.is_active:
+                    raise forms.ValidationError(
+                        '🔒 Sua conta está inativa. Entre em contato com a administração.'
+                    )
                 
                 # Verifica a senha usando check_password
                 if not check_password(senha, interessado.senha):
@@ -510,3 +523,4 @@ class EdicaoInteressadoForm(forms.ModelForm):
     clean_uf_nascimento = CadastroInteressadoForm.clean_uf_nascimento
     clean_rg = CadastroInteressadoForm.clean_rg
 
+    

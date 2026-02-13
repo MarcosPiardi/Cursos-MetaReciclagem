@@ -14,6 +14,9 @@ Data: 30/01/2026
 
 Alteração: Código completo baseado nos models reais - SEM ERROS
 Data: 30/01/2026
+
+Alteração: Adicionada verificação de is_active em todas as views protegidas
+Data: 13/02/2026
 """
 
 from datetime import date
@@ -53,18 +56,34 @@ def login_view(request):
     """
     View de login para interessados - Autentica usando CPF e senha
     CORRIGIDO: Erros são exibidos no formulário, não em messages
+    ADICIONADO: Verificação extra de is_active e atualização de last_login (13/02/2026)
     """
     if request.method == 'POST':
         form = LoginInteressadoForm(request.POST)
         
         if form.is_valid():
-            # Se chegou aqui, o formulário validou CPF e senha
+            # Se chegou aqui, o formulário validou CPF, senha e is_active
             interessado = form.interessado
+            
+            # ============================================================
+            # VALIDAÇÃO EXTRA: VERIFICAR SE ESTÁ ATIVO (CAMADA 3)
+            # Data: 13/02/2026
+            # ============================================================
+            if not interessado.is_active:
+                messages.error(
+                    request,
+                    '🔒 Sua conta está inativa. Entre em contato com a administração.'
+                )
+                return render(request, 'interessados/login.html', {'form': form})
+            
+            # Atualizar last_login
+            interessado.last_login = timezone.now()
+            interessado.save(update_fields=['last_login'])
             
             # Fazer login
             login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
             
-            # Redireciona direto pro dashboard (sem mensagem duplicada)
+            # Redireciona direto pro dashboard
             return redirect('interessados:dashboard')
         
         # Se form.is_valid() retornou False, os erros já estão em form.errors
@@ -77,8 +96,20 @@ def login_view(request):
 
 @login_required(login_url='interessados:login')
 def meus_dados_view(request):
-    """View de edição de dados do interessado logado"""
+    """
+    View de edição de dados do interessado logado
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    """
     interessado = request.user
+    
+    # ============================================================
+    # VALIDAÇÃO: VERIFICAR SE AINDA ESTÁ ATIVO
+    # Data: 13/02/2026
+    # ============================================================
+    if not interessado.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
     
     if request.method == 'POST':
         form = EdicaoInteressadoForm(request.POST, instance=interessado)
@@ -103,8 +134,20 @@ def meus_dados_view(request):
 
 @login_required(login_url='interessados:login')
 def dashboard_view(request):
-    """Dashboard do interessado - Mostra inscrições, estatísticas e eventos disponíveis"""
+    """
+    Dashboard do interessado - Mostra inscrições, estatísticas e eventos disponíveis
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    """
     interessado = request.user
+    
+    # ============================================================
+    # VALIDAÇÃO: VERIFICAR SE AINDA ESTÁ ATIVO
+    # Data: 13/02/2026
+    # ============================================================
+    if not interessado.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
     
     # Inscrições do interessado
     inscricoes = Inscricao.objects.filter(
@@ -118,7 +161,7 @@ def dashboard_view(request):
     
     # Estatísticas
     total_inscricoes = inscricoes.count()
-    total_classificacoes = classificacoes.count()  # ← ADICIONADO
+    total_classificacoes = classificacoes.count()
     inscricoes_aprovadas = inscricoes.filter(status__nome='APROVADO').count()
     inscricoes_pendentes = inscricoes.filter(status__nome='INSCRITO').count()
     
@@ -132,9 +175,9 @@ def dashboard_view(request):
     context = {
         'interessado': interessado,
         'inscricoes': inscricoes,
-        'classificacoes': classificacoes,  # ← ADICIONADO
+        'classificacoes': classificacoes,
         'total_inscricoes': total_inscricoes,
-        'total_classificacoes': total_classificacoes,  # ← ADICIONADO
+        'total_classificacoes': total_classificacoes,
         'inscricoes_aprovadas': inscricoes_aprovadas,
         'inscricoes_pendentes': inscricoes_pendentes,
         'eventos_abertos': eventos_abertos,
@@ -145,7 +188,19 @@ def dashboard_view(request):
 
 @login_required(login_url='interessados:login')
 def detalhes_view(request, inscricao_id):
-    """Detalhes de uma inscrição específica"""
+    """
+    Detalhes de uma inscrição específica
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    """
+    # ============================================================
+    # VALIDAÇÃO: VERIFICAR SE AINDA ESTÁ ATIVO
+    # Data: 13/02/2026
+    # ============================================================
+    if not request.user.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
+    
     inscricao = get_object_or_404(
         Inscricao.objects.select_related('evento', 'status', 'classificacao'),
         pk=inscricao_id,
@@ -170,8 +225,18 @@ def inscrever_evento_view(request, evento_id):
     """
     Inscreve o interessado logado em um evento
     Cria inscrição com status PENDENTE automaticamente
+    ADICIONADO: Verificação de is_active (13/02/2026)
     """
     interessado = request.user
+    
+    # ============================================================
+    # VALIDAÇÃO: VERIFICAR SE AINDA ESTÁ ATIVO
+    # Data: 13/02/2026
+    # ============================================================
+    if not interessado.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
     
     try:
         evento = Evento.objects.get(id=evento_id)
@@ -190,7 +255,6 @@ def inscrever_evento_view(request, evento_id):
         return redirect('interessados:dashboard')
     
     # Verificar se o período de inscrições está aberto
-    # CORRIGIDO: Conversão de datetime para date
     agora = timezone.now()
     
     if not (evento.data_inicio_inscricao <= agora <= evento.data_fim_inscricao):
