@@ -139,3 +139,14 @@ class DashboardMenuAdmin(admin.ModelAdmin):
 admin_site.register([], DashboardMenuAdmin)
 
 
+# ==========================================
+# REGISTRAR GRUPOS (GROUP) NO ADMIN CUSTOMIZADO
+# ==========================================
+
+from django.contrib.auth.models import Group
+from django.contrib.auth.admin import GroupAdmin
+
+# Registrar Group no admin customizado
+admin_site.register(Group, GroupAdmin)
+
+

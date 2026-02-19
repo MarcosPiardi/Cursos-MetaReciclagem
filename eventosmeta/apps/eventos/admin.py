@@ -1,15 +1,14 @@
 """
 Arquivo: admin.py
 Caminho: apps/eventos/admin.py
-Alteração: Registrados todos os models no admin_site customizado (melhor prática)
-Data: 20/01/2026
-"""
-
-"""
-Arquivo: admin.py
-Caminho: apps/eventos/admin.py
 Alteração: Melhorada apresentação da grade de eventos (status colorido, datas formatadas, vagas/inscritos)
 Data: 12/01/2026
+
+Alteração: Registrados todos os models no admin_site customizado (melhor prática)
+Data: 20/01/2026
+
+Alteração: Adicionadas colunas de datas de inscrição no grid do admin
+Data: 19/02/2026
 """
 
 from django import forms
@@ -140,6 +139,8 @@ class EventoAdmin(admin.ModelAdmin):
         'nome',
         'status_colorido',
         'vagas_inscritos',
+        'data_inicio_inscricao_formatada',
+        'data_fim_inscricao_formatada',
         'data_inicio_evento_formatada',
         'data_fim_evento_formatada'
     ]
@@ -164,6 +165,7 @@ class EventoAdmin(admin.ModelAdmin):
     # ==========================================
     # MÉTODOS PERSONALIZADOS PARA LIST_DISPLAY
     # Adicionados em 12/12/2025
+    # Atualizados em 19/02/2026 - Adicionadas datas de inscrição
     # ==========================================
 
     def status_colorido(self, obj):
@@ -211,6 +213,28 @@ class EventoAdmin(admin.ModelAdmin):
         )
     vagas_inscritos.short_description = 'Inscritos / Vagas'
 
+    def data_inicio_inscricao_formatada(self, obj):
+        """Exibe data de início da inscrição no formato dd/mm/yyyy"""
+        if obj.data_inicio_inscricao:
+            return format_html(
+                '<div style="text-align: center;">{}</div>',
+                obj.data_inicio_inscricao.strftime('%d/%m/%Y')
+            )
+        return '—'
+    data_inicio_inscricao_formatada.short_description = 'Início Inscrição'
+    data_inicio_inscricao_formatada.admin_order_field = 'data_inicio_inscricao'
+
+    def data_fim_inscricao_formatada(self, obj):
+        """Exibe data de fim da inscrição no formato dd/mm/yyyy"""
+        if obj.data_fim_inscricao:
+            return format_html(
+                '<div style="text-align: center;">{}</div>',
+                obj.data_fim_inscricao.strftime('%d/%m/%Y')
+            )
+        return '—'
+    data_fim_inscricao_formatada.short_description = 'Fim Inscrição'
+    data_fim_inscricao_formatada.admin_order_field = 'data_fim_inscricao'
+
     def data_inicio_evento_formatada(self, obj):
         """Exibe data de início no formato dd/mm/yyyy"""
         if obj.data_inicio_evento:
@@ -219,7 +243,7 @@ class EventoAdmin(admin.ModelAdmin):
                 obj.data_inicio_evento.strftime('%d/%m/%Y')
             )
         return '—'
-    data_inicio_evento_formatada.short_description = 'Data Início'
+    data_inicio_evento_formatada.short_description = 'Início Evento'
     data_inicio_evento_formatada.admin_order_field = 'data_inicio_evento'
 
     def data_fim_evento_formatada(self, obj):
@@ -230,7 +254,7 @@ class EventoAdmin(admin.ModelAdmin):
                 obj.data_fim_evento.strftime('%d/%m/%Y')
             )
         return '—'
-    data_fim_evento_formatada.short_description = 'Data Fim'
+    data_fim_evento_formatada.short_description = 'Fim Evento'
     data_fim_evento_formatada.admin_order_field = 'data_fim_evento'
 
     # ==========================================

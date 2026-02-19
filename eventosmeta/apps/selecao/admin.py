@@ -372,7 +372,7 @@ class ClassificacaoAdmin(admin.ModelAdmin):
             return
         
         # POST: Processar matrícula
-        if 'apply' in request.POST:
+        if 'confirmar_matricula' in request.POST:
             form = MatricularAlunosForm(request.POST, evento=evento)
             
             if form.is_valid():
@@ -389,21 +389,23 @@ class ClassificacaoAdmin(admin.ModelAdmin):
                 
                 # Buscar status necessários
                 try:
-                    status_matricula = StatusMatricula.objects.get(nome='ATIVA')
+                    status_matricula = StatusMatricula.objects.get(nome__iexact='ATIVA')
                 except StatusMatricula.DoesNotExist:
                     self.message_user(
                         request,
-                        '❌ Status "ATIVA" não encontrado em Status de Matrículas.',
+                        '❌ Status "ATIVA" não encontrado em Status de Matrículas.'
+                        'Verifique se existe um status com este nome (Ativa/ATIVA/ativa).',
                         level=messages.ERROR
                     )
                     return redirect(request.get_full_path())
                 
                 try:
-                    status_inscricao = StatusInscricao.objects.get(nome='CONFIRMADA')
+                    status_inscricao = StatusInscricao.objects.get(nome__iexact='CONFIRMADA')
                 except StatusInscricao.DoesNotExist:
                     self.message_user(
                         request,
-                        '❌ Status "CONFIRMADA" não encontrado em Status de Inscrições.',
+                        '❌ Status "CONFIRMADA" não encontrado em Status de Inscrições.'
+                        'Verifique se existe um status com este nome (Confirmada/CONFIRMADA/confirmada).',
                         level=messages.ERROR
                     )
                     return redirect(request.get_full_path())

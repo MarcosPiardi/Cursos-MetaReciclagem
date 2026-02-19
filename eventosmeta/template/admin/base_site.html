@@ -1,10 +1,80 @@
+<!--
+Arquivo: base_site.html
+Caminho: template/admin/base_site.html
+Alteração: Adicionado banner de notificações de eventos
+Data: 19/02/2026
+-->
+
 {% extends "admin/base.html" %}
+
 {% block extrahead %}
 {{ block.super }}
 {% load static %}
 <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
-{{ block.super }}
+
 <style>
+    /* ==========================================
+       BANNER DE NOTIFICAÇÕES DE EVENTOS
+       ========================================== */
+    .banner-eventos {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        color: #000;
+        padding: 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 1000;
+        margin: 0;
+    }
+    
+    .banner-item {
+        padding: 15px 60px 15px 20px;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        position: relative;
+        font-size: 14px;
+    }
+    
+    .banner-item:last-child {
+        border-bottom: none;
+    }
+    
+    .banner-item strong {
+        font-weight: 700;
+        font-size: 16px;
+        display: block;
+        margin-bottom: 8px;
+    }
+    
+    .banner-item .evento-info {
+        margin: 5px 0;
+        line-height: 1.6;
+    }
+    
+    .banner-item .btn-fechar {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0,0,0,0.2);
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        color: #000;
+        font-size: 20px;
+        line-height: 1;
+        transition: background 0.2s;
+    }
+    
+    .banner-item .btn-fechar:hover {
+        background: rgba(0,0,0,0.35);
+    }
+    
+    .banner-icon {
+        font-weight: bold;
+        margin-right: 5px;
+    }
+
     /* ==========================================
        TOGGLE DO MENU LATERAL ESQUERDO (NATIVO)
        ========================================== */
@@ -111,22 +181,22 @@
     
     /* Linhas alternadas (CONTRASTE MUITO MAIOR) */
     #result_list tbody tr:nth-child(odd) {
-        background: #f0f0f0 !important;  /* Cinza mais escuro */
+        background: #f0f0f0 !important;
     }
     
     #result_list tbody tr:nth-child(even) {
-        background: #ffffff !important;  /* Branco puro */
+        background: #ffffff !important;
     }
     
     /* Hover nas linhas */
     #result_list tbody tr:hover {
-        background: #d4edff !important;  /* Azul mais forte */
+        background: #d4edff !important;
     }
     
     /* Bordas das células */
     #result_list td,
     #result_list th {
-        border-bottom: 1px solid #cccccc !important;  /* Borda mais escura */
+        border-bottom: 1px solid #cccccc !important;
         padding: 10px !important;
     }
     
@@ -134,18 +204,15 @@
        CORRIGIR BARRA DE ROLAGEM E QUEBRA DE LINHA
        ========================================== */
     
-    /* Garantir que a barra de rolagem apareça quando necessário */
     .results {
         overflow-x: auto !important;
         overflow-y: visible !important;
     }
     
-    /* Evitar quebra de linha nas células */
     #result_list td {
         white-space: nowrap !important;
     }
     
-    /* Mostrar barra de rolagem sempre visível */
     .results::-webkit-scrollbar {
         height: 12px;
     }
@@ -172,13 +239,11 @@ document.addEventListener('DOMContentLoaded', function() {
     var filterColumn = document.getElementById('changelist-filter');
     
     if (filterColumn) {
-        // Cria wrapper para o toggle
         var wrapper = document.createElement('div');
         wrapper.id = 'changelist-filter-wrapper';
         filterColumn.parentNode.insertBefore(wrapper, filterColumn);
         wrapper.appendChild(filterColumn);
         
-        // Cria o botão toggle
         var toggleBtn = document.createElement('div');
         toggleBtn.id = 'changelist-filter-toggle';
         toggleBtn.title = 'Mostrar/Ocultar Filtros';
@@ -190,21 +255,88 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleBtn.appendChild(toggleIcon);
         wrapper.appendChild(toggleBtn);
         
-        // Verifica estado salvo dos filtros
         var filtersHidden = localStorage.getItem('adminFiltersHidden') === 'true';
         if (filtersHidden) {
             document.body.classList.add('filters-hidden');
         }
         
-        // Toggle dos filtros ao clicar
         toggleBtn.addEventListener('click', function() {
             document.body.classList.toggle('filters-hidden');
             var isHidden = document.body.classList.contains('filters-hidden');
-            
-            // Salva estado
             localStorage.setItem('adminFiltersHidden', isHidden);
         });
     }
+    
+    // ==========================================
+    // FECHAR BANNER DE EVENTOS
+    // ==========================================
+    var botoesFechar = document.querySelectorAll('.banner-item .btn-fechar');
+    botoesFechar.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var bannerItem = this.closest('.banner-item');
+            bannerItem.style.transition = 'all 0.3s ease';
+            bannerItem.style.opacity = '0';
+            bannerItem.style.maxHeight = bannerItem.offsetHeight + 'px';
+            
+            setTimeout(function() {
+                bannerItem.style.maxHeight = '0';
+                bannerItem.style.padding = '0';
+                bannerItem.style.margin = '0';
+            }, 100);
+            
+            setTimeout(function() {
+                bannerItem.remove();
+                
+                var banner = document.querySelector('.banner-eventos');
+                if (banner && banner.querySelectorAll('.banner-item').length === 0) {
+                    banner.remove();
+                }
+            }, 400);
+        });
+    });
 });
 </script>
 {% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">MetaReciclagem Admin</a></h1>
+{% endblock %}
+
+{% block messages %}
+<!-- ==========================================
+     BANNER DE NOTIFICAÇÕES (ANTES DAS MENSAGENS)
+     ========================================== -->
+{% if user.is_staff and eventos_notificacao %}
+<div class="banner-eventos">
+    {% for evento in eventos_notificacao %}
+    <div class="banner-item">
+        <strong>⚠️ {{ evento.nome }}</strong>
+        <div class="evento-info">
+            {% if evento.tipo_alerta == 'inscricao' %}
+                <span class="banner-icon">📝</span>
+                Período de inscrições ({{ evento.data_inicio_inscricao|date:"d/m/Y" }} a {{ evento.data_fim_inscricao|date:"d/m/Y" }}) - Status atual: <strong>{{ evento.status.nome }}</strong> (deveria ser "Inscrições Abertas")
+            
+            {% elif evento.tipo_alerta == 'pos_inscricao' %}
+                <span class="banner-icon">⏳</span>
+                Entre fim das inscrições ({{ evento.data_fim_inscricao|date:"d/m/Y" }}) e início do evento ({{ evento.data_inicio_evento|date:"d/m/Y" }}) - Status atual: <strong>{{ evento.status.nome }}</strong> (deveria ser "Inscrições Encerradas", "Em Classificação", "Resultado Divulgado" ou "Cancelado")
+            
+            {% elif evento.tipo_alerta == 'evento' %}
+                <span class="banner-icon">🎯</span>
+                Período do evento ({{ evento.data_inicio_evento|date:"d/m/Y" }} a {{ evento.data_fim_evento|date:"d/m/Y" }}) - Status atual: <strong>{{ evento.status.nome }}</strong> (deveria ser "Em Andamento")
+            
+            {% elif evento.tipo_alerta == 'pos_evento' %}
+                <span class="banner-icon">✅</span>
+                Evento finalizado (terminou em {{ evento.data_fim_evento|date:"d/m/Y" }}) - Status atual: <strong>{{ evento.status.nome }}</strong> (deveria ser "Finalizado" ou "Cancelado")
+            {% endif %}
+        </div>
+        <button class="btn-fechar" title="Fechar">×</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{{ block.super }}
+{% endblock %}
+
+
+
