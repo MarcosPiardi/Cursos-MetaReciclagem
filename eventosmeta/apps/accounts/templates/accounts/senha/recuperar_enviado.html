@@ -1,0 +1,55 @@
+<!--
+Arquivo: recuperar_enviado.html
+Caminho: template/accounts/senha/recuperar_enviado.html
+Alteração: Confirmação de envio de e-mail para Staff
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}E-mail Enviado — Staff{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh; display: flex;
+        justify-content: center; align-items: center;
+    }
+    .container {
+        background: white; padding: 40px; border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 100%; max-width: 420px; text-align: center;
+    }
+    .icon { font-size: 60px; margin-bottom: 15px; }
+    h1 { color: #333; font-size: 22px; margin-bottom: 10px; }
+    p { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
+    .alert {
+        background: #fff3cd; border-left: 4px solid #ffc107;
+        padding: 12px; border-radius: 4px; font-size: 13px;
+        color: #856404; margin: 20px 0; text-align: left;
+    }
+    .btn {
+        display: inline-block; padding: 12px 25px; margin-top: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white; border-radius: 5px; text-decoration: none;
+        font-weight: 600; font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="icon">📧</div>
+    <h1>E-mail Enviado!</h1>
+    <p>Se o e-mail informado estiver cadastrado no sistema, você receberá as instruções para redefinir sua senha em breve.</p>
+
+    <div class="alert">
+        ⚠️ <strong>Não recebeu?</strong> Verifique sua pasta de spam ou lixo eletrônico.
+        Em desenvolvimento, o e-mail aparece no <strong>terminal</strong> do servidor.
+    </div>
+
+    <a href="/staff/login/" class="btn">← Voltar para o Login</a>
+</div>
+{% endblock %}
+

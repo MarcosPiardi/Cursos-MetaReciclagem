@@ -3,8 +3,9 @@ Arquivo: login_staff.html
 Caminho: apps/accounts/templates/accounts/login_staff.html
 Alteração: Template refatorado para estender base_auth.html e exibir favicon
 Data: 29/01/2026
+Alteração: Adicionado link "Esqueceu a senha?"
+Data: 20/02/2026
 -->
-
 {% extends 'base_auth.html' %}
 {% load static %}
 
@@ -20,7 +21,6 @@ Data: 29/01/2026
         justify-content: center;
         align-items: center;
     }
-    
     .login-container {
         background: white;
         padding: 40px;
@@ -29,34 +29,28 @@ Data: 29/01/2026
         width: 100%;
         max-width: 400px;
     }
-    
     .login-header {
         text-align: center;
         margin-bottom: 30px;
     }
-    
     .login-header h1 {
         color: #333;
         font-size: 24px;
         margin-bottom: 10px;
     }
-    
     .login-header p {
         color: #666;
         font-size: 14px;
     }
-    
     .form-group {
         margin-bottom: 20px;
     }
-    
     .form-group label {
         display: block;
         margin-bottom: 5px;
         color: #333;
         font-weight: 500;
     }
-    
     .form-control {
         width: 100%;
         padding: 12px;
@@ -64,13 +58,12 @@ Data: 29/01/2026
         border-radius: 5px;
         font-size: 14px;
         transition: border-color 0.3s;
+        box-sizing: border-box;
     }
-    
     .form-control:focus {
         outline: none;
         border-color: #667eea;
     }
-    
     .btn-login {
         width: 100%;
         padding: 12px;
@@ -83,22 +76,31 @@ Data: 29/01/2026
         cursor: pointer;
         transition: transform 0.2s;
     }
-    
     .btn-login:hover {
         transform: translateY(-2px);
     }
-    
+    .forgot-link {
+        text-align: right;
+        margin-top: -10px;
+        margin-bottom: 15px;
+    }
+    .forgot-link a {
+        color: #667eea;
+        font-size: 13px;
+        text-decoration: none;
+    }
+    .forgot-link a:hover {
+        text-decoration: underline;
+    }
     .back-link {
         text-align: center;
         margin-top: 20px;
     }
-    
     .back-link a {
         color: #667eea;
         text-decoration: none;
         font-size: 14px;
     }
-    
     .back-link a:hover {
         text-decoration: underline;
     }
@@ -111,26 +113,32 @@ Data: 29/01/2026
         <h1>🔐 Área Administrativa</h1>
         <p>Eventos MetaReciclagem</p>
     </div>
-    
+
     <form method="post">
         {% csrf_token %}
-        
+
         <div class="form-group">
             {{ form.username.label_tag }}
             {{ form.username }}
         </div>
-        
+
         <div class="form-group">
             {{ form.password.label_tag }}
             {{ form.password }}
         </div>
-        
+
+        <!-- NOVO: Link esqueceu a senha -->
+        <div class="forgot-link">
+            <a href="{% url 'staff_senha_recuperar' %}">Esqueceu sua senha?</a>
+        </div>
+
         <button type="submit" class="btn-login">Entrar</button>
     </form>
-    
+
     <div class="back-link">
         <a href="{% url 'portal:index' %}">← Voltar para página inicial</a>
     </div>
 </div>
 {% endblock %}
+
 

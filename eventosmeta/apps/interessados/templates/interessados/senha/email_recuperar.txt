@@ -1,0 +1,19 @@
+Olá, {{ interessado.nome }}!
+
+Recebemos uma solicitação para redefinir a senha da sua conta no sistema MetaReciclagem.
+
+Para criar uma nova senha, acesse o link abaixo:
+
+{{ link }}
+
+Este link é válido por {{ validade }}.
+
+Se você não solicitou a recuperação de senha, ignore este e-mail.
+Sua senha permanecerá a mesma.
+
+---
+Equipe MetaReciclagem
+meta.recicla@gmail.com
+(15) 3417-3825
+Segunda a Sexta, das 8h às 16h
+

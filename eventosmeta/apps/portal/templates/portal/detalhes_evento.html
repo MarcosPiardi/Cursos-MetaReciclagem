@@ -3,6 +3,9 @@ Arquivo: detalhes_evento.html
 Caminho: apps/portal/templates/portal/detalhes_evento.html
 Alteração: Template para exibir detalhes completos do evento/curso
 Data: 29/01/2026
+Alteração: Status do evento buscado direto da tabela eventos_status (ForeignKey)
+           Removido uso de inscricoes_abertas() (método calculado)
+Data: 20/02/2026
 -->
 
 {% extends 'base.html' %}
@@ -26,21 +29,41 @@ Data: 29/01/2026
 <div class="row mb-4">
     <div class="col-12">
         <div class="card border-primary">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h2 class="mb-0">
                     <i class="bi bi-calendar-event"></i> {{ evento.nome }}
                 </h2>
+                <!-- BADGE DE STATUS DIRETO DO BANCO -->
+                {% if evento.status %}
+                <span class="badge fs-6"
+                      style="background-color: {{ evento.status.cor }};
+                             color: white;
+                             padding: 8px 14px;
+                             border-radius: 20px;">
+                    <i class="bi bi-circle-fill me-1" style="font-size: 10px;"></i>
+                    {{ evento.status.nome }}
+                </span>
+                {% endif %}
             </div>
             <div class="card-body">
                 <p class="lead">{{ evento.descricao }}</p>
-                
-                {% if inscricoes_abertas %}
-                <div class="alert alert-success">
-                    <i class="bi bi-check-circle"></i> <strong>Inscrições Abertas!</strong>
+
+                <!-- STATUS COM COR DO BANCO -->
+                {% if evento.status %}
+                <div class="alert mb-0 d-flex align-items-center gap-2"
+                     style="background-color: {{ evento.status.cor }}22;
+                            border-left: 4px solid {{ evento.status.cor }};
+                            color: #333;">
+                    <i class="bi bi-circle-fill"
+                       style="color: {{ evento.status.cor }}; font-size: 12px;"></i>
+                    <span>
+                        <strong>Status do Evento:</strong> {{ evento.status.nome }}
+                    </span>
                 </div>
                 {% else %}
-                <div class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle"></i> <strong>Inscrições Encerradas</strong>
+                <div class="alert alert-secondary mb-0">
+                    <i class="bi bi-question-circle"></i>
+                    <strong>Status não definido</strong>
                 </div>
                 {% endif %}
             </div>
@@ -53,54 +76,79 @@ Data: 29/01/2026
     <div class="col-md-6 mb-3">
         <div class="card h-100">
             <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="bi bi-calendar-range"></i> Datas Importantes</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-calendar-range"></i> Datas Importantes
+                </h5>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled">
                     <li class="mb-3">
-                        <strong><i class="bi bi-calendar-check text-success"></i> Início das Inscrições:</strong><br>
+                        <strong>
+                            <i class="bi bi-calendar-check text-success"></i>
+                            Início das Inscrições:
+                        </strong><br>
                         {{ evento.data_inicio_inscricao|date:"d/m/Y" }}
                     </li>
                     <li class="mb-3">
-                        <strong><i class="bi bi-calendar-x text-danger"></i> Fim das Inscrições:</strong><br>
+                        <strong>
+                            <i class="bi bi-calendar-x text-danger"></i>
+                            Fim das Inscrições:
+                        </strong><br>
                         {{ evento.data_fim_inscricao|date:"d/m/Y" }}
                     </li>
                     <li class="mb-3">
-                        <strong><i class="bi bi-calendar-event text-primary"></i> Início do Evento:</strong><br>
+                        <strong>
+                            <i class="bi bi-calendar-event text-primary"></i>
+                            Início do Evento:
+                        </strong><br>
                         {{ evento.data_inicio_evento|date:"d/m/Y" }}
                     </li>
                     <li class="mb-3">
-                        <strong><i class="bi bi-calendar-event-fill text-primary"></i> Término do Evento:</strong><br>
+                        <strong>
+                            <i class="bi bi-calendar-event-fill text-primary"></i>
+                            Término do Evento:
+                        </strong><br>
                         {{ evento.data_fim_evento|date:"d/m/Y" }}
                     </li>
                 </ul>
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-6 mb-3">
         <div class="card h-100">
             <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="bi bi-people"></i> Vagas</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-people"></i> Vagas
+                </h5>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled">
                     <li class="mb-3">
-                        <strong><i class="bi bi-clipboard-check text-success"></i> Total de Vagas:</strong><br>
+                        <strong>
+                            <i class="bi bi-clipboard-check text-success"></i>
+                            Total de Vagas:
+                        </strong><br>
                         <span class="fs-4 text-primary">{{ evento.total_vagas }}</span>
                     </li>
                     <li class="mb-3">
-                        <strong><i class="bi bi-person-check text-info"></i> Inscrições Confirmadas:</strong><br>
+                        <strong>
+                            <i class="bi bi-person-check text-info"></i>
+                            Inscrições Confirmadas:
+                        </strong><br>
                         <span class="fs-4 text-info">{{ inscricoes_confirmadas }}</span>
                     </li>
                     <li class="mb-3">
-                        <strong><i class="bi bi-person-plus text-success"></i> Vagas Disponíveis:</strong><br>
+                        <strong>
+                            <i class="bi bi-person-plus text-success"></i>
+                            Vagas Disponíveis:
+                        </strong><br>
                         <span class="fs-4 {% if vagas_disponiveis > 0 %}text-success{% else %}text-danger{% endif %}">
                             {{ vagas_disponiveis }}
                         </span>
                     </li>
                 </ul>
-                
+
                 {% if vagas_disponiveis <= 0 %}
                 <div class="alert alert-warning mb-0">
                     <i class="bi bi-exclamation-triangle"></i> Vagas esgotadas!
@@ -117,26 +165,34 @@ Data: 29/01/2026
     <div class="col-12">
         <div class="card">
             <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações Adicionais</h5>
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle"></i> Informações Adicionais
+                </h5>
             </div>
             <div class="card-body">
                 {% if evento.carga_horaria %}
                 <div class="mb-3">
-                    <strong><i class="bi bi-clock text-primary"></i> Carga Horária:</strong>
+                    <strong>
+                        <i class="bi bi-clock text-primary"></i> Carga Horária:
+                    </strong>
                     {{ evento.carga_horaria }} horas
                 </div>
                 {% endif %}
-                
+
                 {% if evento.local %}
                 <div class="mb-3">
-                    <strong><i class="bi bi-geo-alt text-danger"></i> Local:</strong>
+                    <strong>
+                        <i class="bi bi-geo-alt text-danger"></i> Local:
+                    </strong>
                     {{ evento.local }}
                 </div>
                 {% endif %}
-                
+
                 {% if evento.observacoes %}
                 <div class="mb-3">
-                    <strong><i class="bi bi-card-text text-info"></i> Observações:</strong><br>
+                    <strong>
+                        <i class="bi bi-card-text text-info"></i> Observações:
+                    </strong><br>
                     {{ evento.observacoes|linebreaks }}
                 </div>
                 {% endif %}
@@ -149,14 +205,17 @@ Data: 29/01/2026
 <!-- Ações -->
 <div class="row mb-4">
     <div class="col-md-6 mb-2">
-        <a href="{% url 'portal:resultado_evento' evento.id %}" class="btn btn-success btn-lg w-100">
+        <a href="{% url 'portal:resultado_evento' evento.id %}"
+           class="btn btn-success btn-lg w-100">
             <i class="bi bi-trophy"></i> Ver Classificação
         </a>
     </div>
     <div class="col-md-6 mb-2">
-        <a href="{% url 'portal:index' %}" class="btn btn-secondary btn-lg w-100">
+        <a href="{% url 'portal:index' %}"
+           class="btn btn-secondary btn-lg w-100">
             <i class="bi bi-arrow-left"></i> Voltar para Início
         </a>
     </div>
 </div>
 {% endblock %}
+

@@ -1,0 +1,43 @@
+<!--
+Arquivo: redefinir_concluido.html
+Caminho: apps/interessados/templates/interessados/senha/redefinir_concluido.html
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Senha Redefinida — Interessado{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh; display: flex;
+        justify-content: center; align-items: center;
+    }
+    .container {
+        background: white; padding: 40px; border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 100%; max-width: 420px; text-align: center;
+    }
+    .icon { font-size: 60px; margin-bottom: 15px; }
+    h1 { color: #28a745; font-size: 22px; margin-bottom: 10px; }
+    p { color: #666; font-size: 14px; margin-bottom: 20px; }
+    .btn {
+        display: inline-block; padding: 12px 25px;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white; border-radius: 5px; text-decoration: none;
+        font-weight: 600; font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="icon">✅</div>
+    <h1>Senha Redefinida!</h1>
+    <p>Sua senha foi alterada com sucesso. Faça login com a nova senha.</p>
+    <a href="{% url 'interessados:login' %}" class="btn">🔑 Ir para o Login</a>
+</div>
+{% endblock %}
+

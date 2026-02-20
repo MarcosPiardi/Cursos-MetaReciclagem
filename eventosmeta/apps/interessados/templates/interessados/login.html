@@ -1,29 +1,19 @@
 <!--
-Arquivo: login_interessado.html
-Caminho: apps/interessados/templates/interessados/login_interessado.html
-Alteração: Corrigido mensagens de erro + Máscara CPF + Toggle senha
-Data: 30/01/2026
--->
+Arquivo: login.html    login_interessado.html
+Caminho: apps/interessados/templates/interessados/login.html
+         Template de login com CSS embutido (NÃO precisa de CSS externo)
 
-<!--
-Arquivo: login_interessado.html
-Caminho: apps/interessados/templates/interessados/login_interessado.html
-Alteração: Template refatorado para estender base.html e exibir favicon
-Data: 29/01/2026
--->
-
-<!--
-ARQUIVO: apps/interessados/templates/interessados/login_interessado.html
-AÇÃO: CRIAR arquivo apps/interessados/templates/interessados/login_interessado.html
-MUDANÇA: Template de login com CSS embutido (NÃO precisa de CSS externo)
-OBSERVAÇÃO: Crie a pasta apps/interessados/templates/interessados/ se não existir
--->
-
-<!--
-Arquivo: login_interessado.html
-Caminho: apps/interessados/templates/interessados/login_interessado.html
 Alteração: Login com CPF + SENHA (não data de nascimento)
 Data: 19/01/2026
+
+Alteração: Template refatorado para estender base.html e exibir favicon
+Data: 29/01/2026
+
+Alteração: Corrigido mensagens de erro + Máscara CPF + Toggle senha
+Data: 30/01/2026
+
+Alteração: Adicionado link "Esqueceu a senha?"
+Data: 20/02/2026
 -->
 
 {% extends 'base_auth.html' %}
@@ -41,7 +31,6 @@ Data: 19/01/2026
         justify-content: center;
         align-items: center;
     }
-    
     .login-container {
         background: white;
         padding: 40px;
@@ -51,28 +40,23 @@ Data: 19/01/2026
         max-width: 400px;
         margin: 50px auto;
     }
-    
     .login-header {
         text-align: center;
         margin-bottom: 30px;
     }
-    
     .login-header h1 {
         color: #11998e;
         font-size: 24px;
         margin-bottom: 10px;
     }
-    
     .login-header p {
         color: #666;
         font-size: 14px;
     }
-    
     .form-group {
         margin-bottom: 20px;
         width: 100%;
     }
-    
     .form-group label {
         display: block;
         margin-bottom: 5px;
@@ -80,33 +64,27 @@ Data: 19/01/2026
         font-weight: 500;
         width: 100%;
     }
-    
     .input-wrapper {
         width: 100%;
         position: relative;
     }
-    
     .form-control {
         width: 100%;
         padding: 12px;
-        padding-right: 45px; /* Espaço para o ícone do olho */
+        padding-right: 45px;
         border: 1px solid #ddd;
         border-radius: 5px;
         font-size: 14px;
         transition: border-color 0.3s;
         box-sizing: border-box;
     }
-    
     .form-control:focus {
         outline: none;
         border-color: #11998e;
     }
-    
     .form-control.is-invalid {
         border-color: #dc3545 !important;
     }
-    
-    /* Toggle de senha */
     .password-toggle-icon {
         position: absolute;
         right: 12px;
@@ -118,25 +96,15 @@ Data: 19/01/2026
         user-select: none;
         z-index: 10;
     }
-    
     .password-toggle-icon:hover {
         color: #11998e;
     }
-    
-    /* Mensagens de erro - FORÇAR ABAIXO DO CAMPO */
     .error-message {
         display: block !important;
         color: #dc3545 !important;
         font-size: 13px !important;
         margin-top: 5px !important;
-        margin-bottom: 0 !important;
-        width: 100% !important;
-        text-align: left !important;
-        clear: both !important;
-        float: none !important;
-        position: relative !important;
     }
-    
     .btn-login {
         width: 100%;
         padding: 12px;
@@ -150,59 +118,61 @@ Data: 19/01/2026
         transition: transform 0.2s;
         margin-top: 10px;
     }
-    
     .btn-login:hover {
         transform: translateY(-2px);
     }
-    
+    .forgot-link {
+        text-align: right;
+        margin-top: -10px;
+        margin-bottom: 5px;
+    }
+    .forgot-link a {
+        color: #11998e;
+        font-size: 13px;
+        text-decoration: none;
+    }
+    .forgot-link a:hover {
+        text-decoration: underline;
+    }
     .divider {
         text-align: center;
         margin: 20px 0;
         color: #999;
         font-size: 14px;
     }
-    
     .register-link {
         text-align: center;
         margin-top: 15px;
     }
-    
     .register-link p {
         margin-bottom: 5px;
     }
-    
     .register-link a {
         color: #11998e;
         text-decoration: none;
         font-weight: 500;
     }
-    
     .register-link a:hover {
         text-decoration: underline;
     }
-    
     .back-link {
         text-align: center;
         margin-top: 20px;
     }
-    
     .back-link a {
         color: #11998e;
         text-decoration: none;
         font-size: 14px;
     }
-    
     .back-link a:hover {
         text-decoration: underline;
     }
-    
     .alert {
         padding: 12px;
         border-radius: 5px;
         margin-bottom: 15px;
         width: 100%;
     }
-    
     .alert-danger {
         background: #f8d7da;
         color: #721c24;
@@ -217,24 +187,24 @@ Data: 19/01/2026
         <h1>🔑 Área do Interessado</h1>
         <p>Eventos MetaReciclagem</p>
     </div>
-    
+
     {% if form.non_field_errors %}
         <div class="alert alert-danger">
             {{ form.non_field_errors.0 }}
         </div>
     {% endif %}
-    
+
     <form method="post" action="{% url 'interessados:login' %}" id="formLogin">
         {% csrf_token %}
-        
+
         <div class="form-group">
             <label for="cpf">CPF</label>
             <div class="input-wrapper">
-                <input 
-                    type="text" 
-                    class="form-control {% if form.cpf.errors %}is-invalid{% endif %}" 
-                    id="cpf" 
-                    name="cpf" 
+                <input
+                    type="text"
+                    class="form-control {% if form.cpf.errors %}is-invalid{% endif %}"
+                    id="cpf"
+                    name="cpf"
                     placeholder="000.000.000-00"
                     value="{{ form.cpf.value|default:'' }}"
                     required
@@ -245,15 +215,15 @@ Data: 19/01/2026
                 <span class="error-message">{{ form.cpf.errors.0 }}</span>
             {% endif %}
         </div>
-        
+
         <div class="form-group">
             <label for="senha">Senha</label>
             <div class="input-wrapper">
-                <input 
-                    type="password" 
-                    class="form-control {% if form.senha.errors %}is-invalid{% endif %}" 
-                    id="senha" 
-                    name="senha" 
+                <input
+                    type="password"
+                    class="form-control {% if form.senha.errors %}is-invalid{% endif %}"
+                    id="senha"
+                    name="senha"
                     placeholder="Digite sua senha"
                     required
                 >
@@ -263,17 +233,22 @@ Data: 19/01/2026
                 <span class="error-message">{{ form.senha.errors.0 }}</span>
             {% endif %}
         </div>
-        
+
+        <!-- NOVO: Link esqueceu a senha -->
+        <div class="forgot-link">
+            <a href="{% url 'interessados:senha_recuperar' %}">Esqueceu sua senha?</a>
+        </div>
+
         <button type="submit" class="btn-login">Entrar</button>
     </form>
-    
+
     <div class="divider">ou</div>
-    
+
     <div class="register-link">
         <p>Ainda não tem cadastro?</p>
         <a href="{% url 'interessados:cadastro' %}">Criar conta agora</a>
     </div>
-    
+
     <div class="back-link">
         <a href="{% url 'portal:index' %}">← Voltar para página inicial</a>
     </div>
@@ -282,24 +257,14 @@ Data: 19/01/2026
 
 {% block extra_js %}
 <script src="https://unpkg.com/imask"></script>
-
 <script>
-    // ==========================================
-    // MÁSCARA DE CPF
-    // ==========================================
     const cpfInput = document.getElementById('cpf');
     if (cpfInput) {
-        IMask(cpfInput, {
-            mask: '000.000.000-00'
-        });
+        IMask(cpfInput, { mask: '000.000.000-00' });
     }
-    
-    // ==========================================
-    // TOGGLE DE SENHA (MOSTRAR/OCULTAR)
-    // ==========================================
+
     const toggleSenha = document.getElementById('toggleSenha');
     const senhaInput = document.getElementById('senha');
-    
     if (toggleSenha && senhaInput) {
         toggleSenha.addEventListener('click', function() {
             if (senhaInput.type === 'password') {
@@ -313,11 +278,8 @@ Data: 19/01/2026
             }
         });
     }
-    
-    // ==========================================
-    // REMOVER MÁSCARA ANTES DO ENVIO
-    // ==========================================
-    document.getElementById('formLogin').addEventListener('submit', function(e) {
+
+    document.getElementById('formLogin').addEventListener('submit', function() {
         const cpfField = document.getElementById('cpf');
         if (cpfField && cpfField.value) {
             cpfField.value = cpfField.value.replace(/\D/g, '');
@@ -325,3 +287,4 @@ Data: 19/01/2026
     });
 </script>
 {% endblock %}
+

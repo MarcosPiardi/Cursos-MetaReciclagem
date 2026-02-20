@@ -1,53 +1,49 @@
 """
 Arquivo: apps/interessados/admin.py
-Caminho: apps/interessados/admin.py
-Alteração: Registrados todos os models no admin_site customizado (melhor prática)
-Data: 20/01/2026
-"""
-
-"""
-Arquivo: apps/interessados/admin.py
-Caminho: apps/interessados/admin.py
 Alteração: Corrigido format_html dos ícones e adicionado white-space nowrap nos telefones
 Data: 11/12/2025
+Alteração: Registrados todos os models no admin_site customizado (melhor prática)
+Data: 20/01/2026
+Alteração: Adicionado PasswordResetTokenAdmin com actions de limpeza
+Data: 20/02/2026
 """
 
 from django.contrib import admin
 from django.contrib import messages
 from django.utils.html import format_html
+from django.utils import timezone
 from django.http import HttpResponse
 from datetime import date
-from decimal import Decimal
 import csv
 
-# ==========================================
-# IMPORT DO ADMIN CUSTOMIZADO
-# Adicionado em 20/01/2026
-# ==========================================
 from apps.accounts.admin import admin_site
+from .models import Interessado, Sexo, Fototipo, PasswordResetToken
 
-from .models import Interessado, Sexo, Fototipo
 
+# ==========================================
+# ADMIN: SEXO
+# ==========================================
 
 @admin.register(Sexo)
 class SexoAdmin(admin.ModelAdmin):
-    """Administração de Sexo"""
     list_display = ['nome']
     search_fields = ['nome']
 
 
 @admin.register(Fototipo)
 class FototipoAdmin(admin.ModelAdmin):
-    """Administração de Fototipo"""
     list_display = ['nome', 'descricao']
     search_fields = ['nome', 'descricao']
 
+
+# ==========================================
+# ADMIN: INTERESSADO
+# ==========================================
 
 @admin.register(Interessado)
 class InteressadoAdmin(admin.ModelAdmin):
     """Administração de Interessados"""
 
-    # Listagem - Atualizado em 11/12/2025
     list_display = [
         'cpf',
         'nome',
@@ -61,7 +57,6 @@ class InteressadoAdmin(admin.ModelAdmin):
         'email'
     ]
 
-    # Filtros
     list_filter = [
         'is_active',
         'sexo',
@@ -72,104 +67,66 @@ class InteressadoAdmin(admin.ModelAdmin):
         'criado_em'
     ]
 
-    # Busca
     search_fields = [
-        'cpf',
-        'nome',
-        'email',
-        'celular',
-        'cidade_residencia',
-        'bairro'
+        'cpf', 'nome', 'email', 'celular',
+        'cidade_residencia', 'bairro'
     ]
 
-    # Campos somente leitura
     readonly_fields = ['criado_em', 'atualizado_em', 'last_login']
 
-    # Organização do formulário
     fieldsets = (
         ('Dados Pessoais', {
             'fields': (
-                'cpf',
-                'nome',
-                'rg',
-                'sexo',
-                'data_nascimento',
-                'cidade_nascimento',
-                'uf_nascimento',
-                'nacionalidade',
-                'fototipo',
-                'escolaridade'
+                'cpf', 'nome', 'rg', 'sexo',
+                'data_nascimento', 'cidade_nascimento',
+                'uf_nascimento', 'nacionalidade',
+                'fototipo', 'escolaridade'
             )
         }),
         ('Endereço', {
             'fields': (
-                'endereco_residencial',
-                'num_endereco',
-                'complemento',
-                'bairro',
-                'cidade_residencia',
-                'uf_residencia'
+                'endereco_residencial', 'num_endereco',
+                'complemento', 'bairro',
+                'cidade_residencia', 'uf_residencia'
             )
         }),
         ('Contatos', {
-            'fields': (
-                'telefone',
-                'celular',
-                'email'
-            )
+            'fields': ('telefone', 'celular', 'email')
         }),
         ('Programa Social', {
-            'fields': (
-                'programa_social',
-                'num_nis'
-            ),
+            'fields': ('programa_social', 'num_nis'),
             'classes': ('collapse',)
         }),
         ('Necessidades Especiais / PCD', {
             'fields': (
                 'necessidades_especiais',
-                'pcd_fisica',
-                'pcd_visual',
-                'pcd_auditiva',
-                'pcd_intelectual',
-                'pcd_psicossocial',
-                'pcd_multiplas'
+                'pcd_fisica', 'pcd_visual', 'pcd_auditiva',
+                'pcd_intelectual', 'pcd_psicossocial', 'pcd_multiplas'
             ),
             'classes': ('collapse',),
             'description': 'Marque as deficiências que o interessado possui'
         }),
         ('Responsável (Para menores de idade)', {
             'fields': (
-                'nome_responsavel',
-                'telefone_responsavel',
-                'celular_responsavel',
-                'email_responsavel'
+                'nome_responsavel', 'telefone_responsavel',
+                'celular_responsavel', 'email_responsavel'
             ),
             'classes': ('collapse',)
         }),
         ('🔐 Autenticação e Permissões', {
             'fields': (
-                'senha',
-                'last_login',
-                'is_active',
-                'is_staff',
-                'is_superuser'
+                'senha', 'last_login',
+                'is_active', 'is_staff', 'is_superuser'
             ),
             'classes': ('collapse',),
             'description': (
-                '<div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin-bottom: 15px;">'
+                '<div style="background-color: #f8f9fa; padding: 15px; '
+                'border-left: 4px solid #007bff; margin-bottom: 15px;">'
                 '<strong>📋 CONTROLE DE ACESSO AO SISTEMA:</strong><br><br>'
-                '<strong>🔑 Senha:</strong> Digite a senha do interessado (será criptografada automaticamente)<br>'
-                '<strong>🕒 Último Login:</strong> Data/hora do último acesso (preenchido automaticamente)<br><br>'
-                '<strong>✅ Ativo:</strong> Permite que o interessado faça login no sistema<br>'
-                '&nbsp;&nbsp;&nbsp;&nbsp;• Marcado = Pode fazer login<br>'
-                '&nbsp;&nbsp;&nbsp;&nbsp;• Desmarcado = Login bloqueado<br><br>'
-                '<strong>👔 Membro da Equipe:</strong> Permite acesso ao painel administrativo<br>'
-                '&nbsp;&nbsp;&nbsp;&nbsp;• Normalmente DESMARCADO para interessados comuns<br>'
-                '&nbsp;&nbsp;&nbsp;&nbsp;• Marcar apenas para funcionários/colaboradores<br><br>'
-                '<strong>⚡ Superusuário:</strong> Concede todas as permissões do sistema<br>'
-                '&nbsp;&nbsp;&nbsp;&nbsp;• Normalmente DESMARCADO<br>'
-                '&nbsp;&nbsp;&nbsp;&nbsp;• Marcar apenas para administradores do sistema<br>'
+                '<strong>🔑 Senha:</strong> Digite a senha (será criptografada automaticamente)<br>'
+                '<strong>✅ Ativo:</strong> Permite que o interessado faça login<br>'
+                '<strong>👔 Membro da Equipe:</strong> Acesso ao painel administrativo<br>'
+                '<strong>⚡ Superusuário:</strong> Todas as permissões do sistema'
                 '</div>'
             )
         }),
@@ -182,22 +139,19 @@ class InteressadoAdmin(admin.ModelAdmin):
         })
     )
 
-    # Ordenação
     ordering = ['nome']
-
-    # Quantidade de itens por página
     list_per_page = 25
-
-    # Actions
-    actions = ['ativar_interessados', 'desativar_interessados', 'exportar_interessados_detalhado']
+    actions = [
+        'ativar_interessados',
+        'desativar_interessados',
+        'exportar_interessados_detalhado'
+    ]
 
     # ==========================================
-    # MÉTODOS PERSONALIZADOS PARA LIST_DISPLAY
-    # Adicionados em 11/12/2025
+    # MÉTODOS LIST_DISPLAY
     # ==========================================
 
     def data_nascimento_formatada(self, obj):
-        """Exibe data de nascimento no formato dd/mm/yyyy centralizado"""
         if obj.data_nascimento:
             return format_html(
                 '<div style="text-align: center;">{}</div>',
@@ -208,62 +162,57 @@ class InteressadoAdmin(admin.ModelAdmin):
     data_nascimento_formatada.admin_order_field = 'data_nascimento'
 
     def sexo_display(self, obj):
-        """Exibe o sexo"""
         return obj.sexo.nome if obj.sexo else '—'
     sexo_display.short_description = 'Sexo'
     sexo_display.admin_order_field = 'sexo__nome'
 
     def fototipo_display(self, obj):
-        """Exibe o fototipo centralizado"""
         fototipo = obj.fototipo.nome if obj.fototipo else '—'
         return format_html(
-            '<div style="text-align: center;">{}</div>',
-            fototipo
+            '<div style="text-align: center;">{}</div>', fototipo
         )
     fototipo_display.short_description = 'Fototipo'
     fototipo_display.admin_order_field = 'fototipo__nome'
 
     def programa_social_display(self, obj):
-        """Exibe programa social com ícone colorido centralizado"""
         if obj.programa_social:
             return format_html(
-                '<div style="text-align: center;"><span style="color: #28a745; font-weight: bold;">✅</span></div>'
+                '<div style="text-align: center;">'
+                '<span style="color: #28a745; font-weight: bold;">✅</span>'
+                '</div>'
             )
-        else:
-            return format_html(
-                '<div style="text-align: center;"><span style="color: #6c757d;">—</span></div>'
-            )
+        return format_html(
+            '<div style="text-align: center;">'
+            '<span style="color: #6c757d;">—</span>'
+            '</div>'
+        )
     programa_social_display.short_description = 'Programa Social'
     programa_social_display.admin_order_field = 'programa_social'
 
     def necessidades_especiais_display(self, obj):
-        """Exibe necessidades especiais com ícone colorido centralizado"""
         if obj.necessidades_especiais or obj.tem_deficiencia:
             return format_html(
-                '<div style="text-align: center;"><span style="color: #007bff; font-weight: bold;">♿</span></div>'
+                '<div style="text-align: center;">'
+                '<span style="color: #007bff; font-weight: bold;">♿</span>'
+                '</div>'
             )
-        else:
-            return format_html(
-                '<div style="text-align: center;"><span style="color: #6c757d;">—</span></div>'
-            )
+        return format_html(
+            '<div style="text-align: center;">'
+            '<span style="color: #6c757d;">—</span>'
+            '</div>'
+        )
     necessidades_especiais_display.short_description = 'Necessidades Especiais'
     necessidades_especiais_display.admin_order_field = 'necessidades_especiais'
 
     def celular_formatado(self, obj):
-        """Formata celular como (99) 99999-0000 e centraliza sem quebra de linha"""
         if obj.celular:
-            # Remove caracteres não numéricos
             numeros = ''.join(filter(str.isdigit, obj.celular))
-
             if len(numeros) == 11:
-                # Formato: (99) 99999-0000
                 formatado = f'({numeros[:2]}) {numeros[2:7]}-{numeros[7:]}'
             elif len(numeros) == 10:
-                # Formato: (99) 9999-0000
                 formatado = f'({numeros[:2]}) {numeros[2:6]}-{numeros[6:]}'
             else:
                 formatado = obj.celular
-
             return format_html(
                 '<div style="text-align: center; white-space: nowrap;">{}</div>',
                 formatado
@@ -273,20 +222,14 @@ class InteressadoAdmin(admin.ModelAdmin):
     celular_formatado.admin_order_field = 'celular'
 
     def telefone_formatado(self, obj):
-        """Formata telefone como (99) 9999-0000 e centraliza sem quebra de linha"""
         if obj.telefone:
-            # Remove caracteres não numéricos
             numeros = ''.join(filter(str.isdigit, obj.telefone))
-
             if len(numeros) == 11:
-                # Formato: (99) 99999-0000
                 formatado = f'({numeros[:2]}) {numeros[2:7]}-{numeros[7:]}'
             elif len(numeros) == 10:
-                # Formato: (99) 9999-0000
                 formatado = f'({numeros[:2]}) {numeros[2:6]}-{numeros[6:]}'
             else:
                 formatado = obj.telefone
-
             return format_html(
                 '<div style="text-align: center; white-space: nowrap;">{}</div>',
                 formatado
@@ -295,15 +238,7 @@ class InteressadoAdmin(admin.ModelAdmin):
     telefone_formatado.short_description = 'Telefone'
     telefone_formatado.admin_order_field = 'telefone'
 
-    # ==========================================
-    # MÉTODOS EXISTENTES
-    # ==========================================
-
     def is_active_display(self, obj):
-        """
-        Exibe o status ativo/inativo com ícone colorido
-        Adicionado em 05/12/2025
-        """
         if obj.is_active:
             return format_html(
                 '<span style="color: green; font-weight: bold;">✅ Ativo</span>'
@@ -314,32 +249,28 @@ class InteressadoAdmin(admin.ModelAdmin):
     is_active_display.short_description = 'Status'
     is_active_display.admin_order_field = 'is_active'
 
+    # ==========================================
+    # SAVE MODEL
+    # ==========================================
+
     def save_model(self, request, obj, form, change):
-        """
-        Sobrescreve o método save_model para garantir que a senha seja criptografada
-        """
         if 'senha' in form.changed_data:
-            # Se o campo senha foi alterado, criptografa
             obj.set_password(form.cleaned_data['senha'])
         super().save_model(request, obj, form, change)
 
+    # ==========================================
+    # ACTIONS
+    # ==========================================
+
     def ativar_interessados(self, request, queryset):
-        """
-        Action para ativar interessados selecionados
-        Adicionado em 05/12/2025
-        """
         count = queryset.update(is_active=True)
         self.message_user(
             request,
-            f'✅ {count} interessado(s) ativado(s) com sucesso! Agora podem fazer login.'
+            f'✅ {count} interessado(s) ativado(s) com sucesso!'
         )
     ativar_interessados.short_description = '✅ Ativar interessados selecionados'
 
     def desativar_interessados(self, request, queryset):
-        """
-        Action para desativar interessados selecionados
-        Adicionado em 05/12/2025
-        """
         count = queryset.update(is_active=False)
         self.message_user(
             request,
@@ -349,89 +280,50 @@ class InteressadoAdmin(admin.ModelAdmin):
     desativar_interessados.short_description = '❌ Desativar interessados selecionados'
 
     def exportar_interessados_detalhado(self, request, queryset):
-        """
-        Exporta interessados com análise detalhada de critérios que atendem
-        Adicionado em 10/12/2025
-        """
+        """Exporta interessados com análise detalhada de critérios"""
         from apps.eventos.models import Criterio
 
-        # Criar resposta HTTP com CSV
         response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
-        response['Content-Disposition'] = 'attachment; filename="interessados_analise_criterios.csv"'
-
-        # Adicionar BOM para Excel reconhecer UTF-8
+        response['Content-Disposition'] = (
+            'attachment; filename="interessados_analise_criterios.csv"'
+        )
         response.write('\ufeff')
 
         writer = csv.writer(response, delimiter=';')
-
-        # Buscar todos os critérios de PONTUACAO ativos
         criterios_pontuacao = Criterio.objects.filter(
-            ativo=True,
-            tipo_criterio='PONTUACAO'
+            ativo=True, tipo_criterio='PONTUACAO'
         ).order_by('nome')
 
-        # Cabeçalho base
         cabecalho = [
-            'CPF',
-            'Nome',
-            'Data Nascimento',
-            'Idade',
-            'Sexo',
-            'Fototipo',
-            'Escolaridade',
-            'Cidade/UF',
-            'Telefone',
-            'Celular',
-            'Email',
-            'Tem Deficiência',
-            'Tipos PCD',
-            'Programa Social',
-            'NIS',
-            'Status',
+            'CPF', 'Nome', 'Data Nascimento', 'Idade', 'Sexo',
+            'Fototipo', 'Escolaridade', 'Cidade/UF', 'Telefone',
+            'Celular', 'Email', 'Tem Deficiência', 'Tipos PCD',
+            'Programa Social', 'NIS', 'Status',
         ]
-
-        # Adicionar colunas para cada critério
         for criterio in criterios_pontuacao:
             cabecalho.append(f'{criterio.nome} ({criterio.pontos} pts)')
-
-        # Adicionar colunas finais
-        cabecalho.extend([
-            'Critérios Atendidos',
-            'Pontuação Total Potencial'
-        ])
-
+        cabecalho.extend(['Critérios Atendidos', 'Pontuação Total Potencial'])
         writer.writerow(cabecalho)
 
-        # Processar cada interessado
         hoje = date.today()
 
         for interessado in queryset.select_related('sexo', 'fototipo'):
-            # Calcular idade
             if interessado.data_nascimento:
                 idade = hoje.year - interessado.data_nascimento.year - (
-                    (hoje.month, hoje.day) < (interessado.data_nascimento.month, interessado.data_nascimento.day)
+                    (hoje.month, hoje.day) <
+                    (interessado.data_nascimento.month, interessado.data_nascimento.day)
                 )
             else:
                 idade = 'N/A'
 
-            # Tipos de PCD
             tipos_pcd = []
-            if interessado.pcd_fisica:
-                tipos_pcd.append('Física')
-            if interessado.pcd_visual:
-                tipos_pcd.append('Visual')
-            if interessado.pcd_auditiva:
-                tipos_pcd.append('Auditiva')
-            if interessado.pcd_intelectual:
-                tipos_pcd.append('Intelectual')
-            if interessado.pcd_psicossocial:
-                tipos_pcd.append('Psicossocial')
-            if interessado.pcd_multiplas:
-                tipos_pcd.append('Múltiplas')
+            if interessado.pcd_fisica:       tipos_pcd.append('Física')
+            if interessado.pcd_visual:       tipos_pcd.append('Visual')
+            if interessado.pcd_auditiva:     tipos_pcd.append('Auditiva')
+            if interessado.pcd_intelectual:  tipos_pcd.append('Intelectual')
+            if interessado.pcd_psicossocial: tipos_pcd.append('Psicossocial')
+            if interessado.pcd_multiplas:    tipos_pcd.append('Múltiplas')
 
-            tipos_pcd_str = ', '.join(tipos_pcd) if tipos_pcd else 'Nenhuma'
-
-            # Linha base
             linha = [
                 interessado.cpf,
                 interessado.nome,
@@ -445,116 +337,209 @@ class InteressadoAdmin(admin.ModelAdmin):
                 interessado.celular or 'N/A',
                 interessado.email or 'N/A',
                 'Sim' if interessado.tem_deficiencia else 'Não',
-                tipos_pcd_str,
+                ', '.join(tipos_pcd) if tipos_pcd else 'Nenhuma',
                 'Sim' if interessado.programa_social else 'Não',
                 interessado.num_nis or 'N/A',
                 'Ativo' if interessado.is_active else 'Inativo',
             ]
 
-            # Analisar cada critério
             criterios_atendidos = []
             pontuacao_total = 0
 
             for criterio in criterios_pontuacao:
                 atende = False
-
-                # PCD
                 if criterio.codigo == 'PCD':
-                    if interessado.tem_deficiencia:
-                        atende = True
-
-                # NIS
-                elif criterio.codigo == 'NIS' or criterio.codigo == 'PROGRAMA_SOCIAL':
-                    if interessado.programa_social and interessado.num_nis:
-                        atende = True
-
-                # JOVEM (16 a 24 anos)
-                elif criterio.codigo == 'JOVEM' or (criterio.categoria == 'FAIXA_ETARIA' and '16' in criterio.nome and '24' in criterio.nome):      
-                    if isinstance(idade, int) and 16 <= idade <= 24:
-                        atende = True
-
-                # IDOSO (50+ anos)
-                elif criterio.codigo == 'IDOSO' or (criterio.categoria == 'FAIXA_ETARIA' and ('50' in criterio.nome or 'Idoso' in criterio.nome)):  
-                    if isinstance(idade, int) and idade >= 50:
-                        atende = True
-
-                # IDOSO 60+
-                elif criterio.categoria == 'FAIXA_ETARIA' and '60' in criterio.nome:
-                    if isinstance(idade, int) and idade >= 60:
-                        atende = True
-
-                # COTA RACIAL
-                elif criterio.categoria == 'COTA_RACIAL':
-                    racas_cotistas = ['Preta', 'Parda', 'Indígena', 'Preto', 'Pardo', 'Indigena']
-                    if interessado.fototipo and interessado.fototipo.nome in racas_cotistas:
-                        atende = True
-
-                # ESCOLARIDADE
-                elif criterio.categoria == 'ESCOLARIDADE':
-                    niveis_ordem = [
-                        'FUNDAMENTAL_INCOMPLETO',
-                        'FUNDAMENTAL_COMPLETO',
-                        'MEDIO_INCOMPLETO',
-                        'MEDIO_COMPLETO',
-                        'SUPERIOR_INCOMPLETO',
-                        'SUPERIOR_COMPLETO',
-                        'POS_GRADUACAO'
-                    ]
-
-                    # Identificar critério específico
-                    if criterio.codigo == 'ESC_FUND_INC':
-                        if interessado.escolaridade == 'FUNDAMENTAL_INCOMPLETO':
-                            atende = True
-                    elif criterio.codigo == 'ESC_FUND_COMP':
-                        if interessado.escolaridade == 'FUNDAMENTAL_COMPLETO':
-                            atende = True
-                    elif criterio.codigo == 'ESC_MEDIO_INC':
-                        if interessado.escolaridade == 'MEDIO_INCOMPLETO':
-                            atende = True
-                    elif criterio.codigo == 'ESC_MEDIO_COMP':
-                        if interessado.escolaridade == 'MEDIO_COMPLETO':
-                            atende = True
-                    # Verificação por nível hierárquico
-                    elif interessado.escolaridade and interessado.escolaridade in niveis_ordem:
-                        nivel_minimo = None
-                        if 'Fundamental Completo' in criterio.nome:
-                            nivel_minimo = 'FUNDAMENTAL_COMPLETO'
-                        elif 'Médio Completo' in criterio.nome or 'Medio Completo' in criterio.nome:
-                            nivel_minimo = 'MEDIO_COMPLETO'
-                        elif 'Superior' in criterio.nome:
-                            nivel_minimo = 'SUPERIOR_COMPLETO'
-
-                        if nivel_minimo:
-                            idx_interessado = niveis_ordem.index(interessado.escolaridade)
-                            idx_minimo = niveis_ordem.index(nivel_minimo)
-                            if idx_interessado >= idx_minimo:
-                                atende = True
-
-                # Adicionar resultado
+                    atende = interessado.tem_deficiencia
+                elif criterio.codigo in ('NIS', 'PROGRAMA_SOCIAL'):
+                    atende = interessado.programa_social and bool(interessado.num_nis)
+                linha.append('SIM' if atende else 'NÃO')
                 if atende:
-                    linha.append('SIM')
                     criterios_atendidos.append(criterio.nome)
                     pontuacao_total += criterio.pontos or 0
-                else:
-                    linha.append('NÃO')
 
-            # Adicionar totalizadores
             linha.append(', '.join(criterios_atendidos) if criterios_atendidos else 'Nenhum')
             linha.append(f'{pontuacao_total:.2f}')
-
             writer.writerow(linha)
 
-        messages.success(request, f'✅ {queryset.count()} interessado(s) exportado(s) com sucesso!')
+        messages.success(
+            request,
+            f'✅ {queryset.count()} interessado(s) exportado(s) com sucesso!'
+        )
         return response
+    exportar_interessados_detalhado.short_description = (
+        '📊 Exportar interessados com análise de critérios (Excel)'
+    )
 
-    exportar_interessados_detalhado.short_description = '📊 Exportar interessados com análise de critérios (Excel)'
+
+# ==========================================
+# ADMIN: PASSWORD RESET TOKEN
+# Alteração: 20/02/2026
+# ==========================================
+
+@admin.register(PasswordResetToken)
+class PasswordResetTokenAdmin(admin.ModelAdmin):
+    """
+    Administração dos tokens de recuperação de senha.
+    Permite visualizar e limpar tokens expirados ou usados.
+    """
+
+    list_display = [
+        'get_interessado',
+        'get_cpf',
+        'get_status',
+        'criado_em_formatado',
+        'expira_em_formatado',
+        'usado',
+    ]
+
+    list_filter = [
+        'usado',
+        'criado_em',
+    ]
+
+    search_fields = [
+        'interessado__nome',
+        'interessado__cpf',
+        'token',
+    ]
+
+    ordering = ['-criado_em']
+    readonly_fields = ['token', 'interessado', 'criado_em', 'expira_em', 'usado']
+    list_per_page = 25
+
+    actions = [
+        'limpar_tokens_expirados',
+        'limpar_tokens_usados',
+        'limpar_todos_invalidos',
+    ]
+
+    # ==========================================
+    # MÉTODOS LIST_DISPLAY
+    # ==========================================
+
+    def get_interessado(self, obj):
+        return obj.interessado.nome
+    get_interessado.short_description = 'Interessado'
+    get_interessado.admin_order_field = 'interessado__nome'
+
+    def get_cpf(self, obj):
+        cpf = obj.interessado.cpf
+        return f'{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}'
+    get_cpf.short_description = 'CPF'
+
+    def get_status(self, obj):
+        """Badge colorido indicando o status do token"""
+        agora = timezone.now()
+
+        if obj.usado:
+            return format_html(
+                '<span style="display: inline-block; padding: 3px 8px; '
+                'background-color: #6c757d; color: white; border-radius: 12px; '
+                'font-size: 11px;">✔️ Usado</span>'
+            )
+        elif agora > obj.expira_em:
+            return format_html(
+                '<span style="display: inline-block; padding: 3px 8px; '
+                'background-color: #dc3545; color: white; border-radius: 12px; '
+                'font-size: 11px;">⏰ Expirado</span>'
+            )
+        else:
+            # Calcular minutos restantes
+            restante = obj.expira_em - agora
+            minutos = int(restante.total_seconds() // 60)
+            return format_html(
+                '<span style="display: inline-block; padding: 3px 8px; '
+                'background-color: #28a745; color: white; border-radius: 12px; '
+                'font-size: 11px;">✅ Válido (~{}min)</span>',
+                minutos
+            )
+    get_status.short_description = 'Status'
+
+    def criado_em_formatado(self, obj):
+        return obj.criado_em.strftime('%d/%m/%Y %H:%M')
+    criado_em_formatado.short_description = 'Criado em'
+    criado_em_formatado.admin_order_field = 'criado_em'
+
+    def expira_em_formatado(self, obj):
+        return obj.expira_em.strftime('%d/%m/%Y %H:%M')
+    expira_em_formatado.short_description = 'Expira em'
+    expira_em_formatado.admin_order_field = 'expira_em'
+
+    # ==========================================
+    # ACTIONS DE LIMPEZA
+    # ==========================================
+
+    def limpar_tokens_expirados(self, request, queryset):
+        """
+        Remove tokens cujo prazo de validade já passou
+        (independente de terem sido usados ou não)
+        """
+        agora = timezone.now()
+        expirados = queryset.filter(expira_em__lt=agora)
+        total = expirados.count()
+        expirados.delete()
+        self.message_user(
+            request,
+            f'🗑️ {total} token(s) expirado(s) removido(s) com sucesso!',
+            level=messages.SUCCESS
+        )
+    limpar_tokens_expirados.short_description = '🗑️ Remover tokens EXPIRADOS selecionados'
+
+    def limpar_tokens_usados(self, request, queryset):
+        """
+        Remove tokens que já foram utilizados para redefinir senha
+        """
+        usados = queryset.filter(usado=True)
+        total = usados.count()
+        usados.delete()
+        self.message_user(
+            request,
+            f'🗑️ {total} token(s) já utilizado(s) removido(s) com sucesso!',
+            level=messages.SUCCESS
+        )
+    limpar_tokens_usados.short_description = '🗑️ Remover tokens JÁ USADOS selecionados'
+
+    def limpar_todos_invalidos(self, request, queryset):
+        """
+        Remove TODOS os tokens inválidos (expirados + usados) do banco inteiro.
+        Ignora a seleção — limpa tudo de uma vez.
+        """
+        agora = timezone.now()
+        invalidos = PasswordResetToken.objects.filter(
+            models.Q(expira_em__lt=agora) | models.Q(usado=True)
+        )
+        total = invalidos.count()
+        invalidos.delete()
+        self.message_user(
+            request,
+            f'🧹 Limpeza completa: {total} token(s) inválido(s) removido(s) do banco!',
+            level=messages.SUCCESS
+        )
+    limpar_todos_invalidos.short_description = '🧹 Limpar TODOS os tokens inválidos do banco'
+
+    # ==========================================
+    # PERMISSÕES — SOMENTE LEITURA + LIMPEZA
+    # ==========================================
+
+    def has_add_permission(self, request):
+        """Tokens são criados apenas pelo sistema (view de recuperação)"""
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        """Tokens não devem ser editados manualmente"""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Apenas superuser pode deletar tokens individualmente"""
+        return request.user.is_superuser
 
 
 # ==========================================
 # REGISTRAR NO ADMIN CUSTOMIZADO
-# Adicionado em 20/01/2026
 # ==========================================
+
 admin_site.register(Sexo, SexoAdmin)
 admin_site.register(Fototipo, FototipoAdmin)
 admin_site.register(Interessado, InteressadoAdmin)
+admin_site.register(PasswordResetToken, PasswordResetTokenAdmin)
 

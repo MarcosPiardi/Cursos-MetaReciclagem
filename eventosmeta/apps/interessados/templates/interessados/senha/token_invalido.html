@@ -1,0 +1,121 @@
+<!--
+Arquivo: token_invalido.html
+Caminho: apps/interessados/templates/interessados/senha/token_invalido.html
+Alteração: Diferencia link inválido de senha já trocada com sucesso
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}
+    {% if senha_ja_trocada %}Senha Já Redefinida{% else %}Link Inválido{% endif %}
+    — MetaReciclagem
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .container {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+    }
+    .icon { font-size: 60px; margin-bottom: 15px; }
+    h1 { font-size: 22px; margin-bottom: 10px; }
+    h1.sucesso { color: #28a745; }
+    h1.erro    { color: #dc3545; }
+    p { color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
+    .alert-sucesso {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+        padding: 12px 15px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #155724;
+        text-align: left;
+        margin: 15px 0 25px 0;
+    }
+    .alert-erro {
+        background: #f8d7da;
+        border-left: 4px solid #dc3545;
+        padding: 12px 15px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #721c24;
+        text-align: left;
+        margin: 15px 0 25px 0;
+    }
+    .btn {
+        display: inline-block;
+        padding: 12px 25px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        margin: 5px;
+    }
+    .btn-verde {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+    .btn-cinza {
+        background: #6c757d;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    {% if senha_ja_trocada %}
+        <!-- SENHA JÁ TROCADA COM SUCESSO -->
+        <div class="icon">✅</div>
+        <h1 class="sucesso">Senha já redefinida!</h1>
+        <p>Sua senha foi trocada com sucesso anteriormente.</p>
+
+        <div class="alert-sucesso">
+            ✅ <strong>O link foi utilizado e está desativado por segurança.</strong><br>
+            Isso é normal — cada link de recuperação funciona uma única vez.
+            Faça login com sua nova senha.
+        </div>
+
+        <a href="{% url 'interessados:login' %}" class="btn btn-verde">
+            🔑 Ir para o Login
+        </a>
+
+    {% else %}
+        <!-- LINK INVÁLIDO OU EXPIRADO -->
+        <div class="icon">❌</div>
+        <h1 class="erro">Link Inválido ou Expirado</h1>
+        <p>O link de recuperação de senha que você acessou não é mais válido.</p>
+
+        <div class="alert-erro">
+            <strong>Possíveis causas:</strong><br>
+            • O link expirou (válido por apenas 30 minutos)<br>
+            • O link já foi utilizado anteriormente<br>
+            • O link foi digitado incorretamente
+        </div>
+
+        <a href="{% url 'interessados:senha_recuperar' %}" class="btn btn-verde">
+            🔑 Solicitar Novo Link
+        </a>
+        <a href="{% url 'interessados:login' %}" class="btn btn-cinza">
+            ← Voltar ao Login
+        </a>
+
+    {% endif %}
+
+</div>
+{% endblock %}
+

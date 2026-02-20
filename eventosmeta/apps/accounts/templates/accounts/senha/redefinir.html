@@ -1,0 +1,92 @@
+<!--
+Arquivo: redefinir.html
+Caminho: template/accounts/senha/redefinir.html
+Alteração: Formulário para nova senha — Staff
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Nova Senha — Staff{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh; display: flex;
+        justify-content: center; align-items: center;
+    }
+    .container {
+        background: white; padding: 40px; border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 100%; max-width: 420px;
+    }
+    h1 { color: #333; font-size: 22px; text-align: center; margin-bottom: 20px; }
+    label { display: block; font-weight: 500; margin-bottom: 5px; color: #333; }
+    .form-group { margin-bottom: 18px; }
+    input[type="password"] {
+        width: 100%; padding: 12px; border: 1px solid #ddd;
+        border-radius: 5px; font-size: 14px; box-sizing: border-box;
+    }
+    input[type="password"]:focus { outline: none; border-color: #667eea; }
+    .btn {
+        width: 100%; padding: 12px; margin-top: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white; border: none; border-radius: 5px;
+        font-size: 15px; font-weight: 600; cursor: pointer;
+    }
+    .error { color: red; font-size: 13px; margin-top: 5px; }
+    .requisitos {
+        background: #f8f9fa; border-radius: 4px; padding: 12px;
+        font-size: 12px; color: #555; margin-bottom: 15px;
+    }
+    .requisitos ul { margin: 5px 0 0 15px; padding: 0; }
+    .requisitos li { margin-bottom: 3px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔐 Nova Senha</h1>
+
+    <div class="requisitos">
+        <strong>Requisitos da senha:</strong>
+        <ul>
+            <li>Mínimo de 8 caracteres</li>
+            <li>Não pode ser muito comum</li>
+            <li>Não pode ser apenas números</li>
+        </ul>
+    </div>
+
+    {% if form.errors %}
+        <div class="error" style="margin-bottom: 15px;">
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if validlink %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Nova Senha</label>
+            {{ form.new_password1 }}
+        </div>
+        <div class="form-group">
+            <label>Confirmar Nova Senha</label>
+            {{ form.new_password2 }}
+        </div>
+        <button type="submit" class="btn">✅ Salvar Nova Senha</button>
+    </form>
+    {% else %}
+    <div style="text-align:center; color: #dc3545;">
+        <p>❌ Link inválido ou expirado.</p>
+        <a href="{% url 'staff_senha_recuperar' %}" style="color:#667eea;">Solicitar novo link</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
