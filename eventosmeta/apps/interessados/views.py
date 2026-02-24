@@ -20,6 +20,10 @@ Alteração: Token de recuperação migrado de sessão para banco de dados
            Adicionada mensagem de sucesso antes do redirect em senha_redefinir_view
            Token inválido após uso é comportamento correto de segurança
 Data: 20/02/2026
+
+Alteração: dashboard_view — prefetch_related de matriculas e status da matricula
+           para exibir status de matrícula nos cards do dashboard sem N queries
+Data: 24/02/2026
 """
 
 import secrets
@@ -123,6 +127,8 @@ def dashboard_view(request):
     """
     Dashboard do interessado
     ADICIONADO: Verificação de is_active (13/02/2026)
+    ADICIONADO: prefetch_related de matriculas para exibir status
+                de matrícula nos cards sem gerar N queries (24/02/2026)
     """
     interessado = request.user
 
@@ -131,13 +137,35 @@ def dashboard_view(request):
         messages.error(request, '🔒 Sua conta foi desativada.')
         return redirect('interessados:login')
 
+    # ==========================================
+    # INSCRIÇÕES
+    # select_related: FK diretas (evento, status do evento, status da inscrição)
+    # prefetch_related: matriculas e status da matrícula (related_name='matriculas')
+    # ==========================================
     inscricoes = Inscricao.objects.filter(
         interessado=interessado
-    ).select_related('evento', 'status')
+    ).select_related(
+        'evento',
+        'evento__status',   # ← Status do evento (nome + cor)
+        'status',           # ← Status da inscrição (nome)
+    ).prefetch_related(
+        'matriculas',               # ← Matricula.inscricao (related_name)
+        'matriculas__status',       # ← StatusMatricula (nome + cor)
+    ).order_by('-data_inscricao')
 
+    # ==========================================
+    # CLASSIFICAÇÕES
+    # prefetch_related: matriculas via inscricao
+    # ==========================================
     classificacoes = Classificacao.objects.filter(
         inscricao__interessado=interessado
-    ).select_related('inscricao__evento').order_by('-processado_em')
+    ).select_related(
+        'inscricao__evento',
+        'inscricao__evento__status',
+    ).prefetch_related(
+        'inscricao__matriculas',
+        'inscricao__matriculas__status',
+    ).order_by('-processado_em')
 
     total_inscricoes     = inscricoes.count()
     total_classificacoes = classificacoes.count()
@@ -146,19 +174,21 @@ def dashboard_view(request):
 
     eventos_abertos = Evento.objects.filter(
         data_fim_inscricao__date__gte=date.today()
+    ).select_related(
+        'status'
     ).exclude(
         inscricoes__interessado=interessado
     ).distinct()
 
     context = {
-        'interessado': interessado,
-        'inscricoes': inscricoes,
-        'classificacoes': classificacoes,
-        'total_inscricoes': total_inscricoes,
+        'interessado':          interessado,
+        'inscricoes':           inscricoes,
+        'classificacoes':       classificacoes,
+        'total_inscricoes':     total_inscricoes,
         'total_classificacoes': total_classificacoes,
         'inscricoes_aprovadas': inscricoes_aprovadas,
         'inscricoes_pendentes': inscricoes_pendentes,
-        'eventos_abertos': eventos_abertos,
+        'eventos_abertos':      eventos_abertos,
     }
 
     return render(request, 'interessados/dashboard.html', context)
@@ -392,16 +422,7 @@ def senha_redefinir_view(request, token):
     """
     Passo 3: Formulário de nova senha.
     Token validado via banco — funciona em qualquer aba/navegador.
-
-    ⚠️ COMPORTAMENTO ESPERADO:
-    Após uso bem-sucedido, o token é marcado como 'usado=True'.
-    Se o usuário tentar acessar o link novamente (botão voltar, etc.),
-    verá a tela de 'link inválido' — isso é CORRETO e é segurança por design.
-    A senha JÁ foi trocada com sucesso.
-
-    Alteração: 20/02/2026
     """
-    # Buscar token válido no banco
     try:
         reset_token = PasswordResetToken.objects.select_related('interessado').get(
             token=token,
@@ -411,9 +432,6 @@ def senha_redefinir_view(request, token):
         interessado = reset_token.interessado
 
     except PasswordResetToken.DoesNotExist:
-        # Token inválido, já usado ou expirado
-        # Se o usuário chegou aqui após trocar a senha com sucesso
-        # e voltou ao link, é o comportamento correto de segurança
         return render(request, 'interessados/senha/token_invalido.html', {
             'senha_ja_trocada': True
         })
@@ -429,15 +447,12 @@ def senha_redefinir_view(request, token):
         elif nova_senha != confirmar_senha:
             erro = 'As senhas não coincidem.'
         else:
-            # Salvar nova senha
             interessado.set_password(nova_senha)
             interessado.save()
 
-            # Marcar token como usado — invalida o link permanentemente
             reset_token.usado = True
             reset_token.save()
 
-            # Redirecionar para página de confirmação
             return redirect('interessados:senha_redefinir_concluido')
 
     return render(request, 'interessados/senha/redefinir.html', {'erro': erro})

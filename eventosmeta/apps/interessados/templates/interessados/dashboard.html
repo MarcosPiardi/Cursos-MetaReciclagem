@@ -1,3 +1,21 @@
+<!--
+Arquivo: dashboard.html
+Caminho: apps/interessados/templates/interessados/dashboard.html
+Alteração: Cards visuais padronizados entre os 3 blocos
+           Status do evento com cor dinâmica do banco (Status.cor)
+           Header colorido: azul (inscrições), verde (abertos), lilás (classificações)
+           Status posicionado logo acima dos botões em todos os cards
+Data: 23/02/2026
+Alteração: Minhas Inscrições — borda reforçada nos cards
+           Mesma ordem de informações que Eventos Abertos
+           "Inscrito em:" na última linha em negrito
+           Status de matrícula adicionado (quando houver)
+           Minhas Classificações — status de matrícula adicionado
+Data: 24/02/2026
+Alteração: Status da inscrição usa cor do banco (inscricao.status.cor)
+           Rótulos adicionados em cada badge de status
+Data: 24/02/2026
+-->
 {% extends 'base.html' %}
 {% load static %}
 
@@ -5,6 +23,7 @@
 
 {% block extra_css %}
 <style>
+    /* ── Stat cards ── */
     .stat-card {
         border-left: 4px solid;
         transition: all 0.3s ease;
@@ -13,30 +32,12 @@
         transform: translateY(-5px);
         box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     }
-    .stat-card.primary {
-        border-left-color: #3498db;
-    }
-    .stat-card.success {
-        border-left-color: #27ae60;
-    }
-    .stat-card.warning {
-        border-left-color: #f39c12;
-    }
-    .stat-number {
-        font-size: 1.8rem;
-        font-weight: bold;
-    }
-    .badge-status {
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-weight: 600;
-    }
-    .inscricao-card {
-        transition: all 0.3s ease;
-    }
-    .inscricao-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
+    .stat-card.primary { border-left-color: #3498db; }
+    .stat-card.success { border-left-color: #27ae60; }
+    .stat-card.warning { border-left-color: #f39c12; }
+    .stat-number { font-size: 1.8rem; font-weight: bold; }
+
+    /* ── Action cards ── */
     .action-card {
         transition: all 0.3s ease;
         border: 1px solid #e0e0e0;
@@ -51,29 +52,76 @@
         gap: 15px;
         margin-bottom: 15px;
     }
-    .icon-text-wrapper i {
-        font-size: 2.5rem;
+    .icon-text-wrapper i { font-size: 2.5rem; }
+    .text-content { flex: 1; }
+    .card-title { font-size: 1.1rem; }
+    .card-text  { font-size: 0.95rem; margin-bottom: 0; }
+
+    /* ── Cards dos 3 blocos principais ── */
+    .evento-card {
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
-    .text-content {
-        flex: 1;
+    .evento-card:hover {
+        box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        transform: translateY(-3px);
     }
-    .card-title {
-        font-size: 1.1rem;
+
+    /* ── Borda reforçada nos cards de inscrição ── */
+    .inscricao-card-border {
+        border: 2px solid #3498db !important;
     }
-    .card-text {
-        font-size: 0.95rem;
-        margin-bottom: 0;
+
+    /* ── Badge genérico com cor do banco ── */
+    .badge-dinamico {
+        display: inline-block;
+        padding: 0.3rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #fff;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+    }
+
+    /* ── Grupo de status: rótulo + badge ── */
+    .status-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+    }
+    .status-rotulo {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #999;
+    }
+
+    /* ── Linha de status lado a lado ── */
+    .status-row {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-start;
+        gap: 10px;
+        flex-wrap: wrap;
     }
 </style>
 {% endblock %}
 
 {% block content %}
+
 <!-- Cabeçalho de Boas-Vindas -->
 <div class="row mb-2">
     <div class="col-12">
-        <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+        <div class="card"
+             style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border: none;">
             <div class="card-body py-2">
-                <h5 class="mb-0 text-white">Olá, {{ interessado.nome }}! Bem-vindo ao seu painel</h5>
+                <h5 class="mb-0 text-white">
+                    Olá, {{ interessado.nome }}! Bem-vindo ao seu painel
+                </h5>
             </div>
         </div>
     </div>
@@ -143,61 +191,133 @@
     </div>
 </div>
 
-<!-- Minhas Inscrições -->
+<!-- ==========================================
+     MINHAS INSCRIÇÕES — header AZUL
+     ========================================== -->
 <div class="row mt-4 mb-3">
     <div class="col-12">
-        <h4>
-            <i class="bi bi-list-check text-primary"></i> Minhas Inscrições
-        </h4>
+        <h4><i class="bi bi-list-check text-primary"></i> Minhas Inscrições</h4>
     </div>
 </div>
 
 {% if inscricoes %}
     <div class="row">
         {% for inscricao in inscricoes %}
-            <div class="col-md-6 mb-3">
-                <div class="card inscricao-card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ inscricao.evento.nome }}</h5>
-                        <p class="card-text small text-muted">
-                            <i class="bi bi-calendar"></i> Inscrito em: {{ inscricao.data_inscricao|date:"d/m/Y" }}
-                        </p>
-                        
-                        <div class="mb-2">
-                            <span class="badge badge-status 
-                                {% if inscricao.status.nome == 'Confirmada' %}bg-success
-                                {% elif inscricao.status.nome == 'Pendente' %}bg-warning
-                                {% elif inscricao.status.nome == 'Cancelada' %}bg-danger
-                                {% else %}bg-secondary{% endif %}">
-                                {{ inscricao.status.nome }}
-                            </span>
+            {% with matricula=inscricao.matriculas.first %}
+            <div class="col-md-4 mb-3">
+                <div class="card evento-card inscricao-card-border h-100">
+
+                    <!-- Header azul -->
+                    <div class="card-header text-white py-2"
+                         style="background: linear-gradient(135deg, #2980b9, #3498db);">
+                        <h6 class="mb-0">{{ inscricao.evento.nome }}</h6>
+                    </div>
+
+                    <div class="card-body py-2 d-flex flex-column">
+
+                        <ul class="list-unstyled small mb-2">
+                            <li class="mb-1">
+                                <i class="bi bi-people text-primary"></i>
+                                <strong>Vagas:</strong>
+                                {{ inscricao.evento.total_vagas }}
+                            </li>
+                            <li class="mb-1">
+                                <i class="bi bi-calendar-check text-success"></i>
+                                <strong>Inscrições até:</strong>
+                                {{ inscricao.evento.data_fim_inscricao|date:"d/m/Y" }}
+                            </li>
+                            <li class="mb-1">
+                                <i class="bi bi-calendar-event text-info"></i>
+                                <strong>Início:</strong>
+                                {{ inscricao.evento.data_inicio_evento|date:"d/m/Y" }}
+                            </li>
+                            <li class="mb-1">
+                                <i class="bi bi-calendar-plus text-secondary"></i>
+                                <strong>Inscrito em:
+                                    {{ inscricao.data_inscricao|date:"d/m/Y" }}
+                                </strong>
+                            </li>
+                        </ul>
+
+                        <!-- ==========================================
+                             Status com rótulos — cor do banco
+                             ALTERAÇÃO 24/02/2026:
+                               - inscricao.status.cor vem do banco
+                               - rótulo acima de cada badge
+                             ========================================== -->
+                        <div class="status-row mt-auto mb-2">
+
+                            {# ── Evento ── #}
+                            {% if inscricao.evento.status %}
+                            <div class="status-group">
+                                <span class="status-rotulo">Evento</span>
+                                <span class="badge-dinamico"
+                                      style="background-color: {{ inscricao.evento.status.cor }};">
+                                    <i class="bi bi-circle-fill"
+                                       style="font-size:0.45rem; vertical-align:middle;"></i>
+                                    {{ inscricao.evento.status.nome }}
+                                </span>
+                            </div>
+                            {% endif %}
+
+                            {# ── Inscrição — cor do banco ── #}
+                            {% if inscricao.status %}
+                            <div class="status-group">
+                                <span class="status-rotulo">Inscrição</span>
+                                <span class="badge-dinamico"
+                                      style="background-color: {{ inscricao.status.cor }};">
+                                    <i class="bi bi-person-check"
+                                       style="font-size:0.65rem; vertical-align:middle;"></i>
+                                    {{ inscricao.status.nome }}
+                                </span>
+                            </div>
+                            {% endif %}
+
+                            {# ── Matrícula (se houver) ── #}
+                            {% if matricula %}
+                            <div class="status-group">
+                                <span class="status-rotulo">Matrícula</span>
+                                <span class="badge-dinamico"
+                                      style="background-color: {{ matricula.status.cor }};">
+                                    <i class="bi bi-mortarboard-fill"
+                                       style="font-size:0.65rem; vertical-align:middle;"></i>
+                                    {{ matricula.status.nome }}
+                                </span>
+                            </div>
+                            {% endif %}
+
                         </div>
-                        
-                        <a href="{% url 'portal:detalhes_evento' inscricao.evento.id %}" class="btn btn-outline-info btn-sm w-100">
+
+                    </div>
+
+                    <div class="card-footer bg-transparent py-2">
+                        <a href="{% url 'portal:detalhes_evento' inscricao.evento.id %}"
+                           class="btn btn-outline-info btn-sm w-100">
                             <i class="bi bi-info-circle"></i> Detalhes
                         </a>
-                        
                     </div>
+
                 </div>
             </div>
+            {% endwith %}
         {% endfor %}
     </div>
 {% else %}
-    <div class="row">
-        <div class="col-12">
-            <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i> Você ainda não tem inscrições registradas.
-            </div>
-        </div>
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        Você ainda não tem inscrições registradas.
     </div>
 {% endif %}
 
 
-<!-- Eventos Abertos para Inscrição -->
-<div class="row mb-4">
+<!-- ==========================================
+     EVENTOS ABERTOS — header VERDE
+     ========================================== -->
+<div class="row mb-3 mt-4">
     <div class="col-12">
         <h4 class="mb-3">
-            <i class="bi bi-calendar-event text-success"></i> Eventos Abertos para Inscrição
+            <i class="bi bi-calendar-event text-success"></i>
+            Eventos Abertos para Inscrição
         </h4>
     </div>
 </div>
@@ -205,88 +325,173 @@
 <div class="row">
     {% for evento in eventos_abertos %}
         <div class="col-md-6 col-lg-4 mb-3">
-            <div class="card h-100 shadow-sm">
-                <div class="card-header bg-success text-white py-2">
+            <div class="card evento-card h-100">
+
+                <!-- Header verde -->
+                <div class="card-header text-white py-2"
+                     style="background: linear-gradient(135deg, #27ae60, #2ecc71);">
                     <h6 class="mb-0">{{ evento.nome }}</h6>
                 </div>
-                <div class="card-body py-2">
-                    <p class="card-text small">{{ evento.descricao|truncatewords:15 }}</p>
-                    
-                    <ul class="list-unstyled small">
+
+                <div class="card-body py-2 d-flex flex-column">
+                    <p class="card-text small mb-2">
+                        {{ evento.descricao|truncatewords:15 }}
+                    </p>
+
+                    <ul class="list-unstyled small mb-3">
                         <li class="mb-1">
                             <i class="bi bi-people text-primary"></i>
                             <strong>Vagas:</strong> {{ evento.total_vagas }}
                         </li>
                         <li class="mb-1">
                             <i class="bi bi-calendar-check text-success"></i>
-                            <strong>Inscrições até:</strong> {{ evento.data_fim_inscricao|date:"d/m/Y" }}
+                            <strong>Inscrições até:</strong>
+                            {{ evento.data_fim_inscricao|date:"d/m/Y" }}
                         </li>
                         <li class="mb-1">
                             <i class="bi bi-calendar-event text-info"></i>
-                            <strong>Início:</strong> {{ evento.data_inicio_evento|date:"d/m/Y" }}
+                            <strong>Início:</strong>
+                            {{ evento.data_inicio_evento|date:"d/m/Y" }}
                         </li>
                     </ul>
+
+                    <!-- Status do evento com rótulo -->
+                    <div class="status-row mb-2 mt-auto">
+                        <div class="status-group">
+                            <span class="status-rotulo">Evento</span>
+                            <span class="badge-dinamico"
+                                  style="background-color: {{ evento.status.cor }};">
+                                <i class="bi bi-circle-fill"
+                                   style="font-size:0.45rem; vertical-align:middle;"></i>
+                                {{ evento.status.nome }}
+                            </span>
+                        </div>
+                    </div>
+
                 </div>
+
                 <div class="card-footer bg-transparent py-2">
-                    <!-- Botões Detalhes e Classificação -->
                     <div class="row g-2 mb-2">
                         <div class="col-6">
-                            <a href="{% url 'portal:detalhes_evento' evento.id %}" class="btn btn-outline-info btn-sm w-100">
+                            <a href="{% url 'portal:detalhes_evento' evento.id %}"
+                               class="btn btn-outline-info btn-sm w-100">
                                 <i class="bi bi-info-circle"></i> Detalhes
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{% url 'portal:resultado_evento' evento.id %}" class="btn btn-outline-success btn-sm w-100">
+                            <a href="{% url 'portal:resultado_evento' evento.id %}"
+                               class="btn btn-outline-success btn-sm w-100">
                                 <i class="bi bi-trophy"></i> Classificação
                             </a>
                         </div>
                     </div>
-                    
-                    <!-- Botão Inscrever-se -->
-                    <a href="{% url 'interessados:inscrever_evento' evento.id %}" class="btn btn-success btn-sm w-100">
+                    <a href="{% url 'interessados:inscrever_evento' evento.id %}"
+                       class="btn btn-success btn-sm w-100">
                         <i class="bi bi-plus-circle"></i> Inscrever-se
                     </a>
                 </div>
+
             </div>
         </div>
     {% endfor %}
 </div>
 
 
-<!-- Minhas Classificações -->
+<!-- ==========================================
+     MINHAS CLASSIFICAÇÕES — header LILÁS
+     ========================================== -->
 {% if classificacoes %}
 <div class="row mt-4 mb-3">
     <div class="col-12">
-        <h4>
-            <i class="bi bi-trophy text-warning"></i> Minhas Classificações
-        </h4>
+        <h4><i class="bi bi-trophy text-warning"></i> Minhas Classificações</h4>
     </div>
 </div>
 
 <div class="row">
     {% for classificacao in classificacoes %}
-        <div class="col-md-6 mb-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{{ classificacao.inscricao.evento.nome }}</h5>
-                    <div class="row">
-                        <div class="col-6">
-                            <p class="mb-1"><strong>Posição:</strong> {{ classificacao.posicao }}º</p>
-                            <p class="mb-1"><strong>Pontuação:</strong> {{ classificacao.pontuacao_total }}</p>
-                        </div>
-                        <div class="col-6 text-end">
+        {% with matricula=classificacao.inscricao.matriculas.first %}
+        <div class="col-md-4 mb-3">
+            <div class="card evento-card h-100">
+
+                <!-- Header lilás -->
+                <div class="card-header text-white py-2"
+                     style="background: linear-gradient(135deg, #7d3c98, #9b59b6);">
+                    <h6 class="mb-0">
+                        {{ classificacao.inscricao.evento.nome }}
+                    </h6>
+                </div>
+
+                <div class="card-body py-2 d-flex flex-column">
+                    <ul class="list-unstyled small mb-3">
+                        <li class="mb-1">
+                            <i class="bi bi-hash text-primary"></i>
+                            <strong>Posição:</strong>
+                            {{ classificacao.posicao }}º
+                        </li>
+                        <li class="mb-1">
+                            <i class="bi bi-star text-warning"></i>
+                            <strong>Pontuação:</strong>
+                            {{ classificacao.pontuacao_total }}
+                        </li>
+                    </ul>
+
+                    <!-- Status com rótulos -->
+                    <div class="status-row mt-auto mb-1">
+
+                        {# ── Classificação ── #}
+                        <div class="status-group">
+                            <span class="status-rotulo">Classificação</span>
                             {% if classificacao.classificado %}
-                                <span class="badge bg-success">Classificado</span>
+                                <span class="badge-dinamico"
+                                      style="background-color: #27ae60;">
+                                    <i class="bi bi-check-circle-fill"
+                                       style="font-size:0.7rem; vertical-align:middle;"></i>
+                                    Classificado
+                                </span>
                             {% elif classificacao.lista_espera %}
-                                <span class="badge bg-warning">Lista de Espera</span>
+                                <span class="badge-dinamico"
+                                      style="background-color: #f39c12;">
+                                    <i class="bi bi-clock-fill"
+                                       style="font-size:0.7rem; vertical-align:middle;"></i>
+                                    Lista de Espera
+                                </span>
                             {% else %}
-                                <span class="badge bg-secondary">Não Classificado</span>
+                                <span class="badge-dinamico"
+                                      style="background-color: #7f8c8d;">
+                                    <i class="bi bi-x-circle-fill"
+                                       style="font-size:0.7rem; vertical-align:middle;"></i>
+                                    Não Classificado
+                                </span>
                             {% endif %}
                         </div>
+
+                        {# ── Matrícula (se houver) ── #}
+                        {% if matricula %}
+                        <div class="status-group">
+                            <span class="status-rotulo">Matrícula</span>
+                            <span class="badge-dinamico"
+                                  style="background-color: {{ matricula.status.cor }};">
+                                <i class="bi bi-mortarboard-fill"
+                                   style="font-size:0.65rem; vertical-align:middle;"></i>
+                                {{ matricula.status.nome }}
+                            </span>
+                        </div>
+                        {% endif %}
+
                     </div>
+
                 </div>
+
+                <div class="card-footer bg-transparent py-2">
+                    <a href="{% url 'portal:resultado_evento' classificacao.inscricao.evento.id %}"
+                       class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="bi bi-trophy"></i> Ver Classificação
+                    </a>
+                </div>
+
             </div>
         </div>
+        {% endwith %}
     {% endfor %}
 </div>
 {% endif %}
