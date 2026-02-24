@@ -1,0 +1,23 @@
+RECUPERAÇÃO DE SENHA — ÁREA ADMINISTRATIVA
+MetaReciclagem
+
+
+Olá, {{ user.get_full_name|default:user.username }}.
+
+Recebemos uma solicitação para redefinir a senha da sua conta
+na área administrativa do MetaReciclagem.
+
+Acesse o link abaixo para criar uma nova senha:
+
+{{ protocol }}://{{ domain }}{% url 'staff_senha_redefinir' uidb64=uid token=token %}
+
+ATENÇÃO:
+- Este link é válido por 24 horas.
+- Pode ser utilizado apenas uma vez.
+- Se você não fez esta solicitação, ignore este e-mail.
+  Sua senha permanece a mesma.
+
+------------------------------------------------------------
+MetaReciclagem — Prefeitura de Sorocaba
+Este é um e-mail automático. Por favor, não responda.
+

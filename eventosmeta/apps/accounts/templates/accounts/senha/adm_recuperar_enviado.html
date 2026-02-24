@@ -1,0 +1,107 @@
+<!--
+Arquivo: adm_recuperar_enviado.html
+Caminho: apps/accounts/templates/accounts/senha/adm_recuperar_enviado.html
+Descrição: Passo 2 — Confirmação de envio do e-mail de recuperação
+Criado: 24/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}E-mail Enviado — Staff | MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .container {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+    }
+    .icone { font-size: 60px; margin-bottom: 15px; }
+    h1 { color: #333; font-size: 22px; margin-bottom: 10px; }
+    p { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
+    .alerta {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #856404;
+        margin: 20px 0;
+        text-align: left;
+    }
+    .info {
+        background: #e8f4fd;
+        border-left: 4px solid #667eea;
+        padding: 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #444;
+        margin: 15px 0;
+        text-align: left;
+    }
+    .btn {
+        display: inline-block;
+        padding: 12px 25px;
+        margin-top: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .btn:hover { opacity: 0.9; color: white; }
+    .link-tentar {
+        display: block;
+        margin-top: 15px;
+        color: #667eea;
+        font-size: 13px;
+        text-decoration: none;
+    }
+    .link-tentar:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="icone">📧</div>
+    <h1>E-mail Enviado!</h1>
+
+    <p>
+        Se o e-mail informado estiver cadastrado em uma conta Staff,
+        você receberá as instruções para redefinir sua senha em breve.
+    </p>
+
+    <div class="alerta">
+        ⚠️ <strong>Não recebeu?</strong> Verifique sua pasta de
+        <strong>spam</strong> ou lixo eletrônico.
+    </div>
+
+    <div class="info">
+        ⏱ O link de redefinição é válido por <strong>24 horas</strong>
+        e pode ser usado apenas <strong>uma vez</strong>.
+    </div>
+
+    <a href="{% url 'accounts:login_staff' %}" class="btn">
+        ← Voltar para o Login
+    </a>
+
+    <a href="{% url 'staff_senha_recuperar' %}" class="link-tentar">
+        Não recebi o e-mail — tentar novamente
+    </a>
+
+</div>
+{% endblock %}
+

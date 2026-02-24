@@ -1,8 +1,10 @@
 <!--
-Arquivo: redefinir.html
-Caminho: template/accounts/senha/redefinir.html
-Alteração: Formulário para nova senha — Staff
+Arquivo: confirmar.html
+Caminho: apps/accounts/templates/accounts/senha/confirmar.html
+Alteração: Renomeado de redefinir.html → confirmar.html
+           URL corrigida: 'staff_senha_recuperar' → 'accounts:senha_recuperar'
 Data: 20/02/2026
+Data: 24/02/2026
 -->
 {% extends 'base_auth.html' %}
 
@@ -69,23 +71,27 @@ Data: 20/02/2026
     {% endif %}
 
     {% if validlink %}
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-group">
-            <label>Nova Senha</label>
-            {{ form.new_password1 }}
-        </div>
-        <div class="form-group">
-            <label>Confirmar Nova Senha</label>
-            {{ form.new_password2 }}
-        </div>
-        <button type="submit" class="btn">✅ Salvar Nova Senha</button>
-    </form>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Nova Senha</label>
+                {{ form.new_password1 }}
+            </div>
+            <div class="form-group">
+                <label>Confirmar Nova Senha</label>
+                {{ form.new_password2 }}
+            </div>
+            <button type="submit" class="btn">✅ Salvar Nova Senha</button>
+        </form>
     {% else %}
-    <div style="text-align:center; color: #dc3545;">
-        <p>❌ Link inválido ou expirado.</p>
-        <a href="{% url 'staff_senha_recuperar' %}" style="color:#667eea;">Solicitar novo link</a>
-    </div>
+        <div style="text-align:center; color: #dc3545;">
+            <p>❌ Link inválido ou expirado.</p>
+            {# CORRIGIDO 24/02/2026: era 'staff_senha_recuperar' (inexistente) #}
+            <a href="{% url 'accounts:senha_recuperar' %}"
+               style="color:#667eea;">
+                Solicitar novo link
+            </a>
+        </div>
     {% endif %}
 </div>
 {% endblock %}

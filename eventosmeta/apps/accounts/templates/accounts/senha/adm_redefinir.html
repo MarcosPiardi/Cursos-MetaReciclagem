@@ -1,0 +1,180 @@
+<!--
+Arquivo: adm_redefinir.html
+Caminho: apps/accounts/templates/accounts/senha/adm_redefinir.html
+Descrição: Passo 3 — Formulário de nova senha (acessado pelo link do e-mail)
+Criado: 24/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Nova Senha — Staff | MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .container {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 100%;
+        max-width: 420px;
+    }
+    h1 { color: #333; font-size: 22px; text-align: center; margin-bottom: 20px; }
+    label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    .form-group { margin-bottom: 18px; }
+    input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+    input[type="password"]:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    .btn-salvar {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .btn-salvar:hover { opacity: 0.9; }
+    .erro {
+        color: red;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+    .requisitos {
+        background: #f8f9fa;
+        border-radius: 4px;
+        padding: 12px;
+        font-size: 12px;
+        color: #555;
+        margin-bottom: 20px;
+    }
+    .requisitos ul {
+        margin: 5px 0 0 15px;
+        padding: 0;
+    }
+    .requisitos li { margin-bottom: 3px; }
+    .link-voltar {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #667eea;
+        font-size: 13px;
+        text-decoration: none;
+    }
+    .link-voltar:hover { text-decoration: underline; }
+    /* Link inválido */
+    .invalido {
+        text-align: center;
+        padding: 10px 0;
+    }
+    .invalido .icone-erro { font-size: 50px; margin-bottom: 15px; }
+    .invalido h2 { color: #dc3545; font-size: 20px; margin-bottom: 10px; }
+    .invalido p { color: #666; font-size: 14px; margin-bottom: 20px; }
+    .btn-novo-link {
+        display: inline-block;
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .btn-novo-link:hover { opacity: 0.9; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    {% if validlink %}
+
+        <h1>🔐 Nova Senha</h1>
+
+        <div class="requisitos">
+            <strong>Requisitos da senha:</strong>
+            <ul>
+                <li>Mínimo de 8 caracteres</li>
+                <li>Não pode ser muito comum (ex: 12345678)</li>
+                <li>Não pode ser apenas números</li>
+                <li>Não pode ser igual ao nome de usuário</li>
+            </ul>
+        </div>
+
+        {% if form.errors %}
+            <div class="erro" style="margin-bottom: 15px;">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p>⚠️ {{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.new_password1.id_for_label }}">
+                    Nova Senha
+                </label>
+                {{ form.new_password1 }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.new_password2.id_for_label }}">
+                    Confirmar Nova Senha
+                </label>
+                {{ form.new_password2 }}
+            </div>
+            <button type="submit" class="btn-salvar">
+                ✅ Salvar Nova Senha
+            </button>
+        </form>
+
+        <a href="{% url 'accounts:login_staff' %}" class="link-voltar">
+            ← Voltar para o Login
+        </a>
+
+    {% else %}
+
+        <div class="invalido">
+            <div class="icone-erro">❌</div>
+            <h2>Link Inválido ou Expirado</h2>
+            <p>
+                Este link de redefinição não é mais válido.<br>
+                Isso ocorre quando ele já foi utilizado ou
+                expirou (validade de 24 horas).
+            </p>
+            <a href="{% url 'staff_senha_recuperar' %}" class="btn-novo-link">
+                🔄 Solicitar Novo Link
+            </a>
+        </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}
+

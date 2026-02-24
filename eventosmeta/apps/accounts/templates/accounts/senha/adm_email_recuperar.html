@@ -1,0 +1,86 @@
+<!--
+Arquivo: adm_email_recuperar.html
+Caminho: apps/accounts/templates/accounts/senha/adm_email_recuperar.html
+Descrição: Template HTML do e-mail de recuperação de senha Staff
+Criado: 24/02/2026
+-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; margin: 0;">
+
+    <div style="max-width: 500px; margin: auto; background: white;
+                border-radius: 8px; overflow: hidden;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 28px 32px; text-align: center;">
+            <h2 style="color: white; margin: 0; font-size: 20px;">
+                🔑 Recuperação de Senha
+            </h2>
+            <p style="color: rgba(255,255,255,0.85); margin: 8px 0 0;
+                      font-size: 13px;">
+                Área Administrativa — MetaReciclagem
+            </p>
+        </div>
+
+        <!-- Corpo -->
+        <div style="padding: 32px;">
+            <p style="color: #333; margin-bottom: 8px;">
+                Olá, <strong>{{ user.get_full_name|default:user.username }}</strong>.
+            </p>
+            <p style="color: #555; line-height: 1.7; margin-bottom: 20px;">
+                Recebemos uma solicitação para redefinir a senha da sua conta
+                na <strong>área administrativa do MetaReciclagem</strong>.
+            </p>
+            <p style="color: #555; margin-bottom: 25px;">
+                Clique no botão abaixo para criar uma nova senha:
+            </p>
+
+            <!-- Botão -->
+            <div style="text-align: center; margin: 28px 0;">
+                <a href="{{ protocol }}://{{ domain }}{% url 'staff_senha_redefinir' uidb64=uid token=token %}"
+                   style="background: linear-gradient(135deg, #667eea, #764ba2);
+                          color: white; padding: 14px 32px; border-radius: 5px;
+                          text-decoration: none; font-weight: bold; font-size: 15px;
+                          display: inline-block;">
+                    🔐 Redefinir Minha Senha
+                </a>
+            </div>
+
+            <!-- Aviso -->
+            <div style="background: #fff8e1; border-left: 4px solid #ffc107;
+                        padding: 12px 16px; border-radius: 4px;
+                        font-size: 13px; color: #555; margin-bottom: 20px;">
+                ⏱ <strong>Atenção:</strong> Este link é válido por
+                <strong>24 horas</strong> e pode ser usado apenas
+                <strong>uma vez</strong>.<br><br>
+                Se você não solicitou a redefinição de senha, ignore este e-mail.
+                Sua senha permanece a mesma.
+            </div>
+
+            <!-- Link texto -->
+            <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                Se o botão não funcionar, copie e cole o link abaixo no navegador:<br>
+                <span style="color: #667eea; word-break: break-all; font-size: 11px;">
+                    {{ protocol }}://{{ domain }}{% url 'staff_senha_redefinir' uidb64=uid token=token %}
+                </span>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="background: #f4f4f4; text-align: center;
+                    padding: 16px; font-size: 11px; color: #aaa;
+                    border-top: 1px solid #eee;">
+            MetaReciclagem — Prefeitura Municipal de Sorocaba<br>
+            Este é um e-mail automático. Por favor, não responda.
+        </div>
+
+    </div>
+
+</body>
+</html>
+

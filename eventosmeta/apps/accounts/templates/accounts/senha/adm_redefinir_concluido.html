@@ -1,0 +1,76 @@
+<!--
+Arquivo: adm_redefinir_concluido.html
+Caminho: apps/accounts/templates/accounts/senha/adm_redefinir_concluido.html
+Descrição: Passo 4 — Senha redefinida com sucesso
+Criado: 24/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Senha Redefinida — Staff | MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .container {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+    }
+    .icone { font-size: 60px; margin-bottom: 15px; }
+    h1 { color: #28a745; font-size: 22px; margin-bottom: 10px; }
+    p { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+    .info {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+        padding: 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #155724;
+        margin-bottom: 25px;
+        text-align: left;
+    }
+    .btn {
+        display: inline-block;
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .btn:hover { opacity: 0.9; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="icone">✅</div>
+    <h1>Senha Redefinida!</h1>
+
+    <p>Sua senha foi alterada com sucesso.</p>
+
+    <div class="info">
+        🔐 Agora você pode fazer login na área administrativa
+        com suas novas credenciais.
+    </div>
+
+    <a href="{% url 'accounts:login_staff' %}" class="btn">
+        🔐 Ir para o Login Staff
+    </a>
+
+</div>
+{% endblock %}
+
