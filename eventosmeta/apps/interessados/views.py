@@ -24,6 +24,11 @@ Data: 20/02/2026
 Alteração: dashboard_view — prefetch_related de matriculas e status da matricula
            para exibir status de matrícula nos cards do dashboard sem N queries
 Data: 24/02/2026
+
+Alteração: Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
+           Intercepta login de Interessado com must_change_password = True
+           e força troca de senha antes de qualquer outra ação
+Data: 25/02/2026
 """
 
 import secrets
@@ -101,7 +106,7 @@ def login_view(request):
                 interessado,
                 backend='apps.interessados.authentication.InteressadoBackend'
             )
-
+            # Middleware intercepta e redireciona se must_change_password = True
             return redirect('interessados:dashboard')
 
     else:
@@ -137,26 +142,17 @@ def dashboard_view(request):
         messages.error(request, '🔒 Sua conta foi desativada.')
         return redirect('interessados:login')
 
-    # ==========================================
-    # INSCRIÇÕES
-    # select_related: FK diretas (evento, status do evento, status da inscrição)
-    # prefetch_related: matriculas e status da matrícula (related_name='matriculas')
-    # ==========================================
     inscricoes = Inscricao.objects.filter(
         interessado=interessado
     ).select_related(
         'evento',
-        'evento__status',   # ← Status do evento (nome + cor)
-        'status',           # ← Status da inscrição (nome)
+        'evento__status',
+        'status',
     ).prefetch_related(
-        'matriculas',               # ← Matricula.inscricao (related_name)
-        'matriculas__status',       # ← StatusMatricula (nome + cor)
+        'matriculas',
+        'matriculas__status',
     ).order_by('-data_inscricao')
 
-    # ==========================================
-    # CLASSIFICAÇÕES
-    # prefetch_related: matriculas via inscricao
-    # ==========================================
     classificacoes = Classificacao.objects.filter(
         inscricao__interessado=interessado
     ).select_related(
@@ -181,14 +177,14 @@ def dashboard_view(request):
     ).distinct()
 
     context = {
-        'interessado':          interessado,
-        'inscricoes':           inscricoes,
-        'classificacoes':       classificacoes,
-        'total_inscricoes':     total_inscricoes,
+        'interessado'         : interessado,
+        'inscricoes'          : inscricoes,
+        'classificacoes'      : classificacoes,
+        'total_inscricoes'    : total_inscricoes,
         'total_classificacoes': total_classificacoes,
         'inscricoes_aprovadas': inscricoes_aprovadas,
         'inscricoes_pendentes': inscricoes_pendentes,
-        'eventos_abertos':      eventos_abertos,
+        'eventos_abertos'     : eventos_abertos,
     }
 
     return render(request, 'interessados/dashboard.html', context)
@@ -227,8 +223,8 @@ def meus_dados_view(request):
         form = EdicaoInteressadoForm(instance=interessado)
 
     return render(request, 'interessados/meus_dados.html', {
-        'form': form,
-        'interessado': interessado
+        'form'       : form,
+        'interessado': interessado,
     })
 
 
@@ -254,7 +250,7 @@ def detalhes_view(request, inscricao_id):
     )
 
     return render(request, 'portal/detalhes_evento.html', {
-        'inscricao': inscricao
+        'inscricao': inscricao,
     })
 
 
@@ -313,10 +309,10 @@ def inscrever_evento_view(request, evento_id):
 
     try:
         Inscricao.objects.create(
-            interessado=interessado,
-            evento=evento,
-            status=status_pendente,
-            data_inscricao=timezone.now()
+            interessado  = interessado,
+            evento       = evento,
+            status       = status_pendente,
+            data_inscricao = timezone.now()
         )
         messages.success(
             request,
@@ -339,7 +335,7 @@ def senha_recuperar_view(request):
     Passo 1: Interessado informa o CPF.
     - Com e-mail cadastrado → envia link de recuperação (válido 30 min)
     - Sem e-mail cadastrado → redireciona para página de orientação
-    - CPF não encontrado → exibe erro no formulário
+    - CPF não encontrado   → exibe erro no formulário
     """
     erro      = None
     cpf_value = ''
@@ -353,13 +349,11 @@ def senha_recuperar_view(request):
             interessado = Interessado.objects.get(cpf=cpf, is_active=True)
 
             if interessado.email:
-                # Invalidar tokens anteriores não utilizados
                 PasswordResetToken.objects.filter(
                     interessado=interessado,
                     usado=False
                 ).update(usado=True)
 
-                # Gerar novo token e salvar no banco
                 token = secrets.token_urlsafe(32)
                 PasswordResetToken.objects.create(
                     interessado=interessado,
@@ -367,16 +361,14 @@ def senha_recuperar_view(request):
                     expira_em=timezone.now() + timedelta(minutes=30)
                 )
 
-                # Montar link
                 link = request.build_absolute_uri(
                     f'/inscricao/senha/redefinir/{token}/'
                 )
 
-                # Renderizar e-mail
                 contexto_email = {
                     'interessado': interessado,
-                    'link': link,
-                    'validade': '30 minutos',
+                    'link'       : link,
+                    'validade'   : '30 minutos',
                 }
                 corpo_html = render_to_string(
                     'interessados/senha/email_recuperar.html',
@@ -388,12 +380,12 @@ def senha_recuperar_view(request):
                 )
 
                 send_mail(
-                    subject='MetaReciclagem — Recuperação de Senha',
-                    message=corpo_txt,
-                    html_message=corpo_html,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[interessado.email],
-                    fail_silently=False,
+                    subject      = 'MetaReciclagem — Recuperação de Senha',
+                    message      = corpo_txt,
+                    html_message = corpo_html,
+                    from_email   = settings.DEFAULT_FROM_EMAIL,
+                    recipient_list = [interessado.email],
+                    fail_silently  = False,
                 )
 
                 return redirect('interessados:senha_recuperar_enviado')
@@ -405,16 +397,13 @@ def senha_recuperar_view(request):
             erro = 'CPF não encontrado ou conta inativa no sistema.'
 
     return render(request, 'interessados/senha/recuperar.html', {
-        'erro': erro,
+        'erro'     : erro,
         'cpf_value': cpf_value,
     })
 
 
 def senha_recuperar_enviado_view(request):
-    """
-    Passo 2: Confirmação de envio.
-    Em desenvolvimento o e-mail aparece no terminal (console backend).
-    """
+    """Passo 2: Confirmação de envio."""
     return render(request, 'interessados/senha/recuperar_enviado.html')
 
 
@@ -425,15 +414,15 @@ def senha_redefinir_view(request, token):
     """
     try:
         reset_token = PasswordResetToken.objects.select_related('interessado').get(
-            token=token,
-            usado=False,
-            expira_em__gt=timezone.now()
+            token    = token,
+            usado    = False,
+            expira_em__gt = timezone.now()
         )
         interessado = reset_token.interessado
 
     except PasswordResetToken.DoesNotExist:
         return render(request, 'interessados/senha/token_invalido.html', {
-            'senha_ja_trocada': True
+            'senha_ja_trocada': True,
         })
 
     erro = None
@@ -466,4 +455,55 @@ def senha_redefinir_concluido_view(request):
 def senha_sem_email_view(request):
     """Interessado sem e-mail — orienta contato presencial."""
     return render(request, 'interessados/senha/sem_email.html')
+
+
+# ==============================================================================
+# FLUXO B — TROCA OBRIGATÓRIA DE SENHA — INTERESSADOS
+# Adicionado: 25/02/2026
+# Acionado pelo middleware TrocarSenhaObrigatorioMiddleware quando
+# must_change_password = True no model Interessado.
+# O usuário não consegue acessar nenhuma outra página até trocar a senha.
+# ==============================================================================
+
+@login_required(login_url='interessados:login')
+def trocar_senha_obrigatorio_view(request):
+    """
+    View de troca obrigatória de senha para Interessados.
+
+    Exibida pelo middleware quando must_change_password = True.
+    Após a troca bem-sucedida:
+      - must_change_password é definido como False
+      - Usuário é redirecionado para o dashboard normalmente
+    """
+    interessado = request.user
+
+    # Segurança extra: se chegou aqui sem must_change_password, redireciona
+    if not interessado.must_change_password:
+        return redirect('interessados:dashboard')
+
+    erro = None
+
+    if request.method == 'POST':
+        nova_senha      = request.POST.get('nova_senha', '').strip()
+        confirmar_senha = request.POST.get('confirmar_senha', '').strip()
+
+        if len(nova_senha) < 8:
+            erro = 'A nova senha deve ter no mínimo 8 caracteres.'
+        elif nova_senha != confirmar_senha:
+            erro = 'As senhas não coincidem. Tente novamente.'
+        else:
+            interessado.set_password(nova_senha)
+            interessado.must_change_password = False
+            interessado.save()
+            login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
+            messages.success(
+                request,
+                '✅ Senha alterada com sucesso! Bem-vindo ao sistema.'
+            )
+            return redirect('interessados:dashboard')
+
+    return render(request, 'interessados/senha/int_trocar_obrigatorio.html', {
+        'erro'       : erro,
+        'interessado': interessado,
+    })
 

@@ -1,129 +1,184 @@
 <!--
 Arquivo: email_recuperar.html
 Caminho: apps/interessados/templates/interessados/senha/email_recuperar.html
-Alteração: Template HTML do e-mail de recuperação de senha para Interessados
-Data: 20/02/2026
+Alteração: Corrigido compatibilidade com Outlook, Hotmail e Gmail
+           Substituído linear-gradient por cor sólida + VML para Outlook
+           Botão implementado com tabela aninhada (padrão email marketing)
+Data: 25/02/2026
 -->
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR" xmlns:v="urn:schemas-microsoft-com:vml"
+      xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+            </o:OfficeDocumentSettings>
+        </xml>
+    </noscript>
+    <![endif]-->
+    <style>
+        body { margin:0; padding:0; background-color:#f4f4f4;
+               font-family:Arial, Helvetica, sans-serif; }
+        @media only screen and (max-width:600px) {
+            .email-wrapper { width:100% !important; }
+            .email-body    { padding:20px !important; }
+        }
+    </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f4;
-             font-family: Arial, Helvetica, sans-serif;">
+<body>
 
-    <table width="100%" cellpadding="0" cellspacing="0"
-           style="background-color: #f4f4f4; padding: 30px 0;">
-        <tr>
-            <td align="center">
-                <table width="500" cellpadding="0" cellspacing="0"
-                       style="background-color: #ffffff; border-radius: 8px;
-                              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                              overflow: hidden;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0"
+       style="background-color:#f4f4f4; padding:30px 0;">
+    <tr>
+        <td align="center">
+            <!-- CONTAINER PRINCIPAL -->
+            <table class="email-wrapper" width="500" cellpadding="0"
+                   cellspacing="0" border="0"
+                   style="background-color:#ffffff; border-radius:8px;
+                          box-shadow:0 2px 10px rgba(0,0,0,0.1);">
 
-                    <!-- HEADER -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #11998e, #38ef7d);
-                                   padding: 30px; text-align: center;">
-                            <h1 style="color: white; margin: 0; font-size: 24px;">
-                                🔑 Recuperação de Senha
-                            </h1>
-                            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0;
-                                      font-size: 14px;">
-                                Área do Interessado — MetaReciclagem
-                            </p>
-                        </td>
-                    </tr>
+                <!-- ===== HEADER ===== -->
+                <tr>
+                    <td align="center"
+                        style="background-color:#0e8f84; padding:30px;
+                               border-radius:8px 8px 0 0;">
+                        <h1 style="color:#ffffff; margin:0; font-size:22px;
+                                   font-family:Arial, sans-serif;">
+                            Recuperação de Senha
+                        </h1>
+                        <p style="color:#ccf2ef; margin:8px 0 0 0;
+                                  font-size:13px; font-family:Arial, sans-serif;">
+                            Área do Interessado — MetaReciclagem
+                        </p>
+                    </td>
+                </tr>
 
-                    <!-- CORPO -->
-                    <tr>
-                        <td style="padding: 35px 40px;">
-                            <p style="color: #333; font-size: 15px; margin: 0 0 15px 0;">
-                                Olá, <strong>{{ interessado.nome }}</strong>!
-                            </p>
-                            <p style="color: #555; font-size: 14px; line-height: 1.6;
-                                      margin: 0 0 20px 0;">
-                                Recebemos uma solicitação para redefinir a senha da sua
-                                conta no sistema <strong>MetaReciclagem</strong>.
-                            </p>
-                            <p style="color: #555; font-size: 14px; line-height: 1.6;
-                                      margin: 0 0 25px 0;">
-                                Clique no botão abaixo para criar uma nova senha:
-                            </p>
+                <!-- ===== CORPO ===== -->
+                <tr>
+                    <td class="email-body" style="padding:35px 40px;">
 
-                            <!-- BOTÃO -->
-                            <table width="100%" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td align="center" style="padding: 10px 0 25px 0;">
-                                        <a href="{{ link }}"
-                                           style="display: inline-block;
-                                                  background: linear-gradient(135deg, #11998e, #38ef7d);
-                                                  color: white;
-                                                  padding: 14px 32px;
-                                                  border-radius: 5px;
-                                                  text-decoration: none;
-                                                  font-weight: bold;
-                                                  font-size: 15px;">
+                        <p style="color:#333333; font-size:15px;
+                                  margin:0 0 15px 0; font-family:Arial,sans-serif;">
+                            Olá, <strong>{{ interessado.nome }}</strong>!
+                        </p>
+                        <p style="color:#555555; font-size:14px; line-height:1.7;
+                                  margin:0 0 15px 0; font-family:Arial,sans-serif;">
+                            Recebemos uma solicitação para redefinir a senha da sua
+                            conta no sistema <strong>MetaReciclagem</strong>.
+                        </p>
+                        <p style="color:#555555; font-size:14px; line-height:1.7;
+                                  margin:0 0 25px 0; font-family:Arial,sans-serif;">
+                            Clique no botão abaixo para criar uma nova senha:
+                        </p>
+
+                        <!-- ===== BOTÃO — compatível Outlook, Hotmail, Gmail ===== -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td align="center" style="padding:10px 0 30px 0;">
+                                    <!--[if mso]>
+                                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml"
+                                                 xmlns:w="urn:schemas-microsoft-com:office:word"
+                                                 href="{{ link }}"
+                                                 style="height:46px; v-text-anchor:middle; width:220px;"
+                                                 arcsize="10%"
+                                                 fillcolor="#0e8f84"
+                                                 strokecolor="#0e8f84">
+                                        <w:anchorlock/>
+                                        <center style="color:#ffffff; font-family:Arial,sans-serif;
+                                                       font-size:15px; font-weight:bold;">
                                             Redefinir Minha Senha
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+                                        </center>
+                                    </v:roundrect>
+                                    <![endif]-->
+                                    <!--[if !mso]><!-->
+                                    <a href="{{ link }}"
+                                       style="background-color:#0e8f84;
+                                              color:#ffffff;
+                                              display:inline-block;
+                                              font-family:Arial, sans-serif;
+                                              font-size:15px;
+                                              font-weight:bold;
+                                              line-height:46px;
+                                              text-align:center;
+                                              text-decoration:none;
+                                              width:220px;
+                                              -webkit-text-size-adjust:none;
+                                              border-radius:5px;
+                                              mso-hide:all;">
+                                        Redefinir Minha Senha
+                                    </a>
+                                    <!--<![endif]-->
+                                </td>
+                            </tr>
+                        </table>
 
-                            <!-- AVISO DE VALIDADE -->
-                            <div style="background-color: #fff8e1;
-                                        border-left: 4px solid #ffc107;
-                                        padding: 12px 15px;
-                                        border-radius: 4px;
-                                        margin-bottom: 20px;">
-                                <p style="margin: 0; color: #856404; font-size: 13px;">
-                                    ⏰ <strong>Atenção:</strong> Este link é válido por
-                                    <strong>{{ validade }}</strong>.
-                                    Após esse prazo, será necessário solicitar um novo link.
-                                </p>
-                            </div>
+                        <!-- ===== AVISO DE VALIDADE ===== -->
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="background-color:#fff8e1;
+                                           border-left:4px solid #ffc107;
+                                           padding:12px 15px;
+                                           border-radius:4px;">
+                                    <p style="margin:0; color:#856404;
+                                              font-size:13px;
+                                              font-family:Arial, sans-serif;">
+                                        <strong>Atenção:</strong> Este link é válido por
+                                        <strong>{{ validade }}</strong>.
+                                        Após esse prazo, será necessário solicitar um novo link.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
 
-                            <!-- LINK ALTERNATIVO -->
-                            <p style="color: #888; font-size: 12px; line-height: 1.5;
-                                      margin: 0 0 10px 0;">
-                                Se o botão não funcionar, copie e cole o link abaixo
-                                no seu navegador:
-                            </p>
-                            <p style="background: #f8f9fa; padding: 10px;
-                                      border-radius: 4px; word-break: break-all;
-                                      font-size: 12px; color: #11998e; margin: 0 0 20px 0;">
-                                {{ link }}
-                            </p>
+                        <!-- ===== LINK TEXTO (fallback) ===== -->
+                        <p style="color:#888888; font-size:12px; line-height:1.5;
+                                  margin:20px 0 5px 0; font-family:Arial, sans-serif;">
+                            Se o botão não funcionar, copie e cole o link abaixo
+                            no seu navegador:
+                        </p>
+                        <p style="background-color:#f8f9fa; padding:10px;
+                                  border-radius:4px; word-break:break-all;
+                                  font-size:11px; color:#0e8f84; margin:0 0 20px 0;
+                                  font-family:Arial, sans-serif;">
+                            {{ link }}
+                        </p>
 
-                            <!-- AVISO DE SEGURANÇA -->
-                            <p style="color: #999; font-size: 12px; line-height: 1.5;
-                                      margin: 0; border-top: 1px solid #eee;
-                                      padding-top: 15px;">
-                                🔒 Se você <strong>não solicitou</strong> a recuperação
-                                de senha, ignore este e-mail. Sua senha permanecerá a mesma.
-                            </p>
-                        </td>
-                    </tr>
+                        <!-- ===== AVISO DE SEGURANÇA ===== -->
+                        <p style="color:#999999; font-size:12px; line-height:1.6;
+                                  margin:0; border-top:1px solid #eeeeee;
+                                  padding-top:15px; font-family:Arial, sans-serif;">
+                            Se você <strong>não solicitou</strong> a recuperação de senha,
+                            ignore este e-mail. Sua senha permanecerá a mesma.
+                        </p>
 
-                    <!-- FOOTER -->
-                    <tr>
-                        <td style="background-color: #f8f9fa; padding: 20px 40px;
-                                   text-align: center; border-top: 1px solid #eee;">
-                            <p style="color: #aaa; font-size: 12px; margin: 0;">
-                                Equipe MetaReciclagem &bull;
-                                meta.recicla@gmail.com &bull;
-                                (15) 3417-3825
-                            </p>
-                        </td>
-                    </tr>
+                    </td>
+                </tr>
 
-                </table>
-            </td>
-        </tr>
-    </table>
+                <!-- ===== FOOTER ===== -->
+                <tr>
+                    <td style="background-color:#f8f9fa; padding:20px 40px;
+                               text-align:center; border-top:1px solid #eeeeee;
+                               border-radius:0 0 8px 8px;">
+                        <p style="color:#aaaaaa; font-size:11px; margin:0;
+                                  font-family:Arial, sans-serif;">
+                            Equipe MetaReciclagem &bull;
+                            meta.recicla@gmail.com &bull;
+                            (15) 3417-3825
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
 
 </body>
 </html>
-
 

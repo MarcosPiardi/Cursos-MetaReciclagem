@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.accounts.middleware.TrocarSenhaObrigatorioMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -144,3 +145,4 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD            = True
 
     
+

@@ -1,0 +1,213 @@
+<!--
+Arquivo: int_trocar_obrigatorio.html
+Caminho: apps/interessados/templates/interessados/senha/int_trocar_obrigatorio.html
+Alteração: Template de troca obrigatória de senha para Interessados (Fluxo B)
+           Exibido pelo middleware quando must_change_password = True
+Data: 25/02/2026
+-->
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Troca de Senha Obrigatória — Interessado{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .container {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 420px;
+    }
+    h1 {
+        color: #11998e;
+        font-size: 22px;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    p.sub {
+        color: #666;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .aviso {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 12px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #444;
+        margin-bottom: 20px;
+    }
+    .aviso strong {
+        color: #856404;
+    }
+    label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 5px;
+        margin-top: 15px;
+        color: #333;
+    }
+    input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+    input[type="password"]:focus {
+        outline: none;
+        border-color: #11998e;
+        box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+    }
+    .error {
+        color: #dc3545;
+        font-size: 13px;
+        margin-top: 8px;
+        padding: 10px;
+        background: #f8d7da;
+        border-radius: 4px;
+        border-left: 4px solid #dc3545;
+    }
+    .requisitos {
+        background: #e8f8f5;
+        border-radius: 4px;
+        padding: 10px 14px;
+        font-size: 12px;
+        color: #555;
+        margin-top: 10px;
+    }
+    .requisitos ul {
+        margin: 5px 0 0 0;
+        padding-left: 18px;
+    }
+    .requisitos li {
+        margin-bottom: 2px;
+    }
+    .btn {
+        width: 100%;
+        padding: 12px;
+        margin-top: 20px;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+    .btn:hover {
+        opacity: 0.9;
+    }
+    .rodape {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 13px;
+        color: #999;
+    }
+    .rodape a {
+        color: #11998e;
+        text-decoration: none;
+    }
+    .rodape a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>🔐 Troca de Senha Obrigatória</h1>
+    <p class="sub">Olá, {{ interessado.nome|truncatechars:30 }} — MetaReciclagem</p>
+
+    <div class="aviso">
+        ⚠️ <strong>Atenção:</strong> Você recebeu uma senha provisória.
+        Por segurança, defina uma nova senha antes de continuar.
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="error" style="background:#d4edda; border-color:#28a745; color:#155724;">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if erro %}
+        <div class="error">❌ {{ erro }}</div>
+    {% endif %}
+
+    <form method="post" id="formTrocarSenha">
+        {% csrf_token %}
+
+        <label for="nova_senha">Nova Senha</label>
+        <input
+            type="password"
+            id="nova_senha"
+            name="nova_senha"
+            placeholder="Digite sua nova senha"
+            required
+            autofocus
+        >
+
+        <label for="confirmar_senha">Confirmar Nova Senha</label>
+        <input
+            type="password"
+            id="confirmar_senha"
+            name="confirmar_senha"
+            placeholder="Repita a nova senha"
+            required
+        >
+
+        <div class="requisitos">
+            📋 <strong>Requisitos da senha:</strong>
+            <ul>
+                <li>Mínimo de 8 caracteres</li>
+                <li>Evite senhas muito simples (ex: 12345678)</li>
+                <li>Use letras maiúsculas, minúsculas e números</li>
+            </ul>
+        </div>
+
+        <button type="submit" class="btn">✅ Definir Nova Senha</button>
+    </form>
+
+    <div class="rodape">
+        <a href="{% url 'interessados:logout' %}">Sair do sistema</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('formTrocarSenha').addEventListener('submit', function(e) {
+        const nova     = document.getElementById('nova_senha').value;
+        const confirma = document.getElementById('confirmar_senha').value;
+
+        if (nova.length < 8) {
+            e.preventDefault();
+            alert('A senha deve ter no mínimo 8 caracteres.');
+            return;
+        }
+        if (nova !== confirma) {
+            e.preventDefault();
+            alert('As senhas não coincidem. Verifique e tente novamente.');
+            return;
+        }
+    });
+</script>
+{% endblock %}
+

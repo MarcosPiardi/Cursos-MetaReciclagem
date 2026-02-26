@@ -1,6 +1,6 @@
 """
 URL Configuration for Eventos MetaReciclagem
-Arquivo: eventosmeta/config/urls.py
+Arquivo: config/urls.py
 Alteração: Admin customizado com dashboard + estrutura completa
 Data: 20/01/2026
 Alteração: Admin customizado + rotas de dashboard integradas
@@ -11,16 +11,20 @@ Alteração: Adicionadas rotas de recuperação de senha para Staff e Interessad
 Data: 20/02/2026
 Alteração: Templates de recuperação de senha Staff renomeados com prefixo adm_
 Data: 24/02/2026
+Alteração: Adicionadas rotas de troca obrigatória de senha (Fluxo B)
+           para Staff e Interessados
+Data: 25/02/2026
 """
 
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from apps.accounts.admin import admin_site
+from apps.accounts import views as accounts_views
+from apps.interessados import views as interessados_views
 from dashboard import views as dashboard_views
 
 urlpatterns = [
@@ -67,6 +71,7 @@ urlpatterns = [
 
     # ==========================================
     # RECUPERAÇÃO DE SENHA — STAFF
+    # Fluxo A: Via e-mail (self-service)
     # Templates com prefixo adm_ em accounts/senha/
     # Alteração: 20/02/2026
     # Alteração: Nomes corrigidos para prefixo adm_
@@ -115,12 +120,36 @@ urlpatterns = [
             name='staff_senha_redefinir_concluido',
         ),
 
+        # ==========================================
+        # FLUXO B: Troca obrigatória de senha — STAFF
+        # Adicionado: 25/02/2026
+        # Acionado pelo middleware quando must_change_password = True
+        # ==========================================
+        path(
+            'trocar-obrigatorio/',
+            accounts_views.trocar_senha_obrigatorio_view,
+            name='staff_trocar_senha_obrigatorio',
+        ),
+
     ])),
 
     # ==========================================
     # SISTEMA 2: Público/Interessados
     # ==========================================
     path('inscricao/', include('apps.interessados.urls')),
+
+    # ==========================================
+    # TROCA OBRIGATÓRIA DE SENHA — INTERESSADOS
+    # Fluxo B: Acionado pelo middleware quando must_change_password = True
+    # Adicionado: 25/02/2026
+    # Definido fora do include('apps.interessados.urls') para garantir
+    # que o middleware consiga redirecionar sem conflito de namespace
+    # ==========================================
+    path(
+        'inscricao/senha/trocar-obrigatorio/',
+        interessados_views.trocar_senha_obrigatorio_view,
+        name='interessados_trocar_senha_obrigatorio',
+    ),
 
     # ==========================================
     # SISTEMA 3: Portal Público

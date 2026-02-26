@@ -8,6 +8,8 @@ Data: 26/01/2026
 Alteração: Adicionado modelo PasswordResetToken para recuperação de senha
            Token salvo no banco — funciona em qualquer aba/navegador
 Data: 20/02/2026
+Alteração: Campo email alterado para unique=True (opcional mas único quando informado)
+Data: 26/02/2026
 """
 
 from django.db import models
@@ -65,16 +67,13 @@ class Interessado(models.Model):
         message='NIS deve conter entre 11 e 15 dígitos'
     )
 
-    # ============================================================
-    # VALIDADOR CEP - ADICIONADO EM 26/01/2026
-    # ============================================================
     cep_validator = RegexValidator(
         regex=r'^\d{8}$',
         message='CEP deve conter exatamente 8 dígitos'
     )
 
     # ============================================================
-    # CAMPOS DE AUTENTICAÇÃO - Adicionados em 05/12/2025
+    # CAMPOS DE AUTENTICAÇÃO
     # ============================================================
     senha = models.CharField(
         'Senha',
@@ -107,6 +106,16 @@ class Interessado(models.Model):
         help_text='Indica se o interessado tem todas as permissões (normalmente False)'
     )
 
+    # ============================================================
+    # FLUXO B — SENHA PROVISÓRIA
+    # Adicionado: 25/02/2026
+    # ============================================================
+    must_change_password = models.BooleanField(
+        'Deve trocar a senha',
+        default=False,
+        help_text='Se True, o interessado será obrigado a trocar a senha no próximo login'
+    )
+
     # DADOS PESSOAIS
     cpf = models.CharField(
         'CPF',
@@ -121,7 +130,6 @@ class Interessado(models.Model):
         max_length=50
     )
 
-    # DOCUMENTO
     rg = models.CharField(
         'RG/Identidade',
         max_length=20,
@@ -196,9 +204,6 @@ class Interessado(models.Model):
         default=''
     )
 
-    # ============================================================
-    # CEP - ADICIONADO EM 26/01/2026
-    # ============================================================
     cep = models.CharField(
         'CEP',
         max_length=8,
@@ -243,11 +248,20 @@ class Interessado(models.Model):
         help_text='Somente números (10 ou 11 dígitos)'
     )
 
+    # ============================================================
+    # CAMPO EMAIL — ALTERADO EM 26/02/2026
+    # unique=True  → não permite dois Interessados com o mesmo e-mail
+    # blank=True   → e-mail continua opcional no cadastro
+    # null=True    → obrigatório para unique=True com blank=True no banco
+    # ============================================================
     email = models.EmailField(
         'E-mail',
         max_length=100,
         blank=True,
-        default=''
+        null=True,
+        default=None,
+        unique=True,
+        help_text='E-mail opcional — mas único quando informado'
     )
 
     # CARACTERÍSTICAS
@@ -338,7 +352,6 @@ class Interessado(models.Model):
         default=''
     )
 
-    # OUTROS
     observacao = models.TextField(
         'Observações',
         blank=True,
@@ -361,7 +374,7 @@ class Interessado(models.Model):
         return check_password(raw_password, self.senha)
 
     # ============================================================
-    # MÉTODOS DE PERMISSÃO - Adicionados em 05/12/2025
+    # MÉTODOS DE PERMISSÃO
     # ============================================================
     def has_perm(self, perm, obj=None):
         return self.is_superuser
@@ -392,7 +405,6 @@ class Interessado(models.Model):
     # ============================================================
     @property
     def tem_deficiencia(self):
-        """Verifica se tem alguma deficiência"""
         return any([
             self.pcd_fisica,
             self.pcd_visual,
@@ -412,16 +424,12 @@ class Interessado(models.Model):
 
 # ============================================================
 # PASSWORD RESET TOKEN - ADICIONADO EM 20/02/2026
-# Armazena tokens de recuperação de senha no banco de dados
-# Soluciona problema de "link expirado" ao abrir em nova aba
 # ============================================================
 
 class PasswordResetToken(models.Model):
     """
     Token de recuperação de senha para Interessados.
-
-    Salvo no banco de dados em vez da sessão, garantindo que
-    o link funcione em qualquer aba ou navegador pelo prazo de validade.
+    Salvo no banco de dados — funciona em qualquer aba ou navegador.
     """
 
     interessado = models.ForeignKey(
@@ -438,10 +446,7 @@ class PasswordResetToken(models.Model):
         help_text='Token seguro gerado via secrets.token_urlsafe(32)'
     )
 
-    criado_em = models.DateTimeField(
-        'Criado em',
-        auto_now_add=True
-    )
+    criado_em = models.DateTimeField('Criado em', auto_now_add=True)
 
     expira_em = models.DateTimeField(
         'Expira em',
@@ -456,7 +461,6 @@ class PasswordResetToken(models.Model):
 
     @property
     def esta_valido(self):
-        """Retorna True se o token ainda está válido (não usado e não expirado)"""
         return not self.usado and timezone.now() < self.expira_em
 
     def __str__(self):

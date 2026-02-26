@@ -1,44 +1,54 @@
 """
-Arquivo: apps/interessados/admin.py
+Arquivo: admin.py
+Caminho: apps/interessados/admin.py
 Alteração: Corrigido format_html dos ícones e adicionado white-space nowrap nos telefones
 Data: 11/12/2025
 Alteração: Registrados todos os models no admin_site customizado (melhor prática)
 Data: 20/01/2026
 Alteração: Adicionado PasswordResetTokenAdmin com actions de limpeza
 Data: 20/02/2026
+Alteração: Adicionada ação 'Gerar Senha Provisória' para Interessados
+           Senha de 8 caracteres exibida uma única vez na tela
+           Campo must_change_password marcado como True automaticamente
+           Adicionado must_change_password em list_display, list_filter e fieldsets
+Data: 25/02/2026
 """
+
+import secrets
+import string
+from datetime import date
 
 from django.contrib import admin
 from django.contrib import messages
+from django.db import models
 from django.utils.html import format_html
 from django.utils import timezone
 from django.http import HttpResponse
-from datetime import date
 import csv
 
 from apps.accounts.admin import admin_site
 from .models import Interessado, Sexo, Fototipo, PasswordResetToken
 
 
-# ==========================================
+# 
 # ADMIN: SEXO
-# ==========================================
+# 
 
 @admin.register(Sexo)
 class SexoAdmin(admin.ModelAdmin):
-    list_display = ['nome']
+    list_display  = ['nome']
     search_fields = ['nome']
 
 
 @admin.register(Fototipo)
 class FototipoAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'descricao']
+    list_display  = ['nome', 'descricao']
     search_fields = ['nome', 'descricao']
 
 
-# ==========================================
+# 
 # ADMIN: INTERESSADO
-# ==========================================
+# 
 
 @admin.register(Interessado)
 class InteressadoAdmin(admin.ModelAdmin):
@@ -54,22 +64,24 @@ class InteressadoAdmin(admin.ModelAdmin):
         'necessidades_especiais_display',
         'celular_formatado',
         'telefone_formatado',
-        'email'
+        'email',
+        'must_change_password',          # ← adicionado 25/02/2026
     ]
 
     list_filter = [
         'is_active',
+        'must_change_password',          # ← adicionado 25/02/2026
         'sexo',
         'uf_residencia',
         'necessidades_especiais',
         'programa_social',
         'fototipo',
-        'criado_em'
+        'criado_em',
     ]
 
     search_fields = [
         'cpf', 'nome', 'email', 'celular',
-        'cidade_residencia', 'bairro'
+        'cidade_residencia', 'bairro',
     ]
 
     readonly_fields = ['criado_em', 'atualizado_em', 'last_login']
@@ -80,14 +92,14 @@ class InteressadoAdmin(admin.ModelAdmin):
                 'cpf', 'nome', 'rg', 'sexo',
                 'data_nascimento', 'cidade_nascimento',
                 'uf_nascimento', 'nacionalidade',
-                'fototipo', 'escolaridade'
+                'fototipo', 'escolaridade',
             )
         }),
         ('Endereço', {
             'fields': (
                 'endereco_residencial', 'num_endereco',
                 'complemento', 'bairro',
-                'cidade_residencia', 'uf_residencia'
+                'cidade_residencia', 'uf_residencia',
             )
         }),
         ('Contatos', {
@@ -95,28 +107,28 @@ class InteressadoAdmin(admin.ModelAdmin):
         }),
         ('Programa Social', {
             'fields': ('programa_social', 'num_nis'),
-            'classes': ('collapse',)
+            'classes': ('collapse',),
         }),
         ('Necessidades Especiais / PCD', {
             'fields': (
                 'necessidades_especiais',
                 'pcd_fisica', 'pcd_visual', 'pcd_auditiva',
-                'pcd_intelectual', 'pcd_psicossocial', 'pcd_multiplas'
+                'pcd_intelectual', 'pcd_psicossocial', 'pcd_multiplas',
             ),
             'classes': ('collapse',),
-            'description': 'Marque as deficiências que o interessado possui'
+            'description': 'Marque as deficiências que o interessado possui',
         }),
         ('Responsável (Para menores de idade)', {
             'fields': (
                 'nome_responsavel', 'telefone_responsavel',
-                'celular_responsavel', 'email_responsavel'
+                'celular_responsavel', 'email_responsavel',
             ),
-            'classes': ('collapse',)
+            'classes': ('collapse',),
         }),
         ('🔐 Autenticação e Permissões', {
             'fields': (
                 'senha', 'last_login',
-                'is_active', 'is_staff', 'is_superuser'
+                'is_active', 'is_staff', 'is_superuser',
             ),
             'classes': ('collapse',),
             'description': (
@@ -128,28 +140,39 @@ class InteressadoAdmin(admin.ModelAdmin):
                 '<strong>👔 Membro da Equipe:</strong> Acesso ao painel administrativo<br>'
                 '<strong>⚡ Superusuário:</strong> Todas as permissões do sistema'
                 '</div>'
-            )
+            ),
+        }),
+        # ── Adicionado: 25/02/2026 ──
+        ('🔑 Senha Provisória', {
+            'fields': ('must_change_password',),
+            'classes': ('collapse',),
+            'description': (
+                'Use a ação "Gerar Senha Provisória" na listagem para gerar '
+                'uma senha aleatória e marcar este campo automaticamente. '
+                'Quando marcado, o interessado será obrigado a trocar a senha no próximo login.'
+            ),
         }),
         ('Observações', {
-            'fields': ('observacao',)
+            'fields': ('observacao',),
         }),
         ('Informações do Sistema', {
             'fields': ('criado_em', 'atualizado_em'),
-            'classes': ('collapse',)
-        })
+            'classes': ('collapse',),
+        }),
     )
 
-    ordering = ['nome']
+    ordering      = ['nome']
     list_per_page = 25
-    actions = [
+    actions       = [
+        'gerar_senha_provisoria',            # ← adicionado 25/02/2026
         'ativar_interessados',
         'desativar_interessados',
-        'exportar_interessados_detalhado'
+        'exportar_interessados_detalhado',
     ]
 
-    # ==========================================
+    # 
     # MÉTODOS LIST_DISPLAY
-    # ==========================================
+    # 
 
     def data_nascimento_formatada(self, obj):
         if obj.data_nascimento:
@@ -249,18 +272,58 @@ class InteressadoAdmin(admin.ModelAdmin):
     is_active_display.short_description = 'Status'
     is_active_display.admin_order_field = 'is_active'
 
-    # ==========================================
+    # 
     # SAVE MODEL
-    # ==========================================
+    # 
 
     def save_model(self, request, obj, form, change):
         if 'senha' in form.changed_data:
             obj.set_password(form.cleaned_data['senha'])
         super().save_model(request, obj, form, change)
 
-    # ==========================================
+    # 
     # ACTIONS
-    # ==========================================
+    # 
+
+    # ── Adicionado: 25/02/2026 ──
+    @admin.action(description='🔑 Gerar Senha Provisória')
+    def gerar_senha_provisoria(self, request, queryset):
+        """
+        Gera senha aleatória de 8 caracteres para o interessado selecionado.
+        Exibe a senha UMA ÚNICA VEZ na tela para o Staff anotar e entregar
+        presencialmente. Marca must_change_password = True automaticamente.
+        """
+        if queryset.count() != 1:
+            self.message_user(
+                request,
+                '⚠️ Selecione exatamente 1 interessado para gerar a senha provisória.',
+                level=messages.WARNING,
+            )
+            return
+
+        interessado = queryset.first()
+
+        # Gera senha com letras maiúsculas, minúsculas e dígitos
+        alfabeto = string.ascii_letters + string.digits
+        senha    = ''.join(secrets.choice(alfabeto) for _ in range(8))
+
+        # Aplica a senha e marca troca obrigatória
+        interessado.set_password(senha)
+        interessado.must_change_password = True
+        interessado.save()
+
+        # Exibe a senha UMA ÚNICA VEZ no topo da página
+        self.message_user(
+            request,
+            format_html(
+                '<strong>✅ Senha provisória gerada para {}:</strong> '
+                '<code style="font-size:1.2em; background:#f0f0f0; padding:4px 10px;">{}</code>'
+                ' — Anote e entregue presencialmente. Esta senha não será exibida novamente.',
+                interessado.nome,
+                senha,
+            ),
+            level=messages.SUCCESS,
+        )
 
     def ativar_interessados(self, request, queryset):
         count = queryset.update(is_active=True)
@@ -275,7 +338,7 @@ class InteressadoAdmin(admin.ModelAdmin):
         self.message_user(
             request,
             f'❌ {count} interessado(s) desativado(s)! Login bloqueado.',
-            level='WARNING'
+            level='WARNING',
         )
     desativar_interessados.short_description = '❌ Desativar interessados selecionados'
 
@@ -344,7 +407,7 @@ class InteressadoAdmin(admin.ModelAdmin):
             ]
 
             criterios_atendidos = []
-            pontuacao_total = 0
+            pontuacao_total     = 0
 
             for criterio in criterios_pontuacao:
                 atende = False
@@ -371,10 +434,10 @@ class InteressadoAdmin(admin.ModelAdmin):
     )
 
 
-# ==========================================
+# 
 # ADMIN: PASSWORD RESET TOKEN
 # Alteração: 20/02/2026
-# ==========================================
+# 
 
 @admin.register(PasswordResetToken)
 class PasswordResetTokenAdmin(admin.ModelAdmin):
@@ -392,18 +455,9 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
         'usado',
     ]
 
-    list_filter = [
-        'usado',
-        'criado_em',
-    ]
-
-    search_fields = [
-        'interessado__nome',
-        'interessado__cpf',
-        'token',
-    ]
-
-    ordering = ['-criado_em']
+    list_filter   = ['usado', 'criado_em']
+    search_fields = ['interessado__nome', 'interessado__cpf', 'token']
+    ordering      = ['-criado_em']
     readonly_fields = ['token', 'interessado', 'criado_em', 'expira_em', 'usado']
     list_per_page = 25
 
@@ -413,9 +467,9 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
         'limpar_todos_invalidos',
     ]
 
-    # ==========================================
+    # 
     # MÉTODOS LIST_DISPLAY
-    # ==========================================
+    # 
 
     def get_interessado(self, obj):
         return obj.interessado.nome
@@ -428,30 +482,26 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
     get_cpf.short_description = 'CPF'
 
     def get_status(self, obj):
-        """Badge colorido indicando o status do token"""
         agora = timezone.now()
-
         if obj.usado:
             return format_html(
-                '<span style="display: inline-block; padding: 3px 8px; '
-                'background-color: #6c757d; color: white; border-radius: 12px; '
-                'font-size: 11px;">✔️ Usado</span>'
+                '<span style="display:inline-block;padding:3px 8px;'
+                'background:#6c757d;color:white;border-radius:12px;font-size:11px;">'
+                '✔️ Usado</span>'
             )
         elif agora > obj.expira_em:
             return format_html(
-                '<span style="display: inline-block; padding: 3px 8px; '
-                'background-color: #dc3545; color: white; border-radius: 12px; '
-                'font-size: 11px;">⏰ Expirado</span>'
+                '<span style="display:inline-block;padding:3px 8px;'
+                'background:#dc3545;color:white;border-radius:12px;font-size:11px;">'
+                '⏰ Expirado</span>'
             )
         else:
-            # Calcular minutos restantes
-            restante = obj.expira_em - agora
-            minutos = int(restante.total_seconds() // 60)
+            minutos = int((obj.expira_em - agora).total_seconds() // 60)
             return format_html(
-                '<span style="display: inline-block; padding: 3px 8px; '
-                'background-color: #28a745; color: white; border-radius: 12px; '
-                'font-size: 11px;">✅ Válido (~{}min)</span>',
-                minutos
+                '<span style="display:inline-block;padding:3px 8px;'
+                'background:#28a745;color:white;border-radius:12px;font-size:11px;">'
+                '✅ Válido (~{}min)</span>',
+                minutos,
             )
     get_status.short_description = 'Status'
 
@@ -465,46 +515,35 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
     expira_em_formatado.short_description = 'Expira em'
     expira_em_formatado.admin_order_field = 'expira_em'
 
-    # ==========================================
+    # 
     # ACTIONS DE LIMPEZA
-    # ==========================================
+    # 
 
     def limpar_tokens_expirados(self, request, queryset):
-        """
-        Remove tokens cujo prazo de validade já passou
-        (independente de terem sido usados ou não)
-        """
-        agora = timezone.now()
+        agora     = timezone.now()
         expirados = queryset.filter(expira_em__lt=agora)
-        total = expirados.count()
+        total     = expirados.count()
         expirados.delete()
         self.message_user(
             request,
             f'🗑️ {total} token(s) expirado(s) removido(s) com sucesso!',
-            level=messages.SUCCESS
+            level=messages.SUCCESS,
         )
     limpar_tokens_expirados.short_description = '🗑️ Remover tokens EXPIRADOS selecionados'
 
     def limpar_tokens_usados(self, request, queryset):
-        """
-        Remove tokens que já foram utilizados para redefinir senha
-        """
         usados = queryset.filter(usado=True)
-        total = usados.count()
+        total  = usados.count()
         usados.delete()
         self.message_user(
             request,
             f'🗑️ {total} token(s) já utilizado(s) removido(s) com sucesso!',
-            level=messages.SUCCESS
+            level=messages.SUCCESS,
         )
     limpar_tokens_usados.short_description = '🗑️ Remover tokens JÁ USADOS selecionados'
 
     def limpar_todos_invalidos(self, request, queryset):
-        """
-        Remove TODOS os tokens inválidos (expirados + usados) do banco inteiro.
-        Ignora a seleção — limpa tudo de uma vez.
-        """
-        agora = timezone.now()
+        agora    = timezone.now()
         invalidos = PasswordResetToken.objects.filter(
             models.Q(expira_em__lt=agora) | models.Q(usado=True)
         )
@@ -513,33 +552,31 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
         self.message_user(
             request,
             f'🧹 Limpeza completa: {total} token(s) inválido(s) removido(s) do banco!',
-            level=messages.SUCCESS
+            level=messages.SUCCESS,
         )
     limpar_todos_invalidos.short_description = '🧹 Limpar TODOS os tokens inválidos do banco'
 
-    # ==========================================
+    # 
     # PERMISSÕES — SOMENTE LEITURA + LIMPEZA
-    # ==========================================
+    # 
 
     def has_add_permission(self, request):
-        """Tokens são criados apenas pelo sistema (view de recuperação)"""
         return False
 
     def has_change_permission(self, request, obj=None):
-        """Tokens não devem ser editados manualmente"""
         return False
 
     def has_delete_permission(self, request, obj=None):
-        """Apenas superuser pode deletar tokens individualmente"""
         return request.user.is_superuser
 
 
-# ==========================================
+# 
 # REGISTRAR NO ADMIN CUSTOMIZADO
-# ==========================================
+# 
 
-admin_site.register(Sexo, SexoAdmin)
-admin_site.register(Fototipo, FototipoAdmin)
-admin_site.register(Interessado, InteressadoAdmin)
+admin_site.register(Sexo,               SexoAdmin)
+admin_site.register(Fototipo,           FototipoAdmin)
+admin_site.register(Interessado,        InteressadoAdmin)
 admin_site.register(PasswordResetToken, PasswordResetTokenAdmin)
+
 
