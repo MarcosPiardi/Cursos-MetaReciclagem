@@ -1,0 +1,44 @@
+Script — Auditoria de e-mails dos Interessados
+
+python -c "
+import django, os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
+
+from apps.interessados.models import Interessado
+from django.db.models import Count
+
+print('=== SEM E-MAIL ===')
+sem_email = Interessado.objects.filter(email='')
+for i in sem_email:
+    print('  ' + i.nome + ' | CPF: ' + i.cpf)
+print('Total: ' + str(sem_email.count()))
+
+print()
+print('=== E-MAILS DUPLICADOS ===')
+duplicados = (
+    Interessado.objects
+    .exclude(email='')
+    .values('email')
+    .annotate(total=Count('id'))
+    .filter(total__gt=1)
+)
+for d in duplicados:
+    nomes = list(Interessado.objects.filter(email=d['email']).values_list('nome', flat=True))
+    print('  ' + d['email'] + ' -> ' + str(nomes))
+print('Total de e-mails duplicados: ' + str(duplicados.count()))
+"
+
+
+Resultado em 25/02/2026
+
+=== SEM E-MAIL ===
+  tewste 4 | CPF: 81459787005
+  Sicranio de Tal | CPF: 30233501088
+  Regina Alves | CPF: 22846627061
+Total: 3
+
+=== E-MAILS DUPLICADOS ===
+  teste@email.com -> ['teste 3', 'Teste 1 de Cadastro']
+  marcospiardi@gmail.com -> ['Paula Tras Moreira Rocha', 'Diego de Oliveira']
+Total de e-mails duplicados: 2

@@ -1,0 +1,41 @@
+Script — Auditoria de e-mails dos Usuários Staff
+
+
+python -c "
+import django, os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
+
+from apps.accounts.models import Usuario
+from django.db.models import Count
+
+print('=== SEM E-MAIL ===')
+sem_email = Usuario.objects.filter(email='')
+for u in sem_email:
+    print('  ' + u.username)
+print('Total: ' + str(sem_email.count()))
+
+print()
+print('=== E-MAILS DUPLICADOS ===')
+duplicados = (
+    Usuario.objects
+    .exclude(email='')
+    .values('email')
+    .annotate(total=Count('id'))
+    .filter(total__gt=1)
+)
+for d in duplicados:
+    nomes = list(Usuario.objects.filter(email=d['email']).values_list('username', flat=True))
+    print('  ' + d['email'] + ' -> ' + str(nomes))
+print('Total de e-mails duplicados: ' + str(duplicados.count()))
+"
+
+
+
+Resultado em 25/02/2026
+
+=== SEM E-MAIL ===
+Total: 0
+
+=== E-MAILS DUPLICADOS ===
+Total de e-mails duplicados: 0
