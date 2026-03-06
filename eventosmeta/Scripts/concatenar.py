@@ -76,7 +76,7 @@ if __name__ == "__main__":
         # tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
                     #    'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
                           
-        arquivo_saida='Artefatos-Primarios-MetaReciclagem-22-01-2026.txt'
+        arquivo_saida='Artefatos-Primarios-MetaReciclagem-06-03-2026.txt'
     )
 
     concatenar_arquivos(
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
                        'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
                           
-        arquivo_saida='Artefatos-Secundarios-MetaReciclagem-22-01-2026.txt'
+        arquivo_saida='Artefatos-Secundarios-MetaReciclagem-06-03-2026.txt'
         )       
 
 # comando para rodar: python scripts\concatenar.py    
