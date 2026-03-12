@@ -1,3 +1,3317 @@
+Artefatos-MetaReciclagem
+
+# PROJETO DJANGO - ARQUIVOS CONCATENADOS
+# Pasta: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+# Data: 06/03/2026 15:54:52
+
+================================================================================
+
+
+################################################################################
+# ARQUIVOS: models.py
+################################################################################
+
+
+================================================================================
+# ARQUIVO: apps\academico\models.py
+================================================================================
+
+"""
+Models do app ACADÊMICO
+Arquivo: apps/academico/models.py
+Responsável por: Matrículas, avaliações, execução do curso
+
+Alteração: Adicionado numero_matricula auto-gerado (formato AAAANNN)
+Data: 14/01/2026
+
+Alteração: Mantidos interessado_id e inscricao_id com validação automática
+Data: 30/01/2026
+
+Alteração: Adicionado signal para reverter status ao excluir matrícula
+Data: 02/02/2026
+
+Responsável por: Matrículas, avaliações, execução do curso
+"""
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from decimal import Decimal
+
+from apps.eventos.models import Turma
+from apps.interessados.models import Interessado
+from apps.selecao.models import Inscricao
+
+
+class StatusMatricula(models.Model):
+    """Status de Matrículas (Ativa, Trancada, Concluída, etc.)"""
+    
+    nome = models.CharField(max_length=50, unique=True)
+    cor = models.CharField(
+        max_length=7,
+        default='#6c757d',
+        help_text="Código hexadecimal da cor (ex: #007bff)"
+    )
+    ordem = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        verbose_name = "Status de Matrícula"
+        verbose_name_plural = "Status de Matrículas"
+        ordering = ['ordem', 'nome']
+    
+    def __str__(self):
+        return self.nome
+
+
+class Matricula(models.Model):
+    """
+    Matrículas de alunos em turmas
+    
+    IMPORTANTE: interessado e inscricao devem ser da mesma pessoa
+    A validação garante consistência entre os dois campos
+    """
+    
+    # Número de matrícula único e auto-gerado
+    numero_matricula = models.CharField(
+        max_length=10,
+        unique=True,
+        editable=False,
+        verbose_name='Nº Matrícula',
+        help_text='Gerado automaticamente no formato AAAANNN (ex: 2026001)'
+    )
+    
+    turma = models.ForeignKey(
+        Turma,
+        on_delete=models.PROTECT,
+        related_name='matriculas',
+        verbose_name='Turma'
+    )
+    
+    interessado = models.ForeignKey(
+        Interessado,
+        on_delete=models.PROTECT,
+        related_name='matriculas',
+        verbose_name='Interessado'
+    )
+    
+    inscricao = models.ForeignKey(
+        Inscricao,
+        on_delete=models.PROTECT,
+        related_name='matriculas',
+        verbose_name='Inscrição',
+        help_text="Inscrição que originou esta matrícula"
+    )
+    
+    status = models.ForeignKey(
+        StatusMatricula,
+        on_delete=models.PROTECT,
+        related_name='matriculas',
+        verbose_name='Status'
+    )
+    
+    # Datas
+    data_matricula = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Data da Matrícula'
+    )
+    data_atualizacao = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Última Atualização'
+    )
+    
+    # Observações
+    observacoes = models.TextField(
+        blank=True,
+        verbose_name='Observações/Anotações'
+    )
+    
+    class Meta:
+        verbose_name = "Matrícula"
+        verbose_name_plural = "Matrículas"
+        unique_together = ['turma', 'interessado']
+        ordering = ['-data_matricula']
+        indexes = [
+            models.Index(fields=['numero_matricula']),
+            models.Index(fields=['turma', 'interessado']),
+            models.Index(fields=['inscricao']),
+        ]
+    
+    def __str__(self):
+        return f"{self.numero_matricula} - {self.interessado.nome}"
+    
+    def clean(self):
+        """
+        Validações customizadas - CRÍTICO: interessado deve ser igual a inscricao.interessado
+        """
+        super().clean()
+        
+        # VALIDAÇÃO PRINCIPAL: Interessado deve corresponder à inscrição
+        if self.inscricao and self.interessado:
+            if self.inscricao.interessado != self.interessado:
+                raise ValidationError({
+                    'interessado': 'O interessado selecionado não corresponde ao interessado da inscrição.',
+                    'inscricao': f'Esta inscrição pertence a {self.inscricao.interessado.nome}, '
+                                f'não a {self.interessado.nome}.'
+                })
+        
+        # Validar que a inscrição pertence ao evento da turma
+        if self.inscricao and self.turma:
+            if self.inscricao.evento != self.turma.evento:
+                raise ValidationError({
+                    'inscricao': f'Esta inscrição é do evento "{self.inscricao.evento.nome}", '
+                                f'mas a turma é do evento "{self.turma.evento.nome}". '
+                                f'Escolha uma turma do mesmo evento.'
+                })
+        
+        # Validar que o interessado não está matriculado duas vezes na mesma turma
+        if self.pk is None:  # Apenas na criação
+            if Matricula.objects.filter(
+                turma=self.turma,
+                interessado=self.interessado
+            ).exists():
+                raise ValidationError({
+                    'interessado': f'O interessado {self.interessado.nome} '
+                                  f'já está matriculado nesta turma.'
+                })
+    
+    def save(self, *args, **kwargs):
+        """
+        Sobrescrita do save para:
+        1. Validar consistência
+        2. Gerar numero_matricula automaticamente
+        3. Auto-preencher interessado se não fornecido
+        """
+        # AUTO-PREENCHER: Se só inscricao foi fornecida, preenche interessado automaticamente
+        if self.inscricao and not self.interessado:
+            self.interessado = self.inscricao.interessado
+        
+        # Validações
+        self.full_clean()
+        
+        if not self.numero_matricula:
+            self.numero_matricula = self._gerar_numero_matricula()
+        
+        super().save(*args, **kwargs)
+    
+    def _gerar_numero_matricula(self):
+        """
+        Gera número de matrícula no formato AAAANNN
+        
+        Lógica:
+        - AAAA = Ano atual (ex: 2026)
+        - NNNN = Número sequencial de 4 dígitos (ex: 0001, 0002, ..., 9999)
+        
+        Exemplos: 20260001, 20260002, 20269999, 20270001, ...
+        
+        Returns:
+            str: Número de matrícula único
+        """
+        ano_atual = timezone.now().year
+        prefixo = str(ano_atual)
+        
+        # Buscar última matrícula do ano
+        ultima_matricula = Matricula.objects.filter(
+            numero_matricula__startswith=prefixo
+        ).order_by('-numero_matricula').first()
+        
+        if ultima_matricula:
+            # Extrair o número sequencial (últimos 4 dígitos)
+            try:
+                ultimo_numero = int(ultima_matricula.numero_matricula[4:])
+                proximo_numero = ultimo_numero + 1
+            except (ValueError, IndexError):
+                # Se houver erro na conversão, começar do 1
+                proximo_numero = 1
+        else:
+            # Primeira matrícula do ano
+            proximo_numero = 1
+        
+        # Formatar com 4 dígitos (0001, 0002, ..., 9999)
+        numero_formatado = f"{prefixo}{proximo_numero:04d}"
+        
+        return numero_formatado
+
+
+class Avaliacao(models.Model):
+    """Avaliações finais dos alunos matriculados"""
+    
+    matricula = models.OneToOneField(
+        Matricula,
+        on_delete=models.CASCADE,
+        related_name='avaliacao',
+        verbose_name='Matrícula'
+    )
+    
+    # Desempenho
+    nota_final = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
+        blank=True,
+        null=True,
+        verbose_name='Nota Final',
+        help_text="Nota de 0 a 10"
+    )
+    frequencia = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('100.00'))],
+        verbose_name='Frequência (%)',
+        help_text="Percentual de presença (%)"
+    )
+    
+    # Resultado
+    aprovado = models.BooleanField(
+        default=False,
+        verbose_name='Aprovado'
+    )
+    observacoes = models.TextField(
+        blank=True,
+        verbose_name='Observações'
+    )
+    
+    # Certificado
+    certificado_emitido = models.BooleanField(
+        default=False,
+        verbose_name='Certificado Emitido'
+    )
+    data_emissao_certificado = models.DateField(
+        blank=True,
+        null=True,
+        verbose_name='Data de Emissão do Certificado'
+    )
+    
+    # Auditoria
+    avaliado_em = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Avaliado em'
+    )
+    atualizado_em = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Atualizado em'
+    )
+    
+    class Meta:
+        verbose_name = "Avaliação"
+        verbose_name_plural = "Avaliações"
+        ordering = ['-avaliado_em']
+    
+    def __str__(self):
+        status = "Aprovado" if self.aprovado else "Reprovado"
+        return f"{self.matricula.numero_matricula} - {self.matricula.interessado.nome} - {status}"
+
+
+# ==========================================
+# SIGNALS PARA ATUALIZAR STATUS DA INSCRIÇÃO
+# ==========================================
+
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from apps.selecao.models import StatusInscricao
+
+
+@receiver(post_delete, sender=Matricula)
+def reverter_status_inscricao(sender, instance, **kwargs):
+    """
+    Quando uma matrícula é excluída, reverte o status da inscrição para 'Pendente'
+    """
+    try:
+        # Buscar status "Pendente" (case-insensitive)
+        status_pendente = StatusInscricao.objects.get(nome__iexact='pendente')
+        
+        # Atualizar a inscrição relacionada
+        inscricao = instance.inscricao
+        inscricao.status = status_pendente
+        inscricao.save()
+        
+    except StatusInscricao.DoesNotExist:
+        # Se não encontrar o status Pendente, não faz nada
+        pass
+    except Exception as e:
+        # Log do erro (opcional)
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Erro ao reverter status da inscrição {instance.inscricao.id}: {str(e)}")
+
+# ==========================================
+# SIGNAL: CRIAR AVALIAÇÃO AUTOMATICAMENTE
+# ==========================================
+
+from django.db.models.signals import post_save
+
+
+@receiver(post_save, sender=Matricula)
+def criar_avaliacao_automatica(sender, instance, created, **kwargs):
+    """
+    Quando uma matrícula é criada, cria automaticamente uma avaliação vazia
+    """
+    if created:  # Apenas na criação da matrícula
+        try:
+            # Verifica se já existe avaliação (por segurança)
+            if not hasattr(instance, 'avaliacao'):
+                Avaliacao.objects.create(
+                    matricula=instance,
+                    frequencia=0.00,  # Frequência inicial zerada
+                    aprovado=False     # Inicialmente não aprovado
+                )
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Erro ao criar avaliação para matrícula {instance.numero_matricula}: {str(e)}")
+
+            
+
+
+================================================================================
+# ARQUIVO: apps\accounts\models.py
+================================================================================
+
+"""
+Arquivo: models.py
+Caminho: apps/accounts/models.py
+Alteração: Admin customizado com dashboard + UsuarioAdmin - IMPORT CORRIGIDO
+Data: 20/01/2026
+Alteração: Adicionado campo must_change_password para Fluxo B (Senha Provisória)
+Data: 25/02/2026
+Alteração: Campo email alterado para unique=True e blank=False (obrigatório e único)
+Data: 26/02/2026
+"""
+
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.core.validators import RegexValidator
+
+
+class Usuario(AbstractUser):
+    """
+    Modelo de usuário customizado.
+    Herda todos os campos padrão do Django (username, password, email, etc.)
+    e adiciona campos extras: CPF, telefones, setor e local de trabalho.
+    """
+
+    # Validador para CPF (11 dígitos)
+    cpf_validator = RegexValidator(
+        regex=r'^\d{11}$',
+        message='CPF deve conter exatamente 11 dígitos'
+    )
+
+    # Validador para telefone (10 ou 11 dígitos)
+    telefone_validator = RegexValidator(
+        regex=r'^\d{10,11}$',
+        message='Telefone deve conter 10 ou 11 dígitos'
+    )
+
+    # CAMPOS ADICIONAIS (além dos campos padrão do Django)
+    cpf = models.CharField(
+        'CPF',
+        max_length=11,
+        unique=True,
+        validators=[cpf_validator],
+        help_text='Somente números (11 dígitos)'
+    )
+
+    # ============================================================
+    # CAMPO EMAIL — ALTERADO EM 26/02/2026
+    # unique=True  → não permite dois Staff com o mesmo e-mail
+    # blank=False  → e-mail obrigatório no cadastro de Staff
+    # Substitui o campo email padrão do AbstractUser
+    # ============================================================
+    email = models.EmailField(
+        'E-mail',
+        unique=True,
+        blank=False,
+        help_text='E-mail institucional ou pessoal — obrigatório e único'
+    )
+
+    setor_trabalho = models.CharField(
+        'Setor de Trabalho',
+        max_length=50,
+        blank=True,
+        default=''
+    )
+
+    local_trabalho = models.CharField(
+        'Local de Trabalho',
+        max_length=50,
+        blank=True,
+        default=''
+    )
+
+    telefone = models.CharField(
+        'Telefone',
+        max_length=11,
+        blank=True,
+        default='',
+        validators=[telefone_validator],
+        help_text='Somente números (10 ou 11 dígitos)'
+    )
+
+    celular = models.CharField(
+        'Celular',
+        max_length=11,
+        blank=True,
+        default='',
+        validators=[telefone_validator],
+        help_text='Somente números (10 ou 11 dígitos)'
+    )
+
+    # ============================================================
+    # FLUXO B — SENHA PROVISÓRIA
+    # Adicionado: 25/02/2026
+    # Indica que o usuário deve trocar a senha no próximo login
+    # Definido como True quando Staff gera senha provisória no Admin
+    # ============================================================
+    must_change_password = models.BooleanField(
+        'Deve trocar a senha',
+        default=False,
+        help_text='Se True, o usuário será obrigado a trocar a senha no próximo login'
+    )
+
+    def __str__(self):
+        nome = self.get_full_name()
+        if nome:
+            return f"{nome} - CPF: {self.cpf}"
+        return f"{self.username} - CPF: {self.cpf}"
+
+    class Meta:
+        verbose_name = 'Usuário'
+        verbose_name_plural = 'Usuários'
+        ordering = ['first_name', 'last_name']
+
+        
+
+
+================================================================================
+# ARQUIVO: apps\eventos\models.py
+================================================================================
+
+"""
+Arquivo: models.py
+Caminho: apps/eventos/models.py
+Alteração: Adicionado tipo_criterio em Criterio e prioridade em EventoCriterio
+Data: 09/12/2025
+"""
+from django.db import models
+from django.core.validators import MinValueValidator
+from django.utils import timezone
+
+
+class Status(models.Model):
+    """
+    Status dos eventos (Inscrições Abertas, Em Andamento, Concluído, etc.)
+    """
+    nome = models.CharField('Nome', max_length=50, unique=True)
+    cor = models.CharField('Cor', max_length=7, default='#6c757d',
+                          help_text='Cor em hexadecimal (ex: #007bff)')
+    ordem = models.IntegerField('Ordem de Exibição', default=0)
+    
+    class Meta:
+        verbose_name = 'Status'
+        verbose_name_plural = 'Status'
+        ordering = ['ordem', 'nome']
+    
+    def __str__(self):
+        return self.nome
+
+
+class Criterio(models.Model):
+    """
+    Critérios de classificação: pontuação OU ordenação
+    """
+    TIPO_CHOICES = [
+        ('PONTUACAO', 'Pontuação'),
+        ('ORDENACAO', 'Ordenação'),
+    ]
+    
+    tipo_criterio = models.CharField(
+        'Tipo de Critério',
+        max_length=20,
+        choices=TIPO_CHOICES,
+        default='PONTUACAO',
+        help_text='Pontuação = soma pontos | Ordenação = define ordem de classificação'
+    )
+    
+    codigo = models.CharField(
+        'Código',
+        max_length=30,
+        unique=True,
+        help_text='Código único do critério (ex: PCD, ORDEM_INSCRICAO, IDADE_CRESCENTE)'
+    )
+    
+    nome = models.CharField(
+        'Nome',
+        max_length=200,
+        help_text='Nome descritivo do critério'
+    )
+    
+    descricao = models.TextField(
+        'Descrição',
+        blank=True,
+        help_text='Descrição detalhada do critério'
+    )
+    
+    pontos = models.IntegerField(
+        'Pontos',
+        null=True,
+        blank=True,
+        help_text='Pontuação (apenas para tipo PONTUACAO)'
+    )
+    
+    categoria = models.CharField(
+        'Categoria',
+        max_length=50,
+        choices=[
+            ('ORDENACAO', 'Ordenação'),
+            ('CRONOLÓGICA', 'Ordem de Inscrição'),
+            ('IDADE', 'Idade'),
+            ('VULNERABILIDADE', 'Vulnerabilidade Social'),
+            ('FAIXA_ETARIA', 'Faixa Etária'),
+            ('ESCOLARIDADE', 'Escolaridade'),
+            ('COTA_RACIAL', 'Cota Racial'),
+        ],
+        help_text='Categoria do critério'
+    )
+    
+    ativo = models.BooleanField(
+        'Ativo',
+        default=True,
+        help_text='Se False, não aparece para seleção'
+    )
+    
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Critério de Classificação'
+        verbose_name_plural = 'Critérios de Classificação'
+        ordering = ['categoria', '-pontos', 'nome']
+    
+    def __str__(self):
+        if self.pontos is not None:
+            return f'{self.nome} ({self.pontos} pts)'
+        return self.nome
+
+
+class Evento(models.Model):
+    """
+    Eventos/Cursos oferecidos
+    """
+    nome = models.CharField('Nome do Evento', max_length=200)
+    descricao = models.TextField('Descrição', blank=True)
+    status = models.ForeignKey(
+        Status,
+        on_delete=models.PROTECT,
+        related_name='eventos',
+        verbose_name='Status'
+    )
+    
+    # Vagas
+    total_vagas = models.IntegerField(
+        'Total de Vagas',
+        validators=[MinValueValidator(1)]
+    )
+    
+    # Datas de inscrição
+    data_inicio_inscricao = models.DateTimeField('Início das Inscrições')
+    data_fim_inscricao = models.DateTimeField('Fim das Inscrições')
+    
+    # Período do evento
+    data_inicio_evento = models.DateField('Início do Evento')
+    data_fim_evento = models.DateField('Fim do Evento')
+    
+    # Metadata
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Evento'
+        verbose_name_plural = 'Eventos'
+        ordering = ['-data_inicio_evento']
+    
+    def __str__(self):
+        return self.nome
+    
+    def inscricoes_abertas(self):
+        """Verifica se as inscrições estão abertas"""
+        agora = timezone.now()
+        return self.data_inicio_inscricao <= agora <= self.data_fim_inscricao
+
+
+class EventoCriterio(models.Model):
+    """
+    Relacionamento entre Evento e Critérios ativos
+    """
+    evento = models.ForeignKey(
+        Evento,
+        on_delete=models.CASCADE,
+        related_name='evento_criterios',
+        verbose_name='Evento'
+    )
+    
+    criterio = models.ForeignKey(
+        Criterio,
+        on_delete=models.PROTECT,
+        verbose_name='Critério'
+    )
+    
+    prioridade = models.IntegerField(
+        'Prioridade',
+        default=999,
+        help_text='Ordem de aplicação (1 = primeiro, 2 = segundo, etc.)'
+    )
+    
+    ativo = models.BooleanField(
+        'Ativo',
+        default=True,
+        help_text='Critério será usado na classificação?'
+    )
+    
+    criado_em = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = 'Critério do Evento'
+        verbose_name_plural = 'Critérios do Evento'
+        unique_together = ['evento', 'criterio']
+        ordering = ['prioridade', '-criterio__pontos', 'criterio__nome']
+    
+    def __str__(self):
+        return f'{self.evento.nome} - {self.criterio.nome}'
+    
+    @property
+    def pontos(self):
+        """Retorna os pontos do critério (apenas leitura)"""
+        return self.criterio.pontos
+
+
+class Turma(models.Model):
+    """
+    Turmas de um evento
+    """
+    TURNO_CHOICES = [
+        ('MATUTINO', 'Matutino'),
+        ('VESPERTINO', 'Vespertino'),
+        ('NOTURNO', 'Noturno'),
+        ('INTEGRAL', 'Integral'),
+    ]
+    
+    evento = models.ForeignKey(
+        Evento,
+        on_delete=models.CASCADE,
+        related_name='turmas',
+        verbose_name='Evento'
+    )
+    nome = models.CharField('Nome da Turma', max_length=100)
+    turno = models.CharField('Turno', max_length=20, choices=TURNO_CHOICES)
+    capacidade = models.IntegerField(
+        'Capacidade',
+        validators=[MinValueValidator(1)]
+    )
+    local = models.CharField('Local', max_length=200, blank=True)
+    
+    data_inicio = models.DateField('Data de Início')
+    data_fim = models.DateField('Data de Término')
+    
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Turma'
+        verbose_name_plural = 'Turmas'
+        ordering = ['evento', 'nome']
+        unique_together = ['evento', 'nome']
+    
+    def __str__(self):
+        return f'{self.evento.nome} - {self.nome}'
+
+
+class Horario(models.Model):
+    """
+    Horários das aulas de uma turma
+    """
+    DIA_SEMANA_CHOICES = [
+        (0, 'Segunda-feira'),
+        (1, 'Terça-feira'),
+        (2, 'Quarta-feira'),
+        (3, 'Quinta-feira'),
+        (4, 'Sexta-feira'),
+        (5, 'Sábado'),
+        (6, 'Domingo'),
+    ]
+    
+    turma = models.ForeignKey(
+        Turma,
+        on_delete=models.CASCADE,
+        related_name='horarios',
+        verbose_name='Turma'
+    )
+    dia_semana = models.IntegerField('Dia da Semana', choices=DIA_SEMANA_CHOICES)
+    hora_inicio = models.TimeField('Horário de Início')
+    hora_fim = models.TimeField('Horário de Término')
+    
+    class Meta:
+        verbose_name = 'Horário'
+        verbose_name_plural = 'Horários'
+        ordering = ['turma', 'dia_semana', 'hora_inicio']
+    
+    def __str__(self):
+        return f'{self.turma.nome} - {self.get_dia_semana_display()}'
+
+
+================================================================================
+# ARQUIVO: apps\interessados\models.py
+================================================================================
+
+"""
+ARQUIVO: apps/interessados/models.py
+Models do app INTERESSADOS
+Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
+Arquivo: apps/interessados/models.py
+Alteração: Adicionar campos CEP e Raça/Cor para cadastro completo
+Data: 26/01/2026
+Alteração: Adicionado modelo PasswordResetToken para recuperação de senha
+           Token salvo no banco — funciona em qualquer aba/navegador
+Data: 20/02/2026
+Alteração: Campo email alterado para unique=True (opcional mas único quando informado)
+Data: 26/02/2026
+"""
+
+from django.db import models
+from django.core.validators import RegexValidator
+from django.contrib.auth.hashers import make_password, check_password
+from django.utils import timezone
+
+
+class Sexo(models.Model):
+    """Modelo para Sexo/Gênero"""
+    nome = models.CharField('Sexo', max_length=20)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        verbose_name = 'Sexo'
+        verbose_name_plural = 'Sexos'
+
+
+class Fototipo(models.Model):
+    """Modelo para Fototipo (classificação de pele)"""
+    nome = models.CharField('Fototipo', max_length=50)
+    descricao = models.TextField('Descrição', blank=True)
+
+    def __str__(self):
+        return self.nome
+
+    class Meta:
+        verbose_name = 'Fototipo'
+        verbose_name_plural = 'Fototipos'
+
+
+class Interessado(models.Model):
+    """Modelo para cadastro de interessados com autenticação"""
+
+    # Validadores
+    cpf_validator = RegexValidator(
+        regex=r'^\d{11}$',
+        message='CPF deve conter exatamente 11 dígitos'
+    )
+
+    telefone_validator = RegexValidator(
+        regex=r'^\d{10,11}$',
+        message='Telefone deve conter 10 ou 11 dígitos'
+    )
+
+    uf_validator = RegexValidator(
+        regex=r'^[A-Z]{2}$',
+        message='UF deve conter 2 letras maiúsculas'
+    )
+
+    nis_validator = RegexValidator(
+        regex=r'^\d{11,15}$',
+        message='NIS deve conter entre 11 e 15 dígitos'
+    )
+
+    cep_validator = RegexValidator(
+        regex=r'^\d{8}$',
+        message='CEP deve conter exatamente 8 dígitos'
+    )
+
+    # ============================================================
+    # CAMPOS DE AUTENTICAÇÃO
+    # ============================================================
+    senha = models.CharField(
+        'Senha',
+        max_length=128,
+        help_text='Senha criptografada para login'
+    )
+
+    last_login = models.DateTimeField(
+        'Último Login',
+        null=True,
+        blank=True,
+        help_text='Data e hora do último login'
+    )
+
+    is_active = models.BooleanField(
+        'Ativo',
+        default=True,
+        help_text='Indica se o interessado pode fazer login no sistema'
+    )
+
+    is_staff = models.BooleanField(
+        'Membro da Equipe',
+        default=False,
+        help_text='Indica se o interessado pode acessar o admin (normalmente False)'
+    )
+
+    is_superuser = models.BooleanField(
+        'Superusuário',
+        default=False,
+        help_text='Indica se o interessado tem todas as permissões (normalmente False)'
+    )
+
+    # ============================================================
+    # FLUXO B — SENHA PROVISÓRIA
+    # Adicionado: 25/02/2026
+    # ============================================================
+    must_change_password = models.BooleanField(
+        'Deve trocar a senha',
+        default=False,
+        help_text='Se True, o interessado será obrigado a trocar a senha no próximo login'
+    )
+
+    # DADOS PESSOAIS
+    cpf = models.CharField(
+        'CPF',
+        max_length=11,
+        unique=True,
+        validators=[cpf_validator],
+        help_text='Somente números (11 dígitos)'
+    )
+
+    nome = models.CharField(
+        'Nome Completo',
+        max_length=50
+    )
+
+    rg = models.CharField(
+        'RG/Identidade',
+        max_length=20,
+        blank=True,
+        default='',
+        help_text='Número do RG ou documento de identidade'
+    )
+
+    sexo = models.ForeignKey(
+        Sexo,
+        on_delete=models.PROTECT,
+        verbose_name='Sexo',
+        null=True,
+        blank=True
+    )
+
+    data_nascimento = models.DateField(
+        'Data de Nascimento',
+        null=True,
+        blank=True
+    )
+
+    cidade_nascimento = models.CharField(
+        'Cidade de Nascimento',
+        max_length=50,
+        blank=True,
+        default=''
+    )
+
+    uf_nascimento = models.CharField(
+        'UF Nascimento',
+        max_length=2,
+        blank=True,
+        default='',
+        validators=[uf_validator],
+        help_text='Ex: SP, RJ, MG'
+    )
+
+    nacionalidade = models.CharField(
+        'Nacionalidade',
+        max_length=50,
+        blank=True,
+        default=''
+    )
+
+    # ENDEREÇO
+    endereco_residencial = models.CharField(
+        'Endereço Residencial',
+        max_length=50,
+        blank=True,
+        default=''
+    )
+
+    num_endereco = models.CharField(
+        'Número',
+        max_length=7,
+        blank=True,
+        default=''
+    )
+
+    bairro = models.CharField(
+        'Bairro',
+        max_length=30,
+        blank=True,
+        default=''
+    )
+
+    complemento = models.CharField(
+        'Complemento',
+        max_length=50,
+        blank=True,
+        default=''
+    )
+
+    cep = models.CharField(
+        'CEP',
+        max_length=8,
+        blank=True,
+        default='',
+        validators=[cep_validator],
+        help_text='Somente números (8 dígitos)'
+    )
+
+    cidade_residencia = models.CharField(
+        'Cidade de Residência',
+        max_length=50,
+        blank=True,
+        default=''
+    )
+
+    uf_residencia = models.CharField(
+        'UF Residência',
+        max_length=2,
+        blank=True,
+        default='',
+        validators=[uf_validator],
+        help_text='Ex: SP, RJ, MG'
+    )
+
+    # CONTATOS
+    telefone = models.CharField(
+        'Telefone',
+        max_length=11,
+        blank=True,
+        default='',
+        validators=[telefone_validator],
+        help_text='Somente números (10 ou 11 dígitos)'
+    )
+
+    celular = models.CharField(
+        'Celular',
+        max_length=11,
+        blank=True,
+        default='',
+        validators=[telefone_validator],
+        help_text='Somente números (10 ou 11 dígitos)'
+    )
+
+    # ============================================================
+    # CAMPO EMAIL — ALTERADO EM 26/02/2026
+    # unique=True  → não permite dois Interessados com o mesmo e-mail
+    # blank=True   → e-mail continua opcional no cadastro
+    # null=True    → obrigatório para unique=True com blank=True no banco
+    # ============================================================
+    email = models.EmailField(
+        'E-mail',
+        max_length=100,
+        blank=True,
+        null=True,
+        default=None,
+        unique=True,
+        help_text='E-mail opcional — mas único quando informado'
+    )
+
+    # CARACTERÍSTICAS
+    fototipo = models.ForeignKey(
+        Fototipo,
+        on_delete=models.SET_NULL,
+        verbose_name='Fototipo',
+        null=True,
+        blank=True
+    )
+
+    # ESCOLARIDADE
+    ESCOLARIDADE_CHOICES = [
+        ('FUNDAMENTAL_INCOMPLETO', 'Ensino Fundamental Incompleto'),
+        ('FUNDAMENTAL_COMPLETO', 'Ensino Fundamental Completo'),
+        ('MEDIO_INCOMPLETO', 'Ensino Médio Incompleto'),
+        ('MEDIO_COMPLETO', 'Ensino Médio Completo'),
+        ('SUPERIOR_INCOMPLETO', 'Ensino Superior Incompleto'),
+        ('SUPERIOR_COMPLETO', 'Ensino Superior Completo'),
+        ('POS_GRADUACAO', 'Pós-Graduação'),
+    ]
+
+    escolaridade = models.CharField(
+        'Escolaridade',
+        max_length=30,
+        choices=ESCOLARIDADE_CHOICES,
+        blank=True,
+        default='',
+        help_text='Nível de escolaridade do interessado'
+    )
+
+    # PROGRAMA SOCIAL
+    programa_social = models.BooleanField(
+        'Participa de Programa Social',
+        default=False
+    )
+
+    num_nis = models.CharField(
+        'Número NIS',
+        max_length=15,
+        blank=True,
+        default='',
+        validators=[nis_validator],
+        help_text='Número de Identificação Social (11 a 15 dígitos)'
+    )
+
+    # NECESSIDADES ESPECIAIS / PCD
+    necessidades_especiais = models.BooleanField(
+        'Possui Necessidades Especiais',
+        default=False
+    )
+
+    pcd_fisica = models.BooleanField('PCD Física', default=False)
+    pcd_visual = models.BooleanField('PCD Visual', default=False)
+    pcd_auditiva = models.BooleanField('PCD Auditiva', default=False)
+    pcd_intelectual = models.BooleanField('PCD Intelectual', default=False)
+    pcd_psicossocial = models.BooleanField('PCD Psicossocial', default=False)
+    pcd_multiplas = models.BooleanField('PCD Múltiplas', default=False)
+
+    # RESPONSÁVEL
+    nome_responsavel = models.CharField(
+        'Nome do Responsável',
+        max_length=50,
+        blank=True,
+        default=''
+    )
+
+    telefone_responsavel = models.CharField(
+        'Telefone do Responsável',
+        max_length=11,
+        blank=True,
+        default='',
+        validators=[telefone_validator]
+    )
+
+    celular_responsavel = models.CharField(
+        'Celular do Responsável',
+        max_length=11,
+        blank=True,
+        default='',
+        validators=[telefone_validator]
+    )
+
+    email_responsavel = models.EmailField(
+        'E-mail do Responsável',
+        max_length=100,
+        blank=True,
+        default=''
+    )
+
+    observacao = models.TextField(
+        'Observações',
+        blank=True,
+        default=''
+    )
+
+    # METADATA
+    criado_em = models.DateTimeField('Criado em', auto_now_add=True)
+    atualizado_em = models.DateTimeField('Atualizado em', auto_now=True)
+
+    # ============================================================
+    # MÉTODOS DE SENHA
+    # ============================================================
+    def set_password(self, raw_password):
+        """Define a senha criptografada"""
+        self.senha = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        """Verifica se a senha está correta"""
+        return check_password(raw_password, self.senha)
+
+    # ============================================================
+    # MÉTODOS DE PERMISSÃO
+    # ============================================================
+    def has_perm(self, perm, obj=None):
+        return self.is_superuser
+
+    def has_perms(self, perm_list, obj=None):
+        return all(self.has_perm(perm, obj) for perm in perm_list)
+
+    def has_module_perms(self, app_label):
+        return self.is_staff or self.is_superuser
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    def get_username(self):
+        return self.cpf
+
+    @property
+    def username(self):
+        return self.cpf
+
+    # ============================================================
+    # PROPRIEDADES AUXILIARES
+    # ============================================================
+    @property
+    def tem_deficiencia(self):
+        return any([
+            self.pcd_fisica,
+            self.pcd_visual,
+            self.pcd_auditiva,
+            self.pcd_intelectual,
+            self.pcd_psicossocial,
+            self.pcd_multiplas
+        ])
+
+    def __str__(self):
+        return f"{self.nome} - CPF: {self.cpf}"
+
+    class Meta:
+        verbose_name = 'Interessado'
+        verbose_name_plural = 'Interessados'
+
+
+# ============================================================
+# PASSWORD RESET TOKEN - ADICIONADO EM 20/02/2026
+# ============================================================
+
+class PasswordResetToken(models.Model):
+    """
+    Token de recuperação de senha para Interessados.
+    Salvo no banco de dados — funciona em qualquer aba ou navegador.
+    """
+
+    interessado = models.ForeignKey(
+        Interessado,
+        on_delete=models.CASCADE,
+        related_name='reset_tokens',
+        verbose_name='Interessado'
+    )
+
+    token = models.CharField(
+        'Token',
+        max_length=100,
+        unique=True,
+        help_text='Token seguro gerado via secrets.token_urlsafe(32)'
+    )
+
+    criado_em = models.DateTimeField('Criado em', auto_now_add=True)
+
+    expira_em = models.DateTimeField(
+        'Expira em',
+        help_text='Data/hora de expiração do token (30 minutos após criação)'
+    )
+
+    usado = models.BooleanField(
+        'Usado',
+        default=False,
+        help_text='True após o token ser utilizado para redefinir a senha'
+    )
+
+    @property
+    def esta_valido(self):
+        return not self.usado and timezone.now() < self.expira_em
+
+    def __str__(self):
+        status = 'válido' if self.esta_valido else 'inválido'
+        return f'Token {status} — {self.interessado.nome} ({self.expira_em.strftime("%d/%m/%Y %H:%M")})'
+
+    class Meta:
+        verbose_name = 'Token de Recuperação de Senha'
+        verbose_name_plural = 'Tokens de Recuperação de Senha'
+        ordering = ['-criado_em']
+
+        
+
+
+================================================================================
+# ARQUIVO: apps\portal\models.py
+================================================================================
+
+"""
+Models do app PORTAL - Sistema MetaReciclagem
+Arquivo: apps/portal/models.py
+Data: 05/12/2025
+
+Este app não possui models próprios.
+Ele utiliza os models de outros apps:
+- Interessado (apps.interessados.models)
+- Inscricao (apps.selecao.models)
+- Classificacao (apps.selecao.models)
+- Evento (apps.eventos.models)
+"""
+from django.db import models
+
+# Este app não define models próprios
+# Apenas fornece interface pública (views e templates)
+
+
+================================================================================
+# ARQUIVO: apps\selecao\models.py
+================================================================================
+
+
+
+"""
+Models do app SELEÇÃO
+Responsável por: Processo seletivo, inscrições, classificação
+"""
+from django.db import models
+from django.core.validators import MinValueValidator
+from django.utils import timezone
+
+from apps.eventos.models import Evento, Criterio
+from apps.interessados.models import Interessado
+
+
+class StatusInscricao(models.Model):
+    """Status de Inscrições (Pendente, Confirmada, Cancelada, etc.)"""
+    
+    nome = models.CharField(max_length=50, unique=True)
+    cor = models.CharField(
+        max_length=7,
+        default='#6c757d',
+        help_text="Código hexadecimal da cor (ex: #28a745)"
+    )
+    ordem = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        verbose_name = "Status de Inscrição"
+        verbose_name_plural = "Status de Inscrições"
+        ordering = ['ordem', 'nome']
+    
+    def __str__(self):
+        return self.nome
+
+
+class Inscricao(models.Model):
+    """Inscrições de interessados em eventos"""
+    
+    interessado = models.ForeignKey(
+        Interessado,
+        on_delete=models.PROTECT,
+        related_name='inscricoes'
+    )
+    evento = models.ForeignKey(
+        Evento,
+        on_delete=models.PROTECT,
+        related_name='inscricoes'
+    )
+    status = models.ForeignKey(
+        StatusInscricao,
+        on_delete=models.PROTECT,
+        related_name='inscricoes'
+    )
+    
+    # Datas
+    data_inscricao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
+    
+    # Observações
+    observacoes = models.TextField(blank=True)
+    
+    class Meta:
+        verbose_name = "Inscrição"
+        verbose_name_plural = "Inscrições"
+        unique_together = ['interessado', 'evento']
+        ordering = ['-data_inscricao']
+    
+    def __str__(self):
+        return f"{self.interessado.nome} → {self.evento.nome}"
+
+
+class Classificacao(models.Model):
+    """Classificação final dos inscritos (READ-ONLY para staff)"""
+    
+    inscricao = models.OneToOneField(
+        Inscricao,
+        on_delete=models.CASCADE,
+        related_name='classificacao'
+    )
+    
+    # ========================================================================
+    # ALTERAÇÃO: Campo 'posicao' agora permite NULL
+    # MOTIVO: A posição é atribuída apenas após o processamento completo
+    #         da classificação. Durante o cálculo de pontos, o registro
+    #         é criado sem posição definida.
+    # ========================================================================
+    posicao = models.PositiveIntegerField(
+        null=True,      # ← ADICIONADO: Permite valores nulos
+        blank=True      # ← ADICIONADO: Permite campo vazio no admin
+    )
+    
+    pontuacao_total = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+    classificado = models.BooleanField(
+        default=False,
+        help_text="Se foi classificado dentro das vagas disponíveis"
+    )
+    lista_espera = models.BooleanField(
+        default=False,
+        help_text="Se está na lista de espera"
+    )
+    
+    # Auditoria
+    processado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Classificação"
+        verbose_name_plural = "Classificações"
+        unique_together = ['inscricao']
+        ordering = ['inscricao__evento', 'posicao']
+    
+    def __str__(self):
+        return f"{self.posicao}º - {self.inscricao.interessado.nome} ({self.pontuacao_total} pts)"
+
+
+class InscricaoCriterioAtendido(models.Model):
+    """
+    Critérios atendidos por cada inscrição (READ-ONLY - apenas auditoria)
+    Gerado automaticamente pelo ClassificadorService
+    """
+    
+    inscricao = models.ForeignKey(
+        Inscricao,
+        on_delete=models.CASCADE,
+        related_name='criterios_atendidos'
+    )
+    criterio = models.ForeignKey(
+        Criterio,
+        on_delete=models.PROTECT,
+        related_name='inscricoes_atendidas'
+    )
+    pontos_atribuidos = models.PositiveIntegerField()
+    validado = models.BooleanField(
+        default=False,
+        help_text="Indica se critério customizado foi validado manualmente"
+    )
+    observacao_validacao = models.TextField(blank=True)
+    
+    class Meta:
+        verbose_name = "Critério Atendido"
+        verbose_name_plural = "Critérios Atendidos"
+        unique_together = ['inscricao', 'criterio']
+        ordering = ['inscricao', '-pontos_atribuidos']
+    
+    def __str__(self):
+        return f"{self.inscricao.interessado.nome} - {self.criterio.nome} ({self.pontos_atribuidos} pts)"
+    
+    
+
+
+================================================================================
+# ARQUIVO: dashboard\models.py
+================================================================================
+
+from django.db import models
+
+# Create your models here.
+
+
+
+################################################################################
+# ARQUIVOS: views.py
+################################################################################
+
+
+================================================================================
+# ARQUIVO: apps\academico\views.py
+================================================================================
+
+"""
+Arquivo: views.py
+Caminho: apps/academico/views.py
+Descrição: Views para gestão de matrícula
+Data: 12/01/2026
+"""
+
+"""
+Views do app ACADÊMICO
+Arquivo: apps/academico/views.py
+Data: 02/02/2026
+"""
+
+from django.http import HttpResponse, FileResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_http_methods
+import io
+import zipfile
+
+from .models import Avaliacao
+from .certificado import GeradorCertificado
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def download_certificado_individual(request, avaliacao_id):
+    """
+    Download individual de certificado em PDF
+    """
+    avaliacao = get_object_or_404(Avaliacao, pk=avaliacao_id)
+    
+    # Verificar se está aprovado
+    if not avaliacao.aprovado:
+        return HttpResponse("❌ Certificado disponível apenas para alunos aprovados.", status=400)
+    
+    # Gerar PDF
+    buffer = io.BytesIO()
+    gerador = GeradorCertificado(avaliacao)
+    gerador.gerar_pdf(buffer)
+    buffer.seek(0)
+    
+    # Nome do arquivo
+    aluno_nome = avaliacao.matricula.interessado.nome.replace(' ', '_')
+    curso_nome = avaliacao.matricula.turma.evento.nome.replace(' ', '_')
+    filename = f"Certificado_{aluno_nome}_{curso_nome}.pdf"
+    
+    # Retornar PDF para download
+    response = FileResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def preview_certificado(request, avaliacao_id):
+    """
+    Preview do certificado (visualizar no navegador)
+    """
+    avaliacao = get_object_or_404(Avaliacao, pk=avaliacao_id)
+    
+    # Verificar se está aprovado
+    if not avaliacao.aprovado:
+        return HttpResponse("❌ Certificado disponível apenas para alunos aprovados.", status=400)
+    
+    # Gerar PDF
+    buffer = io.BytesIO()
+    gerador = GeradorCertificado(avaliacao)
+    gerador.gerar_pdf(buffer)
+    buffer.seek(0)
+    
+    # Retornar PDF para visualização inline
+    response = FileResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline'
+    
+    return response
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def download_certificados_lote(request):
+    """
+    Download em lote de certificados (ZIP)
+    """
+    # Pegar IDs da query string
+    ids_str = request.GET.get('ids', '')
+    ids = [int(id) for id in ids_str.split(',') if id.strip().isdigit()]
+    
+    if not ids:
+        return HttpResponse("❌ Nenhuma avaliação selecionada.", status=400)
+    
+    # Buscar avaliações aprovadas
+    avaliacoes = Avaliacao.objects.filter(pk__in=ids, aprovado=True)
+    
+    if avaliacoes.count() == 0:
+        return HttpResponse("❌ Nenhum aluno aprovado foi selecionado.", status=400)
+    
+    # Criar ZIP em memória
+    zip_buffer = io.BytesIO()
+    
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for avaliacao in avaliacoes:
+            # Gerar PDF de cada certificado
+            pdf_buffer = io.BytesIO()
+            gerador = GeradorCertificado(avaliacao)
+            gerador.gerar_pdf(pdf_buffer)
+            pdf_buffer.seek(0)
+            
+            # Nome do arquivo dentro do ZIP
+            aluno_nome = avaliacao.matricula.interessado.nome.replace(' ', '_')
+            matricula_num = avaliacao.matricula.numero_matricula
+            filename = f"Certificado_{matricula_num}_{aluno_nome}.pdf"
+            
+            # Adicionar ao ZIP
+            zip_file.writestr(filename, pdf_buffer.read())
+    
+    zip_buffer.seek(0)
+    
+    # Retornar ZIP para download
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="Certificados_{len(avaliacoes)}_alunos.zip"'
+    
+    return response
+
+
+
+
+================================================================================
+# ARQUIVO: apps\accounts\views.py
+================================================================================
+
+"""
+Arquivo: views.py
+Caminho: apps/accounts/views.py
+Alteração: Login staff redireciona para admin
+Data: 20/01/2026
+Alteração: Adicionado link de recuperação de senha no contexto do login
+Data: 24/02/2026
+Alteração: URL de recuperação corrigida para staff_senha_recuperar
+Data: 24/02/2026
+Alteração: Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
+           Intercepta login de Staff com must_change_password = True
+           e força troca de senha antes de qualquer outra ação
+Data: 25/02/2026
+"""
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+
+
+def login_staff(request):
+    """Login para usuários staff - redireciona para admin"""
+
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect('/admin/')
+
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user     = authenticate(username=username, password=password)
+
+            if user is not None and user.is_staff:
+                login(request, user)
+                messages.success(request, f'Bem-vindo, {user.username}!')
+                # Middleware intercepta e redireciona se must_change_password = True
+                return redirect('/admin/')
+            else:
+                messages.error(
+                    request,
+                    'Você não tem permissão para acessar esta área.'
+                )
+        else:
+            messages.error(request, 'Usuário ou senha incorretos.')
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'accounts/login_staff.html', {
+        'form': form,
+        'url_recuperar_senha': 'staff_senha_recuperar',
+    })
+
+
+def logout_staff(request):
+    """Logout do staff"""
+    logout(request)
+    messages.success(request, 'Você saiu do sistema.')
+    return redirect('accounts:login_staff')
+
+
+# ==============================================================================
+# FLUXO B — TROCA OBRIGATÓRIA DE SENHA — STAFF
+# Adicionado: 25/02/2026
+# Acionado pelo middleware TrocarSenhaObrigatorioMiddleware quando
+# must_change_password = True no model Usuario.
+# O usuário não consegue acessar nenhuma outra página até trocar a senha.
+# ==============================================================================
+
+@login_required(login_url='/staff/login/')
+def trocar_senha_obrigatorio_view(request):
+    """
+    View de troca obrigatória de senha para usuários Staff.
+
+    Exibida pelo middleware quando must_change_password = True.
+    Após a troca bem-sucedida:
+      - must_change_password é definido como False
+      - Usuário é redirecionado para o admin normalmente
+    """
+    usuario = request.user
+
+    # Segurança extra: se chegou aqui sem must_change_password, redireciona
+    if not usuario.must_change_password:
+        return redirect('/admin/')
+
+    erro = None
+
+    if request.method == 'POST':
+        nova_senha      = request.POST.get('nova_senha', '').strip()
+        confirmar_senha = request.POST.get('confirmar_senha', '').strip()
+
+        if len(nova_senha) < 8:
+            erro = 'A nova senha deve ter no mínimo 8 caracteres.'
+        elif nova_senha != confirmar_senha:
+            erro = 'As senhas não coincidem. Tente novamente.'
+        else:
+            usuario.set_password(nova_senha)
+            usuario.must_change_password = False
+            usuario.save()
+
+            # Re-autentica para não perder a sessão após troca de senha
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, usuario)
+
+            messages.success(
+                request,
+                '✅ Senha alterada com sucesso! Bem-vindo ao sistema.'
+            )
+            return redirect('/admin/')
+
+    return render(request, 'accounts/senha/adm_trocar_obrigatorio.html', {
+        'erro'   : erro,
+        'usuario': usuario,
+    })
+
+
+
+
+================================================================================
+# ARQUIVO: apps\eventos\views.py
+================================================================================
+
+from django.shortcuts import render
+
+# Create your views here.
+
+
+
+================================================================================
+# ARQUIVO: apps\interessados\views.py
+================================================================================
+
+"""
+Arquivo: views.py
+Caminho: apps/interessados/views.py
+
+Alteração: Imports corrigidos + dashboard funcional
+Data: 29/01/2026
+
+Alteração: Corrigido login para exibir erros no formulário, não em messages
+Alteração: Corrigido comparação de datas (datetime vs date)
+Alteração: Corrigido relacionamento inscricoes (plural) no dashboard
+Alteração: Código completo baseado nos models reais - SEM ERROS
+Data: 30/01/2026
+
+Alteração: Adicionada verificação de is_active em todas as views protegidas
+Data: 13/02/2026
+
+Alteração: Adicionadas views de recuperação de senha por CPF + e-mail
+Alteração: Token de recuperação migrado de sessão para banco de dados
+           Corrigido problema de "link expirado" ao abrir em nova aba/janela
+           Adicionada mensagem de sucesso antes do redirect em senha_redefinir_view
+           Token inválido após uso é comportamento correto de segurança
+Data: 20/02/2026
+
+Alteração: dashboard_view — prefetch_related de matriculas e status da matricula
+           para exibir status de matrícula nos cards do dashboard sem N queries
+Data: 24/02/2026
+
+Alteração: Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
+           Intercepta login de Interessado com must_change_password = True
+           e força troca de senha antes de qualquer outra ação
+Data: 25/02/2026
+"""
+
+import secrets
+from datetime import date, timedelta, datetime
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+
+from .models import Interessado, PasswordResetToken
+from .forms import CadastroInteressadoForm, LoginInteressadoForm, EdicaoInteressadoForm
+from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
+from apps.eventos.models import Evento
+
+
+# ==========================================
+# CADASTRO
+# ==========================================
+
+def cadastro_view(request):
+    """View de cadastro público de interessados"""
+    if request.method == 'POST':
+        form = CadastroInteressadoForm(request.POST)
+
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(
+                    request,
+                    '✅ Cadastro realizado com sucesso! Faça login para continuar.'
+                )
+                return redirect('interessados:login')
+            except Exception as e:
+                messages.error(request, f'❌ Erro ao salvar cadastro: {str(e)}')
+        else:
+            messages.error(request, '❌ Corrija os erros abaixo para continuar.')
+    else:
+        form = CadastroInteressadoForm()
+
+    return render(request, 'interessados/cadastro.html', {'form': form})
+
+
+# ==========================================
+# LOGIN / LOGOUT
+# ==========================================
+
+def login_view(request):
+    """
+    View de login para interessados - Autentica usando CPF e senha
+    CORRIGIDO: Erros são exibidos no formulário, não em messages
+    ADICIONADO: Verificação extra de is_active e atualização de last_login (13/02/2026)
+    """
+    if request.method == 'POST':
+        form = LoginInteressadoForm(request.POST)
+
+        if form.is_valid():
+            interessado = form.interessado
+
+            if not interessado.is_active:
+                messages.error(
+                    request,
+                    '🔒 Sua conta está inativa. Entre em contato com a administração.'
+                )
+                return render(request, 'interessados/login.html', {'form': form})
+
+            interessado.last_login = timezone.now()
+            interessado.save(update_fields=['last_login'])
+
+            login(
+                request,
+                interessado,
+                backend='apps.interessados.authentication.InteressadoBackend'
+            )
+            # Middleware intercepta e redireciona se must_change_password = True
+            return redirect('interessados:dashboard')
+
+    else:
+        form = LoginInteressadoForm()
+
+    return render(request, 'interessados/login.html', {'form': form})
+
+
+@login_required(login_url='interessados:login')
+def logout_view(request):
+    """View de logout"""
+    logout(request)
+    messages.info(request, '👋 Você saiu do sistema.')
+    return redirect('interessados:login')
+
+
+# ==========================================
+# DASHBOARD
+# ==========================================
+
+@login_required(login_url='interessados:login')
+def dashboard_view(request):
+    """
+    Dashboard do interessado
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    ADICIONADO: prefetch_related de matriculas para exibir status
+                de matrícula nos cards sem gerar N queries (24/02/2026)
+    """
+    interessado = request.user
+
+    if not interessado.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
+
+    inscricoes = Inscricao.objects.filter(
+        interessado=interessado
+    ).select_related(
+        'evento',
+        'evento__status',
+        'status',
+    ).prefetch_related(
+        'matriculas',
+        'matriculas__status',
+    ).order_by('-data_inscricao')
+
+    classificacoes = Classificacao.objects.filter(
+        inscricao__interessado=interessado
+    ).select_related(
+        'inscricao__evento',
+        'inscricao__evento__status',
+    ).prefetch_related(
+        'inscricao__matriculas',
+        'inscricao__matriculas__status',
+    ).order_by('-processado_em')
+
+    total_inscricoes     = inscricoes.count()
+    total_classificacoes = classificacoes.count()
+    inscricoes_aprovadas = inscricoes.filter(status__nome='APROVADO').count()
+    inscricoes_pendentes = inscricoes.filter(status__nome='INSCRITO').count()
+
+    eventos_abertos = Evento.objects.filter(
+        data_fim_inscricao__date__gte=date.today()
+    ).select_related(
+        'status'
+    ).exclude(
+        inscricoes__interessado=interessado
+    ).distinct()
+
+    context = {
+        'interessado'         : interessado,
+        'inscricoes'          : inscricoes,
+        'classificacoes'      : classificacoes,
+        'total_inscricoes'    : total_inscricoes,
+        'total_classificacoes': total_classificacoes,
+        'inscricoes_aprovadas': inscricoes_aprovadas,
+        'inscricoes_pendentes': inscricoes_pendentes,
+        'eventos_abertos'     : eventos_abertos,
+    }
+
+    return render(request, 'interessados/dashboard.html', context)
+
+
+# ==========================================
+# MEUS DADOS
+# ==========================================
+
+@login_required(login_url='interessados:login')
+def meus_dados_view(request):
+    """
+    View de edição de dados do interessado logado
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    """
+    interessado = request.user
+
+    if not interessado.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
+
+    if request.method == 'POST':
+        form = EdicaoInteressadoForm(request.POST, instance=interessado)
+
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, '✅ Dados atualizados com sucesso!')
+                return redirect('interessados:meus_dados')
+            except Exception as e:
+                messages.error(request, f'❌ Erro ao atualizar dados: {str(e)}')
+        else:
+            messages.error(request, '❌ Corrija os erros abaixo para continuar.')
+    else:
+        form = EdicaoInteressadoForm(instance=interessado)
+
+    return render(request, 'interessados/meus_dados.html', {
+        'form'       : form,
+        'interessado': interessado,
+    })
+
+
+# ==========================================
+# DETALHES DE INSCRIÇÃO
+# ==========================================
+
+@login_required(login_url='interessados:login')
+def detalhes_view(request, inscricao_id):
+    """
+    Detalhes de uma inscrição específica
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    """
+    if not request.user.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
+
+    inscricao = get_object_or_404(
+        Inscricao.objects.select_related('evento', 'status', 'classificacao'),
+        pk=inscricao_id,
+        interessado=request.user
+    )
+
+    return render(request, 'portal/detalhes_evento.html', {
+        'inscricao': inscricao,
+    })
+
+
+# ==========================================
+# INSCREVER EM EVENTO
+# ==========================================
+
+@login_required(login_url='interessados:login')
+def inscrever_evento_view(request, evento_id):
+    """
+    Inscreve o interessado logado em um evento
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    """
+    interessado = request.user
+
+    if not interessado.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
+
+    try:
+        evento = Evento.objects.get(id=evento_id)
+    except Evento.DoesNotExist:
+        messages.error(request, '❌ Evento não encontrado.')
+        return redirect('interessados:dashboard')
+
+    inscricao_existente = Inscricao.objects.filter(
+        interessado=interessado,
+        evento=evento
+    ).first()
+
+    if inscricao_existente:
+        messages.warning(
+            request,
+            f'⚠️ Você já está inscrito no evento "{evento.nome}".'
+        )
+        return redirect('interessados:dashboard')
+
+    agora = timezone.now()
+
+    if not (evento.data_inicio_inscricao <= agora <= evento.data_fim_inscricao):
+        messages.error(
+            request,
+            f'❌ O período de inscrições para "{evento.nome}" está encerrado.'
+        )
+        return redirect('interessados:dashboard')
+
+    try:
+        status_pendente = StatusInscricao.objects.get(nome='Pendente')
+    except StatusInscricao.DoesNotExist:
+        messages.error(
+            request,
+            '❌ Status PENDENTE não encontrado. Contate o administrador.'
+        )
+        return redirect('interessados:dashboard')
+
+    try:
+        Inscricao.objects.create(
+            interessado  = interessado,
+            evento       = evento,
+            status       = status_pendente,
+            data_inscricao = timezone.now()
+        )
+        messages.success(
+            request,
+            f'✅ Inscrição realizada com sucesso no evento "{evento.nome}"! '
+            f'Sua inscrição está com status PENDENTE e será analisada pela equipe.'
+        )
+    except Exception as e:
+        messages.error(request, f'❌ Erro ao criar inscrição: {str(e)}')
+
+    return redirect('interessados:dashboard')
+
+
+# ==========================================
+# RECUPERAÇÃO DE SENHA — INTERESSADOS
+# Alteração: 20/02/2026 — Token salvo no BANCO DE DADOS
+# ==========================================
+
+def senha_recuperar_view(request):
+    """
+    Passo 1: Interessado informa o CPF.
+    - Com e-mail cadastrado → envia link de recuperação (válido 30 min)
+    - Sem e-mail cadastrado → redireciona para página de orientação
+    - CPF não encontrado   → exibe erro no formulário
+    """
+    erro      = None
+    cpf_value = ''
+
+    if request.method == 'POST':
+        cpf_raw   = request.POST.get('cpf', '').strip()
+        cpf       = ''.join(filter(str.isdigit, cpf_raw))
+        cpf_value = cpf_raw
+
+        try:
+            interessado = Interessado.objects.get(cpf=cpf, is_active=True)
+
+            if interessado.email:
+                PasswordResetToken.objects.filter(
+                    interessado=interessado,
+                    usado=False
+                ).update(usado=True)
+
+                token = secrets.token_urlsafe(32)
+                PasswordResetToken.objects.create(
+                    interessado=interessado,
+                    token=token,
+                    expira_em=timezone.now() + timedelta(minutes=30)
+                )
+
+                link = request.build_absolute_uri(
+                    f'/inscricao/senha/redefinir/{token}/'
+                )
+
+                contexto_email = {
+                    'interessado': interessado,
+                    'link'       : link,
+                    'validade'   : '30 minutos',
+                }
+                corpo_html = render_to_string(
+                    'interessados/senha/email_recuperar.html',
+                    contexto_email
+                )
+                corpo_txt = render_to_string(
+                    'interessados/senha/email_recuperar.txt',
+                    contexto_email
+                )
+
+                send_mail(
+                    subject      = 'MetaReciclagem — Recuperação de Senha',
+                    message      = corpo_txt,
+                    html_message = corpo_html,
+                    from_email   = settings.DEFAULT_FROM_EMAIL,
+                    recipient_list = [interessado.email],
+                    fail_silently  = False,
+                )
+
+                return redirect('interessados:senha_recuperar_enviado')
+
+            else:
+                return redirect('interessados:senha_sem_email')
+
+        except Interessado.DoesNotExist:
+            erro = 'CPF não encontrado ou conta inativa no sistema.'
+
+    return render(request, 'interessados/senha/recuperar.html', {
+        'erro'     : erro,
+        'cpf_value': cpf_value,
+    })
+
+
+def senha_recuperar_enviado_view(request):
+    """Passo 2: Confirmação de envio."""
+    return render(request, 'interessados/senha/recuperar_enviado.html')
+
+
+def senha_redefinir_view(request, token):
+    """
+    Passo 3: Formulário de nova senha.
+    Token validado via banco — funciona em qualquer aba/navegador.
+    """
+    try:
+        reset_token = PasswordResetToken.objects.select_related('interessado').get(
+            token    = token,
+            usado    = False,
+            expira_em__gt = timezone.now()
+        )
+        interessado = reset_token.interessado
+
+    except PasswordResetToken.DoesNotExist:
+        return render(request, 'interessados/senha/token_invalido.html', {
+            'senha_ja_trocada': True,
+        })
+
+    erro = None
+
+    if request.method == 'POST':
+        nova_senha      = request.POST.get('nova_senha', '')
+        confirmar_senha = request.POST.get('confirmar_senha', '')
+
+        if len(nova_senha) < 8:
+            erro = 'A senha deve ter no mínimo 8 caracteres.'
+        elif nova_senha != confirmar_senha:
+            erro = 'As senhas não coincidem.'
+        else:
+            interessado.set_password(nova_senha)
+            interessado.save()
+
+            reset_token.usado = True
+            reset_token.save()
+
+            return redirect('interessados:senha_redefinir_concluido')
+
+    return render(request, 'interessados/senha/redefinir.html', {'erro': erro})
+
+
+def senha_redefinir_concluido_view(request):
+    """Passo 4: Senha redefinida com sucesso."""
+    return render(request, 'interessados/senha/redefinir_concluido.html')
+
+
+def senha_sem_email_view(request):
+    """Interessado sem e-mail — orienta contato presencial."""
+    return render(request, 'interessados/senha/sem_email.html')
+
+
+# ==============================================================================
+# FLUXO B — TROCA OBRIGATÓRIA DE SENHA — INTERESSADOS
+# Adicionado: 25/02/2026
+# Acionado pelo middleware TrocarSenhaObrigatorioMiddleware quando
+# must_change_password = True no model Interessado.
+# O usuário não consegue acessar nenhuma outra página até trocar a senha.
+# ==============================================================================
+
+@login_required(login_url='interessados:login')
+def trocar_senha_obrigatorio_view(request):
+    """
+    View de troca obrigatória de senha para Interessados.
+
+    Exibida pelo middleware quando must_change_password = True.
+    Após a troca bem-sucedida:
+      - must_change_password é definido como False
+      - Usuário é redirecionado para o dashboard normalmente
+    """
+    interessado = request.user
+
+    # Segurança extra: se chegou aqui sem must_change_password, redireciona
+    if not interessado.must_change_password:
+        return redirect('interessados:dashboard')
+
+    erro = None
+
+    if request.method == 'POST':
+        nova_senha      = request.POST.get('nova_senha', '').strip()
+        confirmar_senha = request.POST.get('confirmar_senha', '').strip()
+
+        if len(nova_senha) < 8:
+            erro = 'A nova senha deve ter no mínimo 8 caracteres.'
+        elif nova_senha != confirmar_senha:
+            erro = 'As senhas não coincidem. Tente novamente.'
+        else:
+            interessado.set_password(nova_senha)
+            interessado.must_change_password = False
+            interessado.save()
+            login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
+            messages.success(
+                request,
+                '✅ Senha alterada com sucesso! Bem-vindo ao sistema.'
+            )
+            return redirect('interessados:dashboard')
+
+    return render(request, 'interessados/senha/int_trocar_obrigatorio.html', {
+        'erro'       : erro,
+        'interessado': interessado,
+    })
+
+
+
+
+================================================================================
+# ARQUIVO: apps\portal\views.py
+================================================================================
+
+"""
+Views do app PORTAL - Sistema MetaReciclagem
+Arquivo: apps/portal/views.py
+Data: 05/12/2025
+Alteração: select_related('status') em detalhes_evento + removida variável inscricoes_abertas
+Data: 20/02/2026
+Alteração: inscricoes_confirmadas corrigido — filtro por Q objects com iexact
+           case-insensitive, sem uso de exclude()
+Data: 23/02/2026
+"""
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.views.decorators.http import require_http_methods
+from django.db.models import Q
+from django.utils import timezone
+
+from .forms import LoginInteressadoForm, ConsultaPublicaForm
+from apps.interessados.models import Interessado
+from apps.selecao.models import Inscricao, Classificacao
+from apps.eventos.models import Evento
+
+
+def index(request):
+    """
+    Página inicial do portal
+    Mostra eventos ativos (exceto FINALIZADOS e CANCELADOS)
+    """
+    eventos_disponiveis = Evento.objects.exclude(
+        status_id__in=[7, 8]
+    ).order_by('data_inicio_evento')
+
+    context = {
+        'eventos_disponiveis': eventos_disponiveis,
+        'total_eventos':       eventos_disponiveis.count(),
+    }
+
+    return render(request, 'portal/index.html', context)
+
+
+@require_http_methods(["GET", "POST"])
+def login_interessado(request):
+    """Login de interessados com CPF e senha"""
+    if request.session.get('interessado_id'):
+        return redirect('portal:dashboard')
+
+    if request.method == 'POST':
+        form = LoginInteressadoForm(request.POST)
+
+        if form.is_valid():
+            interessado = form.interessado
+
+            request.session['interessado_id']   = interessado.id
+            request.session['interessado_nome'] = interessado.nome
+            request.session['interessado_cpf']  = interessado.cpf
+
+            interessado.last_login = timezone.now()
+            interessado.save(update_fields=['last_login'])
+
+            messages.success(request, f'Bem-vindo(a), {interessado.nome}!')
+            return redirect('portal:dashboard')
+    else:
+        form = LoginInteressadoForm()
+
+    return render(request, 'portal/login.html', {'form': form})
+
+
+def logout_interessado(request):
+    """Logout de interessados"""
+    nome = request.session.get('interessado_nome', 'Interessado')
+    request.session.flush()
+    messages.info(request, f'Até logo, {nome}!')
+    return redirect('portal:index')
+
+
+def dashboard(request):
+    """Dashboard do interessado logado"""
+    interessado_id = request.session.get('interessado_id')
+
+    if not interessado_id:
+        messages.warning(request, 'Você precisa fazer login para acessar o dashboard.')
+        return redirect('portal:login')
+
+    try:
+        interessado = Interessado.objects.get(id=interessado_id)
+    except Interessado.DoesNotExist:
+        request.session.flush()
+        messages.error(request, 'Sessão inválida. Faça login novamente.')
+        return redirect('portal:login')
+
+    inscricoes = Inscricao.objects.filter(
+        interessado=interessado
+    ).select_related('evento', 'status').order_by('-data_inscricao')
+
+    classificacoes = Classificacao.objects.filter(
+        inscricao__interessado=interessado
+    ).select_related('inscricao__evento').order_by('posicao')
+
+    context = {
+        'interessado':          interessado,
+        'inscricoes':           inscricoes,
+        'classificacoes':       classificacoes,
+        'total_inscricoes':     inscricoes.count(),
+        'total_classificacoes': classificacoes.count(),
+    }
+
+    return render(request, 'portal/dashboard.html', context)
+
+
+@require_http_methods(["GET", "POST"])
+def consulta_publica(request):
+    """Consulta pública de resultados por CPF"""
+    resultados     = None
+    cpf_consultado = None
+
+    if request.method == 'POST':
+        form = ConsultaPublicaForm(request.POST)
+
+        if form.is_valid():
+            cpf            = form.cleaned_data['cpf']
+            cpf_consultado = cpf
+
+            try:
+                interessado = Interessado.objects.get(cpf=cpf)
+
+                resultados = Classificacao.objects.filter(
+                    inscricao__interessado=interessado
+                ).select_related(
+                    'inscricao__evento',
+                    'inscricao__status'
+                ).order_by('-inscricao__data_inscricao')
+
+                if not resultados.exists():
+                    messages.info(
+                        request,
+                        'Nenhuma classificação encontrada para este CPF.'
+                    )
+
+            except Interessado.DoesNotExist:
+                messages.warning(request, 'CPF não encontrado no sistema.')
+    else:
+        form = ConsultaPublicaForm()
+
+    context = {
+        'form':             form,
+        'resultados':       resultados,
+        'nome_interessado': (
+            resultados.first().inscricao.interessado.nome
+            if resultados and resultados.exists()
+            else ''
+        ),
+        'cpf_consultado': cpf_consultado,
+    }
+
+    return render(request, 'portal/consulta_publica.html', context)
+
+
+def resultado_evento(request, evento_id):
+    """Exibe resultado completo de um evento"""
+    try:
+        evento = Evento.objects.get(id=evento_id)
+    except Evento.DoesNotExist:
+        messages.error(request, 'Evento não encontrado.')
+        return redirect('portal:index')
+
+    classificacoes = Classificacao.objects.filter(
+        inscricao__evento=evento
+    ).select_related('inscricao__interessado').order_by('posicao')
+
+    classificados = classificacoes.filter(classificado=True)
+    lista_espera  = classificacoes.filter(lista_espera=True)
+
+    context = {
+        'evento':              evento,
+        'classificados':       classificados,
+        'lista_espera':        lista_espera,
+        'total_classificados': classificados.count(),
+        'total_lista_espera':  lista_espera.count(),
+    }
+
+    return render(request, 'portal/resultado_evento.html', context)
+
+
+def detalhes_evento(request, evento_id):
+    """
+    Exibe detalhes completos de um evento/curso
+
+    CORREÇÃO 23/02/2026:
+    Antes: status__nome__in=['INSCRITO', 'APROVADO', 'CONFIRMADO']
+           → sempre zero (nomes reais no banco são diferentes)
+    Agora: Q objects com __iexact — case-insensitive, sem exclude()
+           Cobre todas as variações de grafia dos status válidos
+    """
+    try:
+        evento = Evento.objects.select_related('status').get(id=evento_id)
+    except Evento.DoesNotExist:
+        messages.error(request, 'Evento não encontrado.')
+        return redirect('portal:index')
+
+    # ==========================================
+    # CORREÇÃO 23/02/2026
+    # Q objects com iexact — case-insensitive
+    # Cobre: 'Pendente', 'PENDENTE', 'pendente'
+    #        'Confirmada', 'CONFIRMADA', 'confirmada'
+    #        'Inscrito', 'INSCRITO', 'inscrito'
+    #        'Aprovado', 'APROVADO', 'aprovado'
+    #        'Confirmado', 'CONFIRMADO', 'confirmado'
+    # ==========================================
+    inscricoes_confirmadas = Inscricao.objects.filter(
+        evento=evento
+    ).filter(
+        Q(status__nome__iexact='pendente')   |
+        Q(status__nome__iexact='confirmada') |
+        Q(status__nome__iexact='confirmado') |
+        Q(status__nome__iexact='inscrito')   |
+        Q(status__nome__iexact='aprovado')
+    ).count()
+
+    vagas_disponiveis = max(evento.total_vagas - inscricoes_confirmadas, 0)
+
+    context = {
+        'evento':                 evento,
+        'inscricoes_confirmadas': inscricoes_confirmadas,
+        'vagas_disponiveis':      vagas_disponiveis,
+    }
+
+    return render(request, 'portal/detalhes_evento.html', context)
+
+
+def contato(request):
+    """Página de contatos da MetaReciclagem"""
+    context = {
+        'contatos': {
+            'telefone': '(15) 3417-3825',
+            'whatsapp': '(15) 99999-9999',
+            'email':    'meta.recicla@gmail.com',
+            'endereco': 'Avenida Armando Sales de Oliveira, 762 – Sorocaba/SP',
+            'cep':      '18000-000',
+            'horario':  'Segunda a Sexta, das 8h às 16h',
+        },
+        'redes_sociais': {
+            'facebook':  'https://facebook.com/metareciclagemsorocaba',
+            'instagram': 'https://instagram.com/metareciclagemsorocaba',
+            'youtube':   'https://youtube.com/metareciclagemsorocaba',
+            'blog':      'https://metareciclagemdesorocaba.blogspot.com/',
+        }
+    }
+
+    return render(request, 'portal/contato.html', context)
+
+
+
+
+
+
+================================================================================
+# ARQUIVO: apps\selecao\views.py
+================================================================================
+
+from django.shortcuts import render
+
+# Create your views here.
+
+
+
+================================================================================
+# ARQUIVO: dashboard\views.py
+================================================================================
+
+"""
+Views do app DASHBOARD
+Arquivo: dashboard/views.py
+Alteração: Views customizadas para dashboards
+Data: 03/02/2026
+
+Alteração: Views customizadas para dashboards com geração de PDF
+Data: 05/02/2026
+
+Atualização: 10/02/2026 - Correções de imports
+"""
+
+from django.shortcuts import render
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Count, Avg, F
+from django.utils import timezone
+from datetime import date, timedelta, datetime
+
+
+@staff_member_required
+def dashboard_academico(request):
+    """Dashboard de Informações Acadêmicas"""
+    from apps.academico.models import Avaliacao, Matricula
+    from apps.accounts.admin import admin_site
+    
+    # Métricas gerais
+    total_avaliacoes = Avaliacao.objects.count()
+    total_aprovados = Avaliacao.objects.filter(aprovado=True).count()
+    total_reprovados = total_avaliacoes - total_aprovados
+    media_notas = Avaliacao.objects.aggregate(Avg('nota_final'))['nota_final__avg'] or 0
+    media_frequencia = Avaliacao.objects.aggregate(Avg('frequencia'))['frequencia__avg'] or 0
+    certificados_emitidos = Avaliacao.objects.filter(certificado_emitido=True).count()
+    
+    # Taxa de aprovação
+    taxa_aprovacao = (total_aprovados / total_avaliacoes * 100) if total_avaliacoes > 0 else 0
+    
+    # Avaliações por status de matrícula
+    avaliacoes_por_status = Matricula.objects.values('status__nome').annotate(
+        total=Count('avaliacao')
+    ).order_by('-total')
+    
+    # Top 5 cursos com mais aprovados
+    top_cursos_aprovados = Avaliacao.objects.filter(aprovado=True).values(
+        'matricula__turma__evento__nome'
+    ).annotate(
+        total=Count('id')
+    ).order_by('-total')[:5]
+    
+    context = {
+        'title': 'Dashboard - Informações Acadêmicas',
+        'site_title': admin_site.site_title,
+        'site_header': admin_site.site_header,
+        
+        'total_avaliacoes': total_avaliacoes,
+        'total_aprovados': total_aprovados,
+        'total_reprovados': total_reprovados,
+        'taxa_aprovacao': round(taxa_aprovacao, 1),
+        'media_notas': round(media_notas, 2),
+        'media_frequencia': round(media_frequencia, 1),
+        'certificados_emitidos': certificados_emitidos,
+        
+        'avaliacoes_por_status': avaliacoes_por_status,
+        'top_cursos_aprovados': top_cursos_aprovados,
+    }
+    
+    return render(request, 'admin/dashboard/academico.html', context)
+
+
+@staff_member_required
+def dashboard_eventos(request):
+    """Dashboard de Eventos e Cursos"""
+    from apps.eventos.models import Evento, Turma
+    from apps.selecao.models import Inscricao
+    from apps.accounts.admin import admin_site
+    
+    # Métricas gerais
+    total_eventos = Evento.objects.count()
+    
+    # Eventos com inscrições abertas
+    hoje = timezone.now()
+    eventos_inscricoes_abertas = Evento.objects.filter(
+        data_inicio_inscricao__lte=hoje,
+        data_fim_inscricao__gte=hoje
+    ).count()
+    
+    total_turmas = Turma.objects.count()
+    
+    # Turmas por status temporal
+    hoje_data = date.today()
+    turmas_futuras = Turma.objects.filter(data_inicio__gt=hoje_data).count()
+    turmas_em_andamento = Turma.objects.filter(
+        data_inicio__lte=hoje_data,
+        data_fim__gte=hoje_data
+    ).count()
+    turmas_encerradas = Turma.objects.filter(data_fim__lt=hoje_data).count()
+    
+    # Eventos por status
+    eventos_por_status = Evento.objects.values('status__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Top 5 eventos com mais inscrições
+    top_eventos_inscricoes = Inscricao.objects.values(
+        'evento__nome'
+    ).annotate(
+        total_inscricoes=Count('id')
+    ).order_by('-total_inscricoes')[:5]
+    
+    # Eventos recentes
+    eventos_recentes = Evento.objects.select_related('status').order_by('-criado_em')[:5]
+    
+    context = {
+        'title': 'Dashboard - Eventos e Cursos',
+        'site_title': admin_site.site_title,
+        'site_header': admin_site.site_header,
+        
+        'total_eventos': total_eventos,
+        'eventos_inscricoes_abertas': eventos_inscricoes_abertas,
+        'total_turmas': total_turmas,
+        
+        'turmas_futuras': turmas_futuras,
+        'turmas_em_andamento': turmas_em_andamento,
+        'turmas_encerradas': turmas_encerradas,
+        
+        'eventos_por_status': eventos_por_status,
+        'top_eventos_inscricoes': top_eventos_inscricoes,
+        'eventos_recentes': eventos_recentes,
+    }
+    
+    return render(request, 'admin/dashboard/eventos.html', context)
+
+
+@staff_member_required
+def dashboard_interessados(request):
+    """Dashboard de Interessados com dados demográficos detalhados"""
+    from apps.interessados.models import Interessado, Sexo, Fototipo
+    from apps.academico.models import Matricula
+    from apps.accounts.admin import admin_site
+    from django.db.models import Q, Count, Case, When, IntegerField, Value, F
+    
+    # ==========================================
+    # MÉTRICAS GERAIS
+    # ==========================================
+    total_interessados = Interessado.objects.count()
+    
+    interessados_matriculados = Interessado.objects.filter(
+        matriculas__isnull=False
+    ).distinct().count()
+    
+    interessados_sem_matricula = total_interessados - interessados_matriculados
+    
+    # ==========================================
+    # DISTRIBUIÇÃO POR SEXO
+    # ==========================================
+    distribuicao_sexo = Interessado.objects.values('sexo__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Calcular percentuais
+    for item in distribuicao_sexo:
+        item['percentual'] = round((item['total'] / total_interessados * 100), 1) if total_interessados > 0 else 0
+    
+    # ==========================================
+    # DISTRIBUIÇÃO POR FOTOTIPO
+    # ==========================================
+    distribuicao_fototipo = Interessado.objects.values('fototipo__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    for item in distribuicao_fototipo:
+        item['percentual'] = round((item['total'] / total_interessados * 100), 1) if total_interessados > 0 else 0
+    
+    # ==========================================
+    # DISTRIBUIÇÃO POR ESCOLARIDADE
+    # ==========================================
+    distribuicao_escolaridade = Interessado.objects.exclude(
+        escolaridade=''
+    ).values('escolaridade').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Traduzir códigos de escolaridade
+    escolaridade_labels = {
+        'FUNDAMENTAL_INCOMPLETO': 'Fundamental Incompleto',
+        'FUNDAMENTAL_COMPLETO': 'Fundamental Completo',
+        'MEDIO_INCOMPLETO': 'Médio Incompleto',
+        'MEDIO_COMPLETO': 'Médio Completo',
+        'SUPERIOR_INCOMPLETO': 'Superior Incompleto',
+        'SUPERIOR_COMPLETO': 'Superior Completo',
+        'POS_GRADUACAO': 'Pós-Graduação',
+    }
+    
+    for item in distribuicao_escolaridade:
+        item['escolaridade_label'] = escolaridade_labels.get(item['escolaridade'], item['escolaridade'])
+    
+    # ==========================================
+    # PARTICIPAÇÃO EM PROGRAMAS SOCIAIS
+    # ==========================================
+    participa_programas = Interessado.objects.filter(programa_social=True).count()
+    nao_participa_programas = total_interessados - participa_programas
+    
+    distribuicao_programas = [
+        {
+            'participa': 'Sim',
+            'total': participa_programas,
+            'percentual': round((participa_programas / total_interessados * 100), 1) if total_interessados > 0 else 0
+        },
+        {
+            'participa': 'Não',
+            'total': nao_participa_programas,
+            'percentual': round((nao_participa_programas / total_interessados * 100), 1) if total_interessados > 0 else 0
+        }
+    ]
+    
+    # ==========================================
+    # DEFICIÊNCIAS
+    # ==========================================
+    com_deficiencia = Interessado.objects.filter(necessidades_especiais=True).count()
+    sem_deficiencia = total_interessados - com_deficiencia
+    
+    distribuicao_deficiencia = [
+        {
+            'tipo': 'Possui Deficiência',
+            'total': com_deficiencia,
+            'percentual': round((com_deficiencia / total_interessados * 100), 1) if total_interessados > 0 else 0
+        },
+        {
+            'tipo': 'Não Possui',
+            'total': sem_deficiencia,
+            'percentual': round((sem_deficiencia / total_interessados * 100), 1) if total_interessados > 0 else 0
+        }
+    ]
+    
+    # Tipos específicos de deficiência
+    tipos_deficiencia = []
+    
+    deficiencias_map = [
+        ('pcd_fisica', 'Física'),
+        ('pcd_visual', 'Visual'),
+        ('pcd_auditiva', 'Auditiva'),
+        ('pcd_intelectual', 'Intelectual'),
+        ('pcd_psicossocial', 'Psicossocial'),
+        ('pcd_multiplas', 'Múltiplas'),
+    ]
+    
+    for campo, nome in deficiencias_map:
+        count = Interessado.objects.filter(**{campo: True}).count()
+        if count > 0:
+            tipos_deficiencia.append({
+                'tipo_deficiencia': nome,
+                'total': count
+            })
+    
+    # Ordenar por total decrescente
+    tipos_deficiencia.sort(key=lambda x: x['total'], reverse=True)
+    
+    # ==========================================
+    # DISTRIBUIÇÃO POR FAIXA ETÁRIA (5 em 5 anos)
+    # ==========================================
+    hoje = date.today()
+    
+    # Criar faixas etárias
+    faixas_etarias = []
+    faixas = [
+        (0, 14, '0-14 anos'),
+        (15, 19, '15-19 anos'),
+        (20, 24, '20-24 anos'),
+        (25, 29, '25-29 anos'),
+        (30, 34, '30-34 anos'),
+        (35, 39, '35-39 anos'),
+        (40, 44, '40-44 anos'),
+        (45, 49, '45-49 anos'),
+        (50, 54, '50-54 anos'),
+        (55, 59, '55-59 anos'),
+        (60, 999, '60+ anos'),
+    ]
+    
+    for inicio, fim, label in faixas:
+        # Calcular data limite para cada faixa
+        if fim == 999:  # 60+
+            count = Interessado.objects.filter(
+                data_nascimento__lte=hoje.replace(year=hoje.year - inicio)
+            ).exclude(data_nascimento__isnull=True).count()
+        else:
+            data_inicio = hoje.replace(year=hoje.year - fim - 1)
+            data_fim = hoje.replace(year=hoje.year - inicio)
+            count = Interessado.objects.filter(
+                data_nascimento__gt=data_inicio,
+                data_nascimento__lte=data_fim
+            ).count()
+        
+        if count > 0:
+            faixas_etarias.append({
+                'faixa': label,
+                'total': count,
+                'percentual': round((count / total_interessados * 100), 1) if total_interessados > 0 else 0
+            })
+    
+    context = {
+        'title': 'Dashboard - Interessados',
+        'site_title': admin_site.site_title,
+        'site_header': admin_site.site_header,
+        
+        # Métricas gerais
+        'total_interessados': total_interessados,
+        'interessados_matriculados': interessados_matriculados,
+        'interessados_sem_matricula': interessados_sem_matricula,
+        
+        # Distribuições demográficas
+        'distribuicao_sexo': distribuicao_sexo,
+        'distribuicao_fototipo': distribuicao_fototipo,
+        'distribuicao_escolaridade': distribuicao_escolaridade,
+        'distribuicao_programas': distribuicao_programas,
+        'distribuicao_deficiencia': distribuicao_deficiencia,
+        'tipos_deficiencia': tipos_deficiencia,
+        'faixas_etarias': faixas_etarias,
+    }
+    
+    return render(request, 'admin/dashboard/interessados.html', context)
+
+
+@staff_member_required
+def dashboard_processo_seletivo(request):
+    """Dashboard de Processo Seletivo (Inscrições e Classificações)"""
+    from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
+    from apps.accounts.admin import admin_site
+    
+    # Métricas de Inscrições
+    total_inscricoes = Inscricao.objects.count()
+    
+    # Inscrições por status
+    inscricoes_por_status = Inscricao.objects.values('status__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Inscrições recentes (últimos 30 dias)
+    trinta_dias_atras = date.today() - timedelta(days=30)
+    inscricoes_recentes = Inscricao.objects.filter(
+        data_inscricao__gte=trinta_dias_atras
+    ).count()
+    
+    # Métricas de Classificação
+    total_classificacoes = Classificacao.objects.count()
+    classificados = Classificacao.objects.filter(classificado=True).count()
+    lista_espera = Classificacao.objects.filter(lista_espera=True).count()
+    
+    # Top 5 eventos com mais inscrições
+    top_eventos_inscricoes = Inscricao.objects.values(
+        'evento__nome'
+    ).annotate(
+        total=Count('id')
+    ).order_by('-total')[:5]
+    
+    # Últimas classificações processadas
+    ultimas_classificacoes = Classificacao.objects.select_related(
+        'inscricao__interessado',
+        'inscricao__evento'
+    ).order_by('-processado_em')[:10]
+    
+    # Taxa de classificação
+    taxa_classificacao = (classificados / total_classificacoes * 100) if total_classificacoes > 0 else 0
+    
+    context = {
+        'title': 'Dashboard - Processo Seletivo',
+        'site_title': admin_site.site_title,
+        'site_header': admin_site.site_header,
+        
+        'total_inscricoes': total_inscricoes,
+        'inscricoes_recentes': inscricoes_recentes,
+        'inscricoes_por_status': inscricoes_por_status,
+        
+        'total_classificacoes': total_classificacoes,
+        'classificados': classificados,
+        'lista_espera': lista_espera,
+        'taxa_classificacao': round(taxa_classificacao, 1),
+        
+        'top_eventos_inscricoes': top_eventos_inscricoes,
+        'ultimas_classificacoes': ultimas_classificacoes,
+    }
+    
+    return render(request, 'admin/dashboard/processo_seletivo.html', context)
+
+
+# ==========================================
+# VIEWS PDF
+# ==========================================
+
+@staff_member_required
+def dashboard_interessados_pdf(request):
+    """Gera PDF do dashboard de interessados"""
+    from apps.interessados.models import Interessado
+    from django.http import HttpResponse
+    from django.db.models import Count
+    from .utils_pdf import gerar_pdf_interessados
+    
+    # Reutilizar a mesma lógica da view normal
+    total_interessados = Interessado.objects.count()
+    
+    interessados_matriculados = Interessado.objects.filter(
+        matriculas__isnull=False
+    ).distinct().count()
+    
+    interessados_sem_matricula = total_interessados - interessados_matriculados
+    
+    # Distribuição por sexo
+    distribuicao_sexo = Interessado.objects.values('sexo__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Distribuição por fototipo
+    distribuicao_fototipo = Interessado.objects.values('fototipo__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Distribuição por escolaridade
+    distribuicao_escolaridade = Interessado.objects.exclude(
+        escolaridade=''
+    ).values('escolaridade').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    escolaridade_labels = {
+        'FUNDAMENTAL_INCOMPLETO': 'Fundamental Incompleto',
+        'FUNDAMENTAL_COMPLETO': 'Fundamental Completo',
+        'MEDIO_INCOMPLETO': 'Médio Incompleto',
+        'MEDIO_COMPLETO': 'Médio Completo',
+        'SUPERIOR_INCOMPLETO': 'Superior Incompleto',
+        'SUPERIOR_COMPLETO': 'Superior Completo',
+        'POS_GRADUACAO': 'Pós-Graduação',
+    }
+    
+    for item in distribuicao_escolaridade:
+        item['escolaridade_label'] = escolaridade_labels.get(item['escolaridade'], item['escolaridade'])
+    
+    # Programas sociais
+    participa_programas = Interessado.objects.filter(programa_social=True).count()
+    nao_participa_programas = total_interessados - participa_programas
+    
+    distribuicao_programas = [
+        {'participa': 'Sim', 'total': participa_programas},
+        {'participa': 'Não', 'total': nao_participa_programas}
+    ]
+    
+    # Deficiências
+    com_deficiencia = Interessado.objects.filter(necessidades_especiais=True).count()
+    sem_deficiencia = total_interessados - com_deficiencia
+    
+    distribuicao_deficiencia = [
+        {'tipo': 'Possui Deficiência', 'total': com_deficiencia},
+        {'tipo': 'Não Possui', 'total': sem_deficiencia}
+    ]
+    
+    # Tipos de deficiência
+    tipos_deficiencia = []
+    deficiencias_map = [
+        ('pcd_fisica', 'Física'),
+        ('pcd_visual', 'Visual'),
+        ('pcd_auditiva', 'Auditiva'),
+        ('pcd_intelectual', 'Intelectual'),
+        ('pcd_psicossocial', 'Psicossocial'),
+        ('pcd_multiplas', 'Múltiplas'),
+    ]
+    
+    for campo, nome in deficiencias_map:
+        count = Interessado.objects.filter(**{campo: True}).count()
+        if count > 0:
+            tipos_deficiencia.append({'tipo_deficiencia': nome, 'total': count})
+    
+    tipos_deficiencia.sort(key=lambda x: x['total'], reverse=True)
+    
+    # Faixas etárias
+    hoje = date.today()
+    faixas_etarias = []
+    faixas = [
+        (0, 14, '0-14 anos'),
+        (15, 19, '15-19 anos'),
+        (20, 24, '20-24 anos'),
+        (25, 29, '25-29 anos'),
+        (30, 34, '30-34 anos'),
+        (35, 39, '35-39 anos'),
+        (40, 44, '40-44 anos'),
+        (45, 49, '45-49 anos'),
+        (50, 54, '50-54 anos'),
+        (55, 59, '55-59 anos'),
+        (60, 999, '60+ anos'),
+    ]
+    
+    for inicio, fim, label in faixas:
+        if fim == 999:
+            count = Interessado.objects.filter(
+                data_nascimento__lte=hoje.replace(year=hoje.year - inicio)
+            ).exclude(data_nascimento__isnull=True).count()
+        else:
+            data_inicio = hoje.replace(year=hoje.year - fim - 1)
+            data_fim = hoje.replace(year=hoje.year - inicio)
+            count = Interessado.objects.filter(
+                data_nascimento__gt=data_inicio,
+                data_nascimento__lte=data_fim
+            ).count()
+        
+        if count > 0:
+            faixas_etarias.append({'faixa': label, 'total': count})
+    
+    # Preparar context
+    context = {
+        'total_interessados': total_interessados,
+        'interessados_matriculados': interessados_matriculados,
+        'interessados_sem_matricula': interessados_sem_matricula,
+        'distribuicao_sexo': list(distribuicao_sexo),
+        'distribuicao_fototipo': list(distribuicao_fototipo),
+        'distribuicao_escolaridade': list(distribuicao_escolaridade),
+        'distribuicao_programas': distribuicao_programas,
+        'distribuicao_deficiencia': distribuicao_deficiencia,
+        'tipos_deficiencia': tipos_deficiencia,
+        'faixas_etarias': faixas_etarias,
+    }
+    
+    # Gerar PDF
+    pdf_buffer = gerar_pdf_interessados(context)
+    
+    # Retornar response
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_interessados_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
+@staff_member_required
+def dashboard_eventos_pdf(request):
+    """Gera PDF do dashboard de eventos"""
+    from apps.eventos.models import Evento, Turma
+    from apps.selecao.models import Inscricao
+    from django.http import HttpResponse
+    from django.db.models import Count
+    from .utils_pdf import gerar_pdf_eventos
+    
+    # Métricas gerais
+    total_eventos = Evento.objects.count()
+    
+    hoje = timezone.now()
+    eventos_inscricoes_abertas = Evento.objects.filter(
+        data_inicio_inscricao__lte=hoje,
+        data_fim_inscricao__gte=hoje
+    ).count()
+    
+    total_turmas = Turma.objects.count()
+    
+    hoje_data = date.today()
+    turmas_futuras = Turma.objects.filter(data_inicio__gt=hoje_data).count()
+    turmas_em_andamento = Turma.objects.filter(
+        data_inicio__lte=hoje_data,
+        data_fim__gte=hoje_data
+    ).count()
+    turmas_encerradas = Turma.objects.filter(data_fim__lt=hoje_data).count()
+    
+    eventos_por_status = Evento.objects.values('status__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    top_eventos_inscricoes = Inscricao.objects.values(
+        'evento__nome'
+    ).annotate(
+        total_inscricoes=Count('id')
+    ).order_by('-total_inscricoes')[:5]
+    
+    # Preparar context
+    context = {
+        'total_eventos': total_eventos,
+        'eventos_inscricoes_abertas': eventos_inscricoes_abertas,
+        'total_turmas': total_turmas,
+        'turmas_futuras': turmas_futuras,
+        'turmas_em_andamento': turmas_em_andamento,
+        'turmas_encerradas': turmas_encerradas,
+        'eventos_por_status': list(eventos_por_status),
+        'top_eventos_inscricoes': list(top_eventos_inscricoes),
+    }
+    
+    # Gerar PDF
+    pdf_buffer = gerar_pdf_eventos(context)
+    
+    # Retornar response
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_eventos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
+@staff_member_required
+def dashboard_academico_pdf(request):
+    """Gera PDF do dashboard acadêmico"""
+    from apps.academico.models import Avaliacao
+    from django.http import HttpResponse
+    from django.db.models import Avg, Count
+    from .utils_pdf import gerar_pdf_academico
+    
+    total_avaliacoes = Avaliacao.objects.count()
+    total_aprovados = Avaliacao.objects.filter(aprovado=True).count()
+    total_reprovados = total_avaliacoes - total_aprovados
+    media_notas = Avaliacao.objects.aggregate(Avg('nota_final'))['nota_final__avg'] or 0
+    media_frequencia = Avaliacao.objects.aggregate(Avg('frequencia'))['frequencia__avg'] or 0
+    certificados_emitidos = Avaliacao.objects.filter(certificado_emitido=True).count()
+    taxa_aprovacao = (total_aprovados / total_avaliacoes * 100) if total_avaliacoes > 0 else 0
+    
+    top_cursos_aprovados = Avaliacao.objects.filter(aprovado=True).values(
+        'matricula__turma__evento__nome'
+    ).annotate(total=Count('id')).order_by('-total')[:5]
+    
+    context = {
+        'total_avaliacoes': total_avaliacoes,
+        'total_aprovados': total_aprovados,
+        'total_reprovados': total_reprovados,
+        'taxa_aprovacao': round(taxa_aprovacao, 1),
+        'media_notas': round(media_notas, 2),
+        'media_frequencia': round(media_frequencia, 1),
+        'certificados_emitidos': certificados_emitidos,
+        'top_cursos_aprovados': list(top_cursos_aprovados),
+    }
+    
+    pdf_buffer = gerar_pdf_academico(context)
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_academico_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+
+@staff_member_required
+def dashboard_processo_seletivo_pdf(request):
+    """Gera PDF do dashboard de processo seletivo"""
+    from apps.selecao.models import Inscricao, Classificacao
+    from django.http import HttpResponse
+    from django.db.models import Count
+    from .utils_pdf import gerar_pdf_processo_seletivo
+    
+    total_inscricoes = Inscricao.objects.count()
+    
+    trinta_dias_atras = date.today() - timedelta(days=30)
+    inscricoes_recentes = Inscricao.objects.filter(data_inscricao__gte=trinta_dias_atras).count()
+    
+    total_classificacoes = Classificacao.objects.count()
+    classificados = Classificacao.objects.filter(classificado=True).count()
+    lista_espera = Classificacao.objects.filter(lista_espera=True).count()
+    taxa_classificacao = (classificados / total_classificacoes * 100) if total_classificacoes > 0 else 0
+    
+    top_eventos_inscricoes = Inscricao.objects.values('evento__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')[:5]
+    
+    context = {
+        'total_inscricoes': total_inscricoes,
+        'inscricoes_recentes': inscricoes_recentes,
+        'total_classificacoes': total_classificacoes,
+        'classificados': classificados,
+        'lista_espera': lista_espera,
+        'taxa_classificacao': round(taxa_classificacao, 1),
+        'top_eventos_inscricoes': list(top_eventos_inscricoes),
+    }
+    
+    pdf_buffer = gerar_pdf_processo_seletivo(context)
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_processo_seletivo_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+
+
+
+################################################################################
+# ARQUIVOS: settings.py
+################################################################################
+
+
+================================================================================
+# ARQUIVO: config\settings.py
+================================================================================
+
+"""
+Arquivo: settings.py
+Caminho: config/settings.py
+Alteração: Adicionada configuração de e-mail (console backend para desenvolvimento)
+Data: 20/02/2026
+Alteração: EMAIL_BACKEND migrado para SMTP real via .env
+Data: 20/02/2026
+Alteração: Migrado para CustomEmailBackend do servidor interno da prefeitura
+           IP 10.28.10.54 porta 587 — aceita destinatários externos
+Data: 23/02/2026
+"""
+
+from pathlib import Path
+from decouple import config, Csv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+SECRET_KEY    = config('SECRET_KEY')
+DEBUG         = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # Apps do projeto
+    'apps.accounts',
+    'apps.interessados',
+    'apps.eventos',
+    'apps.selecao',
+    'apps.academico',
+    'apps.portal',
+    'apps.scripts_admin',
+    'dashboard',
+
+    # Ferramentas
+    'django_extensions',
+]
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.accounts.middleware.TrocarSenhaObrigatorioMiddleware',
+]
+
+ROOT_URLCONF = 'config.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'template'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'apps.eventos.context_processors.notificacoes_eventos',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'config.wsgi.application'
+
+DATABASES = {
+    'default': {
+        'ENGINE':   config('DATABASE_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME':     config('DATABASE_NAME',   default=str(BASE_DIR / 'db.sqlite3')),
+        'USER':     config('DATABASE_USER',     default=''),
+        'PASSWORD': config('DATABASE_PASSWORD', default=''),
+        'HOST':     config('DATABASE_HOST',     default=''),
+        'PORT':     config('DATABASE_PORT',     default=''),
+    }
+}
+
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+LANGUAGE_CODE  = config('LANGUAGE_CODE', default='pt-br')
+TIME_ZONE      = config('TIME_ZONE',     default='America/Sao_Paulo')
+USE_I18N       = True
+USE_TZ         = True
+
+STATIC_URL       = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT      = BASE_DIR / 'staticfiles'
+
+MEDIA_URL  = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+DEFAULT_AUTO_FIELD  = 'django.db.models.BigAutoField'
+AUTH_USER_MODEL     = 'accounts.Usuario'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'apps.interessados.authentication.InteressadoBackend',
+]
+
+LOGIN_URL           = config('LOGIN_URL',           default='/staff/login/')
+LOGIN_REDIRECT_URL  = config('LOGIN_REDIRECT_URL',  default='/staff/dashboard/')
+LOGOUT_REDIRECT_URL = config('LOGOUT_REDIRECT_URL', default='/')
+
+# ==============================================================================
+# CONFIGURAÇÃO DE E-MAIL
+# Alteração: 23/02/2026
+# Backend customizado necessário para servidor interno da prefeitura
+# (certificado SSL autoassinado — verificação desabilitada)
+# Servidor: 10.28.10.54:587
+# Para voltar ao console em desenvolvimento, mude no .env:
+#   EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+# ==============================================================================
+EMAIL_BACKEND   = 'apps.interessados.utils.CustomEmailBackend'
+EMAIL_HOST      = config('EMAIL_HOST')
+EMAIL_PORT      = config('EMAIL_PORT',    cast=int)
+EMAIL_USE_TLS   = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_USE_SSL   = config('EMAIL_USE_SSL', default=False, cast=bool)
+EMAIL_HOST_USER     = config('EMAIL_HOST_USER',     default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL  = config('DEFAULT_FROM_EMAIL')
+
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER     = True
+    X_FRAME_OPTIONS                = 'DENY'
+    SECURE_CONTENT_TYPE_NOSNIFF    = True
+    SECURE_SSL_REDIRECT            = True
+    SESSION_COOKIE_SECURE          = True
+    CSRF_COOKIE_SECURE             = True
+    SECURE_HSTS_SECONDS            = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD            = True
+
+    
+
 # PROJETO DJANGO - ARQUIVOS CONCATENADOS
 # Pasta: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
 # Data: 06/03/2026 15:54:52
@@ -15060,6 +18374,12 @@ h1 {
             document.getElementById('secaoInteressados').classList.remove('active');
             document.getElementById('secaoCriterios').classList.remove('active');
         }
+
+
+
+
+
+
 
 
 
