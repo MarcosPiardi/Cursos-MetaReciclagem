@@ -14,6 +14,9 @@ Data: 24/02/2026
 Alteração: Adicionadas rotas de troca obrigatória de senha (Fluxo B)
            para Staff e Interessados
 Data: 25/02/2026
+Alteração: Desabilitado Sistema 3 (Portal login duplicado)
+           Mantida apenas página inicial (/)
+Data: 13/03/2026
 """
 
 from django.contrib import admin
@@ -26,8 +29,14 @@ from apps.accounts.admin import admin_site
 from apps.accounts import views as accounts_views
 from apps.interessados import views as interessados_views
 from dashboard import views as dashboard_views
+from apps.portal import views as portal_views
 
 urlpatterns = [
+
+    # ==========================================
+    # PÁGINA INICIAL
+    # ==========================================
+    # path('', portal_views.index, name='index'),
 
     # ==========================================
     # DASHBOARDS CUSTOMIZADOS
@@ -73,13 +82,9 @@ urlpatterns = [
     # RECUPERAÇÃO DE SENHA — STAFF
     # Fluxo A: Via e-mail (self-service)
     # Templates com prefixo adm_ em accounts/senha/
-    # Alteração: 20/02/2026
-    # Alteração: Nomes corrigidos para prefixo adm_
-    # Data: 24/02/2026
     # ==========================================
     path('staff/senha/', include([
 
-        # Passo 1: Formulário — informa o e-mail
         path(
             'recuperar/',
             auth_views.PasswordResetView.as_view(
@@ -92,7 +97,6 @@ urlpatterns = [
             name='staff_senha_recuperar',
         ),
 
-        # Passo 2: Confirmação de envio
         path(
             'recuperar/enviado/',
             auth_views.PasswordResetDoneView.as_view(
@@ -101,7 +105,6 @@ urlpatterns = [
             name='staff_senha_recuperar_enviado',
         ),
 
-        # Passo 3: Formulário de nova senha (link do e-mail)
         path(
             'redefinir/<uidb64>/<token>/',
             auth_views.PasswordResetConfirmView.as_view(
@@ -111,7 +114,6 @@ urlpatterns = [
             name='staff_senha_redefinir',
         ),
 
-        # Passo 4: Senha redefinida com sucesso
         path(
             'redefinir/concluido/',
             auth_views.PasswordResetCompleteView.as_view(
@@ -120,11 +122,6 @@ urlpatterns = [
             name='staff_senha_redefinir_concluido',
         ),
 
-        # ==========================================
-        # FLUXO B: Troca obrigatória de senha — STAFF
-        # Adicionado: 25/02/2026
-        # Acionado pelo middleware quando must_change_password = True
-        # ==========================================
         path(
             'trocar-obrigatorio/',
             accounts_views.trocar_senha_obrigatorio_view,
@@ -140,10 +137,6 @@ urlpatterns = [
 
     # ==========================================
     # TROCA OBRIGATÓRIA DE SENHA — INTERESSADOS
-    # Fluxo B: Acionado pelo middleware quando must_change_password = True
-    # Adicionado: 25/02/2026
-    # Definido fora do include('apps.interessados.urls') para garantir
-    # que o middleware consiga redirecionar sem conflito de namespace
     # ==========================================
     path(
         'inscricao/senha/trocar-obrigatorio/',
@@ -152,7 +145,10 @@ urlpatterns = [
     ),
 
     # ==========================================
-    # SISTEMA 3: Portal Público
+    # SISTEMA 3: Portal Público (DESABILITADO)
+    # Comentado em 13/03/2026
+    # Login duplicado removido (use /inscricao/login/)
+    # Apenas página inicial (/) mantida
     # ==========================================
     path('', include('apps.portal.urls')),
 
@@ -167,4 +163,3 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,  document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-    

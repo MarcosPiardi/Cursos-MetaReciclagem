@@ -1,34 +1,34 @@
 """
 Arquivo: views.py
 Caminho: apps/interessados/views.py
-
 Alteração: Imports corrigidos + dashboard funcional
 Data: 29/01/2026
-
 Alteração: Corrigido login para exibir erros no formulário, não em messages
 Alteração: Corrigido comparação de datas (datetime vs date)
 Alteração: Corrigido relacionamento inscricoes (plural) no dashboard
 Alteração: Código completo baseado nos models reais - SEM ERROS
 Data: 30/01/2026
-
 Alteração: Adicionada verificação de is_active em todas as views protegidas
 Data: 13/02/2026
-
 Alteração: Adicionadas views de recuperação de senha por CPF + e-mail
 Alteração: Token de recuperação migrado de sessão para banco de dados
            Corrigido problema de "link expirado" ao abrir em nova aba/janela
            Adicionada mensagem de sucesso antes do redirect em senha_redefinir_view
            Token inválido após uso é comportamento correto de segurança
 Data: 20/02/2026
-
 Alteração: dashboard_view — prefetch_related de matriculas e status da matricula
            para exibir status de matrícula nos cards do dashboard sem N queries
 Data: 24/02/2026
-
 Alteração: Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
            Intercepta login de Interessado com must_change_password = True
            e força troca de senha antes de qualquer outra ação
 Data: 25/02/2026
+Alteração: Adicionada proteção com rate limiting (django-axes) via @axes_dispatch_decorator
+           nas views de login e recuperação de senha para prevenir força bruta
+Alteração: Rate limiting habilitado via middleware axes.middleware.AxesMiddleware
+           Máximo 5 tentativas falhas de login (bloqueio de 30 minutos)
+           Middleware automático (sem decoradores)
+Data: 12/03/2026
 """
 
 import secrets
@@ -84,6 +84,7 @@ def login_view(request):
     View de login para interessados - Autentica usando CPF e senha
     CORRIGIDO: Erros são exibidos no formulário, não em messages
     ADICIONADO: Verificação extra de is_active e atualização de last_login (13/02/2026)
+    PROTEGIDO: Rate limiting via middleware axes (máximo 5 tentativas, bloqueio 30 min)
     """
     if request.method == 'POST':
         form = LoginInteressadoForm(request.POST)
@@ -328,6 +329,7 @@ def inscrever_evento_view(request, evento_id):
 # ==========================================
 # RECUPERAÇÃO DE SENHA — INTERESSADOS
 # Alteração: 20/02/2026 — Token salvo no BANCO DE DADOS
+# Alteração: 12/03/2026 — Rate limiting via middleware
 # ==========================================
 
 def senha_recuperar_view(request):
@@ -336,6 +338,7 @@ def senha_recuperar_view(request):
     - Com e-mail cadastrado → envia link de recuperação (válido 30 min)
     - Sem e-mail cadastrado → redireciona para página de orientação
     - CPF não encontrado   → exibe erro no formulário
+    PROTEGIDO: Rate limiting via middleware axes (máximo 5 tentativas, bloqueio 30 min)
     """
     erro      = None
     cpf_value = ''
@@ -411,6 +414,7 @@ def senha_redefinir_view(request, token):
     """
     Passo 3: Formulário de nova senha.
     Token validado via banco — funciona em qualquer aba/navegador.
+    PROTEGIDO: Rate limiting via middleware axes (máximo 5 tentativas, bloqueio 30 min)
     """
     try:
         reset_token = PasswordResetToken.objects.select_related('interessado').get(
@@ -506,4 +510,5 @@ def trocar_senha_obrigatorio_view(request):
         'erro'       : erro,
         'interessado': interessado,
     })
+
 

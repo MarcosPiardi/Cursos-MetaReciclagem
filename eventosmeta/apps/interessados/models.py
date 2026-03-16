@@ -10,12 +10,14 @@ Alteração: Adicionado modelo PasswordResetToken para recuperação de senha
 Data: 20/02/2026
 Alteração: Campo email alterado para unique=True (opcional mas único quando informado)
 Data: 26/02/2026
+Alteração: Adicionada criptografia para CPF e NIS usando django-encrypted-model-fields
+Data: 12/03/2026
 """
-
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
+from encrypted_model_fields.fields import EncryptedCharField  # Adicionado - 12/03/2026
 
 
 class Sexo(models.Model):
@@ -117,12 +119,13 @@ class Interessado(models.Model):
     )
 
     # DADOS PESSOAIS
-    cpf = models.CharField(
+    # CPF CRIPTOGRAFADO - ALTERADO 12/03/2026
+    cpf = EncryptedCharField(
         'CPF',
         max_length=11,
         unique=True,
         validators=[cpf_validator],
-        help_text='Somente números (11 dígitos)'
+        help_text='Somente números (11 dígitos) - CRIPTOGRAFADO'
     )
 
     nome = models.CharField(
@@ -299,13 +302,14 @@ class Interessado(models.Model):
         default=False
     )
 
-    num_nis = models.CharField(
+    # NIS CRIPTOGRAFADO - ALTERADO 12/03/2026
+    num_nis = EncryptedCharField(
         'Número NIS',
         max_length=15,
         blank=True,
         default='',
         validators=[nis_validator],
-        help_text='Número de Identificação Social (11 a 15 dígitos)'
+        help_text='Número de Identificação Social (11 a 15 dígitos) - CRIPTOGRAFADO'
     )
 
     # NECESSIDADES ESPECIAIS / PCD
@@ -471,5 +475,6 @@ class PasswordResetToken(models.Model):
         verbose_name = 'Token de Recuperação de Senha'
         verbose_name_plural = 'Tokens de Recuperação de Senha'
         ordering = ['-criado_em']
+
 
         

@@ -1,3 +1,8 @@
+# Arquivo: requirements.txt
+# Caminho: /requirements.txt
+# Alteração: Adicionadas django-encrypted-model-fields, django-axes, django-csp para segurança (criptografia CPF/NIS, rate limiting, CSP headers)
+# Data: 12/03/2026
+
 asgiref==3.9.1
 autopep8==2.2.0
 black==23.11.0
@@ -50,3 +55,6 @@ tzdata==2025.2
 urllib3==2.5.0
 validate_docbr==1.11.1
 webdriver-manager==4.0.2
+django-encrypted-model-fields
+django-axes
+django-csp
