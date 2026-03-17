@@ -2,26 +2,27 @@
 ARQUIVO: apps/interessados/models.py
 Models do app INTERESSADOS
 Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
-Arquivo: apps/interessados/models.py
-Alteração: Adicionar campos CEP e Raça/Cor para cadastro completo
-Data: 26/01/2026
-Alteração: Adicionado modelo PasswordResetToken para recuperação de senha
-           Token salvo no banco — funciona em qualquer aba/navegador
-Data: 20/02/2026
-Alteração: Campo email alterado para unique=True (opcional mas único quando informado)
-Data: 26/02/2026
-Alteração: Adicionada criptografia para CPF e NIS usando django-encrypted-model-fields
-Data: 12/03/2026
+Alteração: Adicionar campos CEP e Raça/Cor para cadastro completo — 26/01/2026
+Alteração: Adicionado modelo PasswordResetToken — 20/02/2026
+Alteração: Campo email unique=True — 26/02/2026
+Alteração: Criptografia CPF e NIS — 12/03/2026
+Alteração: Campo cpf_hash para busca eficiente — 17/03/2026
+Alteração: Campos consentimento_lgpd e consentimento_lgpd_em — 17/03/2026
 """
+import hashlib
 from django.db import models
 from django.core.validators import RegexValidator
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
-from encrypted_model_fields.fields import EncryptedCharField  # Adicionado - 12/03/2026
+from encrypted_model_fields.fields import EncryptedCharField
+
+
+def gerar_hash_cpf(cpf):
+    """Gera hash SHA-256 do CPF para busca no banco. Não reversível."""
+    return hashlib.sha256(cpf.encode()).hexdigest()
 
 
 class Sexo(models.Model):
-    """Modelo para Sexo/Gênero"""
     nome = models.CharField('Sexo', max_length=20)
 
     def __str__(self):
@@ -33,7 +34,6 @@ class Sexo(models.Model):
 
 
 class Fototipo(models.Model):
-    """Modelo para Fototipo (classificação de pele)"""
     nome = models.CharField('Fototipo', max_length=50)
     descricao = models.TextField('Descrição', blank=True)
 
@@ -46,237 +46,79 @@ class Fototipo(models.Model):
 
 
 class Interessado(models.Model):
-    """Modelo para cadastro de interessados com autenticação"""
 
-    # Validadores
-    cpf_validator = RegexValidator(
-        regex=r'^\d{11}$',
-        message='CPF deve conter exatamente 11 dígitos'
-    )
-
-    telefone_validator = RegexValidator(
-        regex=r'^\d{10,11}$',
-        message='Telefone deve conter 10 ou 11 dígitos'
-    )
-
-    uf_validator = RegexValidator(
-        regex=r'^[A-Z]{2}$',
-        message='UF deve conter 2 letras maiúsculas'
-    )
-
-    nis_validator = RegexValidator(
-        regex=r'^\d{11,15}$',
-        message='NIS deve conter entre 11 e 15 dígitos'
-    )
-
-    cep_validator = RegexValidator(
-        regex=r'^\d{8}$',
-        message='CEP deve conter exatamente 8 dígitos'
-    )
+    cpf_validator = RegexValidator(regex=r'^\d{11}$', message='CPF deve conter exatamente 11 dígitos')
+    telefone_validator = RegexValidator(regex=r'^\d{10,11}$', message='Telefone deve conter 10 ou 11 dígitos')
+    uf_validator = RegexValidator(regex=r'^[A-Z]{2}$', message='UF deve conter 2 letras maiúsculas')
+    nis_validator = RegexValidator(regex=r'^\d{11,15}$', message='NIS deve conter entre 11 e 15 dígitos')
+    cep_validator = RegexValidator(regex=r'^\d{8}$', message='CEP deve conter exatamente 8 dígitos')
 
     # ============================================================
-    # CAMPOS DE AUTENTICAÇÃO
+    # AUTENTICAÇÃO
     # ============================================================
-    senha = models.CharField(
-        'Senha',
-        max_length=128,
-        help_text='Senha criptografada para login'
+    senha = models.CharField('Senha', max_length=128, help_text='Senha criptografada para login')
+    last_login = models.DateTimeField('Último Login', null=True, blank=True)
+    is_active = models.BooleanField('Ativo', default=True)
+    is_staff = models.BooleanField('Membro da Equipe', default=False)
+    is_superuser = models.BooleanField('Superusuário', default=False)
+    must_change_password = models.BooleanField('Deve trocar a senha', default=False)
+
+    # ============================================================
+    # LGPD — ADICIONADO 17/03/2026
+    # ============================================================
+    consentimento_lgpd = models.BooleanField(
+        'Consentimento LGPD',
+        default=False,
+        help_text='Indica se o interessado aceitou o termo de consentimento'
     )
 
-    last_login = models.DateTimeField(
-        'Último Login',
+    consentimento_lgpd_em = models.DateTimeField(
+        'Data do Consentimento',
         null=True,
         blank=True,
-        help_text='Data e hora do último login'
-    )
-
-    is_active = models.BooleanField(
-        'Ativo',
-        default=True,
-        help_text='Indica se o interessado pode fazer login no sistema'
-    )
-
-    is_staff = models.BooleanField(
-        'Membro da Equipe',
-        default=False,
-        help_text='Indica se o interessado pode acessar o admin (normalmente False)'
-    )
-
-    is_superuser = models.BooleanField(
-        'Superusuário',
-        default=False,
-        help_text='Indica se o interessado tem todas as permissões (normalmente False)'
+        help_text='Data e hora em que o interessado aceitou o termo'
     )
 
     # ============================================================
-    # FLUXO B — SENHA PROVISÓRIA
-    # Adicionado: 25/02/2026
-    # ============================================================
-    must_change_password = models.BooleanField(
-        'Deve trocar a senha',
-        default=False,
-        help_text='Se True, o interessado será obrigado a trocar a senha no próximo login'
-    )
-
     # DADOS PESSOAIS
-    # CPF CRIPTOGRAFADO - ALTERADO 12/03/2026
+    # ============================================================
     cpf = EncryptedCharField(
-        'CPF',
-        max_length=11,
-        unique=True,
+        'CPF', max_length=11, unique=True,
         validators=[cpf_validator],
         help_text='Somente números (11 dígitos) - CRIPTOGRAFADO'
     )
 
-    nome = models.CharField(
-        'Nome Completo',
-        max_length=50
+    cpf_hash = models.CharField(
+        'Hash do CPF', max_length=64, unique=True, blank=True, default='',
+        help_text='SHA-256 do CPF — gerado automaticamente, não editar'
     )
 
-    rg = models.CharField(
-        'RG/Identidade',
-        max_length=20,
-        blank=True,
-        default='',
-        help_text='Número do RG ou documento de identidade'
-    )
+    nome = models.CharField('Nome Completo', max_length=50)
+    rg = models.CharField('RG/Identidade', max_length=20, blank=True, default='')
 
-    sexo = models.ForeignKey(
-        Sexo,
-        on_delete=models.PROTECT,
-        verbose_name='Sexo',
-        null=True,
-        blank=True
-    )
-
-    data_nascimento = models.DateField(
-        'Data de Nascimento',
-        null=True,
-        blank=True
-    )
-
-    cidade_nascimento = models.CharField(
-        'Cidade de Nascimento',
-        max_length=50,
-        blank=True,
-        default=''
-    )
-
-    uf_nascimento = models.CharField(
-        'UF Nascimento',
-        max_length=2,
-        blank=True,
-        default='',
-        validators=[uf_validator],
-        help_text='Ex: SP, RJ, MG'
-    )
-
-    nacionalidade = models.CharField(
-        'Nacionalidade',
-        max_length=50,
-        blank=True,
-        default=''
-    )
+    sexo = models.ForeignKey(Sexo, on_delete=models.PROTECT, verbose_name='Sexo', null=True, blank=True)
+    data_nascimento = models.DateField('Data de Nascimento', null=True, blank=True)
+    cidade_nascimento = models.CharField('Cidade de Nascimento', max_length=50, blank=True, default='')
+    uf_nascimento = models.CharField('UF Nascimento', max_length=2, blank=True, default='', validators=[uf_validator])
+    nacionalidade = models.CharField('Nacionalidade', max_length=50, blank=True, default='')
 
     # ENDEREÇO
-    endereco_residencial = models.CharField(
-        'Endereço Residencial',
-        max_length=50,
-        blank=True,
-        default=''
-    )
-
-    num_endereco = models.CharField(
-        'Número',
-        max_length=7,
-        blank=True,
-        default=''
-    )
-
-    bairro = models.CharField(
-        'Bairro',
-        max_length=30,
-        blank=True,
-        default=''
-    )
-
-    complemento = models.CharField(
-        'Complemento',
-        max_length=50,
-        blank=True,
-        default=''
-    )
-
-    cep = models.CharField(
-        'CEP',
-        max_length=8,
-        blank=True,
-        default='',
-        validators=[cep_validator],
-        help_text='Somente números (8 dígitos)'
-    )
-
-    cidade_residencia = models.CharField(
-        'Cidade de Residência',
-        max_length=50,
-        blank=True,
-        default=''
-    )
-
-    uf_residencia = models.CharField(
-        'UF Residência',
-        max_length=2,
-        blank=True,
-        default='',
-        validators=[uf_validator],
-        help_text='Ex: SP, RJ, MG'
-    )
+    endereco_residencial = models.CharField('Endereço Residencial', max_length=50, blank=True, default='')
+    num_endereco = models.CharField('Número', max_length=7, blank=True, default='')
+    bairro = models.CharField('Bairro', max_length=30, blank=True, default='')
+    complemento = models.CharField('Complemento', max_length=50, blank=True, default='')
+    cep = models.CharField('CEP', max_length=8, blank=True, default='', validators=[cep_validator])
+    cidade_residencia = models.CharField('Cidade de Residência', max_length=50, blank=True, default='')
+    uf_residencia = models.CharField('UF Residência', max_length=2, blank=True, default='', validators=[uf_validator])
 
     # CONTATOS
-    telefone = models.CharField(
-        'Telefone',
-        max_length=11,
-        blank=True,
-        default='',
-        validators=[telefone_validator],
-        help_text='Somente números (10 ou 11 dígitos)'
-    )
-
-    celular = models.CharField(
-        'Celular',
-        max_length=11,
-        blank=True,
-        default='',
-        validators=[telefone_validator],
-        help_text='Somente números (10 ou 11 dígitos)'
-    )
-
-    # ============================================================
-    # CAMPO EMAIL — ALTERADO EM 26/02/2026
-    # unique=True  → não permite dois Interessados com o mesmo e-mail
-    # blank=True   → e-mail continua opcional no cadastro
-    # null=True    → obrigatório para unique=True com blank=True no banco
-    # ============================================================
-    email = models.EmailField(
-        'E-mail',
-        max_length=100,
-        blank=True,
-        null=True,
-        default=None,
-        unique=True,
-        help_text='E-mail opcional — mas único quando informado'
-    )
+    telefone = models.CharField('Telefone', max_length=11, blank=True, default='', validators=[telefone_validator])
+    celular = models.CharField('Celular', max_length=11, blank=True, default='', validators=[telefone_validator])
+    email = models.EmailField('E-mail', max_length=100, blank=True, null=True, default=None, unique=True)
 
     # CARACTERÍSTICAS
-    fototipo = models.ForeignKey(
-        Fototipo,
-        on_delete=models.SET_NULL,
-        verbose_name='Fototipo',
-        null=True,
-        blank=True
-    )
+    fototipo = models.ForeignKey(Fototipo, on_delete=models.SET_NULL, verbose_name='Fototipo', null=True, blank=True)
 
-    # ESCOLARIDADE
     ESCOLARIDADE_CHOICES = [
         ('FUNDAMENTAL_INCOMPLETO', 'Ensino Fundamental Incompleto'),
         ('FUNDAMENTAL_COMPLETO', 'Ensino Fundamental Completo'),
@@ -286,38 +128,18 @@ class Interessado(models.Model):
         ('SUPERIOR_COMPLETO', 'Ensino Superior Completo'),
         ('POS_GRADUACAO', 'Pós-Graduação'),
     ]
-
-    escolaridade = models.CharField(
-        'Escolaridade',
-        max_length=30,
-        choices=ESCOLARIDADE_CHOICES,
-        blank=True,
-        default='',
-        help_text='Nível de escolaridade do interessado'
-    )
+    escolaridade = models.CharField('Escolaridade', max_length=30, choices=ESCOLARIDADE_CHOICES, blank=True, default='')
 
     # PROGRAMA SOCIAL
-    programa_social = models.BooleanField(
-        'Participa de Programa Social',
-        default=False
-    )
-
-    # NIS CRIPTOGRAFADO - ALTERADO 12/03/2026
+    programa_social = models.BooleanField('Participa de Programa Social', default=False)
     num_nis = EncryptedCharField(
-        'Número NIS',
-        max_length=15,
-        blank=True,
-        default='',
+        'Número NIS', max_length=15, blank=True, default='',
         validators=[nis_validator],
-        help_text='Número de Identificação Social (11 a 15 dígitos) - CRIPTOGRAFADO'
+        help_text='Número de Identificação Social - CRIPTOGRAFADO'
     )
 
-    # NECESSIDADES ESPECIAIS / PCD
-    necessidades_especiais = models.BooleanField(
-        'Possui Necessidades Especiais',
-        default=False
-    )
-
+    # PCD
+    necessidades_especiais = models.BooleanField('Possui Necessidades Especiais', default=False)
     pcd_fisica = models.BooleanField('PCD Física', default=False)
     pcd_visual = models.BooleanField('PCD Visual', default=False)
     pcd_auditiva = models.BooleanField('PCD Auditiva', default=False)
@@ -326,60 +148,28 @@ class Interessado(models.Model):
     pcd_multiplas = models.BooleanField('PCD Múltiplas', default=False)
 
     # RESPONSÁVEL
-    nome_responsavel = models.CharField(
-        'Nome do Responsável',
-        max_length=50,
-        blank=True,
-        default=''
-    )
+    nome_responsavel = models.CharField('Nome do Responsável', max_length=50, blank=True, default='')
+    telefone_responsavel = models.CharField('Telefone do Responsável', max_length=11, blank=True, default='', validators=[telefone_validator])
+    celular_responsavel = models.CharField('Celular do Responsável', max_length=11, blank=True, default='', validators=[telefone_validator])
+    email_responsavel = models.EmailField('E-mail do Responsável', max_length=100, blank=True, default='')
 
-    telefone_responsavel = models.CharField(
-        'Telefone do Responsável',
-        max_length=11,
-        blank=True,
-        default='',
-        validators=[telefone_validator]
-    )
+    observacao = models.TextField('Observações', blank=True, default='')
 
-    celular_responsavel = models.CharField(
-        'Celular do Responsável',
-        max_length=11,
-        blank=True,
-        default='',
-        validators=[telefone_validator]
-    )
-
-    email_responsavel = models.EmailField(
-        'E-mail do Responsável',
-        max_length=100,
-        blank=True,
-        default=''
-    )
-
-    observacao = models.TextField(
-        'Observações',
-        blank=True,
-        default=''
-    )
-
-    # METADATA
     criado_em = models.DateTimeField('Criado em', auto_now_add=True)
     atualizado_em = models.DateTimeField('Atualizado em', auto_now=True)
 
     # ============================================================
-    # MÉTODOS DE SENHA
+    # MÉTODOS
     # ============================================================
     def set_password(self, raw_password):
-        """Define a senha criptografada"""
         self.senha = make_password(raw_password)
 
     def check_password(self, raw_password):
-        """Verifica se a senha está correta"""
         return check_password(raw_password, self.senha)
 
-    # ============================================================
-    # MÉTODOS DE PERMISSÃO
-    # ============================================================
+    def set_cpf_hash(self, cpf_plain):
+        self.cpf_hash = gerar_hash_cpf(cpf_plain)
+
     def has_perm(self, perm, obj=None):
         return self.is_superuser
 
@@ -404,18 +194,11 @@ class Interessado(models.Model):
     def username(self):
         return self.cpf
 
-    # ============================================================
-    # PROPRIEDADES AUXILIARES
-    # ============================================================
     @property
     def tem_deficiencia(self):
         return any([
-            self.pcd_fisica,
-            self.pcd_visual,
-            self.pcd_auditiva,
-            self.pcd_intelectual,
-            self.pcd_psicossocial,
-            self.pcd_multiplas
+            self.pcd_fisica, self.pcd_visual, self.pcd_auditiva,
+            self.pcd_intelectual, self.pcd_psicossocial, self.pcd_multiplas
         ])
 
     def __str__(self):
@@ -426,42 +209,12 @@ class Interessado(models.Model):
         verbose_name_plural = 'Interessados'
 
 
-# ============================================================
-# PASSWORD RESET TOKEN - ADICIONADO EM 20/02/2026
-# ============================================================
-
 class PasswordResetToken(models.Model):
-    """
-    Token de recuperação de senha para Interessados.
-    Salvo no banco de dados — funciona em qualquer aba ou navegador.
-    """
-
-    interessado = models.ForeignKey(
-        Interessado,
-        on_delete=models.CASCADE,
-        related_name='reset_tokens',
-        verbose_name='Interessado'
-    )
-
-    token = models.CharField(
-        'Token',
-        max_length=100,
-        unique=True,
-        help_text='Token seguro gerado via secrets.token_urlsafe(32)'
-    )
-
+    interessado = models.ForeignKey(Interessado, on_delete=models.CASCADE, related_name='reset_tokens', verbose_name='Interessado')
+    token = models.CharField('Token', max_length=100, unique=True)
     criado_em = models.DateTimeField('Criado em', auto_now_add=True)
-
-    expira_em = models.DateTimeField(
-        'Expira em',
-        help_text='Data/hora de expiração do token (30 minutos após criação)'
-    )
-
-    usado = models.BooleanField(
-        'Usado',
-        default=False,
-        help_text='True após o token ser utilizado para redefinir a senha'
-    )
+    expira_em = models.DateTimeField('Expira em')
+    usado = models.BooleanField('Usado', default=False)
 
     @property
     def esta_valido(self):
@@ -477,4 +230,3 @@ class PasswordResetToken(models.Model):
         ordering = ['-criado_em']
 
 
-        

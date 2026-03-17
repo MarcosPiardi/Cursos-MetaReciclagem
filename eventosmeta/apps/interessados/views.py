@@ -12,23 +12,15 @@ Alteração: Adicionada verificação de is_active em todas as views protegidas
 Data: 13/02/2026
 Alteração: Adicionadas views de recuperação de senha por CPF + e-mail
 Alteração: Token de recuperação migrado de sessão para banco de dados
-           Corrigido problema de "link expirado" ao abrir em nova aba/janela
-           Adicionada mensagem de sucesso antes do redirect em senha_redefinir_view
-           Token inválido após uso é comportamento correto de segurança
 Data: 20/02/2026
 Alteração: dashboard_view — prefetch_related de matriculas e status da matricula
-           para exibir status de matrícula nos cards do dashboard sem N queries
 Data: 24/02/2026
 Alteração: Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
-           Intercepta login de Interessado com must_change_password = True
-           e força troca de senha antes de qualquer outra ação
 Data: 25/02/2026
-Alteração: Adicionada proteção com rate limiting (django-axes) via @axes_dispatch_decorator
-           nas views de login e recuperação de senha para prevenir força bruta
-Alteração: Rate limiting habilitado via middleware axes.middleware.AxesMiddleware
-           Máximo 5 tentativas falhas de login (bloqueio de 30 minutos)
-           Middleware automático (sem decoradores)
+Alteração: Rate limiting via middleware axes
 Data: 12/03/2026
+Alteração: senha_recuperar_view migrada para busca por cpf_hash
+Data: 17/03/2026
 """
 
 import secrets
@@ -42,7 +34,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.conf import settings
 
-from .models import Interessado, PasswordResetToken
+from .models import Interessado, PasswordResetToken, gerar_hash_cpf
 from .forms import CadastroInteressadoForm, LoginInteressadoForm, EdicaoInteressadoForm
 from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
 from apps.eventos.models import Evento
@@ -107,7 +99,6 @@ def login_view(request):
                 interessado,
                 backend='apps.interessados.authentication.InteressadoBackend'
             )
-            # Middleware intercepta e redireciona se must_change_password = True
             return redirect('interessados:dashboard')
 
     else:
@@ -133,8 +124,7 @@ def dashboard_view(request):
     """
     Dashboard do interessado
     ADICIONADO: Verificação de is_active (13/02/2026)
-    ADICIONADO: prefetch_related de matriculas para exibir status
-                de matrícula nos cards sem gerar N queries (24/02/2026)
+    ADICIONADO: prefetch_related de matriculas (24/02/2026)
     """
     interessado = request.user
 
@@ -310,9 +300,9 @@ def inscrever_evento_view(request, evento_id):
 
     try:
         Inscricao.objects.create(
-            interessado  = interessado,
-            evento       = evento,
-            status       = status_pendente,
+            interessado    = interessado,
+            evento         = evento,
+            status         = status_pendente,
             data_inscricao = timezone.now()
         )
         messages.success(
@@ -330,6 +320,7 @@ def inscrever_evento_view(request, evento_id):
 # RECUPERAÇÃO DE SENHA — INTERESSADOS
 # Alteração: 20/02/2026 — Token salvo no BANCO DE DADOS
 # Alteração: 12/03/2026 — Rate limiting via middleware
+# Alteração: 17/03/2026 — Busca por cpf_hash (CPF criptografado no banco)
 # ==========================================
 
 def senha_recuperar_view(request):
@@ -338,7 +329,7 @@ def senha_recuperar_view(request):
     - Com e-mail cadastrado → envia link de recuperação (válido 30 min)
     - Sem e-mail cadastrado → redireciona para página de orientação
     - CPF não encontrado   → exibe erro no formulário
-    PROTEGIDO: Rate limiting via middleware axes (máximo 5 tentativas, bloqueio 30 min)
+    ATUALIZADO: Busca por cpf_hash — sem descriptografar todos os registros
     """
     erro      = None
     cpf_value = ''
@@ -349,7 +340,11 @@ def senha_recuperar_view(request):
         cpf_value = cpf_raw
 
         try:
-            interessado = Interessado.objects.get(cpf=cpf, is_active=True)
+            # Busca pelo hash — rápida e sem descriptografar
+            interessado = Interessado.objects.get(
+                cpf_hash=gerar_hash_cpf(cpf),
+                is_active=True
+            )
 
             if interessado.email:
                 PasswordResetToken.objects.filter(
@@ -383,10 +378,10 @@ def senha_recuperar_view(request):
                 )
 
                 send_mail(
-                    subject      = 'MetaReciclagem — Recuperação de Senha',
-                    message      = corpo_txt,
-                    html_message = corpo_html,
-                    from_email   = settings.DEFAULT_FROM_EMAIL,
+                    subject        = 'MetaReciclagem — Recuperação de Senha',
+                    message        = corpo_txt,
+                    html_message   = corpo_html,
+                    from_email     = settings.DEFAULT_FROM_EMAIL,
                     recipient_list = [interessado.email],
                     fail_silently  = False,
                 )
@@ -414,12 +409,11 @@ def senha_redefinir_view(request, token):
     """
     Passo 3: Formulário de nova senha.
     Token validado via banco — funciona em qualquer aba/navegador.
-    PROTEGIDO: Rate limiting via middleware axes (máximo 5 tentativas, bloqueio 30 min)
     """
     try:
         reset_token = PasswordResetToken.objects.select_related('interessado').get(
-            token    = token,
-            usado    = False,
+            token         = token,
+            usado         = False,
             expira_em__gt = timezone.now()
         )
         interessado = reset_token.interessado
@@ -464,24 +458,16 @@ def senha_sem_email_view(request):
 # ==============================================================================
 # FLUXO B — TROCA OBRIGATÓRIA DE SENHA — INTERESSADOS
 # Adicionado: 25/02/2026
-# Acionado pelo middleware TrocarSenhaObrigatorioMiddleware quando
-# must_change_password = True no model Interessado.
-# O usuário não consegue acessar nenhuma outra página até trocar a senha.
 # ==============================================================================
 
 @login_required(login_url='interessados:login')
 def trocar_senha_obrigatorio_view(request):
     """
     View de troca obrigatória de senha para Interessados.
-
     Exibida pelo middleware quando must_change_password = True.
-    Após a troca bem-sucedida:
-      - must_change_password é definido como False
-      - Usuário é redirecionado para o dashboard normalmente
     """
     interessado = request.user
 
-    # Segurança extra: se chegou aqui sem must_change_password, redireciona
     if not interessado.must_change_password:
         return redirect('interessados:dashboard')
 
@@ -500,10 +486,7 @@ def trocar_senha_obrigatorio_view(request):
             interessado.must_change_password = False
             interessado.save()
             login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
-            messages.success(
-                request,
-                '✅ Senha alterada com sucesso! Bem-vindo ao sistema.'
-            )
+            messages.success(request, '✅ Senha alterada com sucesso! Bem-vindo ao sistema.')
             return redirect('interessados:dashboard')
 
     return render(request, 'interessados/senha/int_trocar_obrigatorio.html', {

@@ -1,15 +1,10 @@
 <!--
 Arquivo: meus_dados.html
 Caminho: apps/interessados/templates/interessados/meus_dados.html
-Alteração: Template refatorado para estender base.html e exibir favicon
-Data: 29/01/2026
--->
-
-<!--
-Arquivo: meus_dados.html
-Caminho: apps/interessados/templates/interessados/meus_dados.html
-Alteração: Template de EDIÇÃO de dados do interessado logado
-Data: 26/01/2026
+Alteração: Template refatorado para estender base.html — 29/01/2026
+Alteração: Template de EDIÇÃO de dados do interessado logado — 26/01/2026
+Alteração: Campos PCD ocultos até marcar "necessidades especiais"
+           Campo NIS oculto até marcar "programa social" — 17/03/2026
 -->
 
 {% extends 'base.html' %}
@@ -24,7 +19,7 @@ Data: 26/01/2026
         min-height: 100vh;
         padding: 20px 0;
     }
-    
+
     .dados-container {
         background: white;
         padding: 30px;
@@ -33,7 +28,7 @@ Data: 26/01/2026
         max-width: 900px;
         margin: 0 auto;
     }
-    
+
     .section-title {
         color: #667eea;
         font-size: 18px;
@@ -42,7 +37,7 @@ Data: 26/01/2026
         padding-bottom: 8px;
         border-bottom: 2px solid #667eea;
     }
-    
+
     .user-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -50,7 +45,7 @@ Data: 26/01/2026
         border-radius: 10px;
         margin-bottom: 20px;
     }
-    
+
     .btn-salvar {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border: none;
@@ -59,12 +54,12 @@ Data: 26/01/2026
         font-size: 16px;
         font-weight: 600;
     }
-    
+
     .btn-salvar:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-    
+
     .errorlist {
         color: #dc3545;
         list-style: none;
@@ -72,17 +67,28 @@ Data: 26/01/2026
         margin: 5px 0 0 0;
         font-size: 13px;
     }
-    
+
     .form-control.is-invalid,
     .form-select.is-invalid {
         border-color: #dc3545;
     }
-    
+
     .cep-loading {
         position: absolute;
         right: 10px;
         top: 38px;
         display: none;
+    }
+
+    /* Campos condicionais — ocultos por padrão */
+    #bloco-pcd,
+    #bloco-nis {
+        display: none;
+    }
+
+    #bloco-pcd.visivel,
+    #bloco-nis.visivel {
+        display: block;
     }
 </style>
 {% endblock %}
@@ -93,7 +99,7 @@ Data: 26/01/2026
     <div class="user-header">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h2 class="mb-1">👤 {{ interessado.nome }}</h2>
+                <h2 class="mb-1">{{ interessado.nome }}</h2>
                 <p class="mb-0">CPF: {{ interessado.cpf }}</p>
             </div>
             <div>
@@ -106,28 +112,28 @@ Data: 26/01/2026
             </div>
         </div>
     </div>
-    
+
     <div class="text-center mb-4">
-        <h3 style="color: #667eea;">✏️ Editar Meus Dados</h3>
+        <h3 style="color: #667eea;">Editar Meus Dados</h3>
         <p class="text-muted">Altere suas informações quando necessário</p>
     </div>
-    
+
     {% if form.non_field_errors %}
     <div class="alert alert-danger">
         {{ form.non_field_errors }}
     </div>
     {% endif %}
-    
+
     <form method="post" id="formEdicao" novalidate>
         {% csrf_token %}
-        
+
         <!-- DADOS PESSOAIS -->
-        <h3 class="section-title">👤 Dados Pessoais</h3>
-        
+        <h3 class="section-title">Dados Pessoais</h3>
+
         <div class="alert alert-info">
             <i class="bi bi-info-circle"></i> <strong>CPF não pode ser alterado:</strong> {{ interessado.cpf }}
         </div>
-        
+
         <div class="row">
             <div class="col-md-12 mb-3">
                 <label for="{{ form.nome.id_for_label }}" class="form-label">{{ form.nome.label }} <span class="text-danger">*</span></label>
@@ -135,31 +141,26 @@ Data: 26/01/2026
                 {{ form.nome.errors }}
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="id_rg" class="form-label">{{ form.rg.label }}</label>
-                <input type="text" 
-                       id="id_rg" 
-                       name="rg" 
-                       class="form-control" 
-                       placeholder="00.000.000-0"
-                       value="{{ form.rg.value|default:'' }}">
+                <input type="text" id="id_rg" name="rg" class="form-control" placeholder="00.000.000-0" value="{{ form.rg.value|default:'' }}">
                 {{ form.rg.errors }}
             </div>
-            
+
             <div class="col-md-6 mb-3">
                 <label for="{{ form.data_nascimento.id_for_label }}" class="form-label">{{ form.data_nascimento.label }} <span class="text-danger">*</span></label>
-                <input type="date" 
-                    id="{{ form.data_nascimento.id_for_label }}" 
-                    name="data_nascimento" 
+                <input type="date"
+                    id="{{ form.data_nascimento.id_for_label }}"
+                    name="data_nascimento"
                     class="form-control"
                     value="{% if form.data_nascimento.value %}{{ form.data_nascimento.value|date:'Y-m-d' }}{% elif interessado.data_nascimento %}{{ interessado.data_nascimento|date:'Y-m-d' }}{% endif %}"
                     required>
                 {{ form.data_nascimento.errors }}
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label for="{{ form.sexo.id_for_label }}" class="form-label">{{ form.sexo.label }} <span class="text-danger">*</span></label>
@@ -173,7 +174,7 @@ Data: 26/01/2026
                 </select>
                 {{ form.sexo.errors }}
             </div>
-            
+
             <div class="col-md-4 mb-3">
                 <label for="{{ form.fototipo.id_for_label }}" class="form-label">{{ form.fototipo.label }}</label>
                 <select id="{{ form.fototipo.id_for_label }}" name="fototipo" class="form-select">
@@ -186,7 +187,7 @@ Data: 26/01/2026
                 </select>
                 {{ form.fototipo.errors }}
             </div>
-            
+
             <div class="col-md-4 mb-3">
                 <label for="{{ form.escolaridade.id_for_label }}" class="form-label">{{ form.escolaridade.label }}</label>
                 <select id="{{ form.escolaridade.id_for_label }}" name="escolaridade" class="form-select">
@@ -202,95 +203,74 @@ Data: 26/01/2026
                 {{ form.escolaridade.errors }}
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label for="{{ form.cidade_nascimento.id_for_label }}" class="form-label">{{ form.cidade_nascimento.label }}</label>
                 {{ form.cidade_nascimento }}
                 {{ form.cidade_nascimento.errors }}
             </div>
-            
+
             <div class="col-md-4 mb-3">
                 <label for="{{ form.uf_nascimento.id_for_label }}" class="form-label">{{ form.uf_nascimento.label }}</label>
                 {{ form.uf_nascimento }}
                 {{ form.uf_nascimento.errors }}
             </div>
-            
+
             <div class="col-md-4 mb-3">
                 <label for="{{ form.nacionalidade.id_for_label }}" class="form-label">{{ form.nacionalidade.label }}</label>
                 {{ form.nacionalidade }}
                 {{ form.nacionalidade.errors }}
             </div>
         </div>
-        
+
         <!-- ENDEREÇO -->
-        <h3 class="section-title">📍 Endereço</h3>
-        
+        <h3 class="section-title">Endereço</h3>
+
         <div class="row">
             <div class="col-md-3 mb-3 position-relative">
                 <label for="id_cep" class="form-label">{{ form.cep.label }}</label>
-                <input type="text" 
-                       id="id_cep" 
-                       name="cep" 
-                       class="form-control" 
-                       placeholder="00000-000"
-                       value="{{ form.cep.value|default:interessado.cep }}">
+                <input type="text" id="id_cep" name="cep" class="form-control" placeholder="00000-000" value="{{ form.cep.value|default:interessado.cep }}">
                 {{ form.cep.errors }}
                 <small class="text-muted">Digite para buscar</small>
                 <div class="cep-loading">
                     <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                 </div>
             </div>
-            
+
             <div class="col-md-7 mb-3">
                 <label for="id_endereco_residencial" class="form-label">{{ form.endereco_residencial.label }}</label>
-                <input type="text" 
-                       id="id_endereco_residencial" 
-                       name="endereco_residencial" 
-                       class="form-control" 
-                       value="{{ form.endereco_residencial.value|default:interessado.endereco_residencial }}">
+                <input type="text" id="id_endereco_residencial" name="endereco_residencial" class="form-control" value="{{ form.endereco_residencial.value|default:interessado.endereco_residencial }}">
                 {{ form.endereco_residencial.errors }}
             </div>
-            
+
             <div class="col-md-2 mb-3">
                 <label for="{{ form.num_endereco.id_for_label }}" class="form-label">{{ form.num_endereco.label }}</label>
                 {{ form.num_endereco }}
                 {{ form.num_endereco.errors }}
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label for="id_bairro" class="form-label">{{ form.bairro.label }}</label>
-                <input type="text" 
-                       id="id_bairro" 
-                       name="bairro" 
-                       class="form-control" 
-                       value="{{ form.bairro.value|default:interessado.bairro }}">
+                <input type="text" id="id_bairro" name="bairro" class="form-control" value="{{ form.bairro.value|default:interessado.bairro }}">
                 {{ form.bairro.errors }}
             </div>
-            
+
             <div class="col-md-5 mb-3">
                 <label for="id_cidade_residencia" class="form-label">{{ form.cidade_residencia.label }}</label>
-                <input type="text" 
-                       id="id_cidade_residencia" 
-                       name="cidade_residencia" 
-                       class="form-control" 
-                       value="{{ form.cidade_residencia.value|default:interessado.cidade_residencia }}">
+                <input type="text" id="id_cidade_residencia" name="cidade_residencia" class="form-control" value="{{ form.cidade_residencia.value|default:interessado.cidade_residencia }}">
                 {{ form.cidade_residencia.errors }}
             </div>
-            
+
             <div class="col-md-3 mb-3">
                 <label for="id_uf_residencia" class="form-label">{{ form.uf_residencia.label }}</label>
-                <input type="text" 
-                       id="id_uf_residencia" 
-                       name="uf_residencia" 
-                       class="form-control" 
-                       value="{{ form.uf_residencia.value|default:interessado.uf_residencia }}">
+                <input type="text" id="id_uf_residencia" name="uf_residencia" class="form-control" value="{{ form.uf_residencia.value|default:interessado.uf_residencia }}">
                 {{ form.uf_residencia.errors }}
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-12 mb-3">
                 <label for="{{ form.complemento.id_for_label }}" class="form-label">{{ form.complemento.label }}</label>
@@ -298,45 +278,35 @@ Data: 26/01/2026
                 {{ form.complemento.errors }}
             </div>
         </div>
-        
+
         <!-- CONTATO -->
-        <h3 class="section-title">📞 Contato</h3>
-        
+        <h3 class="section-title">Contato</h3>
+
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label for="id_telefone" class="form-label">{{ form.telefone.label }}</label>
-                <input type="text" 
-                       id="id_telefone" 
-                       name="telefone" 
-                       class="form-control" 
-                       placeholder="(15) 3999-9999"
-                       value="{{ form.telefone.value|default:interessado.telefone }}">
+                <input type="text" id="id_telefone" name="telefone" class="form-control" placeholder="(15) 3999-9999" value="{{ form.telefone.value|default:interessado.telefone }}">
                 {{ form.telefone.errors }}
             </div>
-            
+
             <div class="col-md-4 mb-3">
                 <label for="id_celular" class="form-label">{{ form.celular.label }}</label>
-                <input type="text" 
-                       id="id_celular" 
-                       name="celular" 
-                       class="form-control" 
-                       placeholder="(15) 99999-9999"
-                       value="{{ form.celular.value|default:interessado.celular }}">
+                <input type="text" id="id_celular" name="celular" class="form-control" placeholder="(15) 99999-9999" value="{{ form.celular.value|default:interessado.celular }}">
                 {{ form.celular.errors }}
             </div>
-            
+
             <div class="col-md-4 mb-3">
-                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }} <span class="text-danger">*</span></label>
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
                 {{ form.email }}
                 {{ form.email.errors }}
             </div>
         </div>
-        
+
         <!-- PROGRAMA SOCIAL -->
-        <h3 class="section-title">💰 Programa Social</h3>
-        
+        <h3 class="section-title">Programa Social</h3>
+
         <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-12 mb-3">
                 <div class="form-check">
                     {{ form.programa_social }}
                     <label for="{{ form.programa_social.id_for_label }}" class="form-check-label">
@@ -345,22 +315,22 @@ Data: 26/01/2026
                 </div>
                 {{ form.programa_social.errors }}
             </div>
-            
-            <div class="col-md-6 mb-3">
-                <label for="id_num_nis" class="form-label">{{ form.num_nis.label }}</label>
-                <input type="text" 
-                       id="id_num_nis" 
-                       name="num_nis" 
-                       class="form-control" 
-                       placeholder="000.00000.00-0"
-                       value="{{ form.num_nis.value|default:interessado.num_nis }}">
-                {{ form.num_nis.errors }}
+        </div>
+
+        <!-- NIS — visível apenas se programa_social marcado -->
+        <div id="bloco-nis">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="id_num_nis" class="form-label">{{ form.num_nis.label }}</label>
+                    <input type="text" id="id_num_nis" name="num_nis" class="form-control" placeholder="000.00000.00-0" value="{{ form.num_nis.value|default:interessado.num_nis }}">
+                    {{ form.num_nis.errors }}
+                </div>
             </div>
         </div>
-        
+
         <!-- NECESSIDADES ESPECIAIS -->
-        <h3 class="section-title">♿ Necessidades Especiais</h3>
-        
+        <h3 class="section-title">Necessidades Especiais</h3>
+
         <div class="row">
             <div class="col-md-12 mb-2">
                 <div class="form-check">
@@ -371,52 +341,55 @@ Data: 26/01/2026
                 </div>
             </div>
         </div>
-        
-        <div class="row">
-            <div class="col-md-4 mb-2">
-                <div class="form-check">
-                    {{ form.pcd_fisica }}
-                    <label for="{{ form.pcd_fisica.id_for_label }}" class="form-check-label">{{ form.pcd_fisica.label }}</label>
+
+        <!-- PCD — visível apenas se necessidades_especiais marcado -->
+        <div id="bloco-pcd">
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <div class="form-check">
+                        {{ form.pcd_fisica }}
+                        <label for="{{ form.pcd_fisica.id_for_label }}" class="form-check-label">{{ form.pcd_fisica.label }}</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check">
+                        {{ form.pcd_visual }}
+                        <label for="{{ form.pcd_visual.id_for_label }}" class="form-check-label">{{ form.pcd_visual.label }}</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check">
+                        {{ form.pcd_auditiva }}
+                        <label for="{{ form.pcd_auditiva.id_for_label }}" class="form-check-label">{{ form.pcd_auditiva.label }}</label>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4 mb-2">
-                <div class="form-check">
-                    {{ form.pcd_visual }}
-                    <label for="{{ form.pcd_visual.id_for_label }}" class="form-check-label">{{ form.pcd_visual.label }}</label>
+
+            <div class="row">
+                <div class="col-md-4 mb-2">
+                    <div class="form-check">
+                        {{ form.pcd_intelectual }}
+                        <label for="{{ form.pcd_intelectual.id_for_label }}" class="form-check-label">{{ form.pcd_intelectual.label }}</label>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-4 mb-2">
-                <div class="form-check">
-                    {{ form.pcd_auditiva }}
-                    <label for="{{ form.pcd_auditiva.id_for_label }}" class="form-check-label">{{ form.pcd_auditiva.label }}</label>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check">
+                        {{ form.pcd_psicossocial }}
+                        <label for="{{ form.pcd_psicossocial.id_for_label }}" class="form-check-label">{{ form.pcd_psicossocial.label }}</label>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-2">
+                    <div class="form-check">
+                        {{ form.pcd_multiplas }}
+                        <label for="{{ form.pcd_multiplas.id_for_label }}" class="form-check-label">{{ form.pcd_multiplas.label }}</label>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="row">
-            <div class="col-md-4 mb-2">
-                <div class="form-check">
-                    {{ form.pcd_intelectual }}
-                    <label for="{{ form.pcd_intelectual.id_for_label }}" class="form-check-label">{{ form.pcd_intelectual.label }}</label>
-                </div>
-            </div>
-            <div class="col-md-4 mb-2">
-                <div class="form-check">
-                    {{ form.pcd_psicossocial }}
-                    <label for="{{ form.pcd_psicossocial.id_for_label }}" class="form-check-label">{{ form.pcd_psicossocial.label }}</label>
-                </div>
-            </div>
-            <div class="col-md-4 mb-2">
-                <div class="form-check">
-                    {{ form.pcd_multiplas }}
-                    <label for="{{ form.pcd_multiplas.id_for_label }}" class="form-check-label">{{ form.pcd_multiplas.label }}</label>
-                </div>
-            </div>
-        </div>
-        
+
         <!-- RESPONSÁVEL -->
-        <h3 class="section-title">👨‍👩‍👧 Dados do Responsável</h3>
-        
+        <h3 class="section-title">Dados do Responsável</h3>
+
         <div class="row">
             <div class="col-md-12 mb-3">
                 <label for="{{ form.nome_responsavel.id_for_label }}" class="form-label">{{ form.nome_responsavel.label }}</label>
@@ -424,40 +397,30 @@ Data: 26/01/2026
                 {{ form.nome_responsavel.errors }}
             </div>
         </div>
-        
+
         <div class="row">
             <div class="col-md-4 mb-3">
                 <label for="id_telefone_responsavel" class="form-label">{{ form.telefone_responsavel.label }}</label>
-                <input type="text" 
-                       id="id_telefone_responsavel" 
-                       name="telefone_responsavel" 
-                       class="form-control" 
-                       placeholder="(15) 3999-9999"
-                       value="{{ form.telefone_responsavel.value|default:interessado.telefone_responsavel }}">
+                <input type="text" id="id_telefone_responsavel" name="telefone_responsavel" class="form-control" placeholder="(15) 3999-9999" value="{{ form.telefone_responsavel.value|default:interessado.telefone_responsavel }}">
                 {{ form.telefone_responsavel.errors }}
             </div>
-            
+
             <div class="col-md-4 mb-3">
                 <label for="id_celular_responsavel" class="form-label">{{ form.celular_responsavel.label }}</label>
-                <input type="text" 
-                       id="id_celular_responsavel" 
-                       name="celular_responsavel" 
-                       class="form-control" 
-                       placeholder="(15) 99999-9999"
-                       value="{{ form.celular_responsavel.value|default:interessado.celular_responsavel }}">
+                <input type="text" id="id_celular_responsavel" name="celular_responsavel" class="form-control" placeholder="(15) 99999-9999" value="{{ form.celular_responsavel.value|default:interessado.celular_responsavel }}">
                 {{ form.celular_responsavel.errors }}
             </div>
-            
+
             <div class="col-md-4 mb-3">
                 <label for="{{ form.email_responsavel.id_for_label }}" class="form-label">{{ form.email_responsavel.label }}</label>
                 {{ form.email_responsavel }}
                 {{ form.email_responsavel.errors }}
             </div>
         </div>
-        
+
         <!-- OBSERVAÇÕES -->
-        <h3 class="section-title">📝 Observações</h3>
-        
+        <h3 class="section-title">Observações</h3>
+
         <div class="row">
             <div class="col-md-12 mb-3">
                 <label for="{{ form.observacao.id_for_label }}" class="form-label">{{ form.observacao.label }}</label>
@@ -465,7 +428,7 @@ Data: 26/01/2026
                 {{ form.observacao.errors }}
             </div>
         </div>
-        
+
         <!-- BOTÕES -->
         <div class="row mt-4">
             <div class="col-md-6 mb-2">
@@ -474,7 +437,7 @@ Data: 26/01/2026
                 </button>
             </div>
             <div class="col-md-6 mb-2">
-                <a href="{% url 'interessados:meus_dados' %}" class="btn btn-secondary w-100">
+                <a href="{% url 'interessados:dashboard' %}" class="btn btn-secondary w-100">
                     <i class="bi bi-x-circle"></i> Cancelar
                 </a>
             </div>
@@ -487,138 +450,117 @@ Data: 26/01/2026
 <script src="https://unpkg.com/imask"></script>
 
 <script>
+    // ============================================================
+    // CAMPOS CONDICIONAIS
+    // ============================================================
+
+    // NIS — aparece somente se "programa social" marcado
+    const checkProgramaSocial = document.getElementById('{{ form.programa_social.id_for_label }}');
+    const blocoNis = document.getElementById('bloco-nis');
+
+    function toggleNis() {
+        if (checkProgramaSocial && checkProgramaSocial.checked) {
+            blocoNis.classList.add('visivel');
+        } else {
+            blocoNis.classList.remove('visivel');
+        }
+    }
+
+    if (checkProgramaSocial) {
+        checkProgramaSocial.addEventListener('change', toggleNis);
+        toggleNis(); // aplica estado inicial baseado no valor salvo
+    }
+
+    // PCD — aparece somente se "necessidades especiais" marcado
+    const checkNecessidades = document.getElementById('{{ form.necessidades_especiais.id_for_label }}');
+    const blocoPcd = document.getElementById('bloco-pcd');
+
+    function togglePcd() {
+        if (checkNecessidades && checkNecessidades.checked) {
+            blocoPcd.classList.add('visivel');
+        } else {
+            blocoPcd.classList.remove('visivel');
+        }
+    }
+
+    if (checkNecessidades) {
+        checkNecessidades.addEventListener('change', togglePcd);
+        togglePcd(); // aplica estado inicial baseado no valor salvo
+    }
+
+    // ============================================================
     // MÁSCARAS
+    // ============================================================
     const rgInput = document.getElementById('id_rg');
-    if (rgInput) {
-        IMask(rgInput, { mask: '00.000.000-0' });
-    }
-    
+    if (rgInput) IMask(rgInput, { mask: '00.000.000-0' });
+
     const cepInput = document.getElementById('id_cep');
-    if (cepInput) {
-        IMask(cepInput, { mask: '00000-000' });
-    }
-    
+    if (cepInput) IMask(cepInput, { mask: '00000-000' });
+
     const nisInput = document.getElementById('id_num_nis');
-    if (nisInput) {
-        IMask(nisInput, { mask: '000.00000.00-0' });
-    }
-    
+    if (nisInput) IMask(nisInput, { mask: '000.00000.00-0' });
+
     const telefoneInput = document.getElementById('id_telefone');
-    if (telefoneInput) {
-        IMask(telefoneInput, {
-            mask: [
-                { mask: '(00) 0000-0000' },
-                { mask: '(00) 00000-0000' }
-            ]
-        });
-    }
-    
+    if (telefoneInput) IMask(telefoneInput, { mask: [{ mask: '(00) 0000-0000' }, { mask: '(00) 00000-0000' }] });
+
     const celularInput = document.getElementById('id_celular');
-    if (celularInput) {
-        IMask(celularInput, { mask: '(00) 00000-0000' });
-    }
-    
+    if (celularInput) IMask(celularInput, { mask: '(00) 00000-0000' });
+
     const telefoneRespInput = document.getElementById('id_telefone_responsavel');
-    if (telefoneRespInput) {
-        IMask(telefoneRespInput, {
-            mask: [
-                { mask: '(00) 0000-0000' },
-                { mask: '(00) 00000-0000' }
-            ]
-        });
-    }
-    
+    if (telefoneRespInput) IMask(telefoneRespInput, { mask: [{ mask: '(00) 0000-0000' }, { mask: '(00) 00000-0000' }] });
+
     const celularRespInput = document.getElementById('id_celular_responsavel');
-    if (celularRespInput) {
-        IMask(celularRespInput, { mask: '(00) 00000-0000' });
-    }
-    
+    if (celularRespInput) IMask(celularRespInput, { mask: '(00) 00000-0000' });
+
+    // ============================================================
     // REMOVER FORMATAÇÃO ANTES DO ENVIO
-    document.getElementById('formEdicao').addEventListener('submit', function(e) {
-        function apenasNumeros(valor) {
-            return valor ? valor.replace(/\D/g, '') : '';
+    // ============================================================
+    document.getElementById('formEdicao').addEventListener('submit', function() {
+        function apenasNumeros(id) {
+            const el = document.getElementById(id);
+            if (el && el.value) el.value = el.value.replace(/\D/g, '');
         }
-        
-        const rgField = document.getElementById('id_rg');
-        if (rgField && rgField.value) {
-            rgField.value = apenasNumeros(rgField.value);
-        }
-        
-        const cepField = document.getElementById('id_cep');
-        if (cepField && cepField.value) {
-            cepField.value = apenasNumeros(cepField.value);
-        }
-        
-        const nisField = document.getElementById('id_num_nis');
-        if (nisField && nisField.value) {
-            nisField.value = apenasNumeros(nisField.value);
-        }
-        
-        const telefoneField = document.getElementById('id_telefone');
-        if (telefoneField && telefoneField.value) {
-            telefoneField.value = apenasNumeros(telefoneField.value);
-        }
-        
-        const celularField = document.getElementById('id_celular');
-        if (celularField && celularField.value) {
-            celularField.value = apenasNumeros(celularField.value);
-        }
-        
-        const telefoneRespField = document.getElementById('id_telefone_responsavel');
-        if (telefoneRespField && telefoneRespField.value) {
-            telefoneRespField.value = apenasNumeros(telefoneRespField.value);
-        }
-        
-        const celularRespField = document.getElementById('id_celular_responsavel');
-        if (celularRespField && celularRespField.value) {
-            celularRespField.value = apenasNumeros(celularRespField.value);
-        }
+        apenasNumeros('id_rg');
+        apenasNumeros('id_cep');
+        apenasNumeros('id_num_nis');
+        apenasNumeros('id_telefone');
+        apenasNumeros('id_celular');
+        apenasNumeros('id_telefone_responsavel');
+        apenasNumeros('id_celular_responsavel');
     });
-    
+
+    // ============================================================
     // BUSCA CEP
+    // ============================================================
     if (cepInput) {
         cepInput.addEventListener('blur', function() {
             const cep = this.value.replace(/\D/g, '');
-            if (cep.length === 8) {
-                buscarCEP(cep);
-            }
+            if (cep.length === 8) buscarCEP(cep);
         });
     }
-    
+
     function buscarCEP(cep) {
         const loading = document.querySelector('.cep-loading');
-        const enderecoInput = document.getElementById('id_endereco_residencial');
-        const bairroInput = document.getElementById('id_bairro');
-        const cidadeInput = document.getElementById('id_cidade_residencia');
-        const ufInput = document.getElementById('id_uf_residencia');
-        
         if (loading) loading.style.display = 'block';
-        
+
         fetch(`https://viacep.com.br/ws/${cep}/json/`)
-            .then(response => response.json())
+            .then(r => r.json())
             .then(data => {
                 if (loading) loading.style.display = 'none';
-                
                 if (!data.erro) {
-                    if (enderecoInput) {
-                        enderecoInput.value = data.logradouro || '';
-                        enderecoInput.removeAttribute('readonly');
-                    }
-                    if (bairroInput) {
-                        bairroInput.value = data.bairro || '';
-                        bairroInput.removeAttribute('readonly');
-                    }
-                    if (cidadeInput) {
-                        cidadeInput.value = data.localidade || '';
-                        cidadeInput.removeAttribute('readonly');
-                    }
-                    if (ufInput) {
-                        ufInput.value = data.uf || '';
-                        ufInput.removeAttribute('readonly');
+                    const campos = {
+                        'id_endereco_residencial': data.logradouro,
+                        'id_bairro': data.bairro,
+                        'id_cidade_residencia': data.localidade,
+                        'id_uf_residencia': data.uf,
+                    };
+                    for (const [id, valor] of Object.entries(campos)) {
+                        const el = document.getElementById(id);
+                        if (el) el.value = valor || '';
                     }
                 }
             })
-            .catch(error => {
+            .catch(() => {
                 if (loading) loading.style.display = 'none';
             });
     }
