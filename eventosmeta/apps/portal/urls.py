@@ -35,4 +35,7 @@ urlpatterns = [
 
      # Página de contato
     path('contato/', views.contato, name='contato'),
+
+    # Política de privacidade
+    path('privacidade/', views.politica_privacidade, name='politica_privacidade'),
 ]

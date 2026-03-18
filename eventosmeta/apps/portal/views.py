@@ -247,5 +247,10 @@ def contato(request):
 
     return render(request, 'portal/contato.html', context)
 
+def politica_privacidade(request):
+    """Página de política de privacidade — LGPD"""
+    return render(request, 'portal/politica_privacidade.html')
 
+
+    
 

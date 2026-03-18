@@ -1,0 +1,143 @@
+<!--
+Arquivo: politica_privacidade.html
+Caminho: apps/portal/templates/portal/politica_privacidade.html
+Alteração: Criado — Política de Privacidade conforme LGPD
+Data: 17/03/2026
+-->
+
+{% extends 'base.html' %}
+
+{% block title %}Política de Privacidade — Portal MetaReciclagem{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0 fs-4">Política de Privacidade</h2>
+                <small>Última atualização: março de 2026</small>
+            </div>
+            <div class="card-body px-4 py-4" style="line-height: 1.8;">
+
+                <p>
+                    A Prefeitura Municipal de Sorocaba, por meio do programa <strong>MetaReciclagem</strong>,
+                    está comprometida com a proteção dos seus dados pessoais e com o cumprimento da
+                    <strong>Lei Geral de Proteção de Dados Pessoais (LGPD — Lei nº 13.709/2018)</strong>.
+                    Esta política descreve como coletamos, utilizamos e protegemos suas informações.
+                </p>
+
+                <h5 class="mt-4 text-primary">1. Quem somos</h5>
+                <p>
+                    O <strong>Portal MetaReciclagem</strong> é operado pela Prefeitura Municipal de Sorocaba
+                    e tem como finalidade gerenciar inscrições e participações em cursos e eventos do programa.
+                </p>
+
+                <h5 class="mt-4 text-primary">2. Dados que coletamos</h5>
+                <p>Coletamos os seguintes dados pessoais no momento do cadastro:</p>
+                <ul>
+                    <li>Nome completo, CPF e RG</li>
+                    <li>Data de nascimento, sexo e nacionalidade</li>
+                    <li>Endereço residencial completo</li>
+                    <li>Telefone, celular e e-mail</li>
+                    <li>Escolaridade e raça/cor (fototipo)</li>
+                    <li>Informações sobre necessidades especiais (PCD)</li>
+                    <li>Participação em programas sociais e número NIS</li>
+                    <li>Dados do responsável legal (quando aplicável)</li>
+                </ul>
+
+                <h5 class="mt-4 text-primary">3. Finalidade do uso dos dados</h5>
+                <p>Seus dados são utilizados exclusivamente para:</p>
+                <ul>
+                    <li>Gestão de inscrições em cursos e eventos</li>
+                    <li>Processo de seleção de participantes</li>
+                    <li>Comunicação sobre eventos, resultados e convocações</li>
+                    <li>Emissão de certificados e documentos relacionados ao programa</li>
+                    <li>Elaboração de estatísticas e relatórios internos (sem identificação individual)</li>
+                </ul>
+
+                <h5 class="mt-4 text-primary">4. Base legal</h5>
+                <p>
+                    O tratamento dos seus dados é realizado com base no seu <strong>consentimento</strong>
+                    (art. 7º, inciso I da LGPD) e no <strong>cumprimento de obrigação legal</strong>
+                    (art. 7º, inciso II da LGPD), considerando que o programa é uma política pública municipal.
+                </p>
+
+                <h5 class="mt-4 text-primary">5. Proteção dos dados</h5>
+                <p>
+                    Adotamos medidas técnicas e administrativas para proteger seus dados, incluindo:
+                </p>
+                <ul>
+                    <li>Criptografia de dados sensíveis (CPF e NIS)</li>
+                    <li>Controle de acesso com autenticação e senha</li>
+                    <li>Limitação de acesso apenas a colaboradores autorizados</li>
+                    <li>Proteção contra ataques com bloqueio de tentativas excessivas de login</li>
+                </ul>
+
+                <h5 class="mt-4 text-primary">6. Compartilhamento de dados</h5>
+                <p>
+                    Seus dados <strong>não são compartilhados com terceiros</strong> sem o seu consentimento,
+                    exceto quando exigido por lei, determinação judicial ou por outros órgãos públicos
+                    no exercício de suas atribuições legais.
+                </p>
+
+                <h5 class="mt-4 text-primary">7. Seus direitos</h5>
+                <p>Conforme a LGPD, você tem direito a:</p>
+                <ul>
+                    <li><strong>Acesso:</strong> saber quais dados seus estão armazenados</li>
+                    <li><strong>Correção:</strong> atualizar dados incompletos ou desatualizados</li>
+                    <li><strong>Exclusão:</strong> solicitar a remoção dos seus dados (direito ao esquecimento)</li>
+                    <li><strong>Revogação do consentimento:</strong> retirar sua autorização a qualquer momento</li>
+                    <li><strong>Portabilidade:</strong> solicitar seus dados em formato estruturado</li>
+                </ul>
+                <p>
+                    Para exercer qualquer um desses direitos, entre em contato conosco pelos canais
+                    informados na <a href="{% url 'portal:contato' %}">página de contato</a>.
+                </p>
+
+                <h5 class="mt-4 text-primary">8. Retenção dos dados</h5>
+                <p>
+                    Seus dados são mantidos pelo período necessário ao cumprimento das finalidades descritas
+                    nesta política ou enquanto exigido pela legislação aplicável. Após esse período,
+                    os dados são eliminados de forma segura.
+                </p>
+
+                <h5 class="mt-4 text-primary">9. Cookies</h5>
+                <p>
+                    Este portal utiliza cookies de sessão estritamente necessários para o funcionamento
+                    do sistema de autenticação. Não utilizamos cookies de rastreamento ou publicidade.
+                </p>
+
+                <h5 class="mt-4 text-primary">10. Contato</h5>
+                <p>
+                    Para dúvidas, solicitações ou exercício dos seus direitos relacionados à proteção
+                    de dados, entre em contato:
+                </p>
+                <ul>
+                    <li><strong>Endereço:</strong> Avenida Armando Sales de Oliveira, 762 – Sorocaba/SP</li>
+                    <li><strong>E-mail:</strong> meta.recicla@gmail.com</li>
+                    <li><strong>Telefone:</strong> (15) 3417-3825</li>
+                    <li><strong>Horário:</strong> Segunda a Sexta, das 8h às 16h</li>
+                </ul>
+
+                <hr class="mt-4">
+                <p class="text-muted small mb-0">
+                    Esta política pode ser atualizada periodicamente. Recomendamos que você a consulte
+                    regularmente. A versão vigente é sempre a disponível nesta página.
+                </p>
+
+            </div>
+        </div>
+
+        <div class="text-center mb-4">
+            <a href="{% url 'portal:index' %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left"></i> Voltar para o início
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+
+
