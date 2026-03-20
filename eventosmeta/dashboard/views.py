@@ -380,6 +380,32 @@ def dashboard_processo_seletivo(request):
     
     return render(request, 'admin/dashboard/processo_seletivo.html', context)
 
+@staff_member_required
+def dashboard_lgpd(request):
+    """Dashboard de Solicitações de Exclusão — LGPD"""
+    from apps.interessados.models import SolicitacaoExclusao
+    from apps.accounts.admin import admin_site
+
+    pendentes = SolicitacaoExclusao.objects.filter(status='PENDENTE').order_by('-solicitado_em')
+    aprovadas = SolicitacaoExclusao.objects.filter(status='APROVADA').order_by('-analisado_em')
+    recusadas = SolicitacaoExclusao.objects.filter(status='RECUSADA').order_by('-analisado_em')
+
+    context = {
+        'title'      : 'Dashboard - LGPD / Exclusões',
+        'site_title' : admin_site.site_title,
+        'site_header': admin_site.site_header,
+
+        'pendentes'        : pendentes,
+        'aprovadas'        : aprovadas,
+        'recusadas'        : recusadas,
+        'total_pendentes'  : pendentes.count(),
+        'total_aprovadas'  : aprovadas.count(),
+        'total_recusadas'  : recusadas.count(),
+        'total_solicitacoes': SolicitacaoExclusao.objects.count(),
+    }
+
+    return render(request, 'admin/dashboard/lgpd.html', context)
+
 
 # ==========================================
 # VIEWS PDF

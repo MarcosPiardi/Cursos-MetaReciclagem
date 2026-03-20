@@ -66,6 +66,9 @@ urlpatterns = [
         path('processo-seletivo/pdf/',
              dashboard_views.dashboard_processo_seletivo_pdf,
              name='dashboard_processo_seletivo_pdf'),
+        path('admin/dashboard/lgpd/', 
+             dashboard_views.dashboard_lgpd, 
+             name='dashboard_lgpd'),
     ])),
 
     # ==========================================

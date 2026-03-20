@@ -9,10 +9,15 @@ Data: 24/02/2026
 from django.urls import path
 from . import views
 
+# Importar no topo
+from . import views_exclusao
+
 app_name = 'accounts'
 
 urlpatterns = [
     path('login/',  views.login_staff,  name='login_staff'),
     path('logout/', views.logout_staff, name='logout_staff'),
+    path('exclusao/', views_exclusao.listar_solicitacoes_view, name='listar_solicitacoes_exclusao'),
+    path('exclusao/<int:solicitacao_id>/', views_exclusao.detalhe_solicitacao_view, name='detalhe_solicitacao_exclusao'),
 ]
 

@@ -163,6 +163,34 @@ Data: 24/02/2026
     </div>
 </div>
 
+<!-- Privacidade e Dados -->
+<div class="row mb-2">
+    <div class="col-12">
+        <div class="card action-card">
+            <div class="card-body">
+                <div class="icon-text-wrapper">
+                    <i class="bi bi-shield-lock text-secondary"></i>
+                    <div class="text-content text-start">
+                        <h5 class="card-title mb-0">Privacidade e Dados</h5>
+                        <p class="card-text text-muted">
+                            Conforme a LGPD, você pode solicitar a exclusão dos seus dados pessoais do sistema.
+                            A solicitação será analisada pela equipe antes de ser executada.
+                        </p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{% url 'portal:politica_privacidade' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-file-text"></i> Política de Privacidade
+                    </a>
+                    <a href="{% url 'interessados:solicitar_exclusao' %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash3"></i> Solicitar Exclusão dos Meus Dados
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Estatísticas -->
 <div class="row mb-3">
     <div class="col-md-4 mb-2">

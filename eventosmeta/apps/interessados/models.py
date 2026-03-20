@@ -1,13 +1,13 @@
 """
 ARQUIVO: apps/interessados/models.py
 Models do app INTERESSADOS
-Responsável por: Cadastro de interessados e dados auxiliares (Sexo, Fototipo)
-Alteração: Adicionar campos CEP e Raça/Cor para cadastro completo — 26/01/2026
-Alteração: Adicionado modelo PasswordResetToken — 20/02/2026
-Alteração: Campo email unique=True — 26/02/2026
+Alteração: Adicionar campos CEP e Raça/Cor — 26/01/2026
+Alteração: PasswordResetToken — 20/02/2026
+Alteração: email unique=True — 26/02/2026
 Alteração: Criptografia CPF e NIS — 12/03/2026
-Alteração: Campo cpf_hash para busca eficiente — 17/03/2026
-Alteração: Campos consentimento_lgpd e consentimento_lgpd_em — 17/03/2026
+Alteração: cpf_hash para busca eficiente — 17/03/2026
+Alteração: consentimento_lgpd e consentimento_lgpd_em — 17/03/2026
+Alteração: SolicitacaoExclusao — direito ao esquecimento (LGPD) — 18/03/2026
 """
 import hashlib
 from django.db import models
@@ -53,49 +53,23 @@ class Interessado(models.Model):
     nis_validator = RegexValidator(regex=r'^\d{11,15}$', message='NIS deve conter entre 11 e 15 dígitos')
     cep_validator = RegexValidator(regex=r'^\d{8}$', message='CEP deve conter exatamente 8 dígitos')
 
-    # ============================================================
     # AUTENTICAÇÃO
-    # ============================================================
-    senha = models.CharField('Senha', max_length=128, help_text='Senha criptografada para login')
+    senha = models.CharField('Senha', max_length=128)
     last_login = models.DateTimeField('Último Login', null=True, blank=True)
     is_active = models.BooleanField('Ativo', default=True)
     is_staff = models.BooleanField('Membro da Equipe', default=False)
     is_superuser = models.BooleanField('Superusuário', default=False)
     must_change_password = models.BooleanField('Deve trocar a senha', default=False)
 
-    # ============================================================
-    # LGPD — ADICIONADO 17/03/2026
-    # ============================================================
-    consentimento_lgpd = models.BooleanField(
-        'Consentimento LGPD',
-        default=False,
-        help_text='Indica se o interessado aceitou o termo de consentimento'
-    )
+    # LGPD
+    consentimento_lgpd = models.BooleanField('Consentimento LGPD', default=False)
+    consentimento_lgpd_em = models.DateTimeField('Data do Consentimento', null=True, blank=True)
 
-    consentimento_lgpd_em = models.DateTimeField(
-        'Data do Consentimento',
-        null=True,
-        blank=True,
-        help_text='Data e hora em que o interessado aceitou o termo'
-    )
-
-    # ============================================================
     # DADOS PESSOAIS
-    # ============================================================
-    cpf = EncryptedCharField(
-        'CPF', max_length=11, unique=True,
-        validators=[cpf_validator],
-        help_text='Somente números (11 dígitos) - CRIPTOGRAFADO'
-    )
-
-    cpf_hash = models.CharField(
-        'Hash do CPF', max_length=64, unique=True, blank=True, default='',
-        help_text='SHA-256 do CPF — gerado automaticamente, não editar'
-    )
-
+    cpf = EncryptedCharField('CPF', max_length=11, unique=True, validators=[cpf_validator])
+    cpf_hash = models.CharField('Hash do CPF', max_length=64, unique=True, blank=True, default='')
     nome = models.CharField('Nome Completo', max_length=50)
     rg = models.CharField('RG/Identidade', max_length=20, blank=True, default='')
-
     sexo = models.ForeignKey(Sexo, on_delete=models.PROTECT, verbose_name='Sexo', null=True, blank=True)
     data_nascimento = models.DateField('Data de Nascimento', null=True, blank=True)
     cidade_nascimento = models.CharField('Cidade de Nascimento', max_length=50, blank=True, default='')
@@ -132,11 +106,7 @@ class Interessado(models.Model):
 
     # PROGRAMA SOCIAL
     programa_social = models.BooleanField('Participa de Programa Social', default=False)
-    num_nis = EncryptedCharField(
-        'Número NIS', max_length=15, blank=True, default='',
-        validators=[nis_validator],
-        help_text='Número de Identificação Social - CRIPTOGRAFADO'
-    )
+    num_nis = EncryptedCharField('Número NIS', max_length=15, blank=True, default='', validators=[nis_validator])
 
     # PCD
     necessidades_especiais = models.BooleanField('Possui Necessidades Especiais', default=False)
@@ -152,15 +122,12 @@ class Interessado(models.Model):
     telefone_responsavel = models.CharField('Telefone do Responsável', max_length=11, blank=True, default='', validators=[telefone_validator])
     celular_responsavel = models.CharField('Celular do Responsável', max_length=11, blank=True, default='', validators=[telefone_validator])
     email_responsavel = models.EmailField('E-mail do Responsável', max_length=100, blank=True, default='')
-
     observacao = models.TextField('Observações', blank=True, default='')
 
     criado_em = models.DateTimeField('Criado em', auto_now_add=True)
     atualizado_em = models.DateTimeField('Atualizado em', auto_now=True)
 
-    # ============================================================
     # MÉTODOS
-    # ============================================================
     def set_password(self, raw_password):
         self.senha = make_password(raw_password)
 
@@ -230,3 +197,71 @@ class PasswordResetToken(models.Model):
         ordering = ['-criado_em']
 
 
+# ============================================================
+# SOLICITAÇÃO DE EXCLUSÃO — DIREITO AO ESQUECIMENTO (LGPD)
+# Adicionado: 18/03/2026
+# ============================================================
+
+class SolicitacaoExclusao(models.Model):
+
+    STATUS_CHOICES = [
+        ('PENDENTE',  'Pendente'),
+        ('APROVADA',  'Aprovada'),
+        ('RECUSADA',  'Recusada'),
+    ]
+
+    interessado = models.ForeignKey(
+        Interessado,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='solicitacoes_exclusao',
+        verbose_name='Interessado'
+    )
+
+    # Nome e e-mail salvos no momento da solicitação
+    # pois após a exclusão o interessado será anonimizado
+    nome_solicitante = models.CharField('Nome do Solicitante', max_length=50)
+    email_solicitante = models.EmailField('E-mail do Solicitante', blank=True, default='')
+
+    motivo = models.TextField(
+        'Motivo',
+        blank=True,
+        default='',
+        help_text='Motivo informado pelo interessado (opcional)'
+    )
+
+    status = models.CharField(
+        'Status',
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='PENDENTE'
+    )
+
+    solicitado_em = models.DateTimeField('Solicitado em', auto_now_add=True)
+
+    analisado_em = models.DateTimeField('Analisado em', null=True, blank=True)
+
+    analisado_por = models.ForeignKey(
+        'accounts.Usuario',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Analisado por'
+    )
+
+    parecer_staff = models.TextField(
+        'Parecer do Staff',
+        blank=True,
+        default='',
+        help_text='Motivo da aprovação ou recusa'
+    )
+
+    def __str__(self):
+        return f'Solicitação {self.status} — {self.nome_solicitante} ({self.solicitado_em.strftime("%d/%m/%Y")})'
+
+    class Meta:
+        verbose_name = 'Solicitação de Exclusão'
+        verbose_name_plural = 'Solicitações de Exclusão'
+        ordering = ['-solicitado_em']
+
+        

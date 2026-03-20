@@ -1,0 +1,142 @@
+<!--
+Arquivo: detalhe.html
+Caminho: apps/accounts/templates/accounts/exclusao/detalhe.html
+Alteração: Criado — Detalhe e análise de solicitação de exclusão (LGPD) — 18/03/2026
+-->
+
+{% extends 'base.html' %}
+
+{% block title %}Analisar Solicitação — MetaReciclagem{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-trash3 text-danger"></i> Analisar Solicitação</h2>
+            <a href="{% url 'accounts:listar_solicitacoes_exclusao' %}" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <!-- DADOS DA SOLICITAÇÃO -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header
+                {% if solicitacao.status == 'PENDENTE' %}bg-warning text-dark
+                {% elif solicitacao.status == 'APROVADA' %}bg-success text-white
+                {% else %}bg-danger text-white{% endif %}">
+                <h5 class="mb-0">
+                    Status:
+                    <strong>{{ solicitacao.get_status_display }}</strong>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <strong>Solicitante:</strong><br>
+                        {{ solicitacao.nome_solicitante }}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>E-mail:</strong><br>
+                        {{ solicitacao.email_solicitante|default:"Não informado" }}
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <strong>Solicitado em:</strong><br>
+                        {{ solicitacao.solicitado_em|date:"d/m/Y H:i" }}
+                    </div>
+                    {% if solicitacao.analisado_em %}
+                    <div class="col-md-6 mb-2">
+                        <strong>Analisado em:</strong><br>
+                        {{ solicitacao.analisado_em|date:"d/m/Y H:i" }}
+                        {% if solicitacao.analisado_por %}
+                        por {{ solicitacao.analisado_por }}
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <div class="col-md-12 mb-2">
+                        <strong>Motivo informado pelo solicitante:</strong><br>
+                        {{ solicitacao.motivo|default:"Não informado" }}
+                    </div>
+                    {% if solicitacao.parecer_staff %}
+                    <div class="col-md-12 mb-2">
+                        <strong>Parecer da equipe:</strong><br>
+                        {{ solicitacao.parecer_staff }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- DADOS DO INTERESSADO (apenas se ainda existir e pendente) -->
+        {% if solicitacao.interessado and solicitacao.status == 'PENDENTE' %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Dados atuais do interessado</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-1"><strong>Nome:</strong> {{ solicitacao.interessado.nome }}</div>
+                    <div class="col-md-6 mb-1"><strong>E-mail:</strong> {{ solicitacao.interessado.email|default:"—" }}</div>
+                    <div class="col-md-6 mb-1"><strong>Ativo:</strong> {{ solicitacao.interessado.is_active|yesno:"Sim,Não" }}</div>
+                    <div class="col-md-6 mb-1"><strong>Cadastrado em:</strong> {{ solicitacao.interessado.criado_em|date:"d/m/Y" }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- FORMULÁRIO DE ANÁLISE (apenas se pendente) -->
+        {% if solicitacao.status == 'PENDENTE' %}
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Registrar Análise</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Atenção!</strong> Ao aprovar, os dados pessoais do interessado
+                    serão <strong>anonimizados permanentemente</strong> e ele perderá acesso ao sistema.
+                    Esta ação não pode ser desfeita.
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="parecer" class="form-label fw-semibold">
+                            Parecer <span class="text-danger">*</span>
+                        </label>
+                        <textarea
+                            id="parecer"
+                            name="parecer"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Descreva o motivo da aprovação ou recusa..."
+                            required></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <button type="submit" name="acao" value="aprovar"
+                                class="btn btn-danger w-100"
+                                onclick="return confirm('Confirma a APROVAÇÃO? Os dados serão anonimizados permanentemente.')">
+                                <i class="bi bi-check-circle"></i> Aprovar e Anonimizar
+                            </button>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <button type="submit" name="acao" value="recusar"
+                                class="btn btn-secondary w-100"
+                                onclick="return confirm('Confirma a RECUSA desta solicitação?')">
+                                <i class="bi bi-x-circle"></i> Recusar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+

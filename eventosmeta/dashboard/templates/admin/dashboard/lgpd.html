@@ -1,0 +1,254 @@
+<!--
+Arquivo: lgpd.html
+Caminho: template/admin/dashboard/lgpd.html
+Alteração: Criado — Dashboard de Solicitações de Exclusão (LGPD) — 20/03/2026
+-->
+
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+<link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h1 style="margin: 0;">🗑️ Dashboard — LGPD / Exclusões de Dados</h1>
+        <a href="{% url 'admin:index' %}" class="btn-voltar">⬅️ Voltar ao Admin</a>
+    </div>
+
+    <!-- Cards de Métricas -->
+    <div class="dashboard-cards">
+        <div class="card" style="border-left-color: #f39c12;">
+            <h3>Pendentes</h3>
+            <p class="big-number" style="color: #f39c12;">{{ total_pendentes }}</p>
+        </div>
+        <div class="card" style="border-left-color: #27ae60;">
+            <h3>Aprovadas</h3>
+            <p class="big-number" style="color: #27ae60;">{{ total_aprovadas }}</p>
+        </div>
+        <div class="card" style="border-left-color: #e74c3c;">
+            <h3>Recusadas</h3>
+            <p class="big-number" style="color: #e74c3c;">{{ total_recusadas }}</p>
+        </div>
+        <div class="card" style="border-left-color: #3498db;">
+            <h3>Total</h3>
+            <p class="big-number" style="color: #3498db;">{{ total_solicitacoes }}</p>
+        </div>
+    </div>
+
+    <!-- PENDENTES -->
+    <div class="tabela-box">
+        <h2>⏳ Solicitações Pendentes</h2>
+        {% if pendentes %}
+        <div style="overflow-x: auto;">
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Solicitante</th>
+                        <th>E-mail</th>
+                        <th>Solicitado em</th>
+                        <th>Motivo</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in pendentes %}
+                    <tr>
+                        <td>{{ s.nome_solicitante }}</td>
+                        <td>{{ s.email_solicitante|default:"—" }}</td>
+                        <td>{{ s.solicitado_em|date:"d/m/Y H:i" }}</td>
+                        <td>{{ s.motivo|truncatewords:8|default:"—" }}</td>
+                        <td>
+                            <a href="{% url 'accounts:detalhe_solicitacao_exclusao' s.id %}"
+                               style="background:#e74c3c;color:white;padding:4px 12px;border-radius:4px;text-decoration:none;font-size:12px;">
+                                🔍 Analisar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="sem-dados">Nenhuma solicitação pendente.</p>
+        {% endif %}
+    </div>
+
+    <!-- APROVADAS -->
+    <div class="tabela-box">
+        <h2>✅ Solicitações Aprovadas</h2>
+        {% if aprovadas %}
+        <div style="overflow-x: auto;">
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Solicitante</th>
+                        <th>Analisado em</th>
+                        <th>Analisado por</th>
+                        <th>Parecer</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in aprovadas %}
+                    <tr>
+                        <td>{{ s.nome_solicitante }}</td>
+                        <td>{{ s.analisado_em|date:"d/m/Y H:i" }}</td>
+                        <td>{{ s.analisado_por|default:"—" }}</td>
+                        <td>{{ s.parecer_staff|truncatewords:8|default:"—" }}</td>
+                        <td>
+                            <a href="{% url 'accounts:detalhe_solicitacao_exclusao' s.id %}"
+                               style="background:#7f8c8d;color:white;padding:4px 12px;border-radius:4px;text-decoration:none;font-size:12px;">
+                                👁️ Ver
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="sem-dados">Nenhuma solicitação aprovada.</p>
+        {% endif %}
+    </div>
+
+    <!-- RECUSADAS -->
+    <div class="tabela-box">
+        <h2>❌ Solicitações Recusadas</h2>
+        {% if recusadas %}
+        <div style="overflow-x: auto;">
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Solicitante</th>
+                        <th>Analisado em</th>
+                        <th>Analisado por</th>
+                        <th>Parecer</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in recusadas %}
+                    <tr>
+                        <td>{{ s.nome_solicitante }}</td>
+                        <td>{{ s.analisado_em|date:"d/m/Y H:i" }}</td>
+                        <td>{{ s.analisado_por|default:"—" }}</td>
+                        <td>{{ s.parecer_staff|truncatewords:8|default:"—" }}</td>
+                        <td>
+                            <a href="{% url 'accounts:detalhe_solicitacao_exclusao' s.id %}"
+                               style="background:#7f8c8d;color:white;padding:4px 12px;border-radius:4px;text-decoration:none;font-size:12px;">
+                                👁️ Ver
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="sem-dados">Nenhuma solicitação recusada.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<style>
+    .dashboard-container { padding: 20px; }
+
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-left: 4px solid #ccc;
+    }
+
+    .card h3 {
+        margin: 0 0 10px 0;
+        font-size: 13px;
+        color: #666;
+        text-transform: uppercase;
+    }
+
+    .big-number {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+
+    .tabela-box {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    .tabela-box h2 {
+        margin-top: 0;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    .tabela {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    .tabela thead th {
+        background: #205067;
+        color: white;
+        padding: 10px;
+        text-align: left;
+        font-weight: bold;
+    }
+
+    .tabela tbody tr:nth-child(odd)  { background: #f5f5f5; }
+    .tabela tbody tr:nth-child(even) { background: white; }
+    .tabela tbody tr:hover           { background: #d4edff; }
+    .tabela td { padding: 10px; border-bottom: 1px solid #eee; }
+
+    .sem-dados {
+        color: #999;
+        font-size: 14px;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .btn-voltar {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #05f5f5;
+        color: #000 !important;
+        text-decoration: none !important;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-voltar:hover {
+        background: #04d4d4 !important;
+        color: white !important;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+
