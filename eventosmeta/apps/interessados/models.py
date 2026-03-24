@@ -66,7 +66,7 @@ class Interessado(models.Model):
     consentimento_lgpd_em = models.DateTimeField('Data do Consentimento', null=True, blank=True)
 
     # DADOS PESSOAIS
-    cpf = EncryptedCharField('CPF', max_length=11, unique=True, validators=[cpf_validator])
+    cpf = EncryptedCharField('CPF', max_length=14, unique=True)
     cpf_hash = models.CharField('Hash do CPF', max_length=64, unique=True, blank=True, default='')
     nome = models.CharField('Nome Completo', max_length=50)
     rg = models.CharField('RG/Identidade', max_length=20, blank=True, default='')

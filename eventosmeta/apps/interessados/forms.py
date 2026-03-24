@@ -9,22 +9,25 @@ Alterações anteriores:
 - clean_email adicionado em CadastroInteressadoForm e EdicaoInteressadoForm (26/02/2026)
 - clean_cpf atualizado com validação de dígitos verificadores (16/03/2026)
 - Buscas por CPF migradas para cpf_hash (17/03/2026)
+- Adicionado campo consentimento_lgpd no CadastroInteressadoForm
+  save() registra data/hora do aceite em consentimento_lgpd_em (17/03/2026)
 
-Alteração: Adicionado campo consentimento_lgpd no CadastroInteressadoForm
-           save() registra data/hora do aceite em consentimento_lgpd_em
-Data: 17/03/2026
+Alteração: Refatoração completa dos formulários para validação robusta de CPF (com/sem formatação),
+           reuso de métodos clean e correção de erros de atribuição.
+Data: 23 de março de 2026
 """
 
+import re
 from django import forms
 from django.contrib.auth.hashers import check_password
 from django.utils import timezone
 from .models import Interessado, Sexo, Fototipo, gerar_hash_cpf
 
-
 class CadastroInteressadoForm(forms.ModelForm):
     """
     Formulário COMPLETO de cadastro para interessados.
-    Valores padrão: UF Nascimento = SP, Nacionalidade = Brasileira
+    Valores padrão: UF Nascimento = SP, Nacionalidade = Brasileira.
+    Aceita CPF com ou sem formatação, mas grava SEM formatação.
     """
     senha = forms.CharField(
         label='Senha',
@@ -44,10 +47,6 @@ class CadastroInteressadoForm(forms.ModelForm):
         })
     )
 
-    # ============================================================
-    # LGPD — ADICIONADO 17/03/2026
-    # Campo fora do Meta.fields pois é tratado manualmente no save()
-    # ============================================================
     consentimento_lgpd = forms.BooleanField(
         label='Declaro que li e aceito o Termo de Consentimento para o tratamento dos meus dados pessoais conforme a LGPD.',
         required=True,
@@ -87,7 +86,12 @@ class CadastroInteressadoForm(forms.ModelForm):
 
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nome completo'}),
-            'cpf': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '000.000.000-00'}),
+            'cpf': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '000.000.000-00',
+                'inputmode': 'numeric',
+                'data-cpf-formatter': 'true' # Para JS de formatação
+            }),
             'rg': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '00.000.000-0'}),
             'data_nascimento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'sexo': forms.Select(attrs={'class': 'form-select'}),
@@ -161,97 +165,132 @@ class CadastroInteressadoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # Define valores iniciais padrão se o formulário não foi preenchido
         if not self.data:
             self.initial['uf_nascimento'] = 'SP'
             self.initial['nacionalidade'] = 'Brasileira'
 
     def clean_cpf(self):
-        """Remove formatação, valida dígitos verificadores e unicidade via hash"""
+        """
+        Remove formatação do CPF, valida dígitos verificadores e verifica unicidade via hash.
+        Aceita: 52998224725 ou 529.982.247-25.
+        Retorna: CPF SEM formatação (11 dígitos).
+        """
         cpf = self.cleaned_data.get('cpf', '')
-        cpf = ''.join(filter(str.isdigit, cpf))
+        
+        # Remove tudo que não é dígito (pontos, hífens, etc.)
+        cpf_limpo = re.sub(r'\D', '', cpf)
 
-        if len(cpf) != 11:
+        if len(cpf_limpo) != 11:
             raise forms.ValidationError('CPF deve ter 11 dígitos.')
 
-        if len(set(cpf)) == 1:
+        # Rejeita CPF com todos os dígitos iguais (ex: 111.111.111-11)
+        if len(set(cpf_limpo)) == 1:
             raise forms.ValidationError('CPF inválido.')
 
-        soma = sum(int(cpf[i]) * (10 - i) for i in range(9))
+        # Valida primeiro dígito verificador
+        soma = sum(int(cpf_limpo[i]) * (10 - i) for i in range(9))
         resto = (soma * 10) % 11
         if resto == 10:
             resto = 0
-        if resto != int(cpf[9]):
+        if resto != int(cpf_limpo[9]):
             raise forms.ValidationError('CPF inválido.')
 
-        soma = sum(int(cpf[i]) * (11 - i) for i in range(10))
+        # Valida segundo dígito verificador
+        soma = sum(int(cpf_limpo[i]) * (11 - i) for i in range(10))
         resto = (soma * 10) % 11
         if resto == 10:
             resto = 0
-        if resto != int(cpf[10]):
+        if resto != int(cpf_limpo[10]):
             raise forms.ValidationError('CPF inválido.')
 
-        if Interessado.objects.filter(cpf_hash=gerar_hash_cpf(cpf)).exists():
+        # Verifica se já existe um interessado com o mesmo CPF (usando o hash para busca)
+        if Interessado.objects.filter(cpf_hash=gerar_hash_cpf(cpf_limpo)).exists():
             raise forms.ValidationError('Este CPF já está cadastrado.')
 
-        return cpf
+        # Atualiza o cleaned_data com o CPF limpo para uso posterior no save()
+        self.cleaned_data['cpf'] = cpf_limpo
+        return cpf_limpo
 
     def clean_email(self):
-        """Converte e-mail vazio para None e valida unicidade"""
+        """
+        Converte e-mail vazio para None e valida unicidade.
+        Permite que o campo e-mail seja opcional.
+        """
         email = (self.cleaned_data.get('email') or '').strip()
         if not email:
             return None
+        
+        # Verifica se o e-mail já está cadastrado por outro interessado
         qs = Interessado.objects.filter(email__iexact=email)
-        if self.instance.pk:
+        if self.instance.pk: # Se for uma edição, exclui o próprio interessado da busca
             qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
             raise forms.ValidationError('Este e-mail já está cadastrado.')
         return email
 
     def clean_rg(self):
+        """Remove formatação (pontos e hífens) do RG."""
         rg = self.cleaned_data.get('rg', '')
         return rg.replace('.', '').replace('-', '').strip()
 
     def clean_cep(self):
+        """Remove formatação do CEP e valida se tem 8 dígitos."""
         cep = self.cleaned_data.get('cep', '')
-        cep = ''.join(filter(str.isdigit, cep))
+        cep = re.sub(r'\D', '', cep) # Remove tudo que não é dígito
         if cep and len(cep) != 8:
             raise forms.ValidationError('CEP deve ter 8 dígitos.')
         return cep
 
     def clean_telefone(self):
-        return ''.join(filter(str.isdigit, self.cleaned_data.get('telefone', '')))
+        """Remove formatação do telefone."""
+        return re.sub(r'\D', '', self.cleaned_data.get('telefone', ''))
 
     def clean_celular(self):
-        return ''.join(filter(str.isdigit, self.cleaned_data.get('celular', '')))
+        """Remove formatação do celular."""
+        return re.sub(r'\D', '', self.cleaned_data.get('celular', ''))
 
     def clean_num_nis(self):
-        return ''.join(filter(str.isdigit, self.cleaned_data.get('num_nis', '')))
+        """Remove formatação do Número NIS."""
+        return re.sub(r'\D', '', self.cleaned_data.get('num_nis', ''))
 
     def clean_telefone_responsavel(self):
-        return ''.join(filter(str.isdigit, self.cleaned_data.get('telefone_responsavel', '')))
+        """Remove formatação do telefone do responsável."""
+        return re.sub(r'\D', '', self.cleaned_data.get('telefone_responsavel', ''))
 
     def clean_celular_responsavel(self):
-        return ''.join(filter(str.isdigit, self.cleaned_data.get('celular_responsavel', '')))
+        """Remove formatação do celular do responsável."""
+        return re.sub(r'\D', '', self.cleaned_data.get('celular_responsavel', ''))
 
     def clean_uf_residencia(self):
+        """Converte a UF de residência para maiúsculas e remove espaços."""
         return self.cleaned_data.get('uf_residencia', '').strip().upper()
 
     def clean_uf_nascimento(self):
+        """Converte a UF de nascimento para maiúsculas e remove espaços."""
         return self.cleaned_data.get('uf_nascimento', '').strip().upper()
 
     def clean(self):
+        """Valida se as senhas digitadas são iguais."""
         cleaned_data = super().clean()
         senha = cleaned_data.get('senha')
         confirmar_senha = cleaned_data.get('confirmar_senha')
         if senha and confirmar_senha and senha != confirmar_senha:
-            raise forms.ValidationError('As senhas não conferem.')
+            self.add_error('confirmar_senha', 'As senhas não conferem.') # Adiciona erro ao campo específico
         return cleaned_data
 
     def save(self, commit=True):
-        """Salva com senha criptografada, cpf_hash e registro do consentimento LGPD"""
+        """
+        Salva o interessado com a senha criptografada, o hash do CPF e
+        registra a data/hora do consentimento LGPD.
+        """
         interessado = super().save(commit=False)
         interessado.set_password(self.cleaned_data['senha'])
-        interessado.cpf_hash = gerar_hash_cpf(self.cleaned_data['cpf'])
+        
+        # O CPF já está limpo (sem formatação) em self.cleaned_data['cpf']
+        cpf_limpo = self.cleaned_data['cpf']
+        interessado.cpf = cpf_limpo  # Garante que o CPF seja salvo sem formatação
+        interessado.cpf_hash = gerar_hash_cpf(cpf_limpo) # Gera hash do CPF limpo
 
         # Registra consentimento LGPD com data/hora
         interessado.consentimento_lgpd = True
@@ -262,19 +301,21 @@ class CadastroInteressadoForm(forms.ModelForm):
 
         return interessado
 
-
 class LoginInteressadoForm(forms.Form):
     """
-    Formulário de login com validação de CPF e senha
-    ATUALIZADO: Busca por cpf_hash em 17/03/2026
+    Formulário de login com validação de CPF e senha.
+    Aceita CPF com ou sem formatação.
+    Busca o interessado pelo cpf_hash.
     """
     cpf = forms.CharField(
         label='CPF',
-        max_length=14,
+        max_length=14, # Permite entrada formatada
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': '000.000.000-00',
-            'autofocus': True
+            'inputmode': 'numeric',
+            'autofocus': True,
+            'data-cpf-formatter': 'true' # Para JS de formatação
         })
     )
 
@@ -287,12 +328,17 @@ class LoginInteressadoForm(forms.Form):
     )
 
     def clean(self):
+        """
+        Valida o CPF e a senha para autenticação.
+        Verifica se o interessado existe, está ativo e se a senha está correta.
+        """
         cleaned_data = super().clean()
-        cpf = ''.join(filter(str.isdigit, cleaned_data.get('cpf', '')))
+        cpf = re.sub(r'\D', '', cleaned_data.get('cpf', '')) # Limpa o CPF para busca
         senha = cleaned_data.get('senha')
 
         if cpf and senha:
             try:
+                # Busca o interessado pelo hash do CPF
                 interessado = Interessado.objects.get(cpf_hash=gerar_hash_cpf(cpf))
 
                 if not interessado.is_active:
@@ -300,22 +346,22 @@ class LoginInteressadoForm(forms.Form):
                         'Sua conta está inativa. Entre em contato com a administração.'
                     )
 
+                # Verifica a senha
                 if not check_password(senha, interessado.senha):
                     raise forms.ValidationError('CPF ou senha incorretos.')
 
-                self.interessado = interessado
+                self.interessado = interessado # Armazena o interessado para uso posterior (ex: na view)
 
             except Interessado.DoesNotExist:
                 raise forms.ValidationError('CPF ou senha incorretos.')
 
         return cleaned_data
 
-
 class EdicaoInteressadoForm(forms.ModelForm):
     """
     Formulário de EDIÇÃO de dados do interessado.
-    Permite alterar TUDO, EXCETO CPF.
-    NÃO inclui senha nem consentimento LGPD.
+    Permite alterar TUDO, EXCETO CPF, senha e consentimento LGPD.
+    Reutiliza métodos de limpeza do CadastroInteressadoForm.
     """
 
     class Meta:
@@ -334,21 +380,76 @@ class EdicaoInteressadoForm(forms.ModelForm):
             'email_responsavel', 'observacao',
         ]
 
+        # Reutiliza widgets e labels do formulário de cadastro
         widgets = CadastroInteressadoForm.Meta.widgets.copy()
         labels = CadastroInteressadoForm.Meta.labels.copy()
 
+        # Remove widgets e labels de campos não editáveis ou que não fazem parte deste formulário
+        del widgets['cpf']
+        del labels['cpf']
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # O campo CPF não é editável neste formulário
+        if 'cpf' in self.fields:
+            self.fields['cpf'].widget.attrs['readonly'] = True
+            self.fields['cpf'].widget.attrs['disabled'] = True # Para garantir que não seja enviado
 
-    clean_rg                   = CadastroInteressadoForm.clean_rg
-    clean_cep                  = CadastroInteressadoForm.clean_cep
-    clean_telefone             = CadastroInteressadoForm.clean_telefone
-    clean_celular              = CadastroInteressadoForm.clean_celular
-    clean_num_nis              = CadastroInteressadoForm.clean_num_nis
-    clean_telefone_responsavel = CadastroInteressadoForm.clean_telefone_responsavel
-    clean_celular_responsavel  = CadastroInteressadoForm.clean_celular_responsavel
-    clean_uf_residencia        = CadastroInteressadoForm.clean_uf_residencia
-    clean_uf_nascimento        = CadastroInteressadoForm.clean_uf_nascimento
-    clean_email                = CadastroInteressadoForm.clean_email
+    # Métodos de limpeza copiados do CadastroInteressadoForm
+    def clean_rg(self):
+        """Remove formatação (pontos e hífens) do RG."""
+        rg = self.cleaned_data.get('rg', '')
+        return rg.replace('.', '').replace('-', '').strip()
+
+    def clean_cep(self):
+        """Remove formatação do CEP e valida se tem 8 dígitos."""
+        cep = self.cleaned_data.get('cep', '')
+        cep = re.sub(r'\D', '', cep)
+        if cep and len(cep) != 8:
+            raise forms.ValidationError('CEP deve ter 8 dígitos.')
+        return cep
+
+    def clean_telefone(self):
+        """Remove formatação do telefone."""
+        return re.sub(r'\D', '', self.cleaned_data.get('telefone', ''))
+
+    def clean_celular(self):
+        """Remove formatação do celular."""
+        return re.sub(r'\D', '', self.cleaned_data.get('celular', ''))
+
+    def clean_num_nis(self):
+        """Remove formatação do Número NIS."""
+        return re.sub(r'\D', '', self.cleaned_data.get('num_nis', ''))
+
+    def clean_telefone_responsavel(self):
+        """Remove formatação do telefone do responsável."""
+        return re.sub(r'\D', '', self.cleaned_data.get('telefone_responsavel', ''))
+
+    def clean_celular_responsavel(self):
+        """Remove formatação do celular do responsável."""
+        return re.sub(r'\D', '', self.cleaned_data.get('celular_responsavel', ''))
+
+    def clean_uf_residencia(self):
+        """Converte a UF de residência para maiúsculas e remove espaços."""
+        return self.cleaned_data.get('uf_residencia', '').strip().upper()
+
+    def clean_uf_nascimento(self):
+        """Converte a UF de nascimento para maiúsculas e remove espaços."""
+        return self.cleaned_data.get('uf_nascimento', '').strip().upper()
+
+    def clean_email(self):
+        """
+        Converte e-mail vazio para None e valida unicidade para edição.
+        Exclui o próprio interessado da verificação de unicidade.
+        """
+        email = (self.cleaned_data.get('email') or '').strip()
+        if not email:
+            return None
+        qs = Interessado.objects.filter(email__iexact=email)
+        if self.instance.pk: # Exclui o próprio interessado da busca de duplicidade
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise forms.ValidationError('Este e-mail já está cadastrado.')
+        return email
 
 
