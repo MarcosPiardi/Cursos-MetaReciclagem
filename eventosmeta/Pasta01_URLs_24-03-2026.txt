@@ -1,0 +1,353 @@
+# PROJETO DJANGO - ARQUIVOS CONCATENADOS
+# Pasta: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+# Data: 24/03/2026 16:32:37
+
+================================================================================
+
+
+################################################################################
+# ARQUIVOS: urls.py
+################################################################################
+
+
+================================================================================
+# ARQUIVO: apps\academico\urls.py
+================================================================================
+
+"""
+Arquivo: urls.py
+Caminho: apps/academico/urls.py
+Descrição: URLs do módulo acadêmico
+Data: 12/01/2026
+"""
+
+"""
+URLs do app ACADÊMICO
+Arquivo: apps/academico/urls.py
+Data: 02/02/2026
+"""
+
+from django.urls import path
+from . import views
+
+app_name = 'academico'
+
+urlpatterns = [
+    # Download individual
+    path('certificado/<int:avaliacao_id>/download/', 
+         views.download_certificado_individual, 
+         name='download_certificado'),
+    
+    # Preview
+    path('certificado/<int:avaliacao_id>/preview/', 
+         views.preview_certificado, 
+         name='preview_certificado'),
+    
+    # Download em lote
+    path('certificados/download-lote/', 
+         views.download_certificados_lote, 
+         name='download_certificados_lote'),
+]
+
+
+
+
+================================================================================
+# ARQUIVO: apps\accounts\urls.py
+================================================================================
+
+"""
+Arquivo: urls.py
+Caminho: apps/accounts/urls.py
+Alteração: Login staff redireciona para admin
+Data: 20/01/2026
+Alteração: Removidas rotas de recuperação de senha — já definidas em config/urls.py
+Data: 24/02/2026
+"""
+from django.urls import path
+from . import views
+
+# Importar no topo
+from . import views_exclusao
+
+app_name = 'accounts'
+
+urlpatterns = [
+    path('login/',  views.login_staff,  name='login_staff'),
+    path('logout/', views.logout_staff, name='logout_staff'),
+    path('exclusao/', views_exclusao.listar_solicitacoes_view, name='listar_solicitacoes_exclusao'),
+    path('exclusao/<int:solicitacao_id>/', views_exclusao.detalhe_solicitacao_view, name='detalhe_solicitacao_exclusao'),
+]
+
+
+
+
+================================================================================
+# ARQUIVO: apps\interessados\urls.py
+================================================================================
+
+"""
+Arquivo: urls.py
+Caminho: apps/interessados/urls.py
+Alteração: Rota detalhes adicionada
+Data: 29/01/2026
+Alteração: Adicionadas rotas de recuperação de senha por CPF
+Data: 20/02/2026
+"""
+
+from django.urls import path
+from . import views
+from . import views_exclusao
+
+app_name = 'interessados'
+
+urlpatterns = [
+    path('cadastro/', views.cadastro_view, name='cadastro'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('meus-dados/', views.meus_dados_view, name='meus_dados'),
+    path('dashboard/', views.dashboard_view, name='dashboard'),
+    path('inscricao/<int:inscricao_id>/detalhes/', views.detalhes_view, name='detalhes'),
+    path('inscrever/<int:evento_id>/', views.inscrever_evento_view, name='inscrever_evento'),
+
+    # ==========================================
+    # RECUPERAÇÃO DE SENHA — INTERESSADOS
+    # Alteração: 20/02/2026
+    # ==========================================
+    path('senha/recuperar/', views.senha_recuperar_view, name='senha_recuperar'),
+    path('senha/recuperar/enviado/', views.senha_recuperar_enviado_view, name='senha_recuperar_enviado'),
+    path('senha/redefinir/<str:token>/', views.senha_redefinir_view, name='senha_redefinir'),
+    path('senha/redefinir/concluido/', views.senha_redefinir_concluido_view, name='senha_redefinir_concluido'),
+    path('senha/sem-email/', views.senha_sem_email_view, name='senha_sem_email'),
+    
+    # Adicionar no urlpatterns
+    path('exclusao/solicitar/', views_exclusao.solicitar_exclusao_view, name='solicitar_exclusao'),
+    path('exclusao/solicitada/', views_exclusao.exclusao_solicitada_view, name='exclusao_solicitada'),
+
+
+]
+
+
+
+
+================================================================================
+# ARQUIVO: apps\portal\urls.py
+================================================================================
+
+"""
+URLs do app PORTAL - Sistema MetaReciclagem
+Arquivo: apps/portal/urls.py
+Data: 29/01/2026
+"""
+
+"""
+URLs do app PORTAL - Sistema MetaReciclagem
+Arquivo: apps/portal/urls.py
+Data: 05/12/2025
+"""
+
+from django.urls import path
+from . import views
+
+app_name = 'portal'
+
+urlpatterns = [
+    # Página inicial
+    path('', views.index, name='index'),
+    
+    # Autenticação
+    path('login/', views.login_interessado, name='login'),
+    path('logout/', views.logout_interessado, name='logout'),
+    
+    # Dashboard do interessado
+    path('dashboard/', views.dashboard, name='dashboard'),
+    
+    # Consulta pública
+    path('consulta/', views.consulta_publica, name='consulta_publica'),
+    path('resultado/<int:evento_id>/', views.resultado_evento, name='resultado_evento'),
+    
+    # Detalhes do evento
+    path('evento/<int:evento_id>/', views.detalhes_evento, name='detalhes_evento'),
+
+     # Página de contato
+    path('contato/', views.contato, name='contato'),
+
+    # Política de privacidade
+    path('privacidade/', views.politica_privacidade, name='politica_privacidade'),
+]
+
+
+================================================================================
+# ARQUIVO: config\urls.py
+================================================================================
+
+"""
+URL Configuration for Eventos MetaReciclagem
+Arquivo: config/urls.py
+Alteração: Admin customizado com dashboard + estrutura completa
+Data: 20/01/2026
+Alteração: Admin customizado + rotas de dashboard integradas
+Data: 03/02/2026
+Alteração: Adicionadas rotas PDF para todos os dashboards
+Data: 05/02/2026
+Alteração: Adicionadas rotas de recuperação de senha para Staff e Interessados
+Data: 20/02/2026
+Alteração: Templates de recuperação de senha Staff renomeados com prefixo adm_
+Data: 24/02/2026
+Alteração: Adicionadas rotas de troca obrigatória de senha (Fluxo B)
+           para Staff e Interessados
+Data: 25/02/2026
+Alteração: Desabilitado Sistema 3 (Portal login duplicado)
+           Mantida apenas página inicial (/)
+Data: 13/03/2026
+"""
+
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
+
+from apps.accounts.admin import admin_site
+from apps.accounts import views as accounts_views
+from apps.interessados import views as interessados_views
+from dashboard import views as dashboard_views
+from apps.portal import views as portal_views
+
+urlpatterns = [
+
+    # ==========================================
+    # PÁGINA INICIAL
+    # ==========================================
+    # path('', portal_views.index, name='index'),
+
+    # ==========================================
+    # DASHBOARDS CUSTOMIZADOS
+    # ==========================================
+    path('admin/dashboard/', include([
+        path('academico/',
+             dashboard_views.dashboard_academico,
+             name='dashboard_academico'),
+        path('academico/pdf/',
+             dashboard_views.dashboard_academico_pdf,
+             name='dashboard_academico_pdf'),
+        path('eventos/',
+             dashboard_views.dashboard_eventos,
+             name='dashboard_eventos'),
+        path('eventos/pdf/',
+             dashboard_views.dashboard_eventos_pdf,
+             name='dashboard_eventos_pdf'),
+        path('interessados/',
+             dashboard_views.dashboard_interessados,
+             name='dashboard_interessados'),
+        path('interessados/pdf/',
+             dashboard_views.dashboard_interessados_pdf,
+             name='dashboard_interessados_pdf'),
+        path('processo-seletivo/',
+             dashboard_views.dashboard_processo_seletivo,
+             name='dashboard_processo_seletivo'),
+        path('processo-seletivo/pdf/',
+             dashboard_views.dashboard_processo_seletivo_pdf,
+             name='dashboard_processo_seletivo_pdf'),
+        path('admin/dashboard/lgpd/', 
+             dashboard_views.dashboard_lgpd, 
+             name='dashboard_lgpd'),
+    ])),
+
+    # ==========================================
+    # DJANGO ADMIN CUSTOMIZADO
+    # ==========================================
+    path('admin/', admin_site.urls),
+
+    # ==========================================
+    # SISTEMA 1: Staff/Administração
+    # ==========================================
+    path('staff/', include('apps.accounts.urls')),
+
+    # ==========================================
+    # RECUPERAÇÃO DE SENHA — STAFF
+    # Fluxo A: Via e-mail (self-service)
+    # Templates com prefixo adm_ em accounts/senha/
+    # ==========================================
+    path('staff/senha/', include([
+
+        path(
+            'recuperar/',
+            auth_views.PasswordResetView.as_view(
+                template_name='accounts/senha/adm_recuperar.html',
+                email_template_name='accounts/senha/adm_email_recuperar.txt',
+                html_email_template_name='accounts/senha/adm_email_recuperar.html',
+                subject_template_name='accounts/senha/adm_email_assunto.txt',
+                success_url='/staff/senha/recuperar/enviado/',
+            ),
+            name='staff_senha_recuperar',
+        ),
+
+        path(
+            'recuperar/enviado/',
+            auth_views.PasswordResetDoneView.as_view(
+                template_name='accounts/senha/adm_recuperar_enviado.html',
+            ),
+            name='staff_senha_recuperar_enviado',
+        ),
+
+        path(
+            'redefinir/<uidb64>/<token>/',
+            auth_views.PasswordResetConfirmView.as_view(
+                template_name='accounts/senha/adm_redefinir.html',
+                success_url='/staff/senha/redefinir/concluido/',
+            ),
+            name='staff_senha_redefinir',
+        ),
+
+        path(
+            'redefinir/concluido/',
+            auth_views.PasswordResetCompleteView.as_view(
+                template_name='accounts/senha/adm_redefinir_concluido.html',
+            ),
+            name='staff_senha_redefinir_concluido',
+        ),
+
+        path(
+            'trocar-obrigatorio/',
+            accounts_views.trocar_senha_obrigatorio_view,
+            name='staff_trocar_senha_obrigatorio',
+        ),
+
+    ])),
+
+    # ==========================================
+    # SISTEMA 2: Público/Interessados
+    # ==========================================
+    path('inscricao/', include('apps.interessados.urls')),
+
+    # ==========================================
+    # TROCA OBRIGATÓRIA DE SENHA — INTERESSADOS
+    # ==========================================
+    path(
+        'inscricao/senha/trocar-obrigatorio/',
+        interessados_views.trocar_senha_obrigatorio_view,
+        name='interessados_trocar_senha_obrigatorio',
+    ),
+
+    # ==========================================
+    # SISTEMA 3: Portal Público (DESABILITADO)
+    # Comentado em 13/03/2026
+    # Login duplicado removido (use /inscricao/login/)
+    # Apenas página inicial (/) mantida
+    # ==========================================
+    path('', include('apps.portal.urls')),
+
+    # ==========================================
+    # SISTEMA 4: Gestão Acadêmica
+    # ==========================================
+    path('academico/', include('apps.academico.urls')),
+
+]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,  document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
+

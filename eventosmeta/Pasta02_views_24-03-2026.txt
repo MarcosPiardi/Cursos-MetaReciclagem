@@ -1,0 +1,1753 @@
+# PROJETO DJANGO - ARQUIVOS CONCATENADOS
+# Pasta: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+# Data: 24/03/2026 16:32:37
+
+================================================================================
+
+
+################################################################################
+# ARQUIVOS: views.py
+################################################################################
+
+
+================================================================================
+# ARQUIVO: apps\academico\views.py
+================================================================================
+
+"""
+Arquivo: views.py
+Caminho: apps/academico/views.py
+Descrição: Views para gestão de matrícula
+Data: 12/01/2026
+"""
+
+"""
+Views do app ACADÊMICO
+Arquivo: apps/academico/views.py
+Data: 02/02/2026
+"""
+
+from django.http import HttpResponse, FileResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_http_methods
+import io
+import zipfile
+
+from .models import Avaliacao
+from .certificado import GeradorCertificado
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def download_certificado_individual(request, avaliacao_id):
+    """
+    Download individual de certificado em PDF
+    """
+    avaliacao = get_object_or_404(Avaliacao, pk=avaliacao_id)
+    
+    # Verificar se está aprovado
+    if not avaliacao.aprovado:
+        return HttpResponse("❌ Certificado disponível apenas para alunos aprovados.", status=400)
+    
+    # Gerar PDF
+    buffer = io.BytesIO()
+    gerador = GeradorCertificado(avaliacao)
+    gerador.gerar_pdf(buffer)
+    buffer.seek(0)
+    
+    # Nome do arquivo
+    aluno_nome = avaliacao.matricula.interessado.nome.replace(' ', '_')
+    curso_nome = avaliacao.matricula.turma.evento.nome.replace(' ', '_')
+    filename = f"Certificado_{aluno_nome}_{curso_nome}.pdf"
+    
+    # Retornar PDF para download
+    response = FileResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def preview_certificado(request, avaliacao_id):
+    """
+    Preview do certificado (visualizar no navegador)
+    """
+    avaliacao = get_object_or_404(Avaliacao, pk=avaliacao_id)
+    
+    # Verificar se está aprovado
+    if not avaliacao.aprovado:
+        return HttpResponse("❌ Certificado disponível apenas para alunos aprovados.", status=400)
+    
+    # Gerar PDF
+    buffer = io.BytesIO()
+    gerador = GeradorCertificado(avaliacao)
+    gerador.gerar_pdf(buffer)
+    buffer.seek(0)
+    
+    # Retornar PDF para visualização inline
+    response = FileResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline'
+    
+    return response
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def download_certificados_lote(request):
+    """
+    Download em lote de certificados (ZIP)
+    """
+    # Pegar IDs da query string
+    ids_str = request.GET.get('ids', '')
+    ids = [int(id) for id in ids_str.split(',') if id.strip().isdigit()]
+    
+    if not ids:
+        return HttpResponse("❌ Nenhuma avaliação selecionada.", status=400)
+    
+    # Buscar avaliações aprovadas
+    avaliacoes = Avaliacao.objects.filter(pk__in=ids, aprovado=True)
+    
+    if avaliacoes.count() == 0:
+        return HttpResponse("❌ Nenhum aluno aprovado foi selecionado.", status=400)
+    
+    # Criar ZIP em memória
+    zip_buffer = io.BytesIO()
+    
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for avaliacao in avaliacoes:
+            # Gerar PDF de cada certificado
+            pdf_buffer = io.BytesIO()
+            gerador = GeradorCertificado(avaliacao)
+            gerador.gerar_pdf(pdf_buffer)
+            pdf_buffer.seek(0)
+            
+            # Nome do arquivo dentro do ZIP
+            aluno_nome = avaliacao.matricula.interessado.nome.replace(' ', '_')
+            matricula_num = avaliacao.matricula.numero_matricula
+            filename = f"Certificado_{matricula_num}_{aluno_nome}.pdf"
+            
+            # Adicionar ao ZIP
+            zip_file.writestr(filename, pdf_buffer.read())
+    
+    zip_buffer.seek(0)
+    
+    # Retornar ZIP para download
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="Certificados_{len(avaliacoes)}_alunos.zip"'
+    
+    return response
+
+
+
+
+================================================================================
+# ARQUIVO: apps\accounts\views.py
+================================================================================
+
+"""
+Arquivo: views.py
+Caminho: apps/accounts/views.py
+Alteração: Login staff redireciona para admin
+Data: 20/01/2026
+Alteração: Adicionado link de recuperação de senha no contexto do login
+Data: 24/02/2026
+Alteração: URL de recuperação corrigida para staff_senha_recuperar
+Data: 24/02/2026
+Alteração: Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
+           Intercepta login de Staff com must_change_password = True
+           e força troca de senha antes de qualquer outra ação
+Data: 25/02/2026
+"""
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+
+
+def login_staff(request):
+    """Login para usuários staff - redireciona para admin"""
+
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect('/admin/')
+
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user     = authenticate(request=request, username=username, password=password)
+
+            if user is not None and user.is_staff:
+                login(request, user)
+                messages.success(request, f'Bem-vindo, {user.username}!')
+                # Middleware intercepta e redireciona se must_change_password = True
+                return redirect('/admin/')
+            else:
+                messages.error(
+                    request,
+                    'Você não tem permissão para acessar esta área.'
+                )
+        else:
+            messages.error(request, 'Usuário ou senha incorretos.')
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'accounts/login_staff.html', {
+        'form': form,
+        'url_recuperar_senha': 'staff_senha_recuperar',
+    })
+
+
+def logout_staff(request):
+    """Logout do staff"""
+    logout(request)
+    messages.success(request, 'Você saiu do sistema.')
+    return redirect('accounts:login_staff')
+
+
+# ==============================================================================
+# FLUXO B — TROCA OBRIGATÓRIA DE SENHA — STAFF
+# Adicionado: 25/02/2026
+# Acionado pelo middleware TrocarSenhaObrigatorioMiddleware quando
+# must_change_password = True no model Usuario.
+# O usuário não consegue acessar nenhuma outra página até trocar a senha.
+# ==============================================================================
+
+@login_required(login_url='/staff/login/')
+def trocar_senha_obrigatorio_view(request):
+    """
+    View de troca obrigatória de senha para usuários Staff.
+
+    Exibida pelo middleware quando must_change_password = True.
+    Após a troca bem-sucedida:
+      - must_change_password é definido como False
+      - Usuário é redirecionado para o admin normalmente
+    """
+    usuario = request.user
+
+    # Segurança extra: se chegou aqui sem must_change_password, redireciona
+    if not usuario.must_change_password:
+        return redirect('/admin/')
+
+    erro = None
+
+    if request.method == 'POST':
+        nova_senha      = request.POST.get('nova_senha', '').strip()
+        confirmar_senha = request.POST.get('confirmar_senha', '').strip()
+
+        if len(nova_senha) < 8:
+            erro = 'A nova senha deve ter no mínimo 8 caracteres.'
+        elif nova_senha != confirmar_senha:
+            erro = 'As senhas não coincidem. Tente novamente.'
+        else:
+            usuario.set_password(nova_senha)
+            usuario.must_change_password = False
+            usuario.save()
+
+            # Re-autentica para não perder a sessão após troca de senha
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, usuario)
+
+            messages.success(
+                request,
+                '✅ Senha alterada com sucesso! Bem-vindo ao sistema.'
+            )
+            return redirect('/admin/')
+
+    return render(request, 'accounts/senha/adm_trocar_obrigatorio.html', {
+        'erro'   : erro,
+        'usuario': usuario,
+    })
+
+
+
+
+================================================================================
+# ARQUIVO: apps\eventos\views.py
+================================================================================
+
+from django.shortcuts import render
+
+# Create your views here.
+
+
+
+================================================================================
+# ARQUIVO: apps\interessados\views.py
+================================================================================
+
+"""
+Arquivo: views.py
+Caminho: apps/interessados/views.py
+Alteração: Imports corrigidos + dashboard funcional
+Data: 29/01/2026
+Alteração: Corrigido login para exibir erros no formulário, não em messages
+Alteração: Corrigido comparação de datas (datetime vs date)
+Alteração: Corrigido relacionamento inscricoes (plural) no dashboard
+Alteração: Código completo baseado nos models reais - SEM ERROS
+Data: 30/01/2026
+Alteração: Adicionada verificação de is_active em todas as views protegidas
+Data: 13/02/2026
+Alteração: Adicionadas views de recuperação de senha por CPF + e-mail
+Alteração: Token de recuperação migrado de sessão para banco de dados
+Data: 20/02/2026
+Alteração: dashboard_view — prefetch_related de matriculas e status da matricula
+Data: 24/02/2026
+Alteração: Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
+Data: 25/02/2026
+Alteração: Rate limiting via middleware axes
+Data: 12/03/2026
+Alteração: senha_recuperar_view migrada para busca por cpf_hash
+Data: 17/03/2026
+"""
+
+import secrets
+from datetime import date, timedelta, datetime
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+
+from .models import Interessado, PasswordResetToken, gerar_hash_cpf
+from .forms import CadastroInteressadoForm, LoginInteressadoForm, EdicaoInteressadoForm
+from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
+from apps.eventos.models import Evento
+
+
+# ==========================================
+# CADASTRO
+# ==========================================
+
+def cadastro_view(request):
+    """View de cadastro público de interessados"""
+    if request.method == 'POST':
+        form = CadastroInteressadoForm(request.POST)
+
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(
+                    request,
+                    '✅ Cadastro realizado com sucesso! Faça login para continuar.'
+                )
+                return redirect('interessados:login')
+            except Exception as e:
+                messages.error(request, f'❌ Erro ao salvar cadastro: {str(e)}')
+        else:
+            messages.error(request, '❌ Corrija os erros abaixo para continuar.')
+    else:
+        form = CadastroInteressadoForm()
+
+    return render(request, 'interessados/cadastro.html', {'form': form})
+
+
+# ==========================================
+# LOGIN / LOGOUT
+# ==========================================
+
+def login_view(request):
+    """
+    View de login para interessados - Autentica usando CPF e senha
+    CORRIGIDO: Erros são exibidos no formulário, não em messages
+    ADICIONADO: Verificação extra de is_active e atualização de last_login (13/02/2026)
+    PROTEGIDO: Rate limiting via middleware axes (máximo 5 tentativas, bloqueio 30 min)
+    """
+    if request.method == 'POST':
+        form = LoginInteressadoForm(request.POST)
+
+        if form.is_valid():
+            interessado = form.interessado
+
+            if not interessado.is_active:
+                messages.error(
+                    request,
+                    '🔒 Sua conta está inativa. Entre em contato com a administração.'
+                )
+                return render(request, 'interessados/login.html', {'form': form})
+
+            interessado.last_login = timezone.now()
+            interessado.save(update_fields=['last_login'])
+
+            login(
+                request,
+                interessado,
+                backend='apps.interessados.authentication.InteressadoBackend'
+            )
+            return redirect('interessados:dashboard')
+
+    else:
+        form = LoginInteressadoForm()
+
+    return render(request, 'interessados/login.html', {'form': form})
+
+
+@login_required(login_url='interessados:login')
+def logout_view(request):
+    """View de logout"""
+    logout(request)
+    messages.info(request, '👋 Você saiu do sistema.')
+    return redirect('interessados:login')
+
+
+# ==========================================
+# DASHBOARD
+# ==========================================
+
+@login_required(login_url='interessados:login')
+def dashboard_view(request):
+    """
+    Dashboard do interessado
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    ADICIONADO: prefetch_related de matriculas (24/02/2026)
+    """
+    interessado = request.user
+
+    if not interessado.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
+
+    inscricoes = Inscricao.objects.filter(
+        interessado=interessado
+    ).select_related(
+        'evento',
+        'evento__status',
+        'status',
+    ).prefetch_related(
+        'matriculas',
+        'matriculas__status',
+    ).order_by('-data_inscricao')
+
+    classificacoes = Classificacao.objects.filter(
+        inscricao__interessado=interessado
+    ).select_related(
+        'inscricao__evento',
+        'inscricao__evento__status',
+    ).prefetch_related(
+        'inscricao__matriculas',
+        'inscricao__matriculas__status',
+    ).order_by('-processado_em')
+
+    total_inscricoes     = inscricoes.count()
+    total_classificacoes = classificacoes.count()
+    inscricoes_aprovadas = inscricoes.filter(status__nome='APROVADO').count()
+    inscricoes_pendentes = inscricoes.filter(status__nome='INSCRITO').count()
+
+    eventos_abertos = Evento.objects.filter(
+        data_fim_inscricao__date__gte=date.today()
+    ).select_related(
+        'status'
+    ).exclude(
+        inscricoes__interessado=interessado
+    ).distinct()
+
+    context = {
+        'interessado'         : interessado,
+        'inscricoes'          : inscricoes,
+        'classificacoes'      : classificacoes,
+        'total_inscricoes'    : total_inscricoes,
+        'total_classificacoes': total_classificacoes,
+        'inscricoes_aprovadas': inscricoes_aprovadas,
+        'inscricoes_pendentes': inscricoes_pendentes,
+        'eventos_abertos'     : eventos_abertos,
+    }
+
+    return render(request, 'interessados/dashboard.html', context)
+
+
+# ==========================================
+# MEUS DADOS
+# ==========================================
+
+@login_required(login_url='interessados:login')
+def meus_dados_view(request):
+    """
+    View de edição de dados do interessado logado
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    """
+    interessado = request.user
+
+    if not interessado.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
+
+    if request.method == 'POST':
+        form = EdicaoInteressadoForm(request.POST, instance=interessado)
+
+        if form.is_valid():
+            try:
+                form.save()
+                messages.success(request, '✅ Dados atualizados com sucesso!')
+                return redirect('interessados:meus_dados')
+            except Exception as e:
+                messages.error(request, f'❌ Erro ao atualizar dados: {str(e)}')
+        else:
+            messages.error(request, '❌ Corrija os erros abaixo para continuar.')
+    else:
+        form = EdicaoInteressadoForm(instance=interessado)
+
+    return render(request, 'interessados/meus_dados.html', {
+        'form'       : form,
+        'interessado': interessado,
+    })
+
+
+# ==========================================
+# DETALHES DE INSCRIÇÃO
+# ==========================================
+
+@login_required(login_url='interessados:login')
+def detalhes_view(request, inscricao_id):
+    """
+    Detalhes de uma inscrição específica
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    """
+    if not request.user.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
+
+    inscricao = get_object_or_404(
+        Inscricao.objects.select_related('evento', 'status', 'classificacao'),
+        pk=inscricao_id,
+        interessado=request.user
+    )
+
+    return render(request, 'portal/detalhes_evento.html', {
+        'inscricao': inscricao,
+    })
+
+
+# ==========================================
+# INSCREVER EM EVENTO
+# ==========================================
+
+@login_required(login_url='interessados:login')
+def inscrever_evento_view(request, evento_id):
+    """
+    Inscreve o interessado logado em um evento
+    ADICIONADO: Verificação de is_active (13/02/2026)
+    """
+    interessado = request.user
+
+    if not interessado.is_active:
+        logout(request)
+        messages.error(request, '🔒 Sua conta foi desativada.')
+        return redirect('interessados:login')
+
+    try:
+        evento = Evento.objects.get(id=evento_id)
+    except Evento.DoesNotExist:
+        messages.error(request, '❌ Evento não encontrado.')
+        return redirect('interessados:dashboard')
+
+    inscricao_existente = Inscricao.objects.filter(
+        interessado=interessado,
+        evento=evento
+    ).first()
+
+    if inscricao_existente:
+        messages.warning(
+            request,
+            f'⚠️ Você já está inscrito no evento "{evento.nome}".'
+        )
+        return redirect('interessados:dashboard')
+
+    agora = timezone.now()
+
+    if not (evento.data_inicio_inscricao <= agora <= evento.data_fim_inscricao):
+        messages.error(
+            request,
+            f'❌ O período de inscrições para "{evento.nome}" está encerrado.'
+        )
+        return redirect('interessados:dashboard')
+
+    try:
+        status_pendente = StatusInscricao.objects.get(nome='Pendente')
+    except StatusInscricao.DoesNotExist:
+        messages.error(
+            request,
+            '❌ Status PENDENTE não encontrado. Contate o administrador.'
+        )
+        return redirect('interessados:dashboard')
+
+    try:
+        Inscricao.objects.create(
+            interessado    = interessado,
+            evento         = evento,
+            status         = status_pendente,
+            data_inscricao = timezone.now()
+        )
+        messages.success(
+            request,
+            f'✅ Inscrição realizada com sucesso no evento "{evento.nome}"! '
+            f'Sua inscrição está com status PENDENTE e será analisada pela equipe.'
+        )
+    except Exception as e:
+        messages.error(request, f'❌ Erro ao criar inscrição: {str(e)}')
+
+    return redirect('interessados:dashboard')
+
+
+# ==========================================
+# RECUPERAÇÃO DE SENHA — INTERESSADOS
+# Alteração: 20/02/2026 — Token salvo no BANCO DE DADOS
+# Alteração: 12/03/2026 — Rate limiting via middleware
+# Alteração: 17/03/2026 — Busca por cpf_hash (CPF criptografado no banco)
+# ==========================================
+
+def senha_recuperar_view(request):
+    """
+    Passo 1: Interessado informa o CPF.
+    - Com e-mail cadastrado → envia link de recuperação (válido 30 min)
+    - Sem e-mail cadastrado → redireciona para página de orientação
+    - CPF não encontrado   → exibe erro no formulário
+    ATUALIZADO: Busca por cpf_hash — sem descriptografar todos os registros
+    """
+    erro      = None
+    cpf_value = ''
+
+    if request.method == 'POST':
+        cpf_raw   = request.POST.get('cpf', '').strip()
+        cpf       = ''.join(filter(str.isdigit, cpf_raw))
+        cpf_value = cpf_raw
+
+        try:
+            # Busca pelo hash — rápida e sem descriptografar
+            interessado = Interessado.objects.get(
+                cpf_hash=gerar_hash_cpf(cpf),
+                is_active=True
+            )
+
+            if interessado.email:
+                PasswordResetToken.objects.filter(
+                    interessado=interessado,
+                    usado=False
+                ).update(usado=True)
+
+                token = secrets.token_urlsafe(32)
+                PasswordResetToken.objects.create(
+                    interessado=interessado,
+                    token=token,
+                    expira_em=timezone.now() + timedelta(minutes=30)
+                )
+
+                link = request.build_absolute_uri(
+                    f'/inscricao/senha/redefinir/{token}/'
+                )
+
+                contexto_email = {
+                    'interessado': interessado,
+                    'link'       : link,
+                    'validade'   : '30 minutos',
+                }
+                corpo_html = render_to_string(
+                    'interessados/senha/email_recuperar.html',
+                    contexto_email
+                )
+                corpo_txt = render_to_string(
+                    'interessados/senha/email_recuperar.txt',
+                    contexto_email
+                )
+
+                send_mail(
+                    subject        = 'MetaReciclagem — Recuperação de Senha',
+                    message        = corpo_txt,
+                    html_message   = corpo_html,
+                    from_email     = settings.DEFAULT_FROM_EMAIL,
+                    recipient_list = [interessado.email],
+                    fail_silently  = False,
+                )
+
+                return redirect('interessados:senha_recuperar_enviado')
+
+            else:
+                return redirect('interessados:senha_sem_email')
+
+        except Interessado.DoesNotExist:
+            erro = 'CPF não encontrado ou conta inativa no sistema.'
+
+    return render(request, 'interessados/senha/recuperar.html', {
+        'erro'     : erro,
+        'cpf_value': cpf_value,
+    })
+
+
+def senha_recuperar_enviado_view(request):
+    """Passo 2: Confirmação de envio."""
+    return render(request, 'interessados/senha/recuperar_enviado.html')
+
+
+def senha_redefinir_view(request, token):
+    """
+    Passo 3: Formulário de nova senha.
+    Token validado via banco — funciona em qualquer aba/navegador.
+    """
+    try:
+        reset_token = PasswordResetToken.objects.select_related('interessado').get(
+            token         = token,
+            usado         = False,
+            expira_em__gt = timezone.now()
+        )
+        interessado = reset_token.interessado
+
+    except PasswordResetToken.DoesNotExist:
+        return render(request, 'interessados/senha/token_invalido.html', {
+            'senha_ja_trocada': True,
+        })
+
+    erro = None
+
+    if request.method == 'POST':
+        nova_senha      = request.POST.get('nova_senha', '')
+        confirmar_senha = request.POST.get('confirmar_senha', '')
+
+        if len(nova_senha) < 8:
+            erro = 'A senha deve ter no mínimo 8 caracteres.'
+        elif nova_senha != confirmar_senha:
+            erro = 'As senhas não coincidem.'
+        else:
+            interessado.set_password(nova_senha)
+            interessado.save()
+
+            reset_token.usado = True
+            reset_token.save()
+
+            return redirect('interessados:senha_redefinir_concluido')
+
+    return render(request, 'interessados/senha/redefinir.html', {'erro': erro})
+
+
+def senha_redefinir_concluido_view(request):
+    """Passo 4: Senha redefinida com sucesso."""
+    return render(request, 'interessados/senha/redefinir_concluido.html')
+
+
+def senha_sem_email_view(request):
+    """Interessado sem e-mail — orienta contato presencial."""
+    return render(request, 'interessados/senha/sem_email.html')
+
+
+# ==============================================================================
+# FLUXO B — TROCA OBRIGATÓRIA DE SENHA — INTERESSADOS
+# Adicionado: 25/02/2026
+# ==============================================================================
+
+@login_required(login_url='interessados:login')
+def trocar_senha_obrigatorio_view(request):
+    """
+    View de troca obrigatória de senha para Interessados.
+    Exibida pelo middleware quando must_change_password = True.
+    """
+    interessado = request.user
+
+    if not interessado.must_change_password:
+        return redirect('interessados:dashboard')
+
+    erro = None
+
+    if request.method == 'POST':
+        nova_senha      = request.POST.get('nova_senha', '').strip()
+        confirmar_senha = request.POST.get('confirmar_senha', '').strip()
+
+        if len(nova_senha) < 8:
+            erro = 'A nova senha deve ter no mínimo 8 caracteres.'
+        elif nova_senha != confirmar_senha:
+            erro = 'As senhas não coincidem. Tente novamente.'
+        else:
+            interessado.set_password(nova_senha)
+            interessado.must_change_password = False
+            interessado.save()
+            login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
+            messages.success(request, '✅ Senha alterada com sucesso! Bem-vindo ao sistema.')
+            return redirect('interessados:dashboard')
+
+    return render(request, 'interessados/senha/int_trocar_obrigatorio.html', {
+        'erro'       : erro,
+        'interessado': interessado,
+    })
+
+
+
+
+
+================================================================================
+# ARQUIVO: apps\portal\views.py
+================================================================================
+
+"""
+Views do app PORTAL - Sistema MetaReciclagem
+Arquivo: apps/portal/views.py
+Data: 05/12/2025
+Alteração: select_related('status') em detalhes_evento + removida variável inscricoes_abertas
+Data: 20/02/2026
+Alteração: inscricoes_confirmadas corrigido — filtro por Q objects com iexact
+           case-insensitive, sem uso de exclude()
+Data: 23/02/2026
+"""
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.views.decorators.http import require_http_methods
+from django.db.models import Q
+from django.utils import timezone
+
+from .forms import LoginInteressadoForm, ConsultaPublicaForm
+from apps.interessados.models import Interessado
+from apps.selecao.models import Inscricao, Classificacao
+from apps.eventos.models import Evento
+
+
+def index(request):
+    """
+    Página inicial do portal
+    Mostra eventos ativos (exceto FINALIZADOS e CANCELADOS)
+    """
+    eventos_disponiveis = Evento.objects.exclude(
+        status_id__in=[7, 8]
+    ).order_by('data_inicio_evento')
+
+    context = {
+        'eventos_disponiveis': eventos_disponiveis,
+        'total_eventos':       eventos_disponiveis.count(),
+    }
+
+    return render(request, 'portal/index.html', context)
+
+
+@require_http_methods(["GET", "POST"])
+def login_interessado(request):
+    """Login de interessados com CPF e senha"""
+    if request.session.get('interessado_id'):
+        return redirect('portal:dashboard')
+
+    if request.method == 'POST':
+        form = LoginInteressadoForm(request.POST)
+
+        if form.is_valid():
+            interessado = form.interessado
+
+            request.session['interessado_id']   = interessado.id
+            request.session['interessado_nome'] = interessado.nome
+            request.session['interessado_cpf']  = interessado.cpf
+
+            interessado.last_login = timezone.now()
+            interessado.save(update_fields=['last_login'])
+
+            messages.success(request, f'Bem-vindo(a), {interessado.nome}!')
+            return redirect('portal:dashboard')
+    else:
+        form = LoginInteressadoForm()
+
+    return render(request, 'portal/login.html', {'form': form})
+
+
+def logout_interessado(request):
+    """Logout de interessados"""
+    nome = request.session.get('interessado_nome', 'Interessado')
+    request.session.flush()
+    messages.info(request, f'Até logo, {nome}!')
+    return redirect('portal:index')
+
+
+def dashboard(request):
+    """Dashboard do interessado logado"""
+    interessado_id = request.session.get('interessado_id')
+
+    if not interessado_id:
+        messages.warning(request, 'Você precisa fazer login para acessar o dashboard.')
+        return redirect('portal:login')
+
+    try:
+        interessado = Interessado.objects.get(id=interessado_id)
+    except Interessado.DoesNotExist:
+        request.session.flush()
+        messages.error(request, 'Sessão inválida. Faça login novamente.')
+        return redirect('portal:login')
+
+    inscricoes = Inscricao.objects.filter(
+        interessado=interessado
+    ).select_related('evento', 'status').order_by('-data_inscricao')
+
+    classificacoes = Classificacao.objects.filter(
+        inscricao__interessado=interessado
+    ).select_related('inscricao__evento').order_by('posicao')
+
+    context = {
+        'interessado':          interessado,
+        'inscricoes':           inscricoes,
+        'classificacoes':       classificacoes,
+        'total_inscricoes':     inscricoes.count(),
+        'total_classificacoes': classificacoes.count(),
+    }
+
+    return render(request, 'portal/dashboard.html', context)
+
+
+@require_http_methods(["GET", "POST"])
+def consulta_publica(request):
+    """Consulta pública de resultados por CPF"""
+    resultados     = None
+    cpf_consultado = None
+
+    if request.method == 'POST':
+        form = ConsultaPublicaForm(request.POST)
+
+        if form.is_valid():
+            cpf            = form.cleaned_data['cpf']
+            cpf_consultado = cpf
+
+            try:
+                interessado = Interessado.objects.get(cpf=cpf)
+
+                resultados = Classificacao.objects.filter(
+                    inscricao__interessado=interessado
+                ).select_related(
+                    'inscricao__evento',
+                    'inscricao__status'
+                ).order_by('-inscricao__data_inscricao')
+
+                if not resultados.exists():
+                    messages.info(
+                        request,
+                        'Nenhuma classificação encontrada para este CPF.'
+                    )
+
+            except Interessado.DoesNotExist:
+                messages.warning(request, 'CPF não encontrado no sistema.')
+    else:
+        form = ConsultaPublicaForm()
+
+    context = {
+        'form':             form,
+        'resultados':       resultados,
+        'nome_interessado': (
+            resultados.first().inscricao.interessado.nome
+            if resultados and resultados.exists()
+            else ''
+        ),
+        'cpf_consultado': cpf_consultado,
+    }
+
+    return render(request, 'portal/consulta_publica.html', context)
+
+
+def resultado_evento(request, evento_id):
+    """Exibe resultado completo de um evento"""
+    try:
+        evento = Evento.objects.get(id=evento_id)
+    except Evento.DoesNotExist:
+        messages.error(request, 'Evento não encontrado.')
+        return redirect('portal:index')
+
+    classificacoes = Classificacao.objects.filter(
+        inscricao__evento=evento
+    ).select_related('inscricao__interessado').order_by('posicao')
+
+    classificados = classificacoes.filter(classificado=True)
+    lista_espera  = classificacoes.filter(lista_espera=True)
+
+    context = {
+        'evento':              evento,
+        'classificados':       classificados,
+        'lista_espera':        lista_espera,
+        'total_classificados': classificados.count(),
+        'total_lista_espera':  lista_espera.count(),
+    }
+
+    return render(request, 'portal/resultado_evento.html', context)
+
+
+def detalhes_evento(request, evento_id):
+    """
+    Exibe detalhes completos de um evento/curso
+
+    CORREÇÃO 23/02/2026:
+    Antes: status__nome__in=['INSCRITO', 'APROVADO', 'CONFIRMADO']
+           → sempre zero (nomes reais no banco são diferentes)
+    Agora: Q objects com __iexact — case-insensitive, sem exclude()
+           Cobre todas as variações de grafia dos status válidos
+    """
+    try:
+        evento = Evento.objects.select_related('status').get(id=evento_id)
+    except Evento.DoesNotExist:
+        messages.error(request, 'Evento não encontrado.')
+        return redirect('portal:index')
+
+    # ==========================================
+    # CORREÇÃO 23/02/2026
+    # Q objects com iexact — case-insensitive
+    # Cobre: 'Pendente', 'PENDENTE', 'pendente'
+    #        'Confirmada', 'CONFIRMADA', 'confirmada'
+    #        'Inscrito', 'INSCRITO', 'inscrito'
+    #        'Aprovado', 'APROVADO', 'aprovado'
+    #        'Confirmado', 'CONFIRMADO', 'confirmado'
+    # ==========================================
+    inscricoes_confirmadas = Inscricao.objects.filter(
+        evento=evento
+    ).filter(
+        Q(status__nome__iexact='pendente')   |
+        Q(status__nome__iexact='confirmada') |
+        Q(status__nome__iexact='confirmado') |
+        Q(status__nome__iexact='inscrito')   |
+        Q(status__nome__iexact='aprovado')
+    ).count()
+
+    vagas_disponiveis = max(evento.total_vagas - inscricoes_confirmadas, 0)
+
+    context = {
+        'evento':                 evento,
+        'inscricoes_confirmadas': inscricoes_confirmadas,
+        'vagas_disponiveis':      vagas_disponiveis,
+    }
+
+    return render(request, 'portal/detalhes_evento.html', context)
+
+
+def contato(request):
+    """Página de contatos da MetaReciclagem"""
+    context = {
+        'contatos': {
+            'telefone': '(15) 3417-3825',
+            'whatsapp': '(15) 99999-9999',
+            'email':    'meta.recicla@gmail.com',
+            'endereco': 'Avenida Armando Sales de Oliveira, 762 – Sorocaba/SP',
+            'cep':      '18000-000',
+            'horario':  'Segunda a Sexta, das 8h às 16h',
+        },
+        'redes_sociais': {
+            'facebook':  'https://facebook.com/metareciclagemsorocaba',
+            'instagram': 'https://instagram.com/metareciclagemsorocaba',
+            'youtube':   'https://youtube.com/metareciclagemsorocaba',
+            'blog':      'https://metareciclagemdesorocaba.blogspot.com/',
+        }
+    }
+
+    return render(request, 'portal/contato.html', context)
+
+def politica_privacidade(request):
+    """Página de política de privacidade — LGPD"""
+    return render(request, 'portal/politica_privacidade.html')
+
+
+    
+
+
+
+
+================================================================================
+# ARQUIVO: apps\selecao\views.py
+================================================================================
+
+from django.shortcuts import render
+
+# Create your views here.
+
+
+
+================================================================================
+# ARQUIVO: dashboard\views.py
+================================================================================
+
+"""
+Views do app DASHBOARD
+Arquivo: dashboard/views.py
+Alteração: Views customizadas para dashboards
+Data: 03/02/2026
+
+Alteração: Views customizadas para dashboards com geração de PDF
+Data: 05/02/2026
+
+Atualização: 10/02/2026 - Correções de imports
+"""
+
+from django.shortcuts import render
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Count, Avg, F
+from django.utils import timezone
+from datetime import date, timedelta, datetime
+
+
+@staff_member_required
+def dashboard_academico(request):
+    """Dashboard de Informações Acadêmicas"""
+    from apps.academico.models import Avaliacao, Matricula
+    from apps.accounts.admin import admin_site
+    
+    # Métricas gerais
+    total_avaliacoes = Avaliacao.objects.count()
+    total_aprovados = Avaliacao.objects.filter(aprovado=True).count()
+    total_reprovados = total_avaliacoes - total_aprovados
+    media_notas = Avaliacao.objects.aggregate(Avg('nota_final'))['nota_final__avg'] or 0
+    media_frequencia = Avaliacao.objects.aggregate(Avg('frequencia'))['frequencia__avg'] or 0
+    certificados_emitidos = Avaliacao.objects.filter(certificado_emitido=True).count()
+    
+    # Taxa de aprovação
+    taxa_aprovacao = (total_aprovados / total_avaliacoes * 100) if total_avaliacoes > 0 else 0
+    
+    # Avaliações por status de matrícula
+    avaliacoes_por_status = Matricula.objects.values('status__nome').annotate(
+        total=Count('avaliacao')
+    ).order_by('-total')
+    
+    # Top 5 cursos com mais aprovados
+    top_cursos_aprovados = Avaliacao.objects.filter(aprovado=True).values(
+        'matricula__turma__evento__nome'
+    ).annotate(
+        total=Count('id')
+    ).order_by('-total')[:5]
+    
+    context = {
+        'title': 'Dashboard - Informações Acadêmicas',
+        'site_title': admin_site.site_title,
+        'site_header': admin_site.site_header,
+        
+        'total_avaliacoes': total_avaliacoes,
+        'total_aprovados': total_aprovados,
+        'total_reprovados': total_reprovados,
+        'taxa_aprovacao': round(taxa_aprovacao, 1),
+        'media_notas': round(media_notas, 2),
+        'media_frequencia': round(media_frequencia, 1),
+        'certificados_emitidos': certificados_emitidos,
+        
+        'avaliacoes_por_status': avaliacoes_por_status,
+        'top_cursos_aprovados': top_cursos_aprovados,
+    }
+    
+    return render(request, 'admin/dashboard/academico.html', context)
+
+
+@staff_member_required
+def dashboard_eventos(request):
+    """Dashboard de Eventos e Cursos"""
+    from apps.eventos.models import Evento, Turma
+    from apps.selecao.models import Inscricao
+    from apps.accounts.admin import admin_site
+    
+    # Métricas gerais
+    total_eventos = Evento.objects.count()
+    
+    # Eventos com inscrições abertas
+    hoje = timezone.now()
+    eventos_inscricoes_abertas = Evento.objects.filter(
+        data_inicio_inscricao__lte=hoje,
+        data_fim_inscricao__gte=hoje
+    ).count()
+    
+    total_turmas = Turma.objects.count()
+    
+    # Turmas por status temporal
+    hoje_data = date.today()
+    turmas_futuras = Turma.objects.filter(data_inicio__gt=hoje_data).count()
+    turmas_em_andamento = Turma.objects.filter(
+        data_inicio__lte=hoje_data,
+        data_fim__gte=hoje_data
+    ).count()
+    turmas_encerradas = Turma.objects.filter(data_fim__lt=hoje_data).count()
+    
+    # Eventos por status
+    eventos_por_status = Evento.objects.values('status__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Top 5 eventos com mais inscrições
+    top_eventos_inscricoes = Inscricao.objects.values(
+        'evento__nome'
+    ).annotate(
+        total_inscricoes=Count('id')
+    ).order_by('-total_inscricoes')[:5]
+    
+    # Eventos recentes
+    eventos_recentes = Evento.objects.select_related('status').order_by('-criado_em')[:5]
+    
+    context = {
+        'title': 'Dashboard - Eventos e Cursos',
+        'site_title': admin_site.site_title,
+        'site_header': admin_site.site_header,
+        
+        'total_eventos': total_eventos,
+        'eventos_inscricoes_abertas': eventos_inscricoes_abertas,
+        'total_turmas': total_turmas,
+        
+        'turmas_futuras': turmas_futuras,
+        'turmas_em_andamento': turmas_em_andamento,
+        'turmas_encerradas': turmas_encerradas,
+        
+        'eventos_por_status': eventos_por_status,
+        'top_eventos_inscricoes': top_eventos_inscricoes,
+        'eventos_recentes': eventos_recentes,
+    }
+    
+    return render(request, 'admin/dashboard/eventos.html', context)
+
+
+@staff_member_required
+def dashboard_interessados(request):
+    """Dashboard de Interessados com dados demográficos detalhados"""
+    from apps.interessados.models import Interessado, Sexo, Fototipo
+    from apps.academico.models import Matricula
+    from apps.accounts.admin import admin_site
+    from django.db.models import Q, Count, Case, When, IntegerField, Value, F
+    
+    # ==========================================
+    # MÉTRICAS GERAIS
+    # ==========================================
+    total_interessados = Interessado.objects.count()
+    
+    interessados_matriculados = Interessado.objects.filter(
+        matriculas__isnull=False
+    ).distinct().count()
+    
+    interessados_sem_matricula = total_interessados - interessados_matriculados
+    
+    # ==========================================
+    # DISTRIBUIÇÃO POR SEXO
+    # ==========================================
+    distribuicao_sexo = Interessado.objects.values('sexo__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Calcular percentuais
+    for item in distribuicao_sexo:
+        item['percentual'] = round((item['total'] / total_interessados * 100), 1) if total_interessados > 0 else 0
+    
+    # ==========================================
+    # DISTRIBUIÇÃO POR FOTOTIPO
+    # ==========================================
+    distribuicao_fototipo = Interessado.objects.values('fototipo__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    for item in distribuicao_fototipo:
+        item['percentual'] = round((item['total'] / total_interessados * 100), 1) if total_interessados > 0 else 0
+    
+    # ==========================================
+    # DISTRIBUIÇÃO POR ESCOLARIDADE
+    # ==========================================
+    distribuicao_escolaridade = Interessado.objects.exclude(
+        escolaridade=''
+    ).values('escolaridade').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Traduzir códigos de escolaridade
+    escolaridade_labels = {
+        'FUNDAMENTAL_INCOMPLETO': 'Fundamental Incompleto',
+        'FUNDAMENTAL_COMPLETO': 'Fundamental Completo',
+        'MEDIO_INCOMPLETO': 'Médio Incompleto',
+        'MEDIO_COMPLETO': 'Médio Completo',
+        'SUPERIOR_INCOMPLETO': 'Superior Incompleto',
+        'SUPERIOR_COMPLETO': 'Superior Completo',
+        'POS_GRADUACAO': 'Pós-Graduação',
+    }
+    
+    for item in distribuicao_escolaridade:
+        item['escolaridade_label'] = escolaridade_labels.get(item['escolaridade'], item['escolaridade'])
+    
+    # ==========================================
+    # PARTICIPAÇÃO EM PROGRAMAS SOCIAIS
+    # ==========================================
+    participa_programas = Interessado.objects.filter(programa_social=True).count()
+    nao_participa_programas = total_interessados - participa_programas
+    
+    distribuicao_programas = [
+        {
+            'participa': 'Sim',
+            'total': participa_programas,
+            'percentual': round((participa_programas / total_interessados * 100), 1) if total_interessados > 0 else 0
+        },
+        {
+            'participa': 'Não',
+            'total': nao_participa_programas,
+            'percentual': round((nao_participa_programas / total_interessados * 100), 1) if total_interessados > 0 else 0
+        }
+    ]
+    
+    # ==========================================
+    # DEFICIÊNCIAS
+    # ==========================================
+    com_deficiencia = Interessado.objects.filter(necessidades_especiais=True).count()
+    sem_deficiencia = total_interessados - com_deficiencia
+    
+    distribuicao_deficiencia = [
+        {
+            'tipo': 'Possui Deficiência',
+            'total': com_deficiencia,
+            'percentual': round((com_deficiencia / total_interessados * 100), 1) if total_interessados > 0 else 0
+        },
+        {
+            'tipo': 'Não Possui',
+            'total': sem_deficiencia,
+            'percentual': round((sem_deficiencia / total_interessados * 100), 1) if total_interessados > 0 else 0
+        }
+    ]
+    
+    # Tipos específicos de deficiência
+    tipos_deficiencia = []
+    
+    deficiencias_map = [
+        ('pcd_fisica', 'Física'),
+        ('pcd_visual', 'Visual'),
+        ('pcd_auditiva', 'Auditiva'),
+        ('pcd_intelectual', 'Intelectual'),
+        ('pcd_psicossocial', 'Psicossocial'),
+        ('pcd_multiplas', 'Múltiplas'),
+    ]
+    
+    for campo, nome in deficiencias_map:
+        count = Interessado.objects.filter(**{campo: True}).count()
+        if count > 0:
+            tipos_deficiencia.append({
+                'tipo_deficiencia': nome,
+                'total': count
+            })
+    
+    # Ordenar por total decrescente
+    tipos_deficiencia.sort(key=lambda x: x['total'], reverse=True)
+    
+    # ==========================================
+    # DISTRIBUIÇÃO POR FAIXA ETÁRIA (5 em 5 anos)
+    # ==========================================
+    hoje = date.today()
+    
+    # Criar faixas etárias
+    faixas_etarias = []
+    faixas = [
+        (0, 14, '0-14 anos'),
+        (15, 19, '15-19 anos'),
+        (20, 24, '20-24 anos'),
+        (25, 29, '25-29 anos'),
+        (30, 34, '30-34 anos'),
+        (35, 39, '35-39 anos'),
+        (40, 44, '40-44 anos'),
+        (45, 49, '45-49 anos'),
+        (50, 54, '50-54 anos'),
+        (55, 59, '55-59 anos'),
+        (60, 999, '60+ anos'),
+    ]
+    
+    for inicio, fim, label in faixas:
+        # Calcular data limite para cada faixa
+        if fim == 999:  # 60+
+            count = Interessado.objects.filter(
+                data_nascimento__lte=hoje.replace(year=hoje.year - inicio)
+            ).exclude(data_nascimento__isnull=True).count()
+        else:
+            data_inicio = hoje.replace(year=hoje.year - fim - 1)
+            data_fim = hoje.replace(year=hoje.year - inicio)
+            count = Interessado.objects.filter(
+                data_nascimento__gt=data_inicio,
+                data_nascimento__lte=data_fim
+            ).count()
+        
+        if count > 0:
+            faixas_etarias.append({
+                'faixa': label,
+                'total': count,
+                'percentual': round((count / total_interessados * 100), 1) if total_interessados > 0 else 0
+            })
+    
+    context = {
+        'title': 'Dashboard - Interessados',
+        'site_title': admin_site.site_title,
+        'site_header': admin_site.site_header,
+        
+        # Métricas gerais
+        'total_interessados': total_interessados,
+        'interessados_matriculados': interessados_matriculados,
+        'interessados_sem_matricula': interessados_sem_matricula,
+        
+        # Distribuições demográficas
+        'distribuicao_sexo': distribuicao_sexo,
+        'distribuicao_fototipo': distribuicao_fototipo,
+        'distribuicao_escolaridade': distribuicao_escolaridade,
+        'distribuicao_programas': distribuicao_programas,
+        'distribuicao_deficiencia': distribuicao_deficiencia,
+        'tipos_deficiencia': tipos_deficiencia,
+        'faixas_etarias': faixas_etarias,
+    }
+    
+    return render(request, 'admin/dashboard/interessados.html', context)
+
+
+@staff_member_required
+def dashboard_processo_seletivo(request):
+    """Dashboard de Processo Seletivo (Inscrições e Classificações)"""
+    from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
+    from apps.accounts.admin import admin_site
+    
+    # Métricas de Inscrições
+    total_inscricoes = Inscricao.objects.count()
+    
+    # Inscrições por status
+    inscricoes_por_status = Inscricao.objects.values('status__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Inscrições recentes (últimos 30 dias)
+    trinta_dias_atras = date.today() - timedelta(days=30)
+    inscricoes_recentes = Inscricao.objects.filter(
+        data_inscricao__gte=trinta_dias_atras
+    ).count()
+    
+    # Métricas de Classificação
+    total_classificacoes = Classificacao.objects.count()
+    classificados = Classificacao.objects.filter(classificado=True).count()
+    lista_espera = Classificacao.objects.filter(lista_espera=True).count()
+    
+    # Top 5 eventos com mais inscrições
+    top_eventos_inscricoes = Inscricao.objects.values(
+        'evento__nome'
+    ).annotate(
+        total=Count('id')
+    ).order_by('-total')[:5]
+    
+    # Últimas classificações processadas
+    ultimas_classificacoes = Classificacao.objects.select_related(
+        'inscricao__interessado',
+        'inscricao__evento'
+    ).order_by('-processado_em')[:10]
+    
+    # Taxa de classificação
+    taxa_classificacao = (classificados / total_classificacoes * 100) if total_classificacoes > 0 else 0
+    
+    context = {
+        'title': 'Dashboard - Processo Seletivo',
+        'site_title': admin_site.site_title,
+        'site_header': admin_site.site_header,
+        
+        'total_inscricoes': total_inscricoes,
+        'inscricoes_recentes': inscricoes_recentes,
+        'inscricoes_por_status': inscricoes_por_status,
+        
+        'total_classificacoes': total_classificacoes,
+        'classificados': classificados,
+        'lista_espera': lista_espera,
+        'taxa_classificacao': round(taxa_classificacao, 1),
+        
+        'top_eventos_inscricoes': top_eventos_inscricoes,
+        'ultimas_classificacoes': ultimas_classificacoes,
+    }
+    
+    return render(request, 'admin/dashboard/processo_seletivo.html', context)
+
+@staff_member_required
+def dashboard_lgpd(request):
+    """Dashboard de Solicitações de Exclusão — LGPD"""
+    from apps.interessados.models import SolicitacaoExclusao
+    from apps.accounts.admin import admin_site
+
+    pendentes = SolicitacaoExclusao.objects.filter(status='PENDENTE').order_by('-solicitado_em')
+    aprovadas = SolicitacaoExclusao.objects.filter(status='APROVADA').order_by('-analisado_em')
+    recusadas = SolicitacaoExclusao.objects.filter(status='RECUSADA').order_by('-analisado_em')
+
+    context = {
+        'title'      : 'Dashboard - LGPD / Exclusões',
+        'site_title' : admin_site.site_title,
+        'site_header': admin_site.site_header,
+
+        'pendentes'        : pendentes,
+        'aprovadas'        : aprovadas,
+        'recusadas'        : recusadas,
+        'total_pendentes'  : pendentes.count(),
+        'total_aprovadas'  : aprovadas.count(),
+        'total_recusadas'  : recusadas.count(),
+        'total_solicitacoes': SolicitacaoExclusao.objects.count(),
+    }
+
+    return render(request, 'admin/dashboard/lgpd.html', context)
+
+
+# ==========================================
+# VIEWS PDF
+# ==========================================
+
+@staff_member_required
+def dashboard_interessados_pdf(request):
+    """Gera PDF do dashboard de interessados"""
+    from apps.interessados.models import Interessado
+    from django.http import HttpResponse
+    from django.db.models import Count
+    from .utils_pdf import gerar_pdf_interessados
+    
+    # Reutilizar a mesma lógica da view normal
+    total_interessados = Interessado.objects.count()
+    
+    interessados_matriculados = Interessado.objects.filter(
+        matriculas__isnull=False
+    ).distinct().count()
+    
+    interessados_sem_matricula = total_interessados - interessados_matriculados
+    
+    # Distribuição por sexo
+    distribuicao_sexo = Interessado.objects.values('sexo__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Distribuição por fototipo
+    distribuicao_fototipo = Interessado.objects.values('fototipo__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    # Distribuição por escolaridade
+    distribuicao_escolaridade = Interessado.objects.exclude(
+        escolaridade=''
+    ).values('escolaridade').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    escolaridade_labels = {
+        'FUNDAMENTAL_INCOMPLETO': 'Fundamental Incompleto',
+        'FUNDAMENTAL_COMPLETO': 'Fundamental Completo',
+        'MEDIO_INCOMPLETO': 'Médio Incompleto',
+        'MEDIO_COMPLETO': 'Médio Completo',
+        'SUPERIOR_INCOMPLETO': 'Superior Incompleto',
+        'SUPERIOR_COMPLETO': 'Superior Completo',
+        'POS_GRADUACAO': 'Pós-Graduação',
+    }
+    
+    for item in distribuicao_escolaridade:
+        item['escolaridade_label'] = escolaridade_labels.get(item['escolaridade'], item['escolaridade'])
+    
+    # Programas sociais
+    participa_programas = Interessado.objects.filter(programa_social=True).count()
+    nao_participa_programas = total_interessados - participa_programas
+    
+    distribuicao_programas = [
+        {'participa': 'Sim', 'total': participa_programas},
+        {'participa': 'Não', 'total': nao_participa_programas}
+    ]
+    
+    # Deficiências
+    com_deficiencia = Interessado.objects.filter(necessidades_especiais=True).count()
+    sem_deficiencia = total_interessados - com_deficiencia
+    
+    distribuicao_deficiencia = [
+        {'tipo': 'Possui Deficiência', 'total': com_deficiencia},
+        {'tipo': 'Não Possui', 'total': sem_deficiencia}
+    ]
+    
+    # Tipos de deficiência
+    tipos_deficiencia = []
+    deficiencias_map = [
+        ('pcd_fisica', 'Física'),
+        ('pcd_visual', 'Visual'),
+        ('pcd_auditiva', 'Auditiva'),
+        ('pcd_intelectual', 'Intelectual'),
+        ('pcd_psicossocial', 'Psicossocial'),
+        ('pcd_multiplas', 'Múltiplas'),
+    ]
+    
+    for campo, nome in deficiencias_map:
+        count = Interessado.objects.filter(**{campo: True}).count()
+        if count > 0:
+            tipos_deficiencia.append({'tipo_deficiencia': nome, 'total': count})
+    
+    tipos_deficiencia.sort(key=lambda x: x['total'], reverse=True)
+    
+    # Faixas etárias
+    hoje = date.today()
+    faixas_etarias = []
+    faixas = [
+        (0, 14, '0-14 anos'),
+        (15, 19, '15-19 anos'),
+        (20, 24, '20-24 anos'),
+        (25, 29, '25-29 anos'),
+        (30, 34, '30-34 anos'),
+        (35, 39, '35-39 anos'),
+        (40, 44, '40-44 anos'),
+        (45, 49, '45-49 anos'),
+        (50, 54, '50-54 anos'),
+        (55, 59, '55-59 anos'),
+        (60, 999, '60+ anos'),
+    ]
+    
+    for inicio, fim, label in faixas:
+        if fim == 999:
+            count = Interessado.objects.filter(
+                data_nascimento__lte=hoje.replace(year=hoje.year - inicio)
+            ).exclude(data_nascimento__isnull=True).count()
+        else:
+            data_inicio = hoje.replace(year=hoje.year - fim - 1)
+            data_fim = hoje.replace(year=hoje.year - inicio)
+            count = Interessado.objects.filter(
+                data_nascimento__gt=data_inicio,
+                data_nascimento__lte=data_fim
+            ).count()
+        
+        if count > 0:
+            faixas_etarias.append({'faixa': label, 'total': count})
+    
+    # Preparar context
+    context = {
+        'total_interessados': total_interessados,
+        'interessados_matriculados': interessados_matriculados,
+        'interessados_sem_matricula': interessados_sem_matricula,
+        'distribuicao_sexo': list(distribuicao_sexo),
+        'distribuicao_fototipo': list(distribuicao_fototipo),
+        'distribuicao_escolaridade': list(distribuicao_escolaridade),
+        'distribuicao_programas': distribuicao_programas,
+        'distribuicao_deficiencia': distribuicao_deficiencia,
+        'tipos_deficiencia': tipos_deficiencia,
+        'faixas_etarias': faixas_etarias,
+    }
+    
+    # Gerar PDF
+    pdf_buffer = gerar_pdf_interessados(context)
+    
+    # Retornar response
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_interessados_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
+@staff_member_required
+def dashboard_eventos_pdf(request):
+    """Gera PDF do dashboard de eventos"""
+    from apps.eventos.models import Evento, Turma
+    from apps.selecao.models import Inscricao
+    from django.http import HttpResponse
+    from django.db.models import Count
+    from .utils_pdf import gerar_pdf_eventos
+    
+    # Métricas gerais
+    total_eventos = Evento.objects.count()
+    
+    hoje = timezone.now()
+    eventos_inscricoes_abertas = Evento.objects.filter(
+        data_inicio_inscricao__lte=hoje,
+        data_fim_inscricao__gte=hoje
+    ).count()
+    
+    total_turmas = Turma.objects.count()
+    
+    hoje_data = date.today()
+    turmas_futuras = Turma.objects.filter(data_inicio__gt=hoje_data).count()
+    turmas_em_andamento = Turma.objects.filter(
+        data_inicio__lte=hoje_data,
+        data_fim__gte=hoje_data
+    ).count()
+    turmas_encerradas = Turma.objects.filter(data_fim__lt=hoje_data).count()
+    
+    eventos_por_status = Evento.objects.values('status__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')
+    
+    top_eventos_inscricoes = Inscricao.objects.values(
+        'evento__nome'
+    ).annotate(
+        total_inscricoes=Count('id')
+    ).order_by('-total_inscricoes')[:5]
+    
+    # Preparar context
+    context = {
+        'total_eventos': total_eventos,
+        'eventos_inscricoes_abertas': eventos_inscricoes_abertas,
+        'total_turmas': total_turmas,
+        'turmas_futuras': turmas_futuras,
+        'turmas_em_andamento': turmas_em_andamento,
+        'turmas_encerradas': turmas_encerradas,
+        'eventos_por_status': list(eventos_por_status),
+        'top_eventos_inscricoes': list(top_eventos_inscricoes),
+    }
+    
+    # Gerar PDF
+    pdf_buffer = gerar_pdf_eventos(context)
+    
+    # Retornar response
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_eventos_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
+@staff_member_required
+def dashboard_academico_pdf(request):
+    """Gera PDF do dashboard acadêmico"""
+    from apps.academico.models import Avaliacao
+    from django.http import HttpResponse
+    from django.db.models import Avg, Count
+    from .utils_pdf import gerar_pdf_academico
+    
+    total_avaliacoes = Avaliacao.objects.count()
+    total_aprovados = Avaliacao.objects.filter(aprovado=True).count()
+    total_reprovados = total_avaliacoes - total_aprovados
+    media_notas = Avaliacao.objects.aggregate(Avg('nota_final'))['nota_final__avg'] or 0
+    media_frequencia = Avaliacao.objects.aggregate(Avg('frequencia'))['frequencia__avg'] or 0
+    certificados_emitidos = Avaliacao.objects.filter(certificado_emitido=True).count()
+    taxa_aprovacao = (total_aprovados / total_avaliacoes * 100) if total_avaliacoes > 0 else 0
+    
+    top_cursos_aprovados = Avaliacao.objects.filter(aprovado=True).values(
+        'matricula__turma__evento__nome'
+    ).annotate(total=Count('id')).order_by('-total')[:5]
+    
+    context = {
+        'total_avaliacoes': total_avaliacoes,
+        'total_aprovados': total_aprovados,
+        'total_reprovados': total_reprovados,
+        'taxa_aprovacao': round(taxa_aprovacao, 1),
+        'media_notas': round(media_notas, 2),
+        'media_frequencia': round(media_frequencia, 1),
+        'certificados_emitidos': certificados_emitidos,
+        'top_cursos_aprovados': list(top_cursos_aprovados),
+    }
+    
+    pdf_buffer = gerar_pdf_academico(context)
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_academico_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+
+@staff_member_required
+def dashboard_processo_seletivo_pdf(request):
+    """Gera PDF do dashboard de processo seletivo"""
+    from apps.selecao.models import Inscricao, Classificacao
+    from django.http import HttpResponse
+    from django.db.models import Count
+    from .utils_pdf import gerar_pdf_processo_seletivo
+    
+    total_inscricoes = Inscricao.objects.count()
+    
+    trinta_dias_atras = date.today() - timedelta(days=30)
+    inscricoes_recentes = Inscricao.objects.filter(data_inscricao__gte=trinta_dias_atras).count()
+    
+    total_classificacoes = Classificacao.objects.count()
+    classificados = Classificacao.objects.filter(classificado=True).count()
+    lista_espera = Classificacao.objects.filter(lista_espera=True).count()
+    taxa_classificacao = (classificados / total_classificacoes * 100) if total_classificacoes > 0 else 0
+    
+    top_eventos_inscricoes = Inscricao.objects.values('evento__nome').annotate(
+        total=Count('id')
+    ).order_by('-total')[:5]
+    
+    context = {
+        'total_inscricoes': total_inscricoes,
+        'inscricoes_recentes': inscricoes_recentes,
+        'total_classificacoes': total_classificacoes,
+        'classificados': classificados,
+        'lista_espera': lista_espera,
+        'taxa_classificacao': round(taxa_classificacao, 1),
+        'top_eventos_inscricoes': list(top_eventos_inscricoes),
+    }
+    
+    pdf_buffer = gerar_pdf_processo_seletivo(context)
+    response = HttpResponse(pdf_buffer, content_type='application/pdf')
+    filename = f'dashboard_processo_seletivo_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return response
+
+
+

@@ -5,7 +5,7 @@
 
 <h2>🎯 Escopo</h2>
 <p>
-A solução a ser desenvolvida será dividida em uma página web para a inscrição de interessados e um sistema de administração do sistema. <br>
+A solução desenvolvida está dividida em uma página web para a inscrição de interessados e um sistema de administração do sistema. <br>
 Terá como principal ativo a tabela de pessoas interessadas nos cursos que eventualmente sejam abertas ao longo do tempo. <br>
 Estima-se que haverá por volta de <strong>200 inscrições</strong> para cada uma das <strong>20 turmas</strong> dos <strong>8 cursos</strong> a serem ofertados ainda esse ano, por enquanto.
 </p>

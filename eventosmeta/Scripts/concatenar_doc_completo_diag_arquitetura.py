@@ -99,37 +99,37 @@ if __name__ == "__main__":
     concatenar_arquivos(
         pasta_projeto=PASTA_PROJETO,
         tipos_arquivo=['urls.py'],
-        arquivo_saida='Pasta01_URLs_13-03-2026.txt'
+        arquivo_saida='Pasta01_URLs_24-03-2026.txt'
     )
 
-concatenar_arquivos(
+    concatenar_arquivos(
         pasta_projeto=PASTA_PROJETO,
         tipos_arquivo=['views.py'],
-        arquivo_saida='Pasta02_views_13-03-2026.txt'
+        arquivo_saida='Pasta02_views_24-03-2026.txt'
     )
 
-concatenar_arquivos(
+    concatenar_arquivos(
         pasta_projeto=PASTA_PROJETO,
         tipos_arquivo=['models.py'],
-        arquivo_saida='Pasta03_models_13-03-2026.txt'
+        arquivo_saida='Pasta03_models_24-03-2026.txt'
     )
 
-concatenar_arquivos(
+    concatenar_arquivos(
         pasta_projeto=PASTA_PROJETO,
         tipos_arquivo=['authentication.py', 'middleware.py'],
-        arquivo_saida='Pasta04_Autenticacao_13-03-2026.txt'
+        arquivo_saida='Pasta04_Autenticacao_24-03-2026.txt'
     )
 
-concatenar_arquivos(
+    concatenar_arquivos(
         pasta_projeto=PASTA_PROJETO,
         tipos_arquivo=['*.html', '*.css', '*.js'],
-        arquivo_saida='Pasta05_Templates_13-03-2026.txt'
+        arquivo_saida='Pasta05_Templates_24-03-2026.txt'
     )
 
-concatenar_arquivos(
+    concatenar_arquivos(
         pasta_projeto=PASTA_PROJETO,
         tipos_arquivo=['requirements.txt', 'documentacao_sistema.json', 'documentacao_sistema.yaml', '2026-03-06_resumo_tecnico_classificacao.md', '2026-03-06_estrutura.txt'],
-        arquivo_saida='Pasta06_Doc_Existente_13-03-2026.txt'
+        arquivo_saida='Pasta06_Doc_Existente_24-03-2026.txt'
     )
 
 
