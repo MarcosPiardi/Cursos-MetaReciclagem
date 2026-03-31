@@ -1,0 +1,2602 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from option)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collecting ... collected 18 items
+
+apps/academico/tests/test_models.py::TestStatusMatricula::test_status_criado_corretamente PASSED [  5%]
+apps/academico/tests/test_models.py::TestStatusMatricula::test_status_get_or_create_evita_duplicata PASSED [ 11%]
+apps/academico/tests/test_models.py::TestMatricula::test_matricula_criada_corretamente FAILED [ 16%]
+apps/academico/tests/test_models.py::TestMatricula::test_matricula_data_preenchida FAILED [ 22%]
+apps/academico/tests/test_models.py::TestMatricula::test_matricula_status_ativo_default FAILED [ 27%]
+apps/academico/tests/test_models.py::TestMatricula::test_matricula_unique_together_turma_interessado FAILED [ 33%]
+apps/academico/tests/test_models.py::TestMatricula::test_numero_matricula_unico FAILED [ 38%]
+apps/academico/tests/test_models.py::TestAvaliacao::test_avaliacao_aprovado_quando_nota_maior_7 FAILED [ 44%]
+apps/academico/tests/test_models.py::TestAvaliacao::test_avaliacao_criada_corretamente FAILED [ 50%]
+apps/academico/tests/test_models.py::TestAvaliacao::test_avaliacao_reprovado_quando_nota_menor_7 FAILED [ 55%]
+apps/academico/tests/test_services.py::TestMatriculaService::test_alterar_status_matricula FAILED [ 61%]
+apps/academico/tests/test_services.py::TestMatriculaService::test_avaliar_aluno_aprova_com_nota_alta FAILED [ 66%]
+apps/academico/tests/test_services.py::TestMatriculaService::test_avaliar_aluno_reprova_com_nota_baixa FAILED [ 72%]
+apps/academico/tests/test_services.py::TestMatriculaService::test_gerar_relatorio_turma FAILED [ 77%]
+apps/academico/tests/test_services.py::TestMatriculaService::test_matricula_gerada_com_numero_sequencial FAILED [ 83%]
+apps/academico/tests/test_services.py::TestMatriculaService::test_matricular_classificado_cria_matricula FAILED [ 88%]
+apps/academico/tests/test_services.py::TestMatriculaService::test_verificar_disponibilidade_turma_com_vagas FAILED [ 94%]
+apps/academico/tests/test_services.py::TestMatriculaService::test_verificar_disponibilidade_turma_sem_vagas FAILED [100%]
+
+================================== FAILURES ===================================
+______________ TestMatricula.test_matricula_criada_corretamente _______________
+
+self = <apps.academico.tests.test_models.TestMatricula testMethod=test_matricula_criada_corretamente>
+
+    def test_matricula_criada_corretamente(self):
+>       matricula = MatriculaFactory()
+
+apps\academico\tests\test_models.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ab3dbe0>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-000', 'status': <Status: Ativa>, 'total_vagas': 37}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AAA3A30>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+________________ TestMatricula.test_matricula_data_preenchida _________________
+
+self = <apps.academico.tests.test_models.TestMatricula testMethod=test_matricula_data_preenchida>
+
+    def test_matricula_data_preenchida(self):
+>       matricula = MatriculaFactory()
+
+apps\academico\tests\test_models.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1adfb110>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-001', 'status': <Status: Ativa>, 'total_vagas': 37}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AD2FEB0>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+______________ TestMatricula.test_matricula_status_ativo_default ______________
+
+self = <apps.academico.tests.test_models.TestMatricula testMethod=test_matricula_status_ativo_default>
+
+    def test_matricula_status_ativo_default(self):
+>       matricula = MatriculaFactory()
+
+apps\academico\tests\test_models.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ae50410>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-002', 'status': <Status: Ativa>, 'total_vagas': 16}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AD2C5B0>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+_______ TestMatricula.test_matricula_unique_together_turma_interessado ________
+
+self = <apps.academico.tests.test_models.TestMatricula testMethod=test_matricula_unique_together_turma_interessado>
+
+    def test_matricula_unique_together_turma_interessado(self):
+>       turma = TurmaFactory()
+
+apps\academico\tests\test_models.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1acd3950>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-003', 'status': <Status: Ativa>, 'total_vagas': 35}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AA8B430>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+__________________ TestMatricula.test_numero_matricula_unico __________________
+
+self = <apps.academico.tests.test_models.TestMatricula testMethod=test_numero_matricula_unico>
+
+    def test_numero_matricula_unico(self):
+>       matricula1 = MatriculaFactory()
+
+apps\academico\tests\test_models.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1b290770>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-004', 'status': <Status: Ativa>, 'total_vagas': 15}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AC05AB0>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+__________ TestAvaliacao.test_avaliacao_aprovado_quando_nota_maior_7 __________
+
+self = <apps.academico.tests.test_models.TestAvaliacao testMethod=test_avaliacao_aprovado_quando_nota_maior_7>
+
+    def test_avaliacao_aprovado_quando_nota_maior_7(self):
+>       avaliacao = AvaliacaoFactory(nota_final=8)
+
+apps\academico\tests\test_models.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ac85130>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-005', 'status': <Status: Ativa>, 'total_vagas': 36}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AD2C220>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+______________ TestAvaliacao.test_avaliacao_criada_corretamente _______________
+
+self = <apps.academico.tests.test_models.TestAvaliacao testMethod=test_avaliacao_criada_corretamente>
+
+    def test_avaliacao_criada_corretamente(self):
+>       avaliacao = AvaliacaoFactory()
+
+apps\academico\tests\test_models.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ae62690>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-006', 'status': <Status: Ativa>, 'total_vagas': 25}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AC04BE0>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+_________ TestAvaliacao.test_avaliacao_reprovado_quando_nota_menor_7 __________
+
+self = <apps.academico.tests.test_models.TestAvaliacao testMethod=test_avaliacao_reprovado_quando_nota_menor_7>
+
+    def test_avaliacao_reprovado_quando_nota_menor_7(self):
+>       avaliacao = AvaliacaoFactory(nota_final=5)
+
+apps\academico\tests\test_models.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:270: in build
+    step.resolve(pre)
+..\.venv\Lib\site-packages\factory\builder.py:211: in resolve
+    self.attributes[field_name] = getattr(self.stub, field_name)
+..\.venv\Lib\site-packages\factory\builder.py:356: in __getattr__
+    value = value.evaluate_pre(
+..\.venv\Lib\site-packages\factory\declarations.py:67: in evaluate_pre
+    return self.evaluate(instance, step, context)
+..\.venv\Lib\site-packages\factory\declarations.py:457: in evaluate
+    return step.recurse(subfactory, extra, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:228: in recurse
+    return builder.build(parent_step=self, force_sequence=force_sequence)
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ae639b0>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-007', 'status': <Status: Ativa>, 'total_vagas': 13}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AD2FC40>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+_____________ TestMatriculaService.test_alterar_status_matricula ______________
+
+self = <apps.academico.tests.test_services.TestMatriculaService testMethod=test_alterar_status_matricula>
+
+    def setUp(self):
+>       self.turma_com_vagas = TurmaFactory(total_vagas=5)
+
+apps\academico\tests\test_services.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ae64950>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-008', 'status': <Status: Ativa>, 'total_vagas': 5}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AD2ECE0>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+________ TestMatriculaService.test_avaliar_aluno_aprova_com_nota_alta _________
+
+self = <apps.academico.tests.test_services.TestMatriculaService testMethod=test_avaliar_aluno_aprova_com_nota_alta>
+
+    def setUp(self):
+>       self.turma_com_vagas = TurmaFactory(total_vagas=5)
+
+apps\academico\tests\test_services.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ae64c50>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-009', 'status': <Status: Ativa>, 'total_vagas': 5}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1B426D10>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+_______ TestMatriculaService.test_avaliar_aluno_reprova_com_nota_baixa ________
+
+self = <apps.academico.tests.test_services.TestMatriculaService testMethod=test_avaliar_aluno_reprova_com_nota_baixa>
+
+    def setUp(self):
+>       self.turma_com_vagas = TurmaFactory(total_vagas=5)
+
+apps\academico\tests\test_services.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ad76a80>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-010', 'status': <Status: Ativa>, 'total_vagas': 5}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AD2FE20>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+_______________ TestMatriculaService.test_gerar_relatorio_turma _______________
+
+self = <apps.academico.tests.test_services.TestMatriculaService testMethod=test_gerar_relatorio_turma>
+
+    def setUp(self):
+>       self.turma_com_vagas = TurmaFactory(total_vagas=5)
+
+apps\academico\tests\test_services.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ad77980>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-011', 'status': <Status: Ativa>, 'total_vagas': 5}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1ADEC610>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+______ TestMatriculaService.test_matricula_gerada_com_numero_sequencial _______
+
+self = <apps.academico.tests.test_services.TestMatriculaService testMethod=test_matricula_gerada_com_numero_sequencial>
+
+    def setUp(self):
+>       self.turma_com_vagas = TurmaFactory(total_vagas=5)
+
+apps\academico\tests\test_services.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1aa02190>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-012', 'status': <Status: Ativa>, 'total_vagas': 5}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AD2F5E0>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+______ TestMatriculaService.test_matricular_classificado_cria_matricula _______
+
+self = <apps.academico.tests.test_services.TestMatriculaService testMethod=test_matricular_classificado_cria_matricula>
+
+    def setUp(self):
+>       self.turma_com_vagas = TurmaFactory(total_vagas=5)
+
+apps\academico\tests\test_services.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1aa01d30>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-013', 'status': <Status: Ativa>, 'total_vagas': 5}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1AA61630>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+_____ TestMatriculaService.test_verificar_disponibilidade_turma_com_vagas _____
+
+self = <apps.academico.tests.test_services.TestMatriculaService testMethod=test_verificar_disponibilidade_turma_com_vagas>
+
+    def setUp(self):
+>       self.turma_com_vagas = TurmaFactory(total_vagas=5)
+
+apps\academico\tests\test_services.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1b400bb0>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-014', 'status': <Status: Ativa>, 'total_vagas': 5}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1ADED120>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+_____ TestMatriculaService.test_verificar_disponibilidade_turma_sem_vagas _____
+
+self = <apps.academico.tests.test_services.TestMatriculaService testMethod=test_verificar_disponibilidade_turma_sem_vagas>
+
+    def setUp(self):
+>       self.turma_com_vagas = TurmaFactory(total_vagas=5)
+
+apps\academico\tests\test_services.py:10: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\.venv\Lib\site-packages\factory\base.py:43: in __call__
+    return cls.create(**kwargs)
+..\.venv\Lib\site-packages\factory\base.py:539: in create
+    return cls._generate(enums.CREATE_STRATEGY, kwargs)
+..\.venv\Lib\site-packages\factory\django.py:122: in _generate
+    return super()._generate(strategy, params)
+..\.venv\Lib\site-packages\factory\base.py:468: in _generate
+    return step.build()
+..\.venv\Lib\site-packages\factory\builder.py:274: in build
+    instance = self.factory_meta.instantiate(
+..\.venv\Lib\site-packages\factory\base.py:320: in instantiate
+    return self.factory._create(model, *args, **kwargs)
+..\.venv\Lib\site-packages\factory\django.py:175: in _create
+    return manager.create(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+..\.venv\Lib\site-packages\django\db\models\query.py:661: in create
+    obj = self.model(**kwargs)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <[RelatedObjectDoesNotExist('Turma has no evento.') raised in repr()] Turma object at 0x16f1ae6e210>
+args = ()
+kwargs = {'ativa': True, 'codigo': 'TURMA-015', 'status': <Status: Ativa>, 'total_vagas': 5}
+cls = <class 'apps.eventos.models.Turma'>, opts = <Options for Turma>
+_setattr = <built-in function setattr>, _DEFERRED = <Deferred field>
+fields_iter = <tuple_iterator object at 0x0000016F1B427070>, val = None
+field = <django.db.models.fields.DateTimeField: atualizado_em>
+is_related_object = False, property_names = frozenset({'pk'})
+
+    def __init__(self, *args, **kwargs):
+        # Alias some things as locals to avoid repeat global lookups
+        cls = self.__class__
+        opts = self._meta
+        _setattr = setattr
+        _DEFERRED = DEFERRED
+        if opts.abstract:
+            raise TypeError("Abstract models cannot be instantiated.")
+    
+        pre_init.send(sender=cls, args=args, kwargs=kwargs)
+    
+        # Set up the storage for instance state
+        self._state = ModelState()
+    
+        # There is a rather weird disparity here; if kwargs, it's set, then args
+        # overrides it. It should be one or the other; don't duplicate the work
+        # The reason for the kwargs check is that standard iterator passes in by
+        # args, and instantiation for iteration is 33% faster.
+        if len(args) > len(opts.concrete_fields):
+            # Daft, but matches old exception sans the err msg.
+            raise IndexError("Number of args exceeds number of fields")
+    
+        if not kwargs:
+            fields_iter = iter(opts.concrete_fields)
+            # The ordering of the zip calls matter - zip throws StopIteration
+            # when an iter throws it. So if the first iter throws it, the second
+            # is *not* consumed. We rely on this, so don't change the order
+            # without changing the logic.
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+        else:
+            # Slower, kwargs-ready version.
+            fields_iter = iter(opts.fields)
+            for val, field in zip(args, fields_iter):
+                if val is _DEFERRED:
+                    continue
+                _setattr(self, field.attname, val)
+                if kwargs.pop(field.name, NOT_PROVIDED) is not NOT_PROVIDED:
+                    raise TypeError(
+                        f"{cls.__qualname__}() got both positional and "
+                        f"keyword arguments for field '{field.name}'."
+                    )
+    
+        # Now we're left with the unprocessed fields that *must* come from
+        # keywords, or default.
+    
+        for field in fields_iter:
+            is_related_object = False
+            # Virtual field
+            if field.column is None or field.generated:
+                continue
+            if kwargs:
+                if isinstance(field.remote_field, ForeignObjectRel):
+                    try:
+                        # Assume object instance was passed in.
+                        rel_obj = kwargs.pop(field.name)
+                        is_related_object = True
+                    except KeyError:
+                        try:
+                            # Object instance wasn't passed in -- must be an ID.
+                            val = kwargs.pop(field.attname)
+                        except KeyError:
+                            val = field.get_default()
+                else:
+                    try:
+                        val = kwargs.pop(field.attname)
+                    except KeyError:
+                        # This is done with an exception rather than the
+                        # default argument on pop because we don't want
+                        # get_default() to be evaluated, and then not used.
+                        # Refs #12057.
+                        val = field.get_default()
+            else:
+                val = field.get_default()
+    
+            if is_related_object:
+                # If we are passed a related instance, set it using the
+                # field.name instead of field.attname (e.g. "user" instead of
+                # "user_id") so that the object gets properly cached (and type
+                # checked) by the RelatedObjectDescriptor.
+                if rel_obj is not _DEFERRED:
+                    _setattr(self, field.name, rel_obj)
+            else:
+                if val is not _DEFERRED:
+                    _setattr(self, field.attname, val)
+    
+        if kwargs:
+            property_names = opts._property_names
+            unexpected = ()
+            for prop, value in kwargs.items():
+                # Any remaining kwargs must correspond to properties or virtual
+                # fields.
+                if prop in property_names:
+                    if value is not _DEFERRED:
+                        _setattr(self, prop, value)
+                else:
+                    try:
+                        opts.get_field(prop)
+                    except FieldDoesNotExist:
+                        unexpected += (prop,)
+                    else:
+                        if value is not _DEFERRED:
+                            _setattr(self, prop, value)
+            if unexpected:
+                unexpected_names = ", ".join(repr(n) for n in unexpected)
+>               raise TypeError(
+                    f"{cls.__name__}() got unexpected keyword arguments: "
+                    f"{unexpected_names}"
+                )
+E               TypeError: Turma() got unexpected keyword arguments: 'codigo', 'total_vagas', 'status', 'ativa'
+
+..\.venv\Lib\site-packages\django\db\models\base.py:569: TypeError
+-------------------------- Captured stderr teardown ---------------------------
+Destroying test database for alias 'default'...
+
+=========================== short test summary info ===========================
+FAILED apps/academico/tests/test_models.py::TestMatricula::test_matricula_criada_corretamente
+FAILED apps/academico/tests/test_models.py::TestMatricula::test_matricula_data_preenchida
+FAILED apps/academico/tests/test_models.py::TestMatricula::test_matricula_status_ativo_default
+FAILED apps/academico/tests/test_models.py::TestMatricula::test_matricula_unique_together_turma_interessado
+FAILED apps/academico/tests/test_models.py::TestMatricula::test_numero_matricula_unico
+FAILED apps/academico/tests/test_models.py::TestAvaliacao::test_avaliacao_aprovado_quando_nota_maior_7
+FAILED apps/academico/tests/test_models.py::TestAvaliacao::test_avaliacao_criada_corretamente
+FAILED apps/academico/tests/test_models.py::TestAvaliacao::test_avaliacao_reprovado_quando_nota_menor_7
+FAILED apps/academico/tests/test_services.py::TestMatriculaService::test_alterar_status_matricula
+FAILED apps/academico/tests/test_services.py::TestMatriculaService::test_avaliar_aluno_aprova_com_nota_alta
+FAILED apps/academico/tests/test_services.py::TestMatriculaService::test_avaliar_aluno_reprova_com_nota_baixa
+FAILED apps/academico/tests/test_services.py::TestMatriculaService::test_gerar_relatorio_turma
+FAILED apps/academico/tests/test_services.py::TestMatriculaService::test_matricula_gerada_com_numero_sequencial
+FAILED apps/academico/tests/test_services.py::TestMatriculaService::test_matricular_classificado_cria_matricula
+FAILED apps/academico/tests/test_services.py::TestMatriculaService::test_verificar_disponibilidade_turma_com_vagas
+FAILED apps/academico/tests/test_services.py::TestMatriculaService::test_verificar_disponibilidade_turma_sem_vagas
+======================== 16 failed, 2 passed in 2.91s =========================
