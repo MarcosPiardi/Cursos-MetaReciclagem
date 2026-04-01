@@ -62,7 +62,7 @@ def concatenar_arquivos(pasta_projeto, tipos_arquivo=['models.py', 'views.py'], 
 if __name__ == "__main__":
     # Substitua pelo caminho do seu projeto Django
     # PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta"
-    PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts"
+    PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao"
     
     # Escolha quais arquivos quer concatenar
     concatenar_arquivos(
@@ -72,16 +72,18 @@ if __name__ == "__main__":
         #                'urls.py', 'views.py', 'settings.py', 
         #                '*.html', '*.css', '*.js'],
 
-        tipos_arquivo=['*.html.py', '*.py'],
+        # tipos_arquivo=['*.html.py', '*.py'],
+
+        tipos_arquivo=['*.*'],
 
         # tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
                     #    'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
                           
-        arquivo_saida='resultado.txt'
+        arquivo_saida='2026-03-31-arquivos_selecao.txt'
     )
 
 
-# comando para rodar: python scripts\concatenar.py    
+# comando para rodar: python scripts\concatenar_alguns.py    
 
     """
     Arquivos gerados:

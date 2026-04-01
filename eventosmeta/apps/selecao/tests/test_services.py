@@ -11,10 +11,12 @@ from datetime import timedelta
 from decimal import Decimal
 
 from .factories import (
-    InteressadoFactory,   # ← adicione aqui
+    InteressadoFactory,
     InscricaoFactory,
     StatusInscricaoFactory,
-    ClassificacaoFactory,
+    ClassificacaoFactory
+)
+from apps.eventos.tests.factories import (
     EventoFactory,
     EventoCriterioFactory,
     CriterioFactory
