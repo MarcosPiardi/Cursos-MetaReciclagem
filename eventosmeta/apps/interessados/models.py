@@ -23,7 +23,7 @@ def gerar_hash_cpf(cpf):
 
 
 class Sexo(models.Model):
-    nome = models.CharField('Sexo', max_length=20)
+    nome = models.CharField('Sexo', max_length=20, unique=True)
 
     def __str__(self):
         return self.nome

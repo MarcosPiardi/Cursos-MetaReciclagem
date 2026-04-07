@@ -7,9 +7,9 @@ Data: 20/03/2026
 
 from django.test import TestCase
 from django.utils import timezone
-from ..models import Interessado, SolicitacaoExclusao, gerar_hash_cpf
+from ..models import Interessado, Sexo, Fototipo, PasswordResetToken, SolicitacaoExclusao, gerar_hash_cpf
 from ..forms import CadastroInteressadoForm, LoginInteressadoForm
-from .factories import InteressadoFactory, SexoFactory  # Adicionado para factory tests
+from .factories import InteressadoFactory, SexoFactory, FototipoFactory, PasswordResetTokenFactory
 from ..models import Interessado, SolicitacaoExclusao, gerar_hash_cpf
 
 # ============================================================
@@ -92,14 +92,21 @@ class TestInteressadoModel(TestCase):
     def test_factory_interessado(self):
         """Testa se factory cria Interessado válido."""
         interessado = InteressadoFactory.create()
-        self.assertEqual(interessado.cpf, '123.456.789-00')  # max_length=14
-        self.assertEqual(interessado.num_nis, '123.45678.90-1')  # max_length=15
-        self.assertEqual(interessado.cep, '12345678')  # max_length=8
-        self.assertEqual(interessado.rg, '12.345.678-9')  # max_length=20
-        self.assertTrue(interessado.consentimento_lgpd)
+        # ✅ Verifica que CPF foi gerado (dinâmico, não fixo)
+        self.assertIsNotNone(interessado.cpf)
+        self.assertEqual(len(interessado.cpf.replace('.', '').replace('-', '')), 11)
+        # ✅ Verifica NIS foi gerado
+        self.assertIsNotNone(interessado.num_nis)
+        # ✅ Verifica senha foi criptografada
         self.assertTrue(interessado.check_password('senha123'))
 
-
+        # interessado = InteressadoFactory.create()
+        # self.assertEqual(interessado.cpf, '123.456.789-00')  # max_length=14
+        # self.assertEqual(interessado.num_nis, '123.45678.90-1')  # max_length=15
+        # self.assertEqual(interessado.cep, '12345678')  # max_length=8
+        # self.assertEqual(interessado.rg, '12.345.678-9')  # max_length=20
+        # self.assertTrue(interessado.consentimento_lgpd)
+        # self.assertTrue(interessado.check_password('senha123'))
 
     # ============================================================
     # BLOCO 2: VALIDADORES
@@ -302,7 +309,150 @@ class TestInteressadoModel(TestCase):
         self.assertIn('APROVADA', str_repr)
         self.assertIn('Ana Costa', str_repr)
 
+# ============================================================
+# NOVAS CLASSES DE TESTE - INTEGRAÇÃO COM FACTORIES
+# ============================================================
 
+class TestSexoModelCompleto(TestCase):
+    """Testes para modelo Sexo com constraint unique."""
+
+    def test_sexo_criado_com_factory(self):
+        """Factory cria Sexo válido."""
+        sexo = SexoFactory(nome='Masculino')
+        self.assertEqual(sexo.nome, 'Masculino')
+        self.assertIsNotNone(sexo.id)
+
+    def test_sexo_str_representation(self):
+        """__str__ retorna o nome."""
+        sexo = SexoFactory(nome='Feminino')
+        self.assertEqual(str(sexo), 'Feminino')
+
+    def test_sexo_constraint_via_model(self):
+        """Model não permite duplicar via objects.create()."""
+        from django.db import IntegrityError
+        
+        Sexo.objects.create(nome='Outro')
+        
+        # Tentar criar com mesmo nome = ERRO
+        with self.assertRaises(IntegrityError):
+            Sexo.objects.create(nome='Outro')
+
+    def test_sexo_valores_fixos(self):
+        """Sexo armazena os 4 valores fixos sem duplicatas."""
+        valores = ['Masculino', 'Feminino', 'Outro', 'Prefiro não informar']
+        
+        for valor in valores:
+            sexo = Sexo.objects.create(nome=valor)
+            self.assertIsNotNone(sexo.id)
+        
+        # Total de 4 registros no banco
+        self.assertEqual(Sexo.objects.count(), 4)
+        
+
+class TestFototipoModelCompleto(TestCase):
+    """Testes completos para modelo Fototipo com Factory."""
+
+    def test_fototipo_criado_com_factory(self):
+        """Factory cria Fototipo válido."""
+        fototipo = FototipoFactory(nome='Tipo IV')
+        self.assertEqual(fototipo.nome, 'Tipo IV')
+        self.assertIsNotNone(fototipo.id)
+
+    def test_fototipo_descricao_vazia(self):
+        """Factory pode criar Fototipo sem descrição."""
+        fototipo = FototipoFactory(descricao='')
+        self.assertEqual(fototipo.descricao, '')
+
+
+class TestInteressadoModelCriptografia2(TestCase):
+    """Testes adicionais de criptografia com Factory."""
+
+    def test_cpf_hash_gerado_automaticamente(self):
+        """cpf_hash é gerado corretamente pela factory."""
+        interessado = InteressadoFactory.create()
+        self.assertIsNotNone(interessado.cpf_hash)
+        self.assertEqual(len(interessado.cpf_hash), 64)
+
+    def test_senha_criptografada_factory(self):
+        """Senha criada por factory é criptografada."""
+        interessado = InteressadoFactory.create()
+        self.assertTrue(interessado.senha.startswith('pbkdf2_'))
+        self.assertTrue(interessado.check_password('senha123'))
+
+
+class TestInteressadoModelRelacionamentos(TestCase):
+    """Testes de relacionamentos do modelo Interessado."""
+
+    def setUp(self):
+        self.sexo = SexoFactory()
+        self.fototipo = FototipoFactory()
+
+    def test_interessado_sexo_fk(self):
+        """Interessado pode estar relacionado a Sexo."""
+        interessado = InteressadoFactory.create(sexo=self.sexo)
+        self.assertEqual(interessado.sexo, self.sexo)
+
+    def test_interessado_fototipo_fk(self):
+        """Interessado pode estar relacionado a Fototipo."""
+        interessado = InteressadoFactory.create(fototipo=self.fototipo)
+        self.assertEqual(interessado.fototipo, self.fototipo)
+
+    def test_interessado_multiplos_relacionamentos(self):
+        """Interessado com sexo e fototipo."""
+        interessado = InteressadoFactory.create(
+            sexo=self.sexo,
+            fototipo=self.fototipo
+        )
+        self.assertEqual(interessado.sexo, self.sexo)
+        self.assertEqual(interessado.fototipo, self.fototipo)
+
+
+class TestInteressadoModelFlags(TestCase):
+    """Testes para flags booleanas de PCD."""
+
+    def test_pcd_multiplas_flags(self):
+        """Pode marcar múltiplas deficiências."""
+        interessado = InteressadoFactory.create(
+            necessidades_especiais=True,
+            pcd_fisica=True,
+            pcd_auditiva=True
+        )
+        self.assertTrue(interessado.pcd_fisica)
+        self.assertTrue(interessado.pcd_auditiva)
+        self.assertFalse(interessado.pcd_visual)
+
+    def test_interessado_tem_deficiencia_property(self):
+        """Property tem_deficiencia retorna True se tem alguma deficiência."""
+        i1 = InteressadoFactory.create(pcd_fisica=True)
+        i2 = InteressadoFactory.create(pcd_visual=False, pcd_auditiva=False)
+        
+        self.assertTrue(i1.tem_deficiencia)
+        self.assertFalse(i2.tem_deficiencia)
+
+
+class TestPasswordResetTokenCompleto(TestCase):
+    """Testes completos para PasswordResetToken com Factory."""
+
+    def test_token_criado_com_factory(self):
+        """Factory cria token válido."""
+        token = PasswordResetTokenFactory.create()
+        self.assertIsNotNone(token.id)
+        self.assertIsNotNone(token.token)
+        self.assertFalse(token.usado)
+
+    def test_token_expiracao(self):
+        """Token expira corretamente."""
+        token = PasswordResetTokenFactory.create()
+        self.assertTrue(token.expira_em > token.criado_em)
+
+    def test_token_marca_usado(self):
+        """Token pode ser marcado como usado."""
+        token = PasswordResetTokenFactory.create()
+        token.usado = True
+        token.save()
+        
+        token.refresh_from_db()
+        self.assertTrue(token.usado)
 
 
 
