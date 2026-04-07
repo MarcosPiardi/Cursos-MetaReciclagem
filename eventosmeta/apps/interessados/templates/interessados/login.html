@@ -1,19 +1,7 @@
 <!--
-Arquivo: login.html    login_interessado.html
+Arquivo: login.html
 Caminho: apps/interessados/templates/interessados/login.html
-         Template de login com CSS embutido (NÃO precisa de CSS externo)
-
-Alteração: Login com CPF + SENHA (não data de nascimento)
-Data: 19/01/2026
-
-Alteração: Template refatorado para estender base.html e exibir favicon
-Data: 29/01/2026
-
-Alteração: Corrigido mensagens de erro + Máscara CPF + Toggle senha
-Data: 30/01/2026
-
-Alteração: Adicionado link "Esqueceu a senha?"
-Data: 20/02/2026
+Correção: 06 de abril de 2026 - Formatação de CPF, limite de 11 dígitos, toggle de senha
 -->
 
 {% extends 'base_auth.html' %}
@@ -234,12 +222,12 @@ Data: 20/02/2026
             {% endif %}
         </div>
 
-        <!-- NOVO: Link esqueceu a senha -->
         <div class="forgot-link">
             <a href="{% url 'interessados:senha_recuperar' %}">Esqueceu sua senha?</a>
         </div>
 
         <button type="submit" class="btn-login">Entrar</button>
+
     </form>
 
     <div class="divider">ou</div>
@@ -250,41 +238,73 @@ Data: 20/02/2026
     </div>
 
     <div class="back-link">
-        {% comment %} <a href="{% url 'portal:index' %}">← Voltar para página inicial</a> {% endcomment %}
+        <a href="{% url 'portal:index' %}">← Voltar para página inicial</a>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://unpkg.com/imask"></script>
 <script>
     const cpfInput = document.getElementById('cpf');
+    
     if (cpfInput) {
-        IMask(cpfInput, { mask: '000.000.000-00' });
-    }
-
-    const toggleSenha = document.getElementById('toggleSenha');
-    const senhaInput = document.getElementById('senha');
-    if (toggleSenha && senhaInput) {
-        toggleSenha.addEventListener('click', function() {
-            if (senhaInput.type === 'password') {
-                senhaInput.type = 'text';
-                this.classList.remove('bi-eye-slash');
-                this.classList.add('bi-eye');
+        cpfInput.addEventListener('input', function(e) {
+            let valor = this.value.replace(/\D/g, '');
+            
+            if (valor.length > 11) {
+                valor = valor.substring(0, 11);
+            }
+            
+            if (valor.length <= 3) {
+                this.value = valor;
+            } else if (valor.length <= 6) {
+                this.value = valor.substring(0, 3) + '.' + valor.substring(3);
+            } else if (valor.length <= 9) {
+                this.value = valor.substring(0, 3) + '.' + 
+                             valor.substring(3, 6) + '.' + 
+                             valor.substring(6);
             } else {
-                senhaInput.type = 'password';
-                this.classList.remove('bi-eye');
-                this.classList.add('bi-eye-slash');
+                this.value = valor.substring(0, 3) + '.' + 
+                             valor.substring(3, 6) + '.' + 
+                             valor.substring(6, 9) + '-' + 
+                             valor.substring(9, 11);
+            }
+        });
+        
+        cpfInput.addEventListener('keypress', function(e) {
+            if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
             }
         });
     }
 
-    document.getElementById('formLogin').addEventListener('submit', function() {
-        const cpfField = document.getElementById('cpf');
-        if (cpfField && cpfField.value) {
-            cpfField.value = cpfField.value.replace(/\D/g, '');
-        }
-    });
+    const toggleSenha = document.getElementById('toggleSenha');
+    const senhaInput = document.getElementById('senha');
+    
+    if (toggleSenha && senhaInput) {
+        toggleSenha.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (senhaInput.type === 'password') {
+                senhaInput.type = 'text';
+                this.classList.replace('bi-eye-slash', 'bi-eye');
+            } else {
+                senhaInput.type = 'password';
+                this.classList.replace('bi-eye', 'bi-eye-slash');
+            }
+        });
+    }
+
+    const formLogin = document.getElementById('formLogin');
+    
+    if (formLogin) {
+        formLogin.addEventListener('submit', function(e) {
+            const cpfField = document.getElementById('cpf');
+            if (cpfField && cpfField.value) {
+                cpfField.value = cpfField.value.replace(/\D/g, '');
+            }
+        });
+    }
 </script>
 {% endblock %}
 
