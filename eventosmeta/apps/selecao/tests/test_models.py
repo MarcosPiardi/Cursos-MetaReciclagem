@@ -1,20 +1,21 @@
 """
 Arquivo: test_models.py
 Caminho: apps/selecao/tests/test_models.py
-Testes de modelos para o app Selecao
-Data: 27 de março de 2026
+27/03/2026 - Testes de modelos para o app Selecao
+08/04/2026 - Testes de modelos para o app Seleção com validações e desempate
 """
 
 from django.test import TestCase
 from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
 
-from ..models import StatusInscricao, Inscricao, Classificacao
-from .factories import (
+from apps.selecao.models import StatusInscricao, Inscricao, Classificacao
+from apps.selecao.tests.factories import (
     StatusInscricaoFactory,
     InscricaoFactory,
-    ClassificacaoFactory,
-    EventoFactory
+    ClassificacaoFactory
 )
+from apps.eventos.tests.factories import EventoFactory
 from apps.interessados.tests.factories import InteressadoFactory
 
 
@@ -144,5 +145,59 @@ class TestClassificacaoModel(TestCase):
         with self.assertRaises(IntegrityError):
             ClassificacaoFactory(inscricao=self.inscricao)
 
+    # ==========================================
+    # NOVOS TESTES DE VALIDAÇÃO
+    # ==========================================
 
+    def test_pontuacao_total_validacao_range(self):
+        """A pontuação total não deve ser menor que 0 ou maior que 100."""
+        classificacao = ClassificacaoFactory(inscricao=self.inscricao)
+        
+        # Teste menor que zero
+        classificacao.pontuacao_total = -1
+        with self.assertRaises(ValidationError):
+            classificacao.full_clean()
             
+        # Teste maior que 100
+        classificacao.pontuacao_total = 101
+        with self.assertRaises(ValidationError):
+            classificacao.full_clean()
+
+    def test_flags_classificacao_mutuamente_exclusivas(self):
+        """Um candidato não pode estar classificado e na lista de espera ao mesmo tempo."""
+        classificacao = ClassificacaoFactory(
+            inscricao=self.inscricao,
+            classificado=True,
+            lista_espera=True
+        )
+        
+        with self.assertRaises(ValidationError):
+            classificacao.full_clean()
+
+    def test_desempate_por_data_inscricao(self):
+        """Verifica se a ordenação pelo banco respeita a data de inscrição."""
+        # Funciona como uma fila de banco: quem chega primeiro, tem prioridade
+        interessado2 = InteressadoFactory()
+        inscricao2 = InscricaoFactory(interessado=interessado2)
+        
+        classificacao1 = ClassificacaoFactory(
+            inscricao=self.inscricao,
+            pontuacao_total=50
+        )
+        classificacao2 = ClassificacaoFactory(
+            inscricao=inscricao2,
+            pontuacao_total=50
+        )
+        
+        # Força datas diferentes para simular ordem de chegada
+        self.inscricao.data_inscricao = '2026-01-01 10:00:00'
+        self.inscricao.save()
+        inscricao2.data_inscricao = '2026-01-01 11:00:00'
+        inscricao2.save()
+        
+        # Ordena por pontuação (decrescente) e data de inscrição (crescente)
+        queryset = Classificacao.objects.all().order_by('-pontuacao_total', 'inscricao__data_inscricao')
+        
+        self.assertEqual(queryset.first(), classificacao1)
+        self.assertEqual(queryset.last(), classificacao2)
+

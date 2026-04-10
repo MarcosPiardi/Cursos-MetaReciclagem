@@ -147,12 +147,6 @@ urlpatterns = [
         name='interessados_trocar_senha_obrigatorio',
     ),
 
-    # ==========================================
-    # SISTEMA 3: Portal Público (DESABILITADO)
-    # Comentado em 13/03/2026
-    # Login duplicado removido (use /inscricao/login/)
-    # Apenas página inicial (/) mantida
-    # ==========================================
     path('', include('apps.portal.urls')),
 
     # ==========================================

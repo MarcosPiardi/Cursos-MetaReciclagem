@@ -1,8 +1,8 @@
 """
 conftest.py - Configuração global do pytest para Sistema MetaReciclagem
-Fixtures básicas: usuário staff, interessado teste.
+Fixtures básicas: usuário staff, interessado teste, cliente autenticado.
 Mocks para e-mail e ViaCEP.
-Sem imports problemáticos do pytest-django.
+Data: 10/04/2026
 """
 
 import pytest
@@ -12,7 +12,7 @@ from django.utils import timezone
 from apps.interessados.models import (
     Interessado,
     gerar_hash_cpf,
-)  # Imports básicos do seu models.py
+)
 
 
 @pytest.fixture(autouse=True)
@@ -29,13 +29,27 @@ def client():
 
 @pytest.fixture
 def usuario_staff():
-    """Usuário staff para testes de autenticação admin (de models.txt: Usuario)."""
+    """Usuário staff para testes de autenticação admin."""
     Usuario = get_user_model()
     user = Usuario.objects.create_user(
         username="staff_teste",
         email="staff@teste.com",
         password="senha123",
         is_staff=True,
+        is_superuser=True,
+    )
+    return user
+
+
+@pytest.fixture
+def usuario_comum():
+    """Usuário comum (não staff) para testes de autenticação."""
+    Usuario = get_user_model()
+    user = Usuario.objects.create_user(
+        username="usuario_teste",
+        email="usuario@teste.com",
+        password="senha123",
+        is_staff=False,
         is_superuser=False,
     )
     return user
@@ -43,11 +57,11 @@ def usuario_staff():
 
 @pytest.fixture
 def interessado_teste():
-    """Interessado básico para testes (de models.txt)."""
+    """Interessado básico para testes."""
     interessado = Interessado.objects.create(
         nome="Teste Silva",
         cpf="52998224725",
-        cpf_hash=gerar_hash_cpf("52998224725"),  # Usa a função do seu model
+        cpf_hash=gerar_hash_cpf("52998224725"),
         email="teste@interessado.com",
         consentimento_lgpd=True,
         consentimento_lgpd_em=timezone.now(),
@@ -57,9 +71,27 @@ def interessado_teste():
     return interessado
 
 
-# Mock para e-mail (de models.txt: usado em recovery)
+@pytest.fixture
+def autenticado(client, usuario_staff):
+    """Cliente HTTP com usuário staff autenticado."""
+    client.login(username="staff_teste", password="senha123")
+    return client
+
+
+@pytest.fixture
+def autenticado_interessado(client, interessado_teste):
+    """Cliente HTTP com interessado autenticado."""
+    client.login(username=interessado_teste.cpf, password="senha123")
+    return client
+
+
+# ==========================================
+# MOCKS GLOBAIS
+# ==========================================
+
 @pytest.fixture(autouse=True)
 def mock_send_mail(monkeypatch):
+    """Mock para django.core.mail.send_mail."""
     def mock_send_mail(subject, message, from_email, recipient_list, **kwargs):
         print(f"Mock e-mail: {subject} para {recipient_list}")
         return 1
@@ -67,9 +99,9 @@ def mock_send_mail(monkeypatch):
     monkeypatch.setattr("django.core.mail.send_mail", mock_send_mail)
 
 
-# Mock para ViaCEP (de cadastro.html)
 @pytest.fixture(autouse=True)
 def mock_viacep(monkeypatch):
+    """Mock para requests.get (ViaCEP)."""
     class MockResponse:
         def json(self):
             return {

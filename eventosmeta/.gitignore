@@ -4,6 +4,7 @@
 .env.*
 !.env.example
 staticfiles_collected/
+htmlcov
 
 # Banco de dados
 *.sqlite3

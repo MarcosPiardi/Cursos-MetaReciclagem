@@ -1,0 +1,1648 @@
+================================================================================
+APP: ACADEMICO
+Data: 07-04-2026
+Hora: 16:37:45
+================================================================================
+
+
+################################################################################
+# TIPO: models.py
+################################################################################
+
+
+--------------------------------------------------------------------------------
+ARQUIVO: models.py
+--------------------------------------------------------------------------------
+
+"""
+Models do app ACADÊMICO
+Arquivo: apps/academico/models.py
+Responsável por: Matrículas, avaliações, execução do curso
+
+Alteração: Adicionado numero_matricula auto-gerado (formato AAAANNN)
+Data: 14/01/2026
+
+Alteração: Mantidos interessado_id e inscricao_id com validação automática
+Data: 30/01/2026
+
+Alteração: Adicionado signal para reverter status ao excluir matrícula
+Data: 02/02/2026
+
+Responsável por: Matrículas, avaliações, execução do curso
+"""
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from decimal import Decimal
+
+from apps.eventos.models import Turma
+from apps.interessados.models import Interessado
+from apps.selecao.models import Inscricao
+
+
+class StatusMatricula(models.Model):
+    """Status de Matrículas (Ativa, Trancada, Concluída, etc.)"""
+    
+    nome = models.CharField(max_length=50, unique=True)
+    cor = models.CharField(
+        max_length=7,
+        default='#6c757d',
+        help_text="Código hexadecimal da cor (ex: #007bff)"
+    )
+    ordem = models.PositiveIntegerField(default=0)
+    
+    class Meta:
+        verbose_name = "Status de Matrícula"
+        verbose_name_plural = "Status de Matrículas"
+        ordering = ['ordem', 'nome']
+    
+    def __str__(self):
+        return self.nome
+
+
+class Matricula(models.Model):
+    """
+    Matrículas de alunos em turmas
+    
+    IMPORTANTE: interessado e inscricao devem ser da mesma pessoa
+    A validação garante consistência entre os dois campos
+    """
+    
+    # Número de matrícula único e auto-gerado
+    numero_matricula = models.CharField(
+        max_length=10,
+        unique=True,
+        editable=False,
+        verbose_name='Nº Matrícula',
+        help_text='Gerado automaticamente no formato AAAANNN (ex: 2026001)'
+    )
+    
+    turma = models.ForeignKey(
+        Turma,
+        on_delete=models.PROTECT,
+        related_name='matriculas',
+        verbose_name='Turma'
+    )
+    
+    interessado = models.ForeignKey(
+        Interessado,
+        on_delete=models.PROTECT,
+        related_name='matriculas',
+        verbose_name='Interessado'
+    )
+    
+    inscricao = models.ForeignKey(
+        Inscricao,
+        on_delete=models.PROTECT,
+        related_name='matriculas',
+        verbose_name='Inscrição',
+        help_text="Inscrição que originou esta matrícula"
+    )
+    
+    status = models.ForeignKey(
+        StatusMatricula,
+        on_delete=models.PROTECT,
+        related_name='matriculas',
+        verbose_name='Status'
+    )
+    
+    # Datas
+    data_matricula = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Data da Matrícula'
+    )
+    data_atualizacao = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Última Atualização'
+    )
+    
+    # Observações
+    observacoes = models.TextField(
+        blank=True,
+        verbose_name='Observações/Anotações'
+    )
+    
+    class Meta:
+        verbose_name = "Matrícula"
+        verbose_name_plural = "Matrículas"
+        unique_together = ['turma', 'interessado']
+        ordering = ['-data_matricula']
+        indexes = [
+            models.Index(fields=['numero_matricula']),
+            models.Index(fields=['turma', 'interessado']),
+            models.Index(fields=['inscricao']),
+        ]
+    
+    def __str__(self):
+        return f"{self.numero_matricula} - {self.interessado.nome}"
+    
+    def clean(self):
+        """
+        Validações customizadas - CRÍTICO: interessado deve ser igual a inscricao.interessado
+        """
+        super().clean()
+        
+        # VALIDAÇÃO PRINCIPAL: Interessado deve corresponder à inscrição
+        if self.inscricao and self.interessado:
+            if self.inscricao.interessado != self.interessado:
+                raise ValidationError({
+                    'interessado': 'O interessado selecionado não corresponde ao interessado da inscrição.',
+                    'inscricao': f'Esta inscrição pertence a {self.inscricao.interessado.nome}, '
+                                f'não a {self.interessado.nome}.'
+                })
+        
+        # Validar que a inscrição pertence ao evento da turma
+        if self.inscricao and self.turma:
+            if self.inscricao.evento != self.turma.evento:
+                raise ValidationError({
+                    'inscricao': f'Esta inscrição é do evento "{self.inscricao.evento.nome}", '
+                                f'mas a turma é do evento "{self.turma.evento.nome}". '
+                                f'Escolha uma turma do mesmo evento.'
+                })
+        
+        # Validar que o interessado não está matriculado duas vezes na mesma turma
+        if self.pk is None:  # Apenas na criação
+            if Matricula.objects.filter(
+                turma=self.turma,
+                interessado=self.interessado
+            ).exists():
+                raise ValidationError({
+                    'interessado': f'O interessado {self.interessado.nome} '
+                                  f'já está matriculado nesta turma.'
+                })
+    
+    def save(self, *args, **kwargs):
+        """
+        Sobrescrita do save para:
+        1. Validar consistência
+        2. Gerar numero_matricula automaticamente
+        3. Auto-preencher interessado se não fornecido
+        """
+        # AUTO-PREENCHER: Se só inscricao foi fornecida, preenche interessado automaticamente
+        if self.inscricao and not self.interessado:
+            self.interessado = self.inscricao.interessado
+        
+        # Validações
+        self.full_clean()
+        
+        if not self.numero_matricula:
+            self.numero_matricula = self._gerar_numero_matricula()
+        
+        super().save(*args, **kwargs)
+    
+    def _gerar_numero_matricula(self):
+        """
+        Gera número de matrícula no formato AAAANNN
+        
+        Lógica:
+        - AAAA = Ano atual (ex: 2026)
+        - NNNN = Número sequencial de 4 dígitos (ex: 0001, 0002, ..., 9999)
+        
+        Exemplos: 20260001, 20260002, 20269999, 20270001, ...
+        
+        Returns:
+            str: Número de matrícula único
+        """
+        ano_atual = timezone.now().year
+        prefixo = str(ano_atual)
+        
+        # Buscar última matrícula do ano
+        ultima_matricula = Matricula.objects.filter(
+            numero_matricula__startswith=prefixo
+        ).order_by('-numero_matricula').first()
+        
+        if ultima_matricula:
+            # Extrair o número sequencial (últimos 4 dígitos)
+            try:
+                ultimo_numero = int(ultima_matricula.numero_matricula[4:])
+                proximo_numero = ultimo_numero + 1
+            except (ValueError, IndexError):
+                # Se houver erro na conversão, começar do 1
+                proximo_numero = 1
+        else:
+            # Primeira matrícula do ano
+            proximo_numero = 1
+        
+        # Formatar com 4 dígitos (0001, 0002, ..., 9999)
+        numero_formatado = f"{prefixo}{proximo_numero:04d}"
+        
+        return numero_formatado
+
+
+class Avaliacao(models.Model):
+    """Avaliações finais dos alunos matriculados"""
+    
+    matricula = models.OneToOneField(
+        Matricula,
+        on_delete=models.CASCADE,
+        related_name='avaliacao',
+        verbose_name='Matrícula'
+    )
+    
+    # Desempenho
+    nota_final = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('10.00'))],
+        blank=True,
+        null=True,
+        verbose_name='Nota Final',
+        help_text="Nota de 0 a 10"
+    )
+    frequencia = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('100.00'))],
+        verbose_name='Frequência (%)',
+        help_text="Percentual de presença (%)"
+    )
+    
+    # Resultado
+    aprovado = models.BooleanField(
+        default=False,
+        verbose_name='Aprovado'
+    )
+    observacoes = models.TextField(
+        blank=True,
+        verbose_name='Observações'
+    )
+    
+    # Certificado
+    certificado_emitido = models.BooleanField(
+        default=False,
+        verbose_name='Certificado Emitido'
+    )
+    data_emissao_certificado = models.DateField(
+        blank=True,
+        null=True,
+        verbose_name='Data de Emissão do Certificado'
+    )
+    
+    # Auditoria
+    avaliado_em = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Avaliado em'
+    )
+    atualizado_em = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Atualizado em'
+    )
+    
+    class Meta:
+        verbose_name = "Avaliação"
+        verbose_name_plural = "Avaliações"
+        ordering = ['-avaliado_em']
+    
+    def __str__(self):
+        status = "Aprovado" if self.aprovado else "Reprovado"
+        return f"{self.matricula.numero_matricula} - {self.matricula.interessado.nome} - {status}"
+
+
+# ==========================================
+# SIGNALS PARA ATUALIZAR STATUS DA INSCRIÇÃO
+# ==========================================
+
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from apps.selecao.models import StatusInscricao
+
+
+@receiver(post_delete, sender=Matricula)
+def reverter_status_inscricao(sender, instance, **kwargs):
+    """
+    Quando uma matrícula é excluída, reverte o status da inscrição para 'Pendente'
+    """
+    try:
+        # Buscar status "Pendente" (case-insensitive)
+        status_pendente = StatusInscricao.objects.get(nome__iexact='pendente')
+        
+        # Atualizar a inscrição relacionada
+        inscricao = instance.inscricao
+        inscricao.status = status_pendente
+        inscricao.save()
+        
+    except StatusInscricao.DoesNotExist:
+        # Se não encontrar o status Pendente, não faz nada
+        pass
+    except Exception as e:
+        # Log do erro (opcional)
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Erro ao reverter status da inscrição {instance.inscricao.id}: {str(e)}")
+
+# ==========================================
+# SIGNAL: CRIAR AVALIAÇÃO AUTOMATICAMENTE
+# ==========================================
+
+from django.db.models.signals import post_save
+
+
+@receiver(post_save, sender=Matricula)
+def criar_avaliacao_automatica(sender, instance, created, **kwargs):
+    """
+    Quando uma matrícula é criada, cria automaticamente uma avaliação vazia
+    """
+    if created:  # Apenas na criação da matrícula
+        try:
+            # Verifica se já existe avaliação (por segurança)
+            if not hasattr(instance, 'avaliacao'):
+                Avaliacao.objects.create(
+                    matricula=instance,
+                    frequencia=0.00,  # Frequência inicial zerada
+                    aprovado=False     # Inicialmente não aprovado
+                )
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Erro ao criar avaliação para matrícula {instance.numero_matricula}: {str(e)}")
+
+            
+
+
+################################################################################
+# TIPO: views.py
+################################################################################
+
+
+--------------------------------------------------------------------------------
+ARQUIVO: views.py
+--------------------------------------------------------------------------------
+
+"""
+Arquivo: views.py
+Caminho: apps/academico/views.py
+Descrição: Views para gestão de matrícula
+Data: 12/01/2026
+"""
+
+"""
+Views do app ACADÊMICO
+Arquivo: apps/academico/views.py
+Data: 02/02/2026
+"""
+
+from django.http import HttpResponse, FileResponse
+from django.shortcuts import get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_http_methods
+import io
+import zipfile
+
+from .models import Avaliacao
+from .certificado import GeradorCertificado
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def download_certificado_individual(request, avaliacao_id):
+    """
+    Download individual de certificado em PDF
+    """
+    avaliacao = get_object_or_404(Avaliacao, pk=avaliacao_id)
+    
+    # Verificar se está aprovado
+    if not avaliacao.aprovado:
+        return HttpResponse("❌ Certificado disponível apenas para alunos aprovados.", status=400)
+    
+    # Gerar PDF
+    buffer = io.BytesIO()
+    gerador = GeradorCertificado(avaliacao)
+    gerador.gerar_pdf(buffer)
+    buffer.seek(0)
+    
+    # Nome do arquivo
+    aluno_nome = avaliacao.matricula.interessado.nome.replace(' ', '_')
+    curso_nome = avaliacao.matricula.turma.evento.nome.replace(' ', '_')
+    filename = f"Certificado_{aluno_nome}_{curso_nome}.pdf"
+    
+    # Retornar PDF para download
+    response = FileResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def preview_certificado(request, avaliacao_id):
+    """
+    Preview do certificado (visualizar no navegador)
+    """
+    avaliacao = get_object_or_404(Avaliacao, pk=avaliacao_id)
+    
+    # Verificar se está aprovado
+    if not avaliacao.aprovado:
+        return HttpResponse("❌ Certificado disponível apenas para alunos aprovados.", status=400)
+    
+    # Gerar PDF
+    buffer = io.BytesIO()
+    gerador = GeradorCertificado(avaliacao)
+    gerador.gerar_pdf(buffer)
+    buffer.seek(0)
+    
+    # Retornar PDF para visualização inline
+    response = FileResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = 'inline'
+    
+    return response
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def download_certificados_lote(request):
+    """
+    Download em lote de certificados (ZIP)
+    """
+    # Pegar IDs da query string
+    ids_str = request.GET.get('ids', '')
+    ids = [int(id) for id in ids_str.split(',') if id.strip().isdigit()]
+    
+    if not ids:
+        return HttpResponse("❌ Nenhuma avaliação selecionada.", status=400)
+    
+    # Buscar avaliações aprovadas
+    avaliacoes = Avaliacao.objects.filter(pk__in=ids, aprovado=True)
+    
+    if avaliacoes.count() == 0:
+        return HttpResponse("❌ Nenhum aluno aprovado foi selecionado.", status=400)
+    
+    # Criar ZIP em memória
+    zip_buffer = io.BytesIO()
+    
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for avaliacao in avaliacoes:
+            # Gerar PDF de cada certificado
+            pdf_buffer = io.BytesIO()
+            gerador = GeradorCertificado(avaliacao)
+            gerador.gerar_pdf(pdf_buffer)
+            pdf_buffer.seek(0)
+            
+            # Nome do arquivo dentro do ZIP
+            aluno_nome = avaliacao.matricula.interessado.nome.replace(' ', '_')
+            matricula_num = avaliacao.matricula.numero_matricula
+            filename = f"Certificado_{matricula_num}_{aluno_nome}.pdf"
+            
+            # Adicionar ao ZIP
+            zip_file.writestr(filename, pdf_buffer.read())
+    
+    zip_buffer.seek(0)
+    
+    # Retornar ZIP para download
+    response = HttpResponse(zip_buffer, content_type='application/zip')
+    response['Content-Disposition'] = f'attachment; filename="Certificados_{len(avaliacoes)}_alunos.zip"'
+    
+    return response
+
+
+
+
+################################################################################
+# TIPO: forms.py
+################################################################################
+
+# Nenhum arquivo forms.py encontrado
+
+
+################################################################################
+# TIPO: admin.py
+################################################################################
+
+
+--------------------------------------------------------------------------------
+ARQUIVO: admin.py
+--------------------------------------------------------------------------------
+
+
+"""
+Admin do app ACADÊMICO
+Arquivo: apps/academico/admin.py
+Alteração: Adicionado seletor de cor visual e removido código hex da listagem
+Data: 11/12/2025
+
+Alteração: Registrados todos os models no admin_site customizado (melhor prática)
+Data: 20/01/2026
+
+Alteração: Adicionado filtro por evento e action para certificados
+Alteração: Sistema completo de certificados com 2 opções
+Alteração: Solução híbrida com filtros superiores + edição em massa
+Alteração: Adicionadas actions para relatório Excel e PDF
+Alteração: Título junto com logo, checkbox corrigido, labels removidos
+Data: 03/02/2026
+"""
+
+from django import forms
+from django.contrib import admin
+from django.utils.html import format_html
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib import messages
+from django.urls import reverse
+from datetime import date
+from collections import defaultdict
+
+from apps.accounts.admin import admin_site
+from .models import StatusMatricula, Matricula, Avaliacao
+
+
+# ==========================================
+# STATUS MATRÍCULA
+# ==========================================
+
+class StatusMatriculaForm(forms.ModelForm):
+    """Form personalizado com seletor de cor"""
+    class Meta:
+        model = StatusMatricula
+        fields = '__all__'
+        widgets = {
+            'cor': forms.TextInput(attrs={
+                'type': 'color',
+                'style': 'width: 100px; height: 40px; cursor: pointer; border: 2px solid #ccc; border-radius: 4px;'
+            })
+        }
+
+
+@admin.register(StatusMatricula, site=admin_site)
+class StatusMatriculaAdmin(admin.ModelAdmin):
+    form = StatusMatriculaForm
+    list_display = ['nome', 'cor_display', 'ordem']
+    search_fields = ['nome']
+    ordering = ['ordem', 'nome']
+
+    fieldsets = (
+        (None, {
+            'fields': ('nome', 'cor', 'ordem'),
+        }),
+    )
+
+    def cor_display(self, obj):
+        """Exibe quadrado colorido"""
+        if obj.cor:
+            return format_html(
+                '<span style="display: inline-block; width: 30px; height: 30px; '
+                'background-color: {}; border: 2px solid #ccc; border-radius: 4px;"></span>',
+                obj.cor
+            )
+        return '—'
+    cor_display.short_description = 'Cor'
+    cor_display.admin_order_field = 'cor'
+
+
+# ==========================================
+# MATRÍCULA
+# ==========================================
+
+@admin.register(Matricula, site=admin_site)
+class MatriculaAdmin(admin.ModelAdmin):
+    list_display = [
+        'numero_matricula',
+        'get_interessado',
+        'get_evento',
+        'turma',
+        'status',
+        'data_matricula'
+    ]
+    list_filter = [
+        'status',
+        'turma__evento',
+        'turma',
+        'data_matricula'
+    ]
+    search_fields = [
+        'numero_matricula',
+        'interessado__nome',
+        'interessado__cpf',
+        'turma__nome',
+        'turma__evento__nome'
+    ]
+    date_hierarchy = 'data_matricula'
+    ordering = ['-data_matricula']
+
+    fieldsets = (
+        ('Matrícula', {
+            'fields': ('numero_matricula', 'turma', 'status')
+        }),
+        ('Dados do Aluno', {
+            'fields': ('interessado', 'inscricao')
+        }),
+        ('Observações', {
+            'fields': ('observacoes',)
+        }),
+        ('Auditoria', {
+            'fields': ('data_matricula', 'data_atualizacao'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    readonly_fields = ['numero_matricula', 'data_matricula', 'data_atualizacao']
+
+    def get_interessado(self, obj):
+        return obj.interessado.nome
+    get_interessado.short_description = 'Interessado'
+    get_interessado.admin_order_field = 'interessado__nome'
+
+    def get_evento(self, obj):
+        return obj.turma.evento.nome
+    get_evento.short_description = 'Evento'
+    get_evento.admin_order_field = 'turma__evento__nome'
+
+
+# ==========================================
+# AVALIAÇÃO
+# ==========================================
+
+@admin.register(Avaliacao, site=admin_site)
+class AvaliacaoAdmin(admin.ModelAdmin):
+    change_list_template = 'admin/academico/avaliacao/change_list.html'
+    
+    list_display = [
+        'get_numero_matricula',
+        'get_aluno',
+        'nota_final',
+        'frequencia',
+        'aprovado',
+        'certificado_emitido',
+        'acoes_certificado'
+    ]
+    
+    list_editable = [
+        'nota_final',
+        'frequencia',
+        'aprovado'
+    ]
+    
+    list_filter = [
+        ('matricula__turma__evento', admin.RelatedOnlyFieldListFilter),
+        ('matricula__turma', admin.RelatedOnlyFieldListFilter),
+        'aprovado',
+        'certificado_emitido',
+    ]
+    
+    search_fields = [
+        'matricula__numero_matricula',
+        'matricula__interessado__nome',
+        'matricula__interessado__cpf'
+    ]
+    
+    ordering = ['matricula__interessado__nome']
+    preserve_filters = True
+    
+    actions = [
+        'gerar_certificados', 
+        'download_certificados_lote_action',
+        'gerar_relatorio_excel',
+        'gerar_relatorio_pdf'
+    ]
+
+    fieldsets = (
+        ('Matrícula', {
+            'fields': ('matricula',)
+        }),
+        ('Avaliação', {
+            'fields': ('nota_final', 'frequencia', 'aprovado', 'observacoes')
+        }),
+        ('Certificado', {
+            'fields': ('certificado_emitido', 'data_emissao_certificado')
+        }),
+        ('Auditoria', {
+            'fields': ('avaliado_em', 'atualizado_em'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    readonly_fields = ['avaliado_em', 'atualizado_em']
+
+    def get_numero_matricula(self, obj):
+        return obj.matricula.numero_matricula
+    get_numero_matricula.short_description = 'Matrícula'
+    get_numero_matricula.admin_order_field = 'matricula__numero_matricula'
+
+    def get_aluno(self, obj):
+        return obj.matricula.interessado.nome
+    get_aluno.short_description = 'Aluno'
+    get_aluno.admin_order_field = 'matricula__interessado__nome'
+
+    def acoes_certificado(self, obj):
+        """Botão de visualização para certificados"""
+        if not obj.aprovado:
+            return format_html('<span style="color: #999;">-</span>')
+        
+        preview_url = reverse('academico:preview_certificado', args=[obj.pk])
+        
+        return format_html(
+            '<a href="{}" target="_blank" class="button" style="padding: 5px 12px; background-color: #417690; color: white; text-decoration: none; border-radius: 4px;">👁️ Ver</a>',
+            preview_url
+        )
+    
+    acoes_certificado.short_description = 'Certificado'
+
+    def changelist_view(self, request, extra_context=None):
+        """Adiciona dados extras ao contexto do template"""
+        from apps.eventos.models import Evento, Turma
+        
+        extra_context = extra_context or {}
+        
+        evento_filter = request.GET.get('matricula__turma__evento__id__exact', '')
+        turma_filter = request.GET.get('matricula__turma__id__exact', '')
+        aprovado_filter = request.GET.get('aprovado__exact', '')
+        certificado_filter = request.GET.get('certificado_emitido__exact', '')
+        
+        eventos_disponiveis = Evento.objects.filter(
+            turmas__matriculas__avaliacao__isnull=False
+        ).distinct().order_by('nome')
+        
+        extra_context['eventos_disponiveis'] = eventos_disponiveis
+        extra_context['evento_selecionado'] = evento_filter
+        extra_context['turma_selecionada'] = turma_filter
+        extra_context['aprovado_selecionado'] = aprovado_filter
+        extra_context['certificado_selecionado'] = certificado_filter
+        
+        if evento_filter:
+            try:
+                evento = Evento.objects.get(pk=evento_filter)
+                extra_context['evento_nome'] = evento.nome
+                
+                turmas_disponiveis = Turma.objects.filter(
+                    evento=evento,
+                    matriculas__avaliacao__isnull=False
+                ).distinct().order_by('nome')
+                
+                extra_context['turmas_disponiveis'] = turmas_disponiveis
+                
+                if turma_filter:
+                    try:
+                        turma = Turma.objects.get(pk=turma_filter)
+                        extra_context['turma_nome'] = turma.nome
+                    except Turma.DoesNotExist:
+                        pass
+                        
+            except Evento.DoesNotExist:
+                pass
+        
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def _agrupar_por_turma(self, queryset):
+        """Agrupa avaliações por turma"""
+        grupos = defaultdict(list)
+        
+        for avaliacao in queryset.select_related('matricula__turma__evento', 'matricula__interessado').order_by('matricula__turma__evento__nome', 'matricula__turma__nome', 'matricula__interessado__nome'):
+            turma = avaliacao.matricula.turma
+            grupos[turma].append(avaliacao)
+        
+        return dict(grupos)
+
+    # ==========================================
+    # ACTION 1: GERAR RELATÓRIO EXCEL
+    # ==========================================
+    
+    def gerar_relatorio_excel(self, request, queryset):
+        """Gera relatório Excel segmentado por turma"""
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
+        from openpyxl.drawing.image import Image as XLImage
+        from django.conf import settings
+        import os
+        
+        grupos_turma = self._agrupar_por_turma(queryset)
+        
+        if not grupos_turma:
+            self.message_user(request, '❌ Nenhuma avaliação encontrada.', level=messages.ERROR)
+            return
+        
+        wb = Workbook()
+        wb.remove(wb.active)
+        
+        static_path = os.path.join(settings.BASE_DIR, 'static', 'images')
+        brasao_path = os.path.join(static_path, 'brasão-2.png')
+        logo_meta_path = os.path.join(static_path, 'metareciclagem.png')
+        
+        borda_fina = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+        
+        for turma, avaliacoes in grupos_turma.items():
+            sheet_name = f"{turma.evento.nome[:15]} - {turma.nome[:10]}"
+            ws = wb.create_sheet(title=sheet_name)
+            
+            ws.page_setup.paperSize = ws.PAPERSIZE_A4
+            ws.page_setup.orientation = ws.ORIENTATION_PORTRAIT
+            ws.page_margins.left = 0.7
+            ws.page_margins.right = 0.7
+            ws.page_margins.top = 0.75
+            ws.page_margins.bottom = 0.75
+            
+            linha_atual = 1
+            
+            # Imagens
+            try:
+                if os.path.exists(brasao_path):
+                    img_b = XLImage(brasao_path)
+                    img_b.width = 70
+                    img_b.height = 70
+                    ws.add_image(img_b, 'A1')
+                
+                if os.path.exists(logo_meta_path):
+                    img_m = XLImage(logo_meta_path)
+                    img_m.width = 70
+                    img_m.height = 70
+                    ws.add_image(img_m, 'G1')
+            except Exception as e:
+                print(f"Aviso: Imagens não carregadas - {e}")
+            
+            # Bordas nas células das imagens
+            for col in ['A', 'G']:
+                for row in range(1, 4):
+                    ws[f'{col}{row}'].border = borda_fina
+            
+            # Texto centralizado
+            ws.merge_cells('C1:E3')
+            cell_meta = ws['C1']
+            cell_meta.value = "METARECICLAGEM\n\nALUNOS MATRICULADOS"
+            cell_meta.font = Font(name='Arial', size=14, bold=True, color="1F4788")
+            cell_meta.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+            cell_meta.border = borda_fina
+            ws.row_dimensions[1].height = 60
+            
+            linha_atual = 4
+            
+            # Identificação
+            ws.merge_cells(f'A{linha_atual}:H{linha_atual}')
+            cell_info = ws[f'A{linha_atual}']
+            cell_info.value = f"{turma.evento.nome}  |  {turma.nome}"
+            cell_info.font = Font(name='Arial', size=11, bold=True)
+            cell_info.alignment = Alignment(horizontal='center', vertical='center')
+            cell_info.border = borda_fina
+            ws.row_dimensions[linha_atual].height = 20
+            
+            linha_atual += 2
+            
+            # Largura das colunas
+            ws.column_dimensions['A'].width = 15
+            ws.column_dimensions['B'].width = 35
+            ws.column_dimensions['C'].width = 12
+            ws.column_dimensions['D'].width = 10
+            ws.column_dimensions['E'].width = 12
+            ws.column_dimensions['F'].width = 40
+            
+            fill_header = PatternFill(start_color="4472C4", end_color="4472C4", fill_type="solid")
+            
+            # Cabeçalho da tabela
+            colunas = ['# Matrícula', 'Nome', 'Aprovado\n(S/N)', 'Nota', 'Frequência\n(%)', 'Observação']
+            for col_idx, col_name in enumerate(colunas, start=1):
+                cell = ws.cell(row=linha_atual, column=col_idx)
+                cell.value = col_name
+                cell.font = Font(name='Arial', size=11, bold=True, color="FFFFFF")
+                cell.alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
+                cell.fill = fill_header
+                cell.border = borda_fina
+            
+            ws.row_dimensions[linha_atual].height = 35
+            linha_atual += 1
+            
+            # Dados
+            for avaliacao in avaliacoes:
+                ws.cell(row=linha_atual, column=1).value = avaliacao.matricula.numero_matricula
+                ws.cell(row=linha_atual, column=1).alignment = Alignment(horizontal='center', vertical='center')
+                ws.cell(row=linha_atual, column=1).border = borda_fina
+                
+                ws.cell(row=linha_atual, column=2).value = avaliacao.matricula.interessado.nome
+                ws.cell(row=linha_atual, column=2).alignment = Alignment(horizontal='left', vertical='center')
+                ws.cell(row=linha_atual, column=2).border = borda_fina
+                
+                ws.cell(row=linha_atual, column=3).value = "Sim" if avaliacao.aprovado else ""
+                ws.cell(row=linha_atual, column=3).font = Font(name='Arial', size=11, bold=True if avaliacao.aprovado else False)
+                ws.cell(row=linha_atual, column=3).alignment = Alignment(horizontal='center', vertical='center')
+                ws.cell(row=linha_atual, column=3).border = borda_fina
+                
+                ws.cell(row=linha_atual, column=4).value = avaliacao.nota_final if avaliacao.nota_final else ""
+                ws.cell(row=linha_atual, column=4).alignment = Alignment(horizontal='center', vertical='center')
+                ws.cell(row=linha_atual, column=4).border = borda_fina
+                
+                ws.cell(row=linha_atual, column=5).value = f"{avaliacao.frequencia}%" if avaliacao.frequencia else ""
+                ws.cell(row=linha_atual, column=5).alignment = Alignment(horizontal='center', vertical='center')
+                ws.cell(row=linha_atual, column=5).border = borda_fina
+                
+                ws.cell(row=linha_atual, column=6).value = ""
+                ws.cell(row=linha_atual, column=6).alignment = Alignment(horizontal='left', vertical='center')
+                ws.cell(row=linha_atual, column=6).border = borda_fina
+                
+                ws.row_dimensions[linha_atual].height = 20
+                linha_atual += 1
+            
+            # Rodapé
+            data_emissao = date.today().strftime("%d/%m/%Y")
+            ws.oddFooter.left.text = f"Emitido em: {data_emissao}"
+            ws.oddFooter.left.size = 9
+            ws.oddFooter.right.text = "Página &P de &N"
+            ws.oddFooter.right.size = 9
+        
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        filename = f"Relatorio_Alunos_{date.today().strftime('%Y%m%d')}.xlsx"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        wb.save(response)
+        
+        self.message_user(
+            request,
+            f'✅ Relatório Excel gerado! {len(grupos_turma)} turma(s), {queryset.count()} aluno(s).',
+            level=messages.SUCCESS
+        )
+        
+        return response
+    
+    gerar_relatorio_excel.short_description = '📊 Gerar Relatório Excel (Segmentado por Turma)'
+
+    # ==========================================
+    # ACTION 2: GERAR RELATÓRIO PDF
+    # ==========================================
+    
+    def gerar_relatorio_pdf(self, request, queryset):
+        """Gera relatório PDF segmentado por turma"""
+        from reportlab.lib import colors
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+        from reportlab.lib.units import cm
+        from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak
+        from reportlab.lib.enums import TA_CENTER, TA_LEFT
+        from django.conf import settings
+        import os
+        
+        grupos_turma = self._agrupar_por_turma(queryset)
+        
+        if not grupos_turma:
+            self.message_user(request, '❌ Nenhuma avaliação encontrada.', level=messages.ERROR)
+            return
+        
+        response = HttpResponse(content_type='application/pdf')
+        filename = f"Relatorio_Alunos_{date.today().strftime('%Y%m%d')}.pdf"
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        doc = SimpleDocTemplate(
+            response,
+            pagesize=A4,
+            rightMargin=2*cm,
+            leftMargin=2*cm,
+            topMargin=1.5*cm,
+            bottomMargin=2*cm,
+        )
+        
+        story = []
+        styles = getSampleStyleSheet()
+        static_path = os.path.join(settings.BASE_DIR, 'static', 'images')
+        
+        primeira_turma = True
+        
+        for turma, avaliacoes in grupos_turma.items():
+            if not primeira_turma:
+                story.append(PageBreak())
+            primeira_turma = False
+            
+            # Cabeçalho
+            header_images = []
+            
+            try:
+                brasao_path = os.path.join(static_path, 'brasão-2.png')
+                if os.path.exists(brasao_path):
+                    header_images.append(Image(brasao_path, width=2.2*cm, height=2.2*cm))
+                else:
+                    header_images.append("")
+            except:
+                header_images.append("")
+            
+            style_meta = ParagraphStyle(
+                'MetaStyle',
+                parent=styles['Heading1'],
+                fontSize=13,
+                textColor=colors.HexColor('#1F4788'),
+                alignment=TA_CENTER,
+                leading=16,
+            )
+            header_images.append(Paragraph("METARECICLAGEM<br/><br/><b>ALUNOS MATRICULADOS</b>", style_meta))
+            
+            try:
+                logo_meta_path = os.path.join(static_path, 'metareciclagem.png')
+                if os.path.exists(logo_meta_path):
+                    header_images.append(Image(logo_meta_path, width=2.2*cm, height=2.2*cm))
+                else:
+                    header_images.append("")
+            except:
+                header_images.append("")
+            
+            if any(header_images):
+                header_table = Table([header_images], colWidths=[3*cm, 11*cm, 3*cm])
+                header_table.setStyle(TableStyle([
+                    ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+                    ('ALIGN', (1, 0), (1, 0), 'CENTER'),
+                    ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
+                    ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                    ('BOX', (0, 0), (-1, -1), 1, colors.black),
+                    ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ]))
+                story.append(header_table)
+                story.append(Spacer(1, 0.3*cm))
+            
+            # Identificação
+            style_info = ParagraphStyle(
+                'InfoStyle',
+                parent=styles['Normal'],
+                fontSize=10,
+                alignment=TA_CENTER,
+                fontName='Helvetica-Bold'
+            )
+            info_para = Paragraph(f"{turma.evento.nome}  |  {turma.nome}", style_info)
+            info_table = Table([[info_para]], colWidths=[17*cm])
+            info_table.setStyle(TableStyle([
+                ('BOX', (0, 0), (-1, -1), 1, colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+                ('TOPPADDING', (0, 0), (-1, -1), 4),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+            ]))
+            story.append(info_table)
+            story.append(Spacer(1, 0.3*cm))
+            
+            # Tabela
+            data = [
+                ['# Matrícula', 'Nome', 'Aprovado\n(S/N)', 'Nota', 'Freq.\n(%)', 'Observação']
+            ]
+            
+            for avaliacao in avaliacoes:
+                data.append([
+                    avaliacao.matricula.numero_matricula,
+                    avaliacao.matricula.interessado.nome,
+                    "Sim" if avaliacao.aprovado else "",
+                    str(avaliacao.nota_final) if avaliacao.nota_final else '',
+                    f"{avaliacao.frequencia}%" if avaliacao.frequencia else '',
+                    ''
+                ])
+            
+            table = Table(data, colWidths=[2.5*cm, 6*cm, 1.5*cm, 1.5*cm, 1.5*cm, 4*cm])
+            
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#4472C4')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                ('TOPPADDING', (0, 0), (-1, 0), 8),
+                
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+                ('ALIGN', (0, 1), (0, -1), 'CENTER'),
+                ('ALIGN', (1, 1), (1, -1), 'LEFT'),
+                ('ALIGN', (2, 1), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 1), (-1, -1), 8),
+                ('TOPPADDING', (0, 1), (-1, -1), 5),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 5),
+                ('VALIGN', (0, 1), (-1, -1), 'MIDDLE'),
+                
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('BOX', (0, 0), (-1, -1), 1, colors.black),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F2F2F2')]),
+            ]))
+            
+            story.append(table)
+        
+        def add_page_number(canvas, doc):
+            page_num = canvas.getPageNumber()
+            canvas.saveState()
+            canvas.setFont('Helvetica', 9)
+            canvas.drawString(2*cm, 1.5*cm, f"Emitido em: {date.today().strftime('%d/%m/%Y')}")
+            canvas.drawRightString(A4[0] - 2*cm, 1.5*cm, f"Página {page_num}")
+            canvas.restoreState()
+        
+        doc.build(story, onFirstPage=add_page_number, onLaterPages=add_page_number)
+        
+        self.message_user(
+            request,
+            f'✅ Relatório PDF gerado! {len(grupos_turma)} turma(s), {queryset.count()} aluno(s).',
+            level=messages.SUCCESS
+        )
+        
+        return response
+    
+    gerar_relatorio_pdf.short_description = '📄 Gerar Relatório PDF (Segmentado por Turma)'
+
+    # ==========================================
+    # ACTION 3: GERAR CERTIFICADOS
+    # ==========================================
+
+    def gerar_certificados(self, request, queryset):
+        """Marca certificados como emitidos"""
+        aprovados = queryset.filter(aprovado=True)
+        
+        if aprovados.count() == 0:
+            self.message_user(request, '❌ Nenhum aluno aprovado foi selecionado.', level=messages.ERROR)
+            return
+        
+        certificados_gerados = 0
+        erros = []
+        
+        for avaliacao in aprovados:
+            try:
+                if not avaliacao.certificado_emitido:
+                    avaliacao.certificado_emitido = True
+                    avaliacao.data_emissao_certificado = date.today()
+                    avaliacao.save()
+                    certificados_gerados += 1
+                else:
+                    erros.append(f'{avaliacao.matricula.interessado.nome} já possui certificado emitido.')
+            except Exception as e:
+                erros.append(f'{avaliacao.matricula.interessado.nome}: {str(e)}')
+        
+        if certificados_gerados > 0:
+            self.message_user(
+                request,
+                f'✅ {certificados_gerados} certificado(s) marcado(s) como emitido(s)!',
+                level=messages.SUCCESS
+            )
+        
+        if erros:
+            for erro in erros:
+                self.message_user(request, f'⚠️ {erro}', level=messages.WARNING)
+    
+    gerar_certificados.short_description = '✅ Marcar certificados como emitidos'
+
+    # ==========================================
+    # ACTION 4: DOWNLOAD CERTIFICADOS EM LOTE
+    # ==========================================
+
+    def download_certificados_lote_action(self, request, queryset):
+        """Redireciona para view de download em lote"""
+        aprovados = queryset.filter(aprovado=True)
+        
+        if aprovados.count() == 0:
+            self.message_user(request, '❌ Nenhum aluno aprovado foi selecionado.', level=messages.ERROR)
+            return
+        
+        ids = ','.join(str(av.pk) for av in aprovados)
+        url = reverse('academico:download_certificados_lote')
+        return HttpResponseRedirect(f"{url}?ids={ids}")
+    
+    download_certificados_lote_action.short_description = '📦 Baixar certificados em lote (ZIP)'
+
+    
+
+
+################################################################################
+# TIPO: urls.py
+################################################################################
+
+
+--------------------------------------------------------------------------------
+ARQUIVO: urls.py
+--------------------------------------------------------------------------------
+
+"""
+Arquivo: urls.py
+Caminho: apps/academico/urls.py
+Descrição: URLs do módulo acadêmico
+Data: 12/01/2026
+"""
+
+"""
+URLs do app ACADÊMICO
+Arquivo: apps/academico/urls.py
+Data: 02/02/2026
+"""
+
+from django.urls import path
+from . import views
+
+app_name = 'academico'
+
+urlpatterns = [
+    # Download individual
+    path('certificado/<int:avaliacao_id>/download/', 
+         views.download_certificado_individual, 
+         name='download_certificado'),
+    
+    # Preview
+    path('certificado/<int:avaliacao_id>/preview/', 
+         views.preview_certificado, 
+         name='preview_certificado'),
+    
+    # Download em lote
+    path('certificados/download-lote/', 
+         views.download_certificados_lote, 
+         name='download_certificados_lote'),
+]
+
+
+
+
+################################################################################
+# TIPO: services.py
+################################################################################
+
+
+--------------------------------------------------------------------------------
+ARQUIVO: services.py
+--------------------------------------------------------------------------------
+
+"""
+Arquivo: services.py
+Caminho: apps/academico/services.py
+Alteração: Adicionado métodos para gestão de matrícula em lote e alteração de status
+Data: 12/01/2026
+"""
+
+"""
+Services do app ACADÊMICO
+Responsável por: Lógica de matrículas e avaliações
+"""
+from django.db import transaction
+from django.core.exceptions import ValidationError
+from .models import Matricula, StatusMatricula, Avaliacao
+from apps.selecao.models import Classificacao, Inscricao, StatusInscricao
+from apps.eventos.models import Turma
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class MatriculaService:
+    """
+    Service responsável por gerenciar matrículas
+    """
+    
+    @staticmethod
+    def verificar_disponibilidade_turma(turma):
+        """
+        Verifica se há vagas disponíveis na turma
+        
+        Args:
+            turma: Objeto Turma
+            
+        Returns:
+            tuple: (disponivel: bool, vagas_restantes: int)
+        """
+        matriculas_ativas = Matricula.objects.filter(
+            turma=turma,
+            status__nome__in=['Ativa', 'Pendente']
+        ).count()
+        
+        vagas_restantes = turma.capacidade - matriculas_ativas
+        disponivel = vagas_restantes > 0
+        
+        return (disponivel, vagas_restantes)
+    
+    @staticmethod
+    @transaction.atomic
+    def matricular_classificado(classificacao, turma):
+        """
+        Matricula um classificado em uma turma
+        
+        Args:
+            classificacao: Objeto Classificacao
+            turma: Objeto Turma
+            
+        Returns:
+            Matricula: Objeto Matricula criado
+            
+        Raises:
+            ValidationError: Se não houver vagas ou candidato não classificado
+        """
+        # 1. Verificar se está classificado
+        if not classificacao.classificado:
+            raise ValidationError(
+                f"Candidato {classificacao.inscricao.interessado.nome} não está classificado"
+            )
+        
+        # 2. Verificar disponibilidade de vagas
+        disponivel, vagas_restantes = MatriculaService.verificar_disponibilidade_turma(turma)
+        
+        if not disponivel:
+            raise ValidationError(
+                f"Turma {turma.nome} não possui vagas disponíveis"
+            )
+        
+        # 3. Verificar se já está matriculado
+        matricula_existente = Matricula.objects.filter(
+            interessado=classificacao.inscricao.interessado,
+            turma=turma
+        ).exists()
+        
+        if matricula_existente:
+            raise ValidationError(
+                f"Candidato {classificacao.inscricao.interessado.nome} já está matriculado nesta turma"
+            )
+        
+        # 4. Buscar status "Ativa"
+        status_ativa = StatusMatricula.objects.get(nome='Ativa')
+        
+        # 5. Criar matrícula
+        matricula = Matricula.objects.create(
+            turma=turma,
+            interessado=classificacao.inscricao.interessado,
+            inscricao=classificacao.inscricao,
+            status=status_ativa,
+            observacoes=f"Matriculado automaticamente. Classificação: {classificacao.posicao}ª posição"
+        )
+        
+        logger.info(
+            f"Matrícula {matricula.id} criada para {classificacao.inscricao.interessado.nome} "
+            f"na turma {turma.nome}"
+        )
+        
+        return matricula
+    
+    @staticmethod
+    @transaction.atomic
+    def matricular_lote(classificacoes, turma):
+        """
+        Matricula múltiplos classificados em uma turma
+        
+        Args:
+            classificacoes: QuerySet de Classificacao
+            turma: Objeto Turma
+            
+        Returns:
+            dict: Resultado com sucessos e erros
+        """
+        resultados = {
+            'sucesso': [],
+            'erros': []
+        }
+        
+        for classificacao in classificacoes:
+            try:
+                matricula = MatriculaService.matricular_classificado(classificacao, turma)
+                resultados['sucesso'].append({
+                    'matricula': matricula,
+                    'interessado': classificacao.inscricao.interessado.nome
+                })
+            except ValidationError as e:
+                resultados['erros'].append({
+                    'interessado': classificacao.inscricao.interessado.nome,
+                    'erro': str(e)
+                })
+        
+        logger.info(
+            f"Matrícula em lote concluída. Sucessos: {len(resultados['sucesso'])}, "
+            f"Erros: {len(resultados['erros'])}"
+        )
+        
+        return resultados
+    
+    # 
+    # 🆕 NOVOS MÉTODOS PARA GESTÃO DE MATRÍCULA
+    # Adicionados em 12/01/2026
+    # 
+    
+    @staticmethod
+    @transaction.atomic
+    def matricular_alunos(inscricoes_ids, usuario=None):
+        """
+        Realiza matrícula de múltiplos alunos (NOVA IMPLEMENTAÇÃO)
+        
+        Args:
+            inscricoes_ids: Lista de IDs de inscrições
+            usuario: Usuário que está realizando a ação (opcional)
+            
+        Returns:
+            dict: Resultado com estatísticas
+        """
+        # Buscar status necessários
+        try:
+            status_matricula_ativa = StatusMatricula.objects.get(nome='Ativa')
+        except StatusMatricula.DoesNotExist:
+            raise ValueError("Status 'Ativa' não encontrado em StatusMatricula")
+        
+        try:
+            status_inscricao_confirmado = StatusInscricao.objects.get(nome='Confirmado')
+        except StatusInscricao.DoesNotExist:
+            raise ValueError("Status 'Confirmado' não encontrado em StatusInscricao")
+        
+        # Buscar inscrições
+        inscricoes = Inscricao.objects.filter(
+            id__in=inscricoes_ids,
+            evento__isnull=False
+        ).select_related('interessado', 'evento')
+        
+        total_processadas = 0
+        total_sucesso = 0
+        total_ja_matriculados = 0
+        erros = []
+        
+        for inscricao in inscricoes:
+            try:
+                # Verificar se já existe matrícula ativa
+                matricula_existente = Matricula.objects.filter(
+                    interessado=inscricao.interessado,
+                    turma__evento=inscricao.evento
+                ).first()
+                
+                if matricula_existente:
+                    total_ja_matriculados += 1
+                    logger.info(f"Aluno {inscricao.interessado.nome} já possui matrícula no evento {inscricao.evento.nome}")
+                    continue
+                
+                # Buscar turma padrão do evento (primeira turma ativa)
+                turma = Turma.objects.filter(evento=inscricao.evento).first()
+                
+                if not turma:
+                    erros.append(f"Evento {inscricao.evento.nome} não possui turmas cadastradas")
+                    continue
+                
+                # Criar matrícula
+                matricula = Matricula.objects.create(
+                    interessado=inscricao.interessado,
+                    turma=turma,
+                    status=status_matricula_ativa,
+                    data_matricula=timezone.now()
+                )
+                
+                # Atualizar status da inscrição
+                inscricao.status = status_inscricao_confirmado
+                inscricao.save()
+                
+                total_sucesso += 1
+                total_processadas += 1
+                
+                logger.info(
+                    f"Matrícula criada com sucesso: "
+                    f"Aluno: {inscricao.interessado.nome} | "
+                    f"Evento: {inscricao.evento.nome} | "
+                    f"Turma: {turma.nome}"
+                )
+                
+            except Exception as e:
+                erros.append(f"Erro ao matricular {inscricao.interessado.nome}: {str(e)}")
+                logger.error(f"Erro ao matricular aluno {inscricao.interessado.nome}: {e}")
+        
+        return {
+            'sucesso': True,
+            'total_processadas': total_processadas,
+            'total_sucesso': total_sucesso,
+            'total_ja_matriculados': total_ja_matriculados,
+            'erros': erros
+        }
+    
+    @staticmethod
+    @transaction.atomic
+    def alterar_status_inscricao(inscricoes_ids, novo_status_nome, usuario=None):
+        """
+        Altera status de múltiplas inscrições
+        
+        Args:
+            inscricoes_ids: Lista de IDs de inscrições
+            novo_status_nome: Nome do novo status
+            usuario: Usuário que está realizando a ação (opcional)
+            
+        Returns:
+            dict: Resultado com estatísticas
+        """
+        # Buscar status
+        try:
+            novo_status = StatusInscricao.objects.get(nome=novo_status_nome)
+        except StatusInscricao.DoesNotExist:
+            raise ValueError(f"Status '{novo_status_nome}' não encontrado em StatusInscricao")
+        
+        # Buscar inscrições
+        inscricoes = Inscricao.objects.filter(id__in=inscricoes_ids)
+        
+        total_atualizadas = 0
+        erros = []
+        
+        for inscricao in inscricoes:
+            try:
+                inscricao.status = novo_status
+                inscricao.save()
+                
+                total_atualizadas += 1
+                
+                logger.info(
+                    f"Status da inscrição alterado: "
+                    f"Aluno: {inscricao.interessado.nome} | "
+                    f"Novo Status: {novo_status_nome}"
+                )
+                
+            except Exception as e:
+                erros.append(f"Erro ao alterar status de {inscricao.interessado.nome}: {str(e)}")
+                logger.error(f"Erro ao alterar status: {e}")
+        
+        return {
+            'sucesso': True,
+            'total_atualizadas': total_atualizadas,
+            'erros': erros
+        }
+    
+    # 
+    # MÉTODOS EXISTENTES (mantidos)
+    # 
+    
+    @staticmethod
+    @transaction.atomic
+    def avaliar_aluno(matricula, nota_final, frequencia, observacoes=''):
+        """
+        Registra avaliação de um aluno
+        
+        Args:
+            matricula: Objeto Matricula
+            nota_final: Decimal (0-10)
+            frequencia: Decimal (0-100)
+            observacoes: str (opcional)
+            
+        Returns:
+            Avaliacao: Objeto Avaliacao criado/atualizado
+            
+        Raises:
+            ValidationError: Se nota ou frequência fora dos limites
+        """
+        # 1. Validar nota
+        if nota_final < 0 or nota_final > 10:
+            raise ValidationError("Nota final deve estar entre 0 e 10")
+        
+        # 2. Validar frequência
+        if frequencia < 0 or frequencia > 100:
+            raise ValidationError("Frequência deve estar entre 0 e 100")
+        
+        # 3. Determinar aprovação (nota >= 7.0 E frequência >= 75%)
+        aprovado = (nota_final >= 7.0 and frequencia >= 75.0)
+        
+        # 4. Criar ou atualizar avaliação
+        avaliacao, created = Avaliacao.objects.update_or_create(
+            matricula=matricula,
+            defaults={
+                'nota_final': nota_final,
+                'frequencia': frequencia,
+                'aprovado': aprovado,
+                'observacoes': observacoes
+            }
+        )
+        
+        # 5. Atualizar status da matrícula
+        if aprovado:
+            status_concluida = StatusMatricula.objects.get(nome='Concluída')
+            matricula.status = status_concluida
+        else:
+            status_reprovada = StatusMatricula.objects.get(nome='Cancelada')
+            matricula.status = status_reprovada
+        
+        matricula.save()
+        
+        logger.info(
+            f"Avaliação registrada para matrícula {matricula.id}. "
+            f"Nota: {nota_final}, Frequência: {frequencia}%, Aprovado: {aprovado}"
+        )
+        
+        return avaliacao
+    
+    @staticmethod
+    def gerar_relatorio_turma(turma):
+        """
+        Gera relatório de desempenho de uma turma
+        
+        Args:
+            turma: Objeto Turma
+            
+        Returns:
+            dict: Estatísticas da turma
+        """
+        matriculas = Matricula.objects.filter(turma=turma)
+        avaliacoes = Avaliacao.objects.filter(matricula__turma=turma)
+        
+        total_matriculas = matriculas.count()
+        total_avaliacoes = avaliacoes.count()
+        aprovados = avaliacoes.filter(aprovado=True).count()
+        reprovados = avaliacoes.filter(aprovado=False).count()
+        
+        # Calcular médias
+        if total_avaliacoes > 0:
+            media_nota = sum(a.nota_final for a in avaliacoes) / total_avaliacoes
+            media_frequencia = sum(a.frequencia for a in avaliacoes) / total_avaliacoes
+            taxa_aprovacao = (aprovados / total_avaliacoes) * 100
+        else:
+            media_nota = 0
+            media_frequencia = 0
+            taxa_aprovacao = 0
+        
+        relatorio = {
+            'turma': turma.nome,
+            'evento': turma.evento.nome,
+            'total_matriculas': total_matriculas,
+            'total_avaliacoes': total_avaliacoes,
+            'aprovados': aprovados,
+            'reprovados': reprovados,
+            'pendentes': total_matriculas - total_avaliacoes,
+            'media_nota': round(media_nota, 2),
+            'media_frequencia': round(media_frequencia, 2),
+            'taxa_aprovacao': round(taxa_aprovacao, 2)
+        }
+        
+        return relatorio
+
+
+# Importação adicional necessária
+from django.utils import timezone
+
+
+
+
