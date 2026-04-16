@@ -1,0 +1,31 @@
+{
+    "academico": [
+        "StatusMatricula",
+        "Matricula",
+        "Avaliacao"
+    ],
+    "accounts": [],
+    "eventos": [
+        "Status",
+        "Criterio",
+        "Evento",
+        "EventoCriterio",
+        "Turma",
+        "Horario"
+    ],
+    "interessados": [
+        "Sexo",
+        "Fototipo",
+        "Interessado",
+        "PasswordResetToken",
+        "SolicitacaoExclusao"
+    ],
+    "portal": [],
+    "scripts_admin": [],
+    "selecao": [
+        "StatusInscricao",
+        "Inscricao",
+        "Classificacao",
+        "InscricaoCriterioAtendido"
+    ]
+}

@@ -33,7 +33,6 @@
 # Diagramas ou anotações de design
 
 
-
 import os
 from pathlib import Path
 from datetime import datetime
@@ -53,7 +52,6 @@ def concatenar_arquivos(pasta_projeto, tipos_arquivo=['models.py', 'views.py'], 
     with open(arquivo_saida, 'w', encoding='utf-8') as saida:
         saida.write(f"# PROJETO DJANGO - ARQUIVOS CONCATENADOS\n")
         saida.write(f"# Pasta: {pasta_projeto}\n")
-        # saida.write(f"# Data: {Path(arquivo_saida).stat().st_mtime}\n\n")
         saida.write(f"# Data: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}\n\n")
         saida.write("=" * 80 + "\n\n")
         
@@ -71,7 +69,7 @@ def concatenar_arquivos(pasta_projeto, tipos_arquivo=['models.py', 'views.py'], 
             
             for arquivo in sorted(arquivos_encontrados):
                 # Pula arquivos em pastas de ambiente virtual ou cache
-                if any(parte in arquivo.parts for parte in ['venv', 'env', '__pycache__', 'migrations']):
+                if any(parte in arquivo.parts for parte in ['venv', 'env', '__pycache__', 'migrations', 'htmlcov', 'staticfiles_collected']) or 'htmlcov' in str(arquivo):
                     continue
                 
                 caminho_relativo = arquivo.relative_to(pasta)
@@ -82,55 +80,41 @@ def concatenar_arquivos(pasta_projeto, tipos_arquivo=['models.py', 'views.py'], 
                 
                 try:
                     conteudo = arquivo.read_text(encoding='utf-8')
-                    saida.write(conteudo)
-                    saida.write("\n\n")
+                except UnicodeDecodeError:
+                    conteudo = arquivo.read_text(encoding='latin-1')
                 except Exception as e:
                     saida.write(f"# ERRO ao ler arquivo: {e}\n\n")
+                    continue
+                saida.write(conteudo)
+                saida.write("\n\n")
     
     print(f"✓ Arquivo criado: {arquivo_saida}")
-    print(f"✓ Total de arquivos processados: {len(arquivos_encontrados)}")
 
-# USO:
 if __name__ == "__main__":
-    # Substitua pelo caminho do seu projeto Django
     PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta"
     
-    # Escolha quais arquivos quer concatenar
-    concatenar_arquivos(
-        pasta_projeto=PASTA_PROJETO,
-        tipos_arquivo=['urls.py'],
-        arquivo_saida='Pasta01_URLs_24-03-2026.txt'
-    )
+    data_atual = datetime.now().strftime('%Y-%m-%d')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['urls.py'], arquivo_saida=f'{data_atual}_Pasta01_URLs.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['views.py'], arquivo_saida=f'{data_atual}_Pasta02_views.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['models.py'], arquivo_saida=f'{data_atual}_Pasta03_models.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['authentication.py', 'middleware.py'], arquivo_saida=f'{data_atual}_Pasta04_Autenticacao.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['*.html', '*.css', '*.js'], arquivo_saida=f'{data_atual}_Pasta05_Templates.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['requirements.txt', 'documentacao_sistema.json', 'documentacao_sistema.yaml', '2026-04-15_resumo_tecnico_classificacao.md', 'estrutura.txt'], arquivo_saida=f'{data_atual}_Pasta06_Doc_Existente.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['services.py'], arquivo_saida=f'{data_atual}_Pasta07_Services.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['admin.py'], arquivo_saida=f'{data_atual}_Pasta08_Admin.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['apps.py'], arquivo_saida=f'{data_atual}_Pasta09_Apps-in-Apps.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['tests.py'], arquivo_saida=f'{data_atual}_Pasta10_Tests.txt')
+    concatenar_arquivos(pasta_projeto=PASTA_PROJETO, tipos_arquivo=['forms.py'], arquivo_saida=f'{data_atual}_Pasta11_Forms.txt')
 
-    concatenar_arquivos(
-        pasta_projeto=PASTA_PROJETO,
-        tipos_arquivo=['views.py'],
-        arquivo_saida='Pasta02_views_24-03-2026.txt'
-    )
+r"""
+Para gerar esse arquivos: 
+requirements.txt            --->    pip freeze > requirements.txt 
+documentacao_sistema.json   --->    python scripts\gera_doc_sistema_yaml_json.py
+documentacao_sistema.yaml   --->    e os dois arquivos serão gravados no diretório \docs
+2026-mm-dd_resumo_tecnico_classificacao.md  --->     python scripts\gerar_markdown.py
+2026-mm-dd_estrutura.txt    --->    tree /f /a > yyyy-mm-dd_estrutura.txt
+"""
 
-    concatenar_arquivos(
-        pasta_projeto=PASTA_PROJETO,
-        tipos_arquivo=['models.py'],
-        arquivo_saida='Pasta03_models_24-03-2026.txt'
-    )
-
-    concatenar_arquivos(
-        pasta_projeto=PASTA_PROJETO,
-        tipos_arquivo=['authentication.py', 'middleware.py'],
-        arquivo_saida='Pasta04_Autenticacao_24-03-2026.txt'
-    )
-
-    concatenar_arquivos(
-        pasta_projeto=PASTA_PROJETO,
-        tipos_arquivo=['*.html', '*.css', '*.js'],
-        arquivo_saida='Pasta05_Templates_24-03-2026.txt'
-    )
-
-    concatenar_arquivos(
-        pasta_projeto=PASTA_PROJETO,
-        tipos_arquivo=['requirements.txt', 'documentacao_sistema.json', 'documentacao_sistema.yaml', '2026-03-06_resumo_tecnico_classificacao.md', '2026-03-06_estrutura.txt'],
-        arquivo_saida='Pasta06_Doc_Existente_24-03-2026.txt'
-    )
 
 
 # comando para rodar: python scripts\concatenar_doc_completo_diag_arquitetura.py    
