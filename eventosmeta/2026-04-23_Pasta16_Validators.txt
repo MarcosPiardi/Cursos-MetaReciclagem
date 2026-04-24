@@ -1,0 +1,234 @@
+# PROJETO DJANGO - ARQUIVOS CONCATENADOS
+# Pasta: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+# Data: 23/04/2026 12:12:54
+
+================================================================================
+
+
+################################################################################
+# ARQUIVOS: validators.py
+################################################################################
+
+
+================================================================================
+# ARQUIVO: apps\selecao\validators.py
+================================================================================
+
+"""
+Arquivo: validators.py
+Caminho: apps/selecao/validators.py
+Alteração: Validadores centralizados para o sistema de classificação
+Data: 11/12/2025
+"""
+
+from datetime import date
+from decimal import Decimal
+from django.core.exceptions import ValidationError
+
+
+class ClassificacaoValidator:
+    """
+    Validador centralizado para o processo de classificação
+    """
+    
+    @staticmethod
+    def validar_evento(evento):
+        """
+        Valida se o evento está pronto para classificação
+        
+        Args:
+            evento: Instância do modelo Evento
+            
+        Returns:
+            dict: {'valido': bool, 'erros': list, 'avisos': list}
+        """
+        erros = []
+        avisos = []
+        
+        # 1. Verificar se evento existe
+        if not evento:
+            erros.append('Evento não informado')
+            return {'valido': False, 'erros': erros, 'avisos': avisos}
+        
+        # 2. Verificar total de vagas
+        if not evento.total_vagas or evento.total_vagas <= 0:
+            erros.append(f'Evento "{evento.nome}" não possui vagas definidas (total_vagas = {evento.total_vagas})')
+        
+        # 3. Verificar status do evento
+        if not evento.status:
+            avisos.append(f'Evento "{evento.nome}" sem status definido')
+        
+        # 4. Verificar datas
+        if evento.data_inicio_inscricao and evento.data_fim_inscricao:
+            if evento.data_inicio_inscricao > evento.data_fim_inscricao:
+                erros.append(f'Data início inscrição ({evento.data_inicio_inscricao}) posterior à data fim ({evento.data_fim_inscricao})')
+        
+        # 5. Verificar se tem inscrições
+        from apps.selecao.models import Inscricao
+        total_inscricoes = Inscricao.objects.filter(evento=evento).count()
+        
+        if total_inscricoes == 0:
+            erros.append(f'Evento "{evento.nome}" não possui inscrições')
+        
+        # 6. Verificar critérios ativos
+        from apps.eventos.models import EventoCriterio
+        criterios_ativos = EventoCriterio.objects.filter(
+            evento=evento,
+            ativo=True
+        )
+        
+        if not criterios_ativos.exists():
+            erros.append(f'Evento "{evento.nome}" não possui critérios de classificação ativos')
+        else:
+            # Verificar se há critérios de pontuação
+            criterios_pontuacao = criterios_ativos.filter(criterio__tipo_criterio='PONTUACAO')
+            if not criterios_pontuacao.exists():
+                avisos.append(f'Evento "{evento.nome}" não possui critérios de PONTUAÇÃO (apenas ordenação)')
+        
+        return {
+            'valido': len(erros) == 0,
+            'erros': erros,
+            'avisos': avisos
+        }
+    
+    @staticmethod
+    def validar_interessado(interessado):
+        """
+        Valida se o interessado possui dados mínimos para classificação
+        
+        Args:
+            interessado: Instância do modelo Interessado
+            
+        Returns:
+            dict: {'valido': bool, 'erros': list, 'avisos': list}
+        """
+        erros = []
+        avisos = []
+        
+        # 1. Campos obrigatórios
+        if not interessado.nome:
+            erros.append(f'Interessado ID {interessado.id}: nome não informado')
+        
+        if not interessado.cpf:
+            erros.append(f'Interessado {interessado.nome or "ID " + str(interessado.id)}: CPF não informado')
+        
+        # 2. Data de nascimento (importante para critérios de idade)
+        if not interessado.data_nascimento:
+            avisos.append(f'Interessado {interessado.nome}: data de nascimento não informada (critérios de idade não serão aplicados)')
+        else:
+            # Validar idade realista
+            hoje = date.today()
+            idade = hoje.year - interessado.data_nascimento.year - (
+                (hoje.month, hoje.day) < (interessado.data_nascimento.month, interessado.data_nascimento.day)
+            )
+            
+            if idade < 0:
+                erros.append(f'Interessado {interessado.nome}: data de nascimento no futuro ({interessado.data_nascimento})')
+            elif idade > 120:
+                avisos.append(f'Interessado {interessado.nome}: idade muito alta ({idade} anos) - verificar data de nascimento')
+        
+        # 3. Campos importantes para critérios
+        if not interessado.sexo:
+            avisos.append(f'Interessado {interessado.nome}: sexo não informado')
+        
+        if not interessado.fototipo:
+            avisos.append(f'Interessado {interessado.nome}: fototipo não informado (critérios de cota racial não serão aplicados)')
+        
+        if not interessado.escolaridade:
+            avisos.append(f'Interessado {interessado.nome}: escolaridade não informada (critérios de escolaridade não serão aplicados)')
+        
+        # 4. Contatos
+        if not interessado.email and not interessado.celular and not interessado.telefone:
+            avisos.append(f'Interessado {interessado.nome}: nenhum contato informado (email, celular ou telefone)')
+        
+        return {
+            'valido': len(erros) == 0,
+            'erros': erros,
+            'avisos': avisos
+        }
+    
+    @staticmethod
+    def validar_criterio(criterio):
+        """
+        Valida se o critério está configurado corretamente
+        
+        Args:
+            criterio: Instância do modelo Criterio
+            
+        Returns:
+            dict: {'valido': bool, 'erros': list, 'avisos': list}
+        """
+        erros = []
+        avisos = []
+        
+        # 1. Nome obrigatório
+        if not criterio.nome:
+            erros.append(f'Critério ID {criterio.id}: nome não informado')
+        
+        # 2. Tipo de critério obrigatório
+        if not criterio.tipo_criterio:
+            erros.append(f'Critério {criterio.nome}: tipo_criterio não informado')
+        
+        # 3. Se for PONTUACAO, pontos é obrigatório
+        if criterio.tipo_criterio == 'PONTUACAO':
+            if criterio.pontos is None or criterio.pontos == 0:
+                erros.append(f'Critério {criterio.nome}: tipo PONTUACAO requer pontos > 0 (atual: {criterio.pontos})')
+            elif criterio.pontos < 0:
+                erros.append(f'Critério {criterio.nome}: pontos não pode ser negativo ({criterio.pontos})')
+        
+        # 4. Categoria recomendada
+        if not criterio.categoria:
+            avisos.append(f'Critério {criterio.nome}: categoria não informada (dificulta organização)')
+        
+        # 5. Código recomendado
+        if not criterio.codigo:
+            avisos.append(f'Critério {criterio.nome}: código não informado (recomendado para referência)')
+        
+        return {
+            'valido': len(erros) == 0,
+            'erros': erros,
+            'avisos': avisos
+        }
+    
+    @staticmethod
+    def validar_inscricao(inscricao):
+        """
+        Valida se a inscrição pode ser classificada
+        
+        Args:
+            inscricao: Instância do modelo Inscricao
+            
+        Returns:
+            dict: {'valido': bool, 'erros': list, 'avisos': list}
+        """
+        erros = []
+        avisos = []
+        
+        # 1. Verificar se tem interessado
+        if not inscricao.interessado:
+            erros.append(f'Inscrição ID {inscricao.id}: interessado não informado')
+            return {'valido': False, 'erros': erros, 'avisos': avisos}
+        
+        # 2. Verificar se tem evento
+        if not inscricao.evento:
+            erros.append(f'Inscrição ID {inscricao.id}: evento não informado')
+            return {'valido': False, 'erros': erros, 'avisos': avisos}
+        
+        # 3. Validar interessado
+        validacao_interessado = ClassificacaoValidator.validar_interessado(inscricao.interessado)
+        if not validacao_interessado['valido']:
+            erros.extend(validacao_interessado['erros'])
+        avisos.extend(validacao_interessado['avisos'])
+        
+        # 4. Verificar status
+        if not inscricao.status:
+            avisos.append(f'Inscrição {inscricao.interessado.nome} - {inscricao.evento.nome}: status não informado')
+        
+        return {
+            'valido': len(erros) == 0,
+            'erros': erros,
+            'avisos': avisos
+        }
+    
+    
+

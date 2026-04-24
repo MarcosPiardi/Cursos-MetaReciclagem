@@ -1,5 +1,731 @@
+# PROJETO DJANGO - ARQUIVOS CONCATENADOS
+# Pasta: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+# Data: 23/04/2026 12:12:53
+
+================================================================================
+
+
+################################################################################
+# ARQUIVOS: requirements.txt
+################################################################################
+
+
+================================================================================
+# ARQUIVO: requirements.txt
+================================================================================
+
+attrs==25.4.0
+beautifulsoup4==4.14.2
+certifi==2025.10.5
+cffi==2.0.0
+charset-normalizer==3.4.4
+h11==0.16.0
+idna==3.11
+outcome==1.3.0.post0
+packaging==25.0
+pdfkit==1.0.0
+pycparser==2.23
+PySocks==1.7.1
+python-dotenv==1.2.1
+requests==2.32.5
+selenium==4.38.0
+sniffio==1.3.1
+sortedcontainers==2.4.0
+soupsieve==2.8
+trio==0.32.0
+trio-websocket==0.12.2
+typing_extensions==4.15.0
+urllib3==2.5.0
+webdriver-manager==4.0.2
+websocket-client==1.9.0
+wsproto==1.2.0
+
+
+
+################################################################################
+# ARQUIVOS: documentacao_sistema.json
+################################################################################
+
+
+================================================================================
+# ARQUIVO: documentacao_sistema.json
+================================================================================
+
+{
+  "system": {
+    "name": "Sistema Acadêmico / MetaReciclagem",
+    "description": "Sistema desenvolvido em Django para gestão de eventos, inscrições, classificação de candidatos e processos acadêmicos posteriores (matrícula, avaliações, certificados, relatórios).",
+    "versao_documentacao": "2026-04-17"
+  },
+  "documentation_strategy": {
+    "approach": "referenciada",
+    "rationale": "A documentação principal mantém visão sistêmica e arquitetural. Subsistemas complexos possuem documentação técnica especializada em arquivos separados."
+  },
+  "overview": {
+    "main_domains": [
+      "Eventos",
+      "Inscrições",
+      "Classificação",
+      "Matrícula",
+      "Acadêmico (Avaliações e Certificados)"
+    ],
+    "primary_flow": "Inscrição -> Classificação -> Resultado -> Matrícula -> Avaliação -> Certificado"
+  },
+  "architecture": {
+    "framework": "Django",
+    "language": "Python",
+    "database": "SQLite (dev) / configurável via .env",
+    "patterns": [
+      "Apps desacoplados",
+      "Services para regras de negócio",
+      "Admin Django customizado como interface operacional",
+      "Templates para apresentação",
+      "Signals para automação (pós-save/delete)"
+    ],
+    "separation_of_concerns": {
+      "models": "Persistência de dados e validações",
+      "services": "Regras de negócio e cálculos",
+      "admin": "Operações em massa, exportações e controle",
+      "templates": "Interface e UX",
+      "signals": "Automações pós-operação"
+    }
+  },
+  "apps": {
+    "accounts": {
+      "caminho": "apps/accounts",
+      "arquivos_detectados": {
+        "models": true,
+        "services": false,
+        "admin": true,
+        "urls": true
+      },
+      "models": [
+        "Usuario",
+        "Meta"
+      ],
+      "admin_actions": [
+        "🔑 Gerar Senha Provisória"
+      ],
+      "urls": [
+        "/login/",
+        "/logout/",
+        "/exclusao/",
+        "/exclusao/<int:solicitacao_id>/"
+      ]
+    },
+    "interessados": {
+      "caminho": "apps/interessados",
+      "arquivos_detectados": {
+        "models": true,
+        "services": false,
+        "admin": true,
+        "urls": true
+      },
+      "models": [
+        "Sexo",
+        "Fototipo",
+        "Interessado",
+        "PasswordResetToken",
+        "SolicitacaoExclusao",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta"
+      ],
+      "admin_actions": [
+        "Data Nascimento",
+        "Sexo",
+        "Fototipo",
+        "Programa Social",
+        "Necessidades Especiais",
+        "Celular",
+        "Telefone",
+        "Status",
+        "🔑 Gerar Senha Provisória",
+        "✅ Ativar interessados selecionados",
+        "❌ Desativar interessados selecionados",
+        "📊 Exportar interessados com análise de critérios (Excel)",
+        "Interessado",
+        "CPF",
+        "Criado em",
+        "Expira em",
+        "🗑️ Remover tokens EXPIRADOS selecionados",
+        "🗑️ Remover tokens JÁ USADOS selecionados",
+        "🧹 Limpar TODOS os tokens inválidos do banco"
+      ],
+      "urls": [
+        "/cadastro/",
+        "/login/",
+        "/logout/",
+        "/meus-dados/",
+        "/dashboard/",
+        "/inscricao/<int:inscricao_id>/detalhes/",
+        "/inscrever/<int:evento_id>/",
+        "/senha/recuperar/",
+        "/senha/recuperar/enviado/",
+        "/senha/redefinir/<str:token>/",
+        "/senha/redefinir/concluido/",
+        "/senha/sem-email/",
+        "/exclusao/solicitar/",
+        "/exclusao/solicitada/"
+      ],
+      "management_commands": [
+        "criptografar_cpfs",
+        "limpar_tokens",
+        "popular_cpf_hash"
+      ]
+    },
+    "eventos": {
+      "caminho": "apps/eventos",
+      "arquivos_detectados": {
+        "models": true,
+        "services": false,
+        "admin": true,
+        "urls": false
+      },
+      "models": [
+        "Status",
+        "Criterio",
+        "Evento",
+        "EventoCriterio",
+        "Turma",
+        "Horario",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta"
+      ],
+      "admin_actions": [
+        "Cor",
+        "Pontuação",
+        "Status",
+        "Inscritos / Vagas",
+        "Início Inscrição",
+        "Fim Inscrição",
+        "Início Evento",
+        "Fim Evento",
+        "🎯 Classificar inscrições dos eventos selecionados",
+        "📊 Exportar classificação detalhada (Excel)",
+        "Dia da Semana"
+      ]
+    },
+    "selecao": {
+      "caminho": "apps/selecao",
+      "arquivos_detectados": {
+        "models": true,
+        "services": true,
+        "admin": true,
+        "urls": false
+      },
+      "models": [
+        "StatusInscricao",
+        "Inscricao",
+        "Classificacao",
+        "InscricaoCriterioAtendido",
+        "Meta",
+        "Meta",
+        "Meta",
+        "Meta"
+      ],
+      "services": [
+        "ClassificadorService"
+      ],
+      "admin_actions": [
+        "Cor",
+        "Interessado",
+        "#",
+        "CPF",
+        "Evento",
+        "Status Inscrição",
+        "Classificado?",
+        "🎓 Matricular alunos selecionados",
+        "📞 PDF STAFF: Por Classificação (com telefones)",
+        "📞 PDF STAFF: Por Nome (com telefones)",
+        "📋 PDF MURAL: Por Classificação (público)",
+        "📋 PDF MURAL: Por Nome (público)",
+        "📊 EXCEL STAFF: Por Classificação",
+        "📊 EXCEL STAFF: Por Nome",
+        "📊 EXCEL MURAL: Por Classificação",
+        "📊 EXCEL MURAL: Por Nome"
+      ]
+    },
+    "academico": {
+      "caminho": "apps/academico",
+      "arquivos_detectados": {
+        "models": true,
+        "services": true,
+        "admin": true,
+        "urls": true
+      },
+      "models": [
+        "StatusMatricula",
+        "Matricula",
+        "Avaliacao",
+        "Meta",
+        "Meta",
+        "Meta"
+      ],
+      "services": [
+        "MatriculaService"
+      ],
+      "admin_actions": [
+        "Cor",
+        "Interessado",
+        "Evento",
+        "Matrícula",
+        "Aluno",
+        "Certificado",
+        "📊 Gerar Relatório Excel (Segmentado por Turma)",
+        "📄 Gerar Relatório PDF (Segmentado por Turma)",
+        "✅ Marcar certificados como emitidos",
+        "📦 Baixar certificados em lote (ZIP)"
+      ],
+      "urls": [
+        "/certificado/<int:avaliacao_id>/download/",
+        "/certificado/<int:avaliacao_id>/preview/",
+        "/certificados/download-lote/"
+      ]
+    },
+    "portal": {
+      "caminho": "apps/portal",
+      "arquivos_detectados": {
+        "models": true,
+        "services": false,
+        "admin": true,
+        "urls": true
+      },
+      "urls": [
+        "/",
+        "/login/",
+        "/logout/",
+        "/dashboard/",
+        "/consulta/",
+        "/resultado/<int:evento_id>/",
+        "/evento/<int:evento_id>/",
+        "/contato/",
+        "/privacidade/"
+      ]
+    },
+    "scripts_admin": {
+      "caminho": "apps/scripts_admin",
+      "arquivos_detectados": {
+        "models": false,
+        "services": false,
+        "admin": false,
+        "urls": false
+      },
+      "management_commands": [
+        "classificar_evento",
+        "configurar_criterios_evento",
+        "criar_dados_teste",
+        "gerar_dados_teste",
+        "popular_criterios",
+        "popular_dados_iniciais"
+      ]
+    },
+    "dashboard": {
+      "caminho": "dashboard",
+      "arquivos_detectados": {
+        "models": true,
+        "services": false,
+        "admin": true,
+        "urls": false
+      }
+    }
+  },
+  "business_flows": {
+    "classificacao": {
+      "description": "Processo de avaliação e ordenação de inscrições com base em critérios configuráveis por evento.",
+      "detailed_documentation": {
+        "file": "2026-04-15_resumo_tecnico_classificacao.md",
+        "role": "Fonte técnica oficial do subsistema de Classificação"
+      },
+      "summary_steps": [
+        "Leitura dos critérios ativos do evento (EventoCriterio)",
+        "Cálculo de pontuação por critério PONTUACAO",
+        "Aplicação de ordenação por critério ORDENACAO",
+        "Desempate final por data_inscricao (ordem de chegada)",
+        "Definição de posição final e flags (classificado/lista_espera)",
+        "Persistência em Classificacao e InscricaoCriterioAtendido"
+      ]
+    },
+    "matricula": {
+      "description": "Matrícula de classificados em turmas, com validação de capacidade, proteção contra duplicidade e atomicidade.",
+      "summary_steps": [
+        "Seleção de classificações no admin (mesmo evento)",
+        "Escolha da turma de destino",
+        "Validação de vagas disponíveis",
+        "Criação de Matricula (número auto-gerado)",
+        "Atualização do status da inscrição para CONFIRMADA",
+        "Criação automática de Avaliacao (signal post_save)"
+      ]
+    },
+    "avaliacao_e_certificado": {
+      "description": "Registro de desempenho do aluno e emissão de certificado.",
+      "summary_steps": [
+        "Lançamento de nota e frequência no admin",
+        "Aprovação: nota >= 7.0 E frequência >= 75%",
+        "Geração e download de certificado (individual ou lote ZIP)"
+      ]
+    }
+  },
+  "onboarding": {
+    "recommended_reading_order": [
+      "documentacao_sistema.yaml (este arquivo)",
+      "2026-04-15_resumo_tecnico_classificacao.md",
+      "apps/selecao/services.py (ClassificadorService)",
+      "apps/academico/models.py (Matricula, signals)",
+      "apps/eventos/models.py (Criterio, EventoCriterio)",
+      "Código (services -> models -> admin)"
+    ],
+    "warnings": [
+      "Não alterar ClassificadorService sem entender critérios e desempate",
+      "Classificação é área sensível — alterações impactam resultados diretos",
+      "CPF e NIS são criptografados; usar cpf_hash para buscas",
+      "Matrícula em lote exige status ATIVA e CONFIRMADA cadastrados no banco",
+      "admin_site customizado (CustomAdminSite) — não usar o admin padrão do Django"
+    ]
+  },
+  "risks_and_notes": [
+    "Subsistema de Classificação é crítico e complexo",
+    "Documentação especializada deve ser mantida alinhada ao código",
+    "Alterações em critérios impactam resultados de eventos já processados",
+    "CPF criptografado exige FERNET_KEY no .env — sem ela o sistema não inicia",
+    "Status de matrícula e inscrição precisam existir no banco com nomes exatos (ex: ATIVA, CONFIRMADA, Pendente)"
+  ]
+}
+
+
+################################################################################
+# ARQUIVOS: documentacao_sistema.yaml
+################################################################################
+
+
+================================================================================
+# ARQUIVO: documentacao_sistema.yaml
+================================================================================
+
+system:
+  name: Sistema Acadêmico / MetaReciclagem
+  description: Sistema desenvolvido em Django para gestão de eventos, inscrições,
+    classificação de candidatos e processos acadêmicos posteriores (matrícula, avaliações,
+    certificados, relatórios).
+  versao_documentacao: '2026-04-17'
+documentation_strategy:
+  approach: referenciada
+  rationale: A documentação principal mantém visão sistêmica e arquitetural. Subsistemas
+    complexos possuem documentação técnica especializada em arquivos separados.
+overview:
+  main_domains:
+  - Eventos
+  - Inscrições
+  - Classificação
+  - Matrícula
+  - Acadêmico (Avaliações e Certificados)
+  primary_flow: Inscrição -> Classificação -> Resultado -> Matrícula -> Avaliação
+    -> Certificado
+architecture:
+  framework: Django
+  language: Python
+  database: SQLite (dev) / configurável via .env
+  patterns:
+  - Apps desacoplados
+  - Services para regras de negócio
+  - Admin Django customizado como interface operacional
+  - Templates para apresentação
+  - Signals para automação (pós-save/delete)
+  separation_of_concerns:
+    models: Persistência de dados e validações
+    services: Regras de negócio e cálculos
+    admin: Operações em massa, exportações e controle
+    templates: Interface e UX
+    signals: Automações pós-operação
+apps:
+  accounts:
+    caminho: apps/accounts
+    arquivos_detectados:
+      models: true
+      services: false
+      admin: true
+      urls: true
+    models:
+    - Usuario
+    - Meta
+    admin_actions:
+    - 🔑 Gerar Senha Provisória
+    urls:
+    - /login/
+    - /logout/
+    - /exclusao/
+    - /exclusao/<int:solicitacao_id>/
+  interessados:
+    caminho: apps/interessados
+    arquivos_detectados:
+      models: true
+      services: false
+      admin: true
+      urls: true
+    models:
+    - Sexo
+    - Fototipo
+    - Interessado
+    - PasswordResetToken
+    - SolicitacaoExclusao
+    - Meta
+    - Meta
+    - Meta
+    - Meta
+    - Meta
+    admin_actions:
+    - Data Nascimento
+    - Sexo
+    - Fototipo
+    - Programa Social
+    - Necessidades Especiais
+    - Celular
+    - Telefone
+    - Status
+    - 🔑 Gerar Senha Provisória
+    - ✅ Ativar interessados selecionados
+    - ❌ Desativar interessados selecionados
+    - 📊 Exportar interessados com análise de critérios (Excel)
+    - Interessado
+    - CPF
+    - Criado em
+    - Expira em
+    - 🗑️ Remover tokens EXPIRADOS selecionados
+    - 🗑️ Remover tokens JÁ USADOS selecionados
+    - 🧹 Limpar TODOS os tokens inválidos do banco
+    urls:
+    - /cadastro/
+    - /login/
+    - /logout/
+    - /meus-dados/
+    - /dashboard/
+    - /inscricao/<int:inscricao_id>/detalhes/
+    - /inscrever/<int:evento_id>/
+    - /senha/recuperar/
+    - /senha/recuperar/enviado/
+    - /senha/redefinir/<str:token>/
+    - /senha/redefinir/concluido/
+    - /senha/sem-email/
+    - /exclusao/solicitar/
+    - /exclusao/solicitada/
+    management_commands:
+    - criptografar_cpfs
+    - limpar_tokens
+    - popular_cpf_hash
+  eventos:
+    caminho: apps/eventos
+    arquivos_detectados:
+      models: true
+      services: false
+      admin: true
+      urls: false
+    models:
+    - Status
+    - Criterio
+    - Evento
+    - EventoCriterio
+    - Turma
+    - Horario
+    - Meta
+    - Meta
+    - Meta
+    - Meta
+    - Meta
+    - Meta
+    admin_actions:
+    - Cor
+    - Pontuação
+    - Status
+    - Inscritos / Vagas
+    - Início Inscrição
+    - Fim Inscrição
+    - Início Evento
+    - Fim Evento
+    - 🎯 Classificar inscrições dos eventos selecionados
+    - 📊 Exportar classificação detalhada (Excel)
+    - Dia da Semana
+  selecao:
+    caminho: apps/selecao
+    arquivos_detectados:
+      models: true
+      services: true
+      admin: true
+      urls: false
+    models:
+    - StatusInscricao
+    - Inscricao
+    - Classificacao
+    - InscricaoCriterioAtendido
+    - Meta
+    - Meta
+    - Meta
+    - Meta
+    services:
+    - ClassificadorService
+    admin_actions:
+    - Cor
+    - Interessado
+    - '#'
+    - CPF
+    - Evento
+    - Status Inscrição
+    - Classificado?
+    - 🎓 Matricular alunos selecionados
+    - '📞 PDF STAFF: Por Classificação (com telefones)'
+    - '📞 PDF STAFF: Por Nome (com telefones)'
+    - '📋 PDF MURAL: Por Classificação (público)'
+    - '📋 PDF MURAL: Por Nome (público)'
+    - '📊 EXCEL STAFF: Por Classificação'
+    - '📊 EXCEL STAFF: Por Nome'
+    - '📊 EXCEL MURAL: Por Classificação'
+    - '📊 EXCEL MURAL: Por Nome'
+  academico:
+    caminho: apps/academico
+    arquivos_detectados:
+      models: true
+      services: true
+      admin: true
+      urls: true
+    models:
+    - StatusMatricula
+    - Matricula
+    - Avaliacao
+    - Meta
+    - Meta
+    - Meta
+    services:
+    - MatriculaService
+    admin_actions:
+    - Cor
+    - Interessado
+    - Evento
+    - Matrícula
+    - Aluno
+    - Certificado
+    - 📊 Gerar Relatório Excel (Segmentado por Turma)
+    - 📄 Gerar Relatório PDF (Segmentado por Turma)
+    - ✅ Marcar certificados como emitidos
+    - 📦 Baixar certificados em lote (ZIP)
+    urls:
+    - /certificado/<int:avaliacao_id>/download/
+    - /certificado/<int:avaliacao_id>/preview/
+    - /certificados/download-lote/
+  portal:
+    caminho: apps/portal
+    arquivos_detectados:
+      models: true
+      services: false
+      admin: true
+      urls: true
+    urls:
+    - /
+    - /login/
+    - /logout/
+    - /dashboard/
+    - /consulta/
+    - /resultado/<int:evento_id>/
+    - /evento/<int:evento_id>/
+    - /contato/
+    - /privacidade/
+  scripts_admin:
+    caminho: apps/scripts_admin
+    arquivos_detectados:
+      models: false
+      services: false
+      admin: false
+      urls: false
+    management_commands:
+    - classificar_evento
+    - configurar_criterios_evento
+    - criar_dados_teste
+    - gerar_dados_teste
+    - popular_criterios
+    - popular_dados_iniciais
+  dashboard:
+    caminho: dashboard
+    arquivos_detectados:
+      models: true
+      services: false
+      admin: true
+      urls: false
+business_flows:
+  classificacao:
+    description: Processo de avaliação e ordenação de inscrições com base em critérios
+      configuráveis por evento.
+    detailed_documentation:
+      file: 2026-04-15_resumo_tecnico_classificacao.md
+      role: Fonte técnica oficial do subsistema de Classificação
+    summary_steps:
+    - Leitura dos critérios ativos do evento (EventoCriterio)
+    - Cálculo de pontuação por critério PONTUACAO
+    - Aplicação de ordenação por critério ORDENACAO
+    - Desempate final por data_inscricao (ordem de chegada)
+    - Definição de posição final e flags (classificado/lista_espera)
+    - Persistência em Classificacao e InscricaoCriterioAtendido
+  matricula:
+    description: Matrícula de classificados em turmas, com validação de capacidade,
+      proteção contra duplicidade e atomicidade.
+    summary_steps:
+    - Seleção de classificações no admin (mesmo evento)
+    - Escolha da turma de destino
+    - Validação de vagas disponíveis
+    - Criação de Matricula (número auto-gerado)
+    - Atualização do status da inscrição para CONFIRMADA
+    - Criação automática de Avaliacao (signal post_save)
+  avaliacao_e_certificado:
+    description: Registro de desempenho do aluno e emissão de certificado.
+    summary_steps:
+    - Lançamento de nota e frequência no admin
+    - 'Aprovação: nota >= 7.0 E frequência >= 75%'
+    - Geração e download de certificado (individual ou lote ZIP)
+onboarding:
+  recommended_reading_order:
+  - documentacao_sistema.yaml (este arquivo)
+  - 2026-04-15_resumo_tecnico_classificacao.md
+  - apps/selecao/services.py (ClassificadorService)
+  - apps/academico/models.py (Matricula, signals)
+  - apps/eventos/models.py (Criterio, EventoCriterio)
+  - Código (services -> models -> admin)
+  warnings:
+  - Não alterar ClassificadorService sem entender critérios e desempate
+  - Classificação é área sensível — alterações impactam resultados diretos
+  - CPF e NIS são criptografados; usar cpf_hash para buscas
+  - Matrícula em lote exige status ATIVA e CONFIRMADA cadastrados no banco
+  - admin_site customizado (CustomAdminSite) — não usar o admin padrão do Django
+risks_and_notes:
+- Subsistema de Classificação é crítico e complexo
+- Documentação especializada deve ser mantida alinhada ao código
+- Alterações em critérios impactam resultados de eventos já processados
+- CPF criptografado exige FERNET_KEY no .env — sem ela o sistema não inicia
+- 'Status de matrícula e inscrição precisam existir no banco com nomes exatos (ex:
+  ATIVA, CONFIRMADA, Pendente)'
+
+
+
+################################################################################
+# ARQUIVOS: 2026-04-15_resumo_tecnico_classificacao.md
+################################################################################
+
+# Nenhum arquivo 2026-04-15_resumo_tecnico_classificacao.md encontrado
+
+
+################################################################################
+# ARQUIVOS: estrutura.txt
+################################################################################
+
+
+================================================================================
+# ARQUIVO: estrutura.txt
+================================================================================
+
 Listagem de caminhos de pasta
-O n�mero de s�rie do volume � 92D0-3051
+O número de série do volume é 92D0-3051
 C:.
 |   .coverage
 |   .coveragerc
@@ -685,8 +1411,8 @@ C:.
 |       gera_doc_sistema_yaml_json.py
 |       limpar_sessoes.py
 |       listar_todos_htmls.py
-|       Script � Auditoria de e-mails dos Interessados.txt
-|       Script � Auditoria de e-mails dos Usu�rios.txt
+|       Script  Auditoria de e-mails dos Interessados.txt
+|       Script  Auditoria de e-mails dos Usuários.txt
 |       teste1.py
 |       verificar_templates.py
 |       
@@ -698,9 +1424,9 @@ C:.
 |   +---images
 |   |       brasao-1024x937.png
 |   |       brasao.gif
-|   |       bras�o 2.jpg
-|   |       bras�o-2.png
-|   |       Bras�o-PMS.png
+|   |       brasão 2.jpg
+|   |       brasão-2.png
+|   |       Brasão-PMS.png
 |   |       favicon.png
 |   |       logo-pms-header.png
 |   |       logo-pms-horizontal-colorido.png
@@ -883,9 +1609,9 @@ C:.
 |   +---images
 |   |       brasao-1024x937.png
 |   |       brasao.gif
-|   |       bras�o 2.jpg
-|   |       bras�o-2.png
-|   |       Bras�o-PMS.png
+|   |       brasão 2.jpg
+|   |       brasão-2.png
+|   |       Brasão-PMS.png
 |   |       favicon.png
 |   |       logo-pms-header.png
 |   |       logo-pms-horizontal-colorido.png
@@ -913,3 +1639,5 @@ C:.
 \---__pycache__
         conftest.cpython-313-pytest-7.4.3.pyc
         
+
+

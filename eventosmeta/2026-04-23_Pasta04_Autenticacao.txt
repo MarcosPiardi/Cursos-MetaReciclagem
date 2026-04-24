@@ -1,0 +1,201 @@
+# PROJETO DJANGO - ARQUIVOS CONCATENADOS
+# Pasta: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+# Data: 23/04/2026 12:12:53
+
+================================================================================
+
+
+################################################################################
+# ARQUIVOS: authentication.py
+################################################################################
+
+
+================================================================================
+# ARQUIVO: apps\interessados\authentication.py
+================================================================================
+
+"""
+ARQUIVO: apps/interessados/authentication.py
+AÇÃO: CRIAR novo arquivo apps/interessados/authentication.py
+MUDANÇA: Backend customizado para autenticação por CPF
+
+Alteração: Adicionada verificação de is_active nos métodos authenticate e get_user
+Data: 13/02/2026
+"""
+
+"""
+Backend de autenticação customizado para Interessados.
+Permite login usando CPF + senha ao invés de username + senha.
+ADICIONADO: Verificação de is_active para segurança (13/02/2026)
+"""
+from django.contrib.auth.backends import BaseBackend
+from .models import Interessado
+
+
+class InteressadoBackend(BaseBackend):
+    """
+    Backend de autenticação para Interessados usando CPF.
+    ADICIONADO: Verificação de is_active em 13/02/2026
+    """
+    
+    def authenticate(self, request, cpf=None, password=None, **kwargs):
+        """
+        Autentica um interessado usando CPF e senha.
+        ADICIONADO: Verificação de is_active em 13/02/2026
+        
+        Args:
+            request: HttpRequest object
+            cpf: CPF do interessado (11 dígitos)
+            password: Senha em texto plano
+            
+        Returns:
+            Interessado object se autenticado, None caso contrário
+        """
+        if cpf is None or password is None:
+            return None
+        
+        try:
+            # Busca interessado pelo CPF
+            interessado = Interessado.objects.get(cpf=cpf)
+            
+            # ============================================================
+            # VALIDAÇÃO CRÍTICA: VERIFICAR SE ESTÁ ATIVO
+            # Data: 13/02/2026
+            # ============================================================
+            if not interessado.is_active:
+                return None
+            
+            # Verifica a senha
+            if interessado.check_password(password):
+                return interessado
+            
+        except Interessado.DoesNotExist:
+            # Retorna None se não encontrar o interessado
+            return None
+        
+        return None
+    
+    def get_user(self, user_id):
+        """
+        Recupera um interessado pelo ID.
+        Necessário para manter a sessão ativa.
+        ADICIONADO: Verificação de is_active em 13/02/2026
+        
+        Args:
+            user_id: ID do interessado
+            
+        Returns:
+            Interessado object ou None
+        """
+        try:
+            interessado = Interessado.objects.get(pk=user_id)
+            
+            # ============================================================
+            # VALIDAÇÃO CRÍTICA: VERIFICAR SE AINDA ESTÁ ATIVO
+            # Data: 13/02/2026
+            # ============================================================
+            if interessado.is_active:
+                return interessado
+            return None
+            
+        except Interessado.DoesNotExist:
+            return None
+        
+        
+
+
+################################################################################
+# ARQUIVOS: middleware.py
+################################################################################
+
+
+================================================================================
+# ARQUIVO: apps\accounts\middleware.py
+================================================================================
+
+"""
+Arquivo: middleware.py
+Caminho: apps/accounts/middleware.py
+Alteração: Criado middleware de troca obrigatória de senha
+           Intercepta qualquer requisição autenticada e redireciona
+           para tela de troca de senha se must_change_password = True
+           Libera URLs de logout, troca de senha e arquivos estáticos
+Data: 25/02/2026
+Alteração: Removido '/admin/' dos prefixos liberados — Staff com
+           must_change_password = True não pode acessar o admin
+           sem trocar a senha primeiro.
+           Adicionadas URLs mínimas do admin necessárias para
+           que o redirect funcione sem loop.
+Data: 26/02/2026
+"""
+
+from django.shortcuts import redirect
+
+
+# URLs liberadas mesmo com must_change_password = True
+URLS_LIBERADAS = [
+    # Staff
+    '/staff/senha/trocar-obrigatorio/',
+    '/staff/logout/',
+    # Interessado
+    '/inscricao/senha/trocar-obrigatorio/',
+    '/inscricao/logout/',
+    # Admin mínimo — necessário para não causar loop no redirect
+    '/admin/login/',
+    '/admin/logout/',
+    '/admin/jsi18n/',
+]
+
+# Prefixos sempre liberados (estáticos e mídia apenas)
+PREFIXOS_LIBERADOS = [
+    '/static/',
+    '/media/',
+]
+
+
+class TrocarSenhaObrigatorioMiddleware:
+    """
+    Middleware que intercepta requisições de usuários autenticados
+    com must_change_password = True e os redireciona para a tela
+    de troca obrigatória de senha antes de qualquer outra ação.
+
+    Funciona para dois tipos de usuário:
+      - Usuario (Staff) → apps.accounts.models.Usuario
+      - Interessado     → apps.interessados.models.Interessado
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        usuario = request.user
+        path    = request.path
+
+        # Verifica se há usuário autenticado com must_change_password
+        if (
+            usuario.is_authenticated
+            and hasattr(usuario, 'must_change_password')
+            and usuario.must_change_password
+        ):
+            # Libera prefixos (estáticos e mídia)
+            for prefixo in PREFIXOS_LIBERADOS:
+                if path.startswith(prefixo):
+                    return self.get_response(request)
+
+            # Libera URLs específicas
+            if path in URLS_LIBERADAS:
+                return self.get_response(request)
+
+            # Determina para qual tela redirecionar
+            # Staff → Usuario do Django (tem atributo username nativo)
+            from apps.accounts.models import Usuario
+            if isinstance(usuario, Usuario):
+                return redirect('/staff/senha/trocar-obrigatorio/')
+
+            # Interessado → redireciona para tela própria
+            return redirect('/inscricao/senha/trocar-obrigatorio/')
+
+        return self.get_response(request)
+    
+    
+

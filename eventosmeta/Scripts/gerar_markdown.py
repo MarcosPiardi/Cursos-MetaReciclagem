@@ -458,7 +458,7 @@ def gerar_markdown() -> str:
     L(f"")
     L(f"**Data:** {agora_data}  ")
     L(f"**Projeto:** Sistema MetaReciclagem - Gestão de Eventos e Inscrições  ")
-    L(f"**Tecnologia:** Django + Python  ")
+    L(f"**Tecnologia:** Django + Python + HTML + CSS + JS ")
     L(f"**Gerado automaticamente em:** {agora_fmt}")
     L(f"")
 
