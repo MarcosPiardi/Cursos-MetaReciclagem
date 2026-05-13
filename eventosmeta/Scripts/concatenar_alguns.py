@@ -62,7 +62,9 @@ def concatenar_arquivos(pasta_projeto, tipos_arquivo=['models.py', 'views.py'], 
 if __name__ == "__main__":
     # Substitua pelo caminho do seu projeto Django
     # PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta"
-    PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao"
+    # PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao"
+    PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\Contexto para alimentar IA\Todos arquivos para ler\Arquivos gerados por scripts\Stack, requisitos, diretrizes, etc"
+    
     
     # Escolha quais arquivos quer concatenar
     concatenar_arquivos(
@@ -79,7 +81,7 @@ if __name__ == "__main__":
         # tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
                     #    'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
                           
-        arquivo_saida='2026-03-31-arquivos_selecao.txt'
+        arquivo_saida='Stack-requisitos-etc.txt'
     )
 
 

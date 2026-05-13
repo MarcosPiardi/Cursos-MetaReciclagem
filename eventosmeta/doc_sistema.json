@@ -1,0 +1,169 @@
+{
+  "system": {
+    "descricao": "Sistema desenvolvido em Django para gestão de eventos, classificações, matrículas e certificados."
+  },
+  "documentation_strategy": {
+    "metodo": "Extração automática via AST de arquivos Python + dados narrativos hardcoded.",
+    "versao": "VERSÃO FINAL"
+  },
+  "overview": {
+    "resumo": "Sistema Django modular para gestão de eventos com apps especializados.",
+    "apps": [
+      "academico",
+      "accounts",
+      "dashboard",
+      "eventos",
+      "interessados",
+      "portal",
+      "scripts_admin",
+      "selecao"
+    ]
+  },
+  "architecture": {
+    "framework": "Django",
+    "estrutura": "Apps em apps/ + dashboard opcional",
+    "extensoes": [
+      "AST para extração dinâmica"
+    ]
+  },
+  "apps": {
+    "academico": {
+      "models": [
+        "StatusMatricula",
+        "Matricula",
+        "Avaliacao"
+      ],
+      "services": [
+        "MatriculaService"
+      ],
+      "admin_actions": [],
+      "urls": [
+        "certificado/<int:avaliacao_id>/download/",
+        "certificado/<int:avaliacao_id>/preview/",
+        "certificados/download-lote/"
+      ],
+      "commands": []
+    },
+    "accounts": {
+      "models": [
+        "Usuario"
+      ],
+      "services": [],
+      "admin_actions": [],
+      "urls": [
+        "login/",
+        "logout/",
+        "exclusao/",
+        "exclusao/<int:solicitacao_id>/"
+      ],
+      "commands": []
+    },
+    "dashboard": {
+      "models": [],
+      "services": [],
+      "admin_actions": [],
+      "urls": [],
+      "commands": []
+    },
+    "eventos": {
+      "models": [
+        "Status",
+        "Criterio",
+        "Evento",
+        "EventoCriterio",
+        "Turma",
+        "Horario"
+      ],
+      "services": [],
+      "admin_actions": [],
+      "urls": [],
+      "commands": []
+    },
+    "interessados": {
+      "models": [
+        "Sexo",
+        "Fototipo",
+        "Interessado",
+        "PasswordResetToken",
+        "SolicitacaoExclusao"
+      ],
+      "services": [],
+      "admin_actions": [],
+      "urls": [
+        "cadastro/",
+        "login/",
+        "logout/",
+        "meus-dados/",
+        "dashboard/",
+        "inscricao/<int:inscricao_id>/detalhes/",
+        "inscrever/<int:evento_id>/",
+        "senha/recuperar/",
+        "senha/recuperar/enviado/",
+        "senha/redefinir/<str:token>/",
+        "senha/redefinir/concluido/",
+        "senha/sem-email/",
+        "exclusao/solicitar/",
+        "exclusao/solicitada/"
+      ],
+      "commands": [
+        "Command"
+      ]
+    },
+    "portal": {
+      "models": [],
+      "services": [],
+      "admin_actions": [],
+      "urls": [
+        "login/",
+        "logout/",
+        "dashboard/",
+        "consulta/",
+        "resultado/<int:evento_id>/",
+        "evento/<int:evento_id>/",
+        "contato/",
+        "privacidade/"
+      ],
+      "commands": []
+    },
+    "scripts_admin": {
+      "models": [],
+      "services": [],
+      "admin_actions": [],
+      "urls": [],
+      "commands": [
+        "Command"
+      ]
+    },
+    "selecao": {
+      "models": [
+        "StatusInscricao",
+        "Inscricao",
+        "Classificacao",
+        "InscricaoCriterioAtendido"
+      ],
+      "services": [
+        "ClassificadorService"
+      ],
+      "admin_actions": [],
+      "urls": [],
+      "commands": []
+    }
+  },
+  "business_flows": {
+    "classificacao": "Fluxo principal para classificação de participantes em eventos.",
+    "matricula": "Processo de matrícula e inscrição em cursos/eventos.",
+    "avaliacao_e_certificado": "Sistema de avaliação e geração de certificados."
+  },
+  "onboarding": {
+    "warnings": [
+      "Verificar dependências antes de deploy.",
+      "Configurar banco de dados PostgreSQL.",
+      "Executar migrations pendentes."
+    ]
+  },
+  "risks_and_notes": [
+    "Risco: Dependência de serviços externos para notificações.",
+    "Nota: Implementar cache com Redis para performance.",
+    "Risco: Validações de segurança em uploads de arquivos."
+  ]
+}

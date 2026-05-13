@@ -5,8 +5,13 @@ C:.
 |   .coveragerc
 |   .env
 |   .gitignore
+|   2026-07-05_estrutura.txt
 |   conftest.py
 |   coverage.xml
+|   documentacao_banco.md
+|   documentacao_sistema.json
+|   documentacao_sistema.txt
+|   documentacao_sistema.yaml
 |   estrutura.txt
 |   limpar_tokens.bat
 |   manage.py
@@ -14,16 +19,6 @@ C:.
 |   requirements.txt
 |   Scripts-Concatenados.txt
 |   
-+---.pytest_cache
-|   |   .gitignore
-|   |   CACHEDIR.TAG
-|   |   README.md
-|   |   
-|   \---v
-|       \---cache
-|               lastfailed
-|               nodeids
-|               stepwise
 |               
 +---apps
 |   |   arqs-apps.txt
@@ -155,7 +150,6 @@ C:.
 |   |           
 |   +---eventos
 |   |   |   admin.py
-|   |   |   admin.py.backup
 |   |   |   apps.py
 |   |   |   context_processors.py
 |   |   |   models.py
@@ -462,15 +456,6 @@ C:.
 |   |           
 |   \---__pycache__
 |           __init__.cpython-313.pyc
-|           
-+---artefatos
-|       academico-07-04-2026.txt
-|       accounts-07-04-2026.txt
-|       eventos-07-04-2026.txt
-|       interessados-07-04-2026.txt
-|       portal-07-04-2026.txt
-|       scripts_admin-07-04-2026.txt
-|       selecao-07-04-2026.txt
 |       
 +---config
 |   |   asgi.py
@@ -519,18 +504,6 @@ C:.
 |           views.cpython-313.pyc
 |           __init__.cpython-313.pyc
 |           
-+---docs
-|   |   documentacao_sistema.json
-|   |   documentacao_sistema.yaml
-|   |   GAPS_IDENTIFICADOS.md
-|   |   mkdocs.yml
-|   |   PLANO_PROXIMO_EXPANDIR.md
-|   |   RESULTADOS_COBERTURA.md
-|   |   STRATEGY_TESTES_EXECUCAO.md
-|   |   
-|   \---docs
-|           index.md
-|           
 +---fixtures
 |       01_interessados.json
 |       02_evento.json
@@ -538,157 +511,10 @@ C:.
 |       04_turmas.json
 |       05_inscricoes.json
 |       
-+---htmlcov
-|       .gitignore
-|       class_index.html
-|       conftest_py.html
-|       coverage_html_cb_497bf287.js
-|       favicon_32_cb_58284776.png
-|       function_index.html
-|       index.html
-|       keybd_closed_cb_ce680311.png
-|       status.json
-|       style_cb_dca529e9.css
-|       z_01e2d9878c9aa67a_0001_initial_py.html
-|       z_01e2d9878c9aa67a___init___py.html
-|       z_093f493a86e81cdd_0001_initial_py.html
-|       z_093f493a86e81cdd_0002_interessado_cep_interessado_raca_cor_py.html
-|       z_093f493a86e81cdd_0003_remove_interessado_raca_cor_py.html
-|       z_093f493a86e81cdd_0004_passwordresettoken_py.html
-|       z_093f493a86e81cdd_0005_interessado_must_change_password_py.html
-|       z_093f493a86e81cdd_0006_alter_interessado_email_py.html
-|       z_093f493a86e81cdd_0007_alter_interessado_cpf_alter_interessado_num_nis_py.html
-|       z_093f493a86e81cdd_0008_interessado_cpf_hash_py.html
-|       z_093f493a86e81cdd_0009_interessado_cpf_hash_unique_py.html
-|       z_093f493a86e81cdd_0010_interessado_consentimento_lgpd_and_more_py.html
-|       z_093f493a86e81cdd_0011_alter_interessado_consentimento_lgpd_and_more_py.html
-|       z_093f493a86e81cdd___init___py.html
-|       z_0daf9d4b3925bce1_admin_py.html
-|       z_0daf9d4b3925bce1_apps_py.html
-|       z_0daf9d4b3925bce1_forms_py.html
-|       z_0daf9d4b3925bce1_middleware_py.html
-|       z_0daf9d4b3925bce1_models_py.html
-|       z_0daf9d4b3925bce1_tests_py.html
-|       z_0daf9d4b3925bce1_urls_py.html
-|       z_0daf9d4b3925bce1_views_exclusao_py.html
-|       z_0daf9d4b3925bce1_views_py.html
-|       z_0daf9d4b3925bce1___init___py.html
-|       z_0fc3ea6511df39f5_0001_initial_py.html
-|       z_0fc3ea6511df39f5_0002_matricula_academico_m_inscric_af84a1_idx_py.html
-|       z_0fc3ea6511df39f5___init___py.html
-|       z_1ea838694151cac8_settings_py.html
-|       z_1ea838694151cac8_urls_py.html
-|       z_1ea838694151cac8___init___py.html
-|       z_31ef9d691bcae19d_admin_py.html
-|       z_31ef9d691bcae19d_apps_py.html
-|       z_31ef9d691bcae19d_models_py.html
-|       z_31ef9d691bcae19d_views_py.html
-|       z_31ef9d691bcae19d___init___py.html
-|       z_3cd1707b36e3b65d___init___py.html
-|       z_54a080a14ef3e80e_factories_py.html
-|       z_54a080a14ef3e80e_test_models_py.html
-|       z_54a080a14ef3e80e_test_services_py.html
-|       z_54a080a14ef3e80e___init___py.html
-|       z_55858e1c37406d95___init___py.html
-|       z_6ce779792740922c_admin_py.html
-|       z_6ce779792740922c_apps_py.html
-|       z_6ce779792740922c_certificado_py.html
-|       z_6ce779792740922c_models_py.html
-|       z_6ce779792740922c_services_py.html
-|       z_6ce779792740922c_tests_py.html
-|       z_6ce779792740922c_urls_py.html
-|       z_6ce779792740922c_views_py.html
-|       z_6ce779792740922c___init___py.html
-|       z_87de2200aec32e6b___init___py.html
-|       z_8a4787bb1446583e_admin_py.html
-|       z_8a4787bb1446583e_apps_py.html
-|       z_8a4787bb1446583e_authentication_py.html
-|       z_8a4787bb1446583e_forms_py.html
-|       z_8a4787bb1446583e_models_py.html
-|       z_8a4787bb1446583e_tests_py.html
-|       z_8a4787bb1446583e_urls_py.html
-|       z_8a4787bb1446583e_utils_py.html
-|       z_8a4787bb1446583e_views_exclusao_py.html
-|       z_8a4787bb1446583e_views_py.html
-|       z_8a4787bb1446583e___init___py.html
-|       z_8e055f594c69d024___init___py.html
-|       z_8e835377efbddd70_0001_initial_py.html
-|       z_8e835377efbddd70_0002_usuario_must_change_password_py.html
-|       z_8e835377efbddd70_0003_alter_usuario_email_py.html
-|       z_8e835377efbddd70___init___py.html
-|       z_91063696ab9f0c78_factories_py.html
-|       z_91063696ab9f0c78_test_forms_py.html
-|       z_91063696ab9f0c78_test_models_py.html
-|       z_91063696ab9f0c78_test_views_py.html
-|       z_91063696ab9f0c78___init___py.html
-|       z_9266ee3db1565c17_admin_py.html
-|       z_9266ee3db1565c17_apps_py.html
-|       z_9266ee3db1565c17_models_py.html
-|       z_9266ee3db1565c17_reports_py.html
-|       z_9266ee3db1565c17_services_py.html
-|       z_9266ee3db1565c17_tests_py.html
-|       z_9266ee3db1565c17_validators_py.html
-|       z_9266ee3db1565c17_views_py.html
-|       z_9266ee3db1565c17___init___py.html
-|       z_9e189ee61a034fc9___init___py.html
-|       z_a5e0cc1fe8f5796c_0001_initial_py.html
-|       z_a5e0cc1fe8f5796c___init___py.html
-|       z_a6419a99b01d79ca___init___py.html
-|       z_a9a8a6be5ba9434e_admin_py.html
-|       z_a9a8a6be5ba9434e_apps_py.html
-|       z_a9a8a6be5ba9434e_context_processors_py.html
-|       z_a9a8a6be5ba9434e_models_py.html
-|       z_a9a8a6be5ba9434e_tests_py.html
-|       z_a9a8a6be5ba9434e_views_py.html
-|       z_a9a8a6be5ba9434e___init___py.html
-|       z_ab4a2f34b7b4614d___init___py.html
-|       z_bb8a1a7b4baedd2d___init___py.html
-|       z_d89872321e18ad0f_criptografar_cpfs_py.html
-|       z_d89872321e18ad0f_limpar_tokens_py.html
-|       z_d89872321e18ad0f_popular_cpf_hash_py.html
-|       z_d89872321e18ad0f___init___py.html
-|       z_df7282fd5fb4e175_classificar_evento_py.html
-|       z_df7282fd5fb4e175_configurar_criterios_evento_py.html
-|       z_df7282fd5fb4e175_criar_dados_teste_py.html
-|       z_df7282fd5fb4e175_gerar_dados_teste_py.html
-|       z_df7282fd5fb4e175_popular_criterios_py.html
-|       z_df7282fd5fb4e175_popular_dados_iniciais_py.html
-|       z_df7282fd5fb4e175___init___py.html
-|       z_f05b36176d97d732___init___py.html
-|       z_f4d7054553d4e859_admin_py.html
-|       z_f4d7054553d4e859_apps_py.html
-|       z_f4d7054553d4e859_forms_py.html
-|       z_f4d7054553d4e859_models_py.html
-|       z_f4d7054553d4e859_tests_py.html
-|       z_f4d7054553d4e859_urls_py.html
-|       z_f4d7054553d4e859_views_py.html
-|       z_f4d7054553d4e859___init___py.html
-|       z_f985408338552be7___init___py.html
-|       
 +---logs
 |       .gitkeep
 |       limpar_tokens.log
 |       
-+---Scripts
-|       backup_tabelas.py
-|       concatenar.py
-|       concatenar_alguns.py
-|       concatenar_base.py
-|       concatenar_doc_completo_diag_arquitetura.py
-|       concatenar_html.py
-|       concatenar_para_analise_LGPD.py
-|       concatenar_por_app.py
-|       concatenar_scripts.py
-|       concatenar_testes.py
-|       gerar_documentacao.py
-|       gerar_markdown.py
-|       gera_doc_sistema_yaml_json.py
-|       limpar_sessoes.py
-|       listar_todos_htmls.py
-|       Script — Auditoria de e-mails dos Interessados.txt
-|       Script — Auditoria de e-mails dos Usuários.txt
-|       teste1.py
-|       verificar_templates.py
 |       
 +---scripts_admin
 +---static
@@ -714,192 +540,6 @@ C:.
 |           cpf-formatter.js
 |           script.js
 |           
-+---staticfiles_collected
-|   +---admin
-|   |   +---css
-|   |   |   |   autocomplete.css
-|   |   |   |   base.css
-|   |   |   |   changelists.css
-|   |   |   |   dark_mode.css
-|   |   |   |   dashboard.css
-|   |   |   |   forms.css
-|   |   |   |   login.css
-|   |   |   |   nav_sidebar.css
-|   |   |   |   responsive.css
-|   |   |   |   responsive_rtl.css
-|   |   |   |   rtl.css
-|   |   |   |   unusable_password_field.css
-|   |   |   |   widgets.css
-|   |   |   |   
-|   |   |   \---vendor
-|   |   |       \---select2
-|   |   |               LICENSE-SELECT2.md
-|   |   |               select2.css
-|   |   |               select2.min.css
-|   |   |               
-|   |   +---img
-|   |   |   |   calendar-icons.svg
-|   |   |   |   icon-addlink.svg
-|   |   |   |   icon-alert.svg
-|   |   |   |   icon-calendar.svg
-|   |   |   |   icon-changelink.svg
-|   |   |   |   icon-clock.svg
-|   |   |   |   icon-deletelink.svg
-|   |   |   |   icon-hidelink.svg
-|   |   |   |   icon-no.svg
-|   |   |   |   icon-unknown-alt.svg
-|   |   |   |   icon-unknown.svg
-|   |   |   |   icon-viewlink.svg
-|   |   |   |   icon-yes.svg
-|   |   |   |   inline-delete.svg
-|   |   |   |   LICENSE
-|   |   |   |   README.txt
-|   |   |   |   search.svg
-|   |   |   |   selector-icons.svg
-|   |   |   |   sorting-icons.svg
-|   |   |   |   tooltag-add.svg
-|   |   |   |   tooltag-arrowright.svg
-|   |   |   |   
-|   |   |   \---gis
-|   |   |           move_vertex_off.svg
-|   |   |           move_vertex_on.svg
-|   |   |           
-|   |   \---js
-|   |       |   actions.js
-|   |       |   autocomplete.js
-|   |       |   calendar.js
-|   |       |   cancel.js
-|   |       |   change_form.js
-|   |       |   core.js
-|   |       |   filters.js
-|   |       |   inlines.js
-|   |       |   jquery.init.js
-|   |       |   nav_sidebar.js
-|   |       |   popup_response.js
-|   |       |   prepopulate.js
-|   |       |   prepopulate_init.js
-|   |       |   SelectBox.js
-|   |       |   SelectFilter2.js
-|   |       |   theme.js
-|   |       |   unusable_password_field.js
-|   |       |   urlify.js
-|   |       |   
-|   |       +---admin
-|   |       |       DateTimeShortcuts.js
-|   |       |       RelatedObjectLookups.js
-|   |       |       
-|   |       \---vendor
-|   |           +---jquery
-|   |           |       jquery.js
-|   |           |       jquery.min.js
-|   |           |       LICENSE.txt
-|   |           |       
-|   |           +---select2
-|   |           |   |   LICENSE.md
-|   |           |   |   select2.full.js
-|   |           |   |   select2.full.min.js
-|   |           |   |   
-|   |           |   \---i18n
-|   |           |           af.js
-|   |           |           ar.js
-|   |           |           az.js
-|   |           |           bg.js
-|   |           |           bn.js
-|   |           |           bs.js
-|   |           |           ca.js
-|   |           |           cs.js
-|   |           |           da.js
-|   |           |           de.js
-|   |           |           dsb.js
-|   |           |           el.js
-|   |           |           en.js
-|   |           |           es.js
-|   |           |           et.js
-|   |           |           eu.js
-|   |           |           fa.js
-|   |           |           fi.js
-|   |           |           fr.js
-|   |           |           gl.js
-|   |           |           he.js
-|   |           |           hi.js
-|   |           |           hr.js
-|   |           |           hsb.js
-|   |           |           hu.js
-|   |           |           hy.js
-|   |           |           id.js
-|   |           |           is.js
-|   |           |           it.js
-|   |           |           ja.js
-|   |           |           ka.js
-|   |           |           km.js
-|   |           |           ko.js
-|   |           |           lt.js
-|   |           |           lv.js
-|   |           |           mk.js
-|   |           |           ms.js
-|   |           |           nb.js
-|   |           |           ne.js
-|   |           |           nl.js
-|   |           |           pl.js
-|   |           |           ps.js
-|   |           |           pt-BR.js
-|   |           |           pt.js
-|   |           |           ro.js
-|   |           |           ru.js
-|   |           |           sk.js
-|   |           |           sl.js
-|   |           |           sq.js
-|   |           |           sr-Cyrl.js
-|   |           |           sr.js
-|   |           |           sv.js
-|   |           |           th.js
-|   |           |           tk.js
-|   |           |           tr.js
-|   |           |           uk.js
-|   |           |           vi.js
-|   |           |           zh-CN.js
-|   |           |           zh-TW.js
-|   |           |           
-|   |           \---xregexp
-|   |                   LICENSE.txt
-|   |                   xregexp.js
-|   |                   xregexp.min.js
-|   |                   
-|   +---css
-|   |       style.css
-|   |       
-|   +---django_extensions
-|   |   +---css
-|   |   |       jquery.autocomplete.css
-|   |   |       
-|   |   +---img
-|   |   |       indicator.gif
-|   |   |       
-|   |   \---js
-|   |           jquery.ajaxQueue.js
-|   |           jquery.autocomplete.js
-|   |           jquery.bgiframe.js
-|   |           
-|   +---images
-|   |       brasao-1024x937.png
-|   |       brasao.gif
-|   |       brasão 2.jpg
-|   |       brasão-2.png
-|   |       Brasão-PMS.png
-|   |       favicon.png
-|   |       logo-pms-header.png
-|   |       logo-pms-horizontal-colorido.png
-|   |       logo-pms-horizontal-colorido.svg
-|   |       metareciclagem.ico
-|   |       metareciclagem.jpg
-|   |       metareciclagem.png
-|   |       metareciclagem.svg
-|   |       
-|   +---interessados
-|   |       formStyles.css
-|   |       
-|   \---js
-|           script.js
 |           
 +---template
 |   |   base.html

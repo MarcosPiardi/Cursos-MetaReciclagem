@@ -1,0 +1,486 @@
+{
+  "models": [
+    {
+      "app_label": "admin",
+      "model_name": "logentry",
+      "fields": [
+        "id",
+        "action_time",
+        "user",
+        "content_type",
+        "object_id",
+        "object_repr",
+        "action_flag",
+        "change_message"
+      ],
+      "verbose_name": "entrada de log",
+      "verbose_name_plural": "entradas de log"
+    },
+    {
+      "app_label": "auth",
+      "model_name": "permission",
+      "fields": [
+        "group",
+        "user",
+        "id",
+        "name",
+        "content_type",
+        "codename"
+      ],
+      "verbose_name": "permissão",
+      "verbose_name_plural": "permissões"
+    },
+    {
+      "app_label": "auth",
+      "model_name": "group",
+      "fields": [
+        "user",
+        "id",
+        "name",
+        "permissions"
+      ],
+      "verbose_name": "grupo",
+      "verbose_name_plural": "grupos"
+    },
+    {
+      "app_label": "contenttypes",
+      "model_name": "contenttype",
+      "fields": [
+        "logentry",
+        "permission",
+        "id",
+        "app_label",
+        "model"
+      ],
+      "verbose_name": "tipo de conteúdo",
+      "verbose_name_plural": "tipos de conteúdo"
+    },
+    {
+      "app_label": "sessions",
+      "model_name": "session",
+      "fields": [
+        "session_key",
+        "session_data",
+        "expire_date"
+      ],
+      "verbose_name": "sessão",
+      "verbose_name_plural": "sessões"
+    },
+    {
+      "app_label": "axes",
+      "model_name": "accessfailurelog",
+      "fields": [
+        "id",
+        "user_agent",
+        "ip_address",
+        "username",
+        "http_accept",
+        "path_info",
+        "attempt_time",
+        "locked_out"
+      ],
+      "verbose_name": "access failure",
+      "verbose_name_plural": "access failures"
+    },
+    {
+      "app_label": "axes",
+      "model_name": "accessattempt",
+      "fields": [
+        "expiration",
+        "id",
+        "user_agent",
+        "ip_address",
+        "username",
+        "http_accept",
+        "path_info",
+        "attempt_time",
+        "get_data",
+        "post_data",
+        "failures_since_start"
+      ],
+      "verbose_name": "access attempt",
+      "verbose_name_plural": "access attempts"
+    },
+    {
+      "app_label": "axes",
+      "model_name": "accessattemptexpiration",
+      "fields": [
+        "access_attempt",
+        "expires_at"
+      ],
+      "verbose_name": "access attempt expiration",
+      "verbose_name_plural": "access attempt expirations"
+    },
+    {
+      "app_label": "axes",
+      "model_name": "accesslog",
+      "fields": [
+        "id",
+        "user_agent",
+        "ip_address",
+        "username",
+        "http_accept",
+        "path_info",
+        "attempt_time",
+        "logout_time",
+        "session_hash"
+      ],
+      "verbose_name": "access log",
+      "verbose_name_plural": "access logs"
+    },
+    {
+      "app_label": "accounts",
+      "model_name": "usuario",
+      "fields": [
+        "logentry",
+        "solicitacaoexclusao",
+        "id",
+        "password",
+        "last_login",
+        "is_superuser",
+        "username",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "is_active",
+        "date_joined",
+        "cpf",
+        "email",
+        "setor_trabalho",
+        "local_trabalho",
+        "telefone",
+        "celular",
+        "must_change_password",
+        "groups",
+        "user_permissions"
+      ],
+      "verbose_name": "Usuário",
+      "verbose_name_plural": "Usuários"
+    },
+    {
+      "app_label": "interessados",
+      "model_name": "sexo",
+      "fields": [
+        "interessado",
+        "id",
+        "nome"
+      ],
+      "verbose_name": "Sexo",
+      "verbose_name_plural": "Sexos"
+    },
+    {
+      "app_label": "interessados",
+      "model_name": "fototipo",
+      "fields": [
+        "interessado",
+        "id",
+        "nome",
+        "descricao"
+      ],
+      "verbose_name": "Fototipo",
+      "verbose_name_plural": "Fototipos"
+    },
+    {
+      "app_label": "interessados",
+      "model_name": "interessado",
+      "fields": [
+        "reset_tokens",
+        "solicitacoes_exclusao",
+        "inscricoes",
+        "matriculas",
+        "id",
+        "senha",
+        "last_login",
+        "is_active",
+        "is_staff",
+        "is_superuser",
+        "must_change_password",
+        "consentimento_lgpd",
+        "consentimento_lgpd_em",
+        "cpf",
+        "cpf_hash",
+        "nome",
+        "rg",
+        "sexo",
+        "data_nascimento",
+        "cidade_nascimento",
+        "uf_nascimento",
+        "nacionalidade",
+        "endereco_residencial",
+        "num_endereco",
+        "bairro",
+        "complemento",
+        "cep",
+        "cidade_residencia",
+        "uf_residencia",
+        "telefone",
+        "celular",
+        "email",
+        "fototipo",
+        "escolaridade",
+        "programa_social",
+        "num_nis",
+        "necessidades_especiais",
+        "pcd_fisica",
+        "pcd_visual",
+        "pcd_auditiva",
+        "pcd_intelectual",
+        "pcd_psicossocial",
+        "pcd_multiplas",
+        "nome_responsavel",
+        "telefone_responsavel",
+        "celular_responsavel",
+        "email_responsavel",
+        "observacao",
+        "criado_em",
+        "atualizado_em"
+      ],
+      "verbose_name": "Interessado",
+      "verbose_name_plural": "Interessados"
+    },
+    {
+      "app_label": "interessados",
+      "model_name": "passwordresettoken",
+      "fields": [
+        "id",
+        "interessado",
+        "token",
+        "criado_em",
+        "expira_em",
+        "usado"
+      ],
+      "verbose_name": "Token de Recuperação de Senha",
+      "verbose_name_plural": "Tokens de Recuperação de Senha"
+    },
+    {
+      "app_label": "interessados",
+      "model_name": "solicitacaoexclusao",
+      "fields": [
+        "id",
+        "interessado",
+        "nome_solicitante",
+        "email_solicitante",
+        "motivo",
+        "status",
+        "solicitado_em",
+        "analisado_em",
+        "analisado_por",
+        "parecer_staff"
+      ],
+      "verbose_name": "Solicitação de Exclusão",
+      "verbose_name_plural": "Solicitações de Exclusão"
+    },
+    {
+      "app_label": "eventos",
+      "model_name": "status",
+      "fields": [
+        "eventos",
+        "id",
+        "nome",
+        "cor",
+        "ordem"
+      ],
+      "verbose_name": "Status",
+      "verbose_name_plural": "Status"
+    },
+    {
+      "app_label": "eventos",
+      "model_name": "criterio",
+      "fields": [
+        "eventocriterio",
+        "inscricoes_atendidas",
+        "id",
+        "tipo_criterio",
+        "codigo",
+        "nome",
+        "descricao",
+        "pontos",
+        "categoria",
+        "ativo",
+        "criado_em",
+        "atualizado_em"
+      ],
+      "verbose_name": "Critério de Classificação",
+      "verbose_name_plural": "Critérios de Classificação"
+    },
+    {
+      "app_label": "eventos",
+      "model_name": "evento",
+      "fields": [
+        "evento_criterios",
+        "turmas",
+        "inscricoes",
+        "id",
+        "nome",
+        "descricao",
+        "status",
+        "total_vagas",
+        "data_inicio_inscricao",
+        "data_fim_inscricao",
+        "data_inicio_evento",
+        "data_fim_evento",
+        "criado_em",
+        "atualizado_em"
+      ],
+      "verbose_name": "Evento",
+      "verbose_name_plural": "Eventos"
+    },
+    {
+      "app_label": "eventos",
+      "model_name": "eventocriterio",
+      "fields": [
+        "id",
+        "evento",
+        "criterio",
+        "prioridade",
+        "ativo",
+        "criado_em"
+      ],
+      "verbose_name": "Critério do Evento",
+      "verbose_name_plural": "Critérios do Evento"
+    },
+    {
+      "app_label": "eventos",
+      "model_name": "turma",
+      "fields": [
+        "horarios",
+        "matriculas",
+        "id",
+        "evento",
+        "nome",
+        "turno",
+        "capacidade",
+        "local",
+        "data_inicio",
+        "data_fim",
+        "criado_em",
+        "atualizado_em"
+      ],
+      "verbose_name": "Turma",
+      "verbose_name_plural": "Turmas"
+    },
+    {
+      "app_label": "eventos",
+      "model_name": "horario",
+      "fields": [
+        "id",
+        "turma",
+        "dia_semana",
+        "hora_inicio",
+        "hora_fim"
+      ],
+      "verbose_name": "Horário",
+      "verbose_name_plural": "Horários"
+    },
+    {
+      "app_label": "selecao",
+      "model_name": "statusinscricao",
+      "fields": [
+        "inscricoes",
+        "id",
+        "nome",
+        "cor",
+        "ordem"
+      ],
+      "verbose_name": "Status de Inscrição",
+      "verbose_name_plural": "Status de Inscrições"
+    },
+    {
+      "app_label": "selecao",
+      "model_name": "inscricao",
+      "fields": [
+        "classificacao",
+        "criterios_atendidos",
+        "matriculas",
+        "id",
+        "interessado",
+        "evento",
+        "status",
+        "data_inscricao",
+        "data_atualizacao",
+        "observacoes"
+      ],
+      "verbose_name": "Inscrição",
+      "verbose_name_plural": "Inscrições"
+    },
+    {
+      "app_label": "selecao",
+      "model_name": "classificacao",
+      "fields": [
+        "id",
+        "inscricao",
+        "posicao",
+        "pontuacao_total",
+        "classificado",
+        "lista_espera",
+        "processado_em",
+        "atualizado_em"
+      ],
+      "verbose_name": "Classificação",
+      "verbose_name_plural": "Classificações"
+    },
+    {
+      "app_label": "selecao",
+      "model_name": "inscricaocriterioatendido",
+      "fields": [
+        "id",
+        "inscricao",
+        "criterio",
+        "pontos_atribuidos",
+        "validado",
+        "observacao_validacao"
+      ],
+      "verbose_name": "Critério Atendido",
+      "verbose_name_plural": "Critérios Atendidos"
+    },
+    {
+      "app_label": "academico",
+      "model_name": "statusmatricula",
+      "fields": [
+        "matriculas",
+        "id",
+        "nome",
+        "cor",
+        "ordem"
+      ],
+      "verbose_name": "Status de Matrícula",
+      "verbose_name_plural": "Status de Matrículas"
+    },
+    {
+      "app_label": "academico",
+      "model_name": "matricula",
+      "fields": [
+        "avaliacao",
+        "id",
+        "numero_matricula",
+        "turma",
+        "interessado",
+        "inscricao",
+        "status",
+        "data_matricula",
+        "data_atualizacao",
+        "observacoes"
+      ],
+      "verbose_name": "Matrícula",
+      "verbose_name_plural": "Matrículas"
+    },
+    {
+      "app_label": "academico",
+      "model_name": "avaliacao",
+      "fields": [
+        "id",
+        "matricula",
+        "nota_final",
+        "frequencia",
+        "aprovado",
+        "observacoes",
+        "certificado_emitido",
+        "data_emissao_certificado",
+        "avaliado_em",
+        "atualizado_em"
+      ],
+      "verbose_name": "Avaliação",
+      "verbose_name_plural": "Avaliações"
+    }
+  ]
+}
