@@ -63,7 +63,7 @@ if __name__ == "__main__":
     # Substitua pelo caminho do seu projeto Django
     # PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta"
     # PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao"
-    PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\Contexto para alimentar IA\Todos arquivos para ler\Arquivos gerados por scripts\Stack, requisitos, diretrizes, etc"
+    PASTA_PROJETO = r"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\scripts_admin"
     
     
     # Escolha quais arquivos quer concatenar
@@ -81,7 +81,7 @@ if __name__ == "__main__":
         # tipos_arquivo=['admin.py', 'apps.py', 'authentication.py', 
                     #    'forms.py', 'services.py', 'urls.py', '*.html', '*.css', '*.js'],            
                           
-        arquivo_saida='Stack-requisitos-etc.txt'
+        arquivo_saida='App-script_admin.txt'
     )
 
 
