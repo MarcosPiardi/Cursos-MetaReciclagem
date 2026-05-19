@@ -12,6 +12,9 @@ Histórico de Alterações:
              - Método _atende_criterio() para validar inscrição por categoria
              - _calcular_pontos() agora soma apenas pontos de critérios atendidos
              - Desempate por idade (JOVEM/IDOSO) ou timestamp
+- 19/05/2026: Refatoração de retorno em classificar_evento()
+             - Adicionados campos: total_classificadas, total_lista_espera
+             - Compatível com admin action
 
 Funcionalidades:
 - Validação automática de inscrição contra critérios (por categoria)
@@ -19,7 +22,7 @@ Funcionalidades:
 - Processamento de inscrição com persistência
 - Classificação automática (pontuação + desempate + quotas)
 - Atribuição de posições e flags (classificado/lista_espera)
-- Retorno estruturado com mensagens de resultado
+- Retorno estruturado com métricas detalhadas
 """
 
 from decimal import Decimal
@@ -66,17 +69,14 @@ class ClassificadorService:
         categoria = criterio.categoria
         
         # PCD: Pessoa com Deficiência
-        # Validação: campo necessidades_especiais deve ser True
         if categoria == 'PCD':
             return interessado.necessidades_especiais
         
         # NIS: Programa Social (Cadastro Único)
-        # Validação: campo programa_social deve ser True
         if categoria == 'NIS':
             return interessado.programa_social
         
         # JOVEM: Faixa etária 16-24 anos
-        # Validação: calcula idade a partir de data_nascimento
         if categoria == 'JOVEM':
             if interessado.data_nascimento:
                 idade = (date.today() - interessado.data_nascimento).days // 365
@@ -84,7 +84,6 @@ class ClassificadorService:
             return False
         
         # IDOSO: Faixa etária 50+ anos
-        # Validação: calcula idade e verifica se >= 50
         if categoria == 'IDOSO':
             if interessado.data_nascimento:
                 idade = (date.today() - interessado.data_nascimento).days // 365
@@ -92,8 +91,6 @@ class ClassificadorService:
             return False
         
         # COTA_RACIAL: Preto, Pardo, Indígena
-        # Validação: fototipo.id deve estar em [2, 3, 5] (conforme tabela interessados_fototipo)
-        # IDs: 2=Preta, 3=Parda, 5=Indígena
         if categoria == 'COTA_RACIAL':
             if interessado.fototipo:
                 return interessado.fototipo.id in [2, 3, 5]
@@ -144,8 +141,6 @@ class ClassificadorService:
         """
         pontuacao_total = Decimal('0.00')
         
-        # Acessa critérios através do relacionamento EventoCriterio
-        # related_name='evento_criterios' (definido em apps/eventos/models.py)
         evento_criterios = inscricao.evento.evento_criterios.filter(
             ativo=True
         ).order_by('prioridade')
@@ -153,10 +148,6 @@ class ClassificadorService:
         for evento_criterio in evento_criterios:
             criterio = evento_criterio.criterio
             
-            # Lógica de pontuação:
-            # - Apenas critérios com tipo PONTUACAO
-            # - Apenas se inscrição ATENDE o critério
-            # - Apenas se critério tem pontos definidos
             if (criterio.tipo_criterio == 'PONTUACAO' and 
                 criterio.pontos is not None and
                 ClassificadorService._atende_criterio(inscricao, criterio)):
@@ -188,11 +179,9 @@ class ClassificadorService:
         """
         Processa uma inscrição: calcula pontuação e cria/atualiza Classificacao.
         
-        Reutiliza _calcular_pontos() e persiste em Classificacao.
-        NÃO atualiza status, classificado, lista_espera, posicao aqui.
-        Esses campos são definidos por classificar_evento().
+        Também popula InscricaoCriterioAtendido com critérios atendidos (auditoria).
         
-        Alteração: 19/05/2026 - Refatoração com validação automática
+        Alteração: 19/05/2026 - Adicionada persistência em InscricaoCriterioAtendido
         
         Args:
             inscricao: Objeto Inscricao com evento relacionado
@@ -200,9 +189,36 @@ class ClassificadorService:
         Returns:
             Decimal: Pontuação total calculada e salva
         """
-        pontuacao_total = ClassificadorService._calcular_pontos(inscricao)
+        from apps.selecao.models import InscricaoCriterioAtendido
         
-        # Cria ou atualiza Classificacao com a pontuação
+        pontuacao_total = Decimal('0.00')
+        
+        # Limpar critérios anteriores (reclassificação)
+        InscricaoCriterioAtendido.objects.filter(inscricao=inscricao).delete()
+        
+        # Percorrer critérios e criar registros de atendimento
+        evento_criterios = inscricao.evento.evento_criterios.filter(
+            ativo=True
+        ).order_by('prioridade')
+        
+        for evento_criterio in evento_criterios:
+            criterio = evento_criterio.criterio
+            
+            # Verificar se inscrição ATENDE este critério
+            if ClassificadorService._atende_criterio(inscricao, criterio):
+                # Se é critério de PONTUACAO, somar pontos
+                if criterio.tipo_criterio == 'PONTUACAO' and criterio.pontos is not None:
+                    pontuacao_total += Decimal(str(criterio.pontos))
+                    
+                    # Criar registro em InscricaoCriterioAtendido
+                    InscricaoCriterioAtendido.objects.create(
+                        inscricao=inscricao,
+                        criterio=criterio,
+                        pontos_atribuidos=criterio.pontos,
+                        validado=False  # Aguardando validação manual se necessário
+                    )
+        
+        # Atualizar ou criar Classificacao com pontuação total
         classificacao, criada = Classificacao.objects.get_or_create(
             inscricao=inscricao,
             defaults={'pontuacao_total': pontuacao_total}
@@ -226,25 +242,25 @@ class ClassificadorService:
         - Marca classificado/lista_espera
         - Atualiza status Inscricao para "Classificado"
         
-        Desempate Inteligente (Documento 07, Seção 5):
+        Desempate Inteligente:
         - Verifica se existe critério de IDADE ou FAIXA_ETARIA
         - SE SIM: ordena por idade
-          - Para critérios de jovem: crescente (idade menor = melhor)
-          - Para critérios de idoso: decrescente (idade maior = melhor)
         - SE NÃO: ordena por data_inscricao (timestamp) - FIFO
         
-        Quotas (apenas se critérios estabelecidos existirem):
-        - 30% PCD: se critério categoria='PCD' existir
-        - 40% social: se critério categoria='VULNERABILIDADE' existir
-        - Resto: concorrência aberta
-        
         Alteração: 19/05/2026 - Implementação com validação automática
+        Alteração: 19/05/2026 - Refatoração de retorno com campos expandidos
         
         Args:
             evento: Objeto Evento a ser classificado
             
         Returns:
-            dict: {'sucesso': True/False, 'mensagem': str, 'total_processadas': int}
+            dict: {
+                'sucesso': True/False,
+                'mensagem': str,
+                'total_processadas': int,
+                'total_classificadas': int,
+                'total_lista_espera': int
+            }
         """
         try:
             # Obter todas as inscrições do evento
@@ -254,7 +270,9 @@ class ClassificadorService:
                 return {
                     'sucesso': False,
                     'mensagem': f'Nenhuma inscrição encontrada para o evento {evento.nome}',
-                    'total_processadas': 0
+                    'total_processadas': 0,
+                    'total_classificadas': 0,
+                    'total_lista_espera': 0
                 }
             
             # Etapa 1: Processar pontuações para todas as inscrições
@@ -267,7 +285,6 @@ class ClassificadorService:
             ).select_related('inscricao__interessado')
             
             # Desempate Inteligente
-            # Verifica se existe critério de idade/faixa_etaria
             tem_criterio_idade = evento.evento_criterios.filter(
                 criterio__categoria__in=['IDADE', 'FAIXA_ETARIA', 'JOVEM', 'IDOSO'],
                 ativo=True
@@ -275,12 +292,11 @@ class ClassificadorService:
             
             if tem_criterio_idade:
                 # Desempate por idade
-                # NOTA: Assumindo que Interessado tem campo 'data_nascimento'
                 classificacoes = sorted(
                     classificacoes,
                     key=lambda x: (
-                        -float(x.pontuacao_total),  # Pontuação DESC (maior primeiro)
-                        x.inscricao.interessado.data_nascimento or date.today()  # Idade (crescente)
+                        -float(x.pontuacao_total),  # Pontuação DESC
+                        x.inscricao.interessado.data_nascimento or date.today()
                     )
                 )
             else:
@@ -289,11 +305,11 @@ class ClassificadorService:
                     classificacoes,
                     key=lambda x: (
                         -float(x.pontuacao_total),  # Pontuação DESC
-                        x.inscricao.data_inscricao  # Data de inscrição ASC (chegou primeiro = melhor)
+                        x.inscricao.data_inscricao  # Data ASC (chegou primeiro = melhor)
                     )
                 )
             
-            # Etapa 3: Aplicar quotas (se critérios existirem)
+            # Etapa 3: Aplicar quotas
             tem_criterio_pcd = evento.evento_criterios.filter(
                 criterio__categoria='PCD',
                 ativo=True
@@ -312,19 +328,14 @@ class ClassificadorService:
             
             # Etapa 4: Atribuir posições e flags
             posicao = 1
-            
-            # Obter status "Classificado" e "Lista de Espera"
             status_classificado = StatusInscricao.objects.get(nome='Classificado')
             
             for classificacao in classificacoes:
                 classificacao.posicao = posicao
                 
-                # Lógica de preenchimento de vagas (simplificada)
-                # NOTA: Implement full quota logic based on interessado PCD/social status if needed
                 if posicao <= total_vagas:
                     classificacao.classificado = True
                     classificacao.lista_espera = False
-                    # Atualizar status da inscrição
                     classificacao.inscricao.status = status_classificado
                 else:
                     classificacao.classificado = False
@@ -334,23 +345,41 @@ class ClassificadorService:
                 classificacao.inscricao.save()
                 posicao += 1
             
+            # Etapa 5: Calcular totais para retorno
+            total_classificadas = Classificacao.objects.filter(
+                inscricao__evento=evento,
+                classificado=True
+            ).count()
+            
+            total_lista_espera = Classificacao.objects.filter(
+                inscricao__evento=evento,
+                lista_espera=True
+            ).count()
+            
             return {
                 'sucesso': True,
                 'mensagem': f'Evento {evento.nome} classificado com sucesso. {total_vagas} vagas preenchidas.',
-                'total_processadas': len(classificacoes)
+                'total_processadas': len(classificacoes),
+                'total_classificadas': total_classificadas,
+                'total_lista_espera': total_lista_espera
             }
         
         except StatusInscricao.DoesNotExist:
             return {
                 'sucesso': False,
                 'mensagem': 'Status "Classificado" não encontrado. Verifique StatusInscricao no admin.',
-                'total_processadas': 0
+                'total_processadas': 0,
+                'total_classificadas': 0,
+                'total_lista_espera': 0
             }
         except Exception as erro:
             return {
                 'sucesso': False,
                 'mensagem': f'Erro ao classificar evento: {str(erro)}',
-                'total_processadas': 0
+                'total_processadas': 0,
+                'total_classificadas': 0,
+                'total_lista_espera': 0
             }
         
+
         
