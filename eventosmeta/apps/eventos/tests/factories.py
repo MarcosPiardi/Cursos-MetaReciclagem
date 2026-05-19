@@ -1,3 +1,10 @@
+"""
+Arquivo: factories.py
+Caminho: apps/eventos/tests/factories.py
+Finalidade: Fornecer dados de teste para os modelos do app eventos usando Factory Boy
+Data: 15/05/2026 - Inclusão de cabeçalho  
+"""
+
 import factory
 from faker import Faker
 from datetime import timedelta, time

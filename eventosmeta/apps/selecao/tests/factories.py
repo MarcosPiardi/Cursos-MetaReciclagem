@@ -1,3 +1,12 @@
+"""
+Arquivo: factories.py
+caminho: apps/selecao/tests/factories.py
+Finalidade: Definir factories para testes do app seleção.
+
+Histórico de Alterações:
+- 15/05/2026 - Inclusão de cabeçalho 
+"""
+
 import factory
 import hashlib
 from django.utils import timezone

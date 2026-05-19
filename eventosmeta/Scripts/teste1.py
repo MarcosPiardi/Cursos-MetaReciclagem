@@ -4,4 +4,3 @@ driver_path = ChromeDriverManager().install()
 print(f"ChromeDriver instalado em: {driver_path}")
 
 
-

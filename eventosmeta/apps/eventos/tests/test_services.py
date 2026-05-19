@@ -1,8 +1,15 @@
+"""
+Arquivo: test_services.py
+caminho: apps/eventos/tests/test_services.py
+Finalidade: Testar os serviços relacionados à classificação de inscrições para eventos.
+Data: 15/05/2026 - Corrigir de onde está chamando inscricaofactory e inclusão de cabeçalho  
+"""
+
 from django.test import TestCase
 from apps.selecao.services import ClassificadorService
 from apps.eventos.tests.factories import EventoFactory, CriterioFactory, StatusFactory
 from apps.interessados.tests.factories import InteressadoFactory
-from .factories import InscricaoFactory
+from apps.selecao.tests.factories import InscricaoFactory
 
 
 class TestClassificadorService(TestCase):

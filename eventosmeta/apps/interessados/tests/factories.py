@@ -21,6 +21,7 @@ fake = Faker('pt_BR')
 class SexoFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Sexo
+        django_get_or_create = ('nome',)  # ← ADICIONADO 18/05/2026: evita duplicatas
 
     nome = factory.Iterator(['Masculino', 'Feminino', 'Outro'])
 
@@ -28,6 +29,7 @@ class SexoFactory(factory.django.DjangoModelFactory):
 class FototipoFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Fototipo
+        django_get_or_create = ('nome',)  # ← ADICIONADO 18/05/2026: evita duplicatas
 
     nome = factory.Iterator(['Tipo I', 'Tipo II', 'Tipo III', 'Tipo IV', 'Tipo V', 'Tipo VI'])
     descricao = factory.Faker('sentence', nb_words=5)

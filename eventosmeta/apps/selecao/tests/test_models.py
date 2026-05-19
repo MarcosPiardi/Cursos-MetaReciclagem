@@ -165,15 +165,17 @@ class TestClassificacaoModel(TestCase):
 
     def test_flags_classificacao_mutuamente_exclusivas(self):
         """Um candidato não pode estar classificado e na lista de espera ao mesmo tempo."""
-        classificacao = ClassificacaoFactory(
-            inscricao=self.inscricao,
-            classificado=True,
-            lista_espera=True
+        """Verifica se classificado e lista_espera são mutuamente exclusivos."""
+
+        from django.core.exceptions import ValidationError
+    
+        # Deve lançar erro ao tentar criar com ambas True
+        with self.assertRaises(ValidationError):
+            ClassificacaoFactory(
+                classificado=True,
+                lista_espera=True
         )
         
-        with self.assertRaises(ValidationError):
-            classificacao.full_clean()
-
     def test_desempate_por_data_inscricao(self):
         """Verifica se a ordenação pelo banco respeita a data de inscrição."""
         # Funciona como uma fila de banco: quem chega primeiro, tem prioridade

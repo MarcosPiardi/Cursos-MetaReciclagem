@@ -1,12 +1,18 @@
-
-
 """
-Models do app SELEÇÃO
-Responsável por: Processo seletivo, inscrições, classificação
+Arquivo: models.py
+Caminho: apps/selecao/models.py
+Finalidade: Definir os modelos do app seleção.
+
+Histórico de Alterações:
+- 15/05/2026 - Inclusão de cabeçalho  
+- 18/05/2026 - Adição de validadores (MaxValueValidator) e 
+               método clean() para validar pontuação e exclusividade mútua de flags
 """
+
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from apps.eventos.models import Evento, Criterio
 from apps.interessados.models import Interessado
@@ -84,14 +90,14 @@ class Classificacao(models.Model):
     #         é criado sem posição definida.
     # ========================================================================
     posicao = models.PositiveIntegerField(
-        null=True,      # ← ADICIONADO: Permite valores nulos
-        blank=True      # ← ADICIONADO: Permite campo vazio no admin
+        null=True,
+        blank=True
     )
     
     pontuacao_total = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0)]
+        validators=[MinValueValidator(0), MaxValueValidator(100)]  # ← ALTERAÇÃO 18/05/2026
     )
     classificado = models.BooleanField(
         default=False,
@@ -105,6 +111,38 @@ class Classificacao(models.Model):
     # Auditoria
     processado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
+    
+    def clean(self):
+        """
+        Valida regras de negócio da classificação.
+        
+        Alteração: 18/05/2026 - Implementação de validações
+        - Pontuação total deve estar entre 0 e 100
+        - Classificado e lista_espera são mutuamente exclusivos
+        """
+        errors = {}
+        
+        # Validação 1: Pontuação entre 0 e 100
+        if self.pontuacao_total is not None:
+            if self.pontuacao_total < 0 or self.pontuacao_total > 100:
+                errors['pontuacao_total'] = 'Pontuação deve estar entre 0 e 100.'
+        
+        # Validação 2: Classificado e lista_espera são mutuamente exclusivos
+        if self.classificado and self.lista_espera:
+            errors['classificado'] = 'Não é possível estar classificado E na lista de espera simultaneamente.'
+            errors['lista_espera'] = 'Não é possível estar classificado E na lista de espera simultaneamente.'
+        
+        if errors:
+            raise ValidationError(errors)
+    
+    def save(self, *args, **kwargs):
+        """
+        Sobrescreve save() para chamar validação clean() antes de salvar.
+        
+        Alteração: 18/05/2026 - Adição de chamada a clean()
+        """
+        self.clean()
+        super().save(*args, **kwargs)
     
     class Meta:
         verbose_name = "Classificação"

@@ -1,9 +1,17 @@
+"""
+Arquivo: test_models.py
+caminho: apps/eventos/tests/test_models.py
+Finalidade: Testar os modelos do app eventos.
+Data: 15/05/2026 - Corrigir de onde está chamando inscricaofactory, classificacaofactory e 
+                   Inclusão de cabeçalho  
+"""
+
 from django.test import TestCase
 from django.utils import timezone
 from datetime import timedelta
 
 from apps.selecao.models import Inscricao, Classificacao
-from .factories import InscricaoFactory, ClassificacaoFactory
+from apps.selecao.tests.factories import InscricaoFactory, ClassificacaoFactory
 
 
 class TestInscricaoModel(TestCase):
