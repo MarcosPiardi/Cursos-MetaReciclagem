@@ -1,27 +1,32 @@
 # Ambientes e segredos
 .env
-*.env
 .env.*
 !.env.example
-staticfiles_collected/
-htmlcov
 
 # Banco de dados
-*.sqlite3
 db.sqlite3
+*.sqlite3
 
 # Python
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
 *.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
 
 # Django
-/staticfiles/
-/media/
+staticfiles_collected/
+media/uploads/
 *.log
+logs/
+
+# pytest e coverage
+.pytest_cache/
+.cache/
+.coverage
+coverage.xml
+htmlcov/
 
 # IDEs
 .vscode/
@@ -29,14 +34,12 @@ __pycache__/
 *.swp
 *.swo
 
+# Node.js (caso use)
+node_modules/
 
+# macOS
+.DS_Store
 
-# db.sqlite3
-# *.pyc
-# __pycache__/
-# *.xlsx
-# *.txt
-# venv/
-# env/
-# .env
-# *.env
+# Windows
+Thumbs.db
+

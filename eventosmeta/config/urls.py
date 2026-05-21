@@ -28,7 +28,7 @@ from django.contrib.auth import views as auth_views
 from apps.accounts.admin import admin_site
 from apps.accounts import views as accounts_views
 from apps.interessados import views as interessados_views
-from dashboard import views as dashboard_views
+from apps.dashboard import views as dashboard_views
 from apps.portal import views as portal_views
 
 urlpatterns = [

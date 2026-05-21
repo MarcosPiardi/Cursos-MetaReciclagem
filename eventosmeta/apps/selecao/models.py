@@ -90,6 +90,7 @@ class Classificacao(models.Model):
     #         é criado sem posição definida.
     # ========================================================================
     posicao = models.PositiveIntegerField(
+        default=1,
         null=True,
         blank=True
     )

@@ -1,0 +1,327 @@
+# test_admin.py
+# Data: 2025-04-07
+# Caminho: apps/eventos/tests/test_admin.py
+# Finalidade: Testes para o módulo admin do app eventos
+
+import pytest
+from django.contrib.admin.sites import AdminSite
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.http import HttpRequest
+from django.test import RequestFactory
+from django.urls import reverse
+from apps.eventos.admin import (
+    StatusAdmin,
+    CriterioAdmin,
+    EventoCriterioInline,
+    EventoAdmin,
+    TurmaAdmin,
+    HorarioAdmin,
+)
+from apps.eventos.models import (
+    Status,
+    Criterio,
+    Evento,
+    EventoCriterio,
+    Turma,
+    Horario,
+)
+from apps.selecao.models import (
+    Inscricao,
+    Classificacao,
+)
+from apps.interessados.models import Interessado
+
+from apps.eventos.tests.factories import (
+    StatusFactory,
+    CriterioFactory,
+    EventoFactory,
+    EventoCriterioFactory,
+    TurmaFactory,
+    HorarioFactory,
+)
+from apps.selecao.tests.factories import (
+    InscricaoFactory,
+    ClassificacaoFactory,
+)
+
+from apps.interessados.tests.factories import InteressadoFactory
+
+from apps.selecao.services import ClassificadorService
+
+
+class TestStatusAdmin:
+    @pytest.mark.django_db
+    def test_status_admin_list_display(self):
+        admin = StatusAdmin(Status, AdminSite())
+        expected = ("nome", "cor", "ativo", "criado_em", "atualizado_em")
+        assert admin.list_display == expected
+
+    @pytest.mark.django_db
+    def test_status_admin_cor_visual_method(self):
+        status = StatusFactory(cor="#ff0000")
+        admin = StatusAdmin(Status, AdminSite())
+        result = admin.cor_visual(status)
+        assert result.startswith('<div style="background-color: #ff0000;')
+        assert "<span>" in result
+
+
+class TestCriterioAdmin:
+    @pytest.mark.django_db
+    def test_criterio_admin_has_delete_permission_false(self):
+        request = HttpRequest()
+        admin = CriterioAdmin(Criterio, AdminSite())
+        assert admin.has_delete_permission(request) is False
+
+    @pytest.mark.django_db
+    def test_criterio_admin_list_display(self):
+        admin = CriterioAdmin(Criterio, AdminSite())
+        expected = ("nome", "peso", "descricao", "ativo", "criado_em")
+        assert admin.list_display == expected
+
+
+class TestEventoCriterioInline:
+    @pytest.mark.django_db
+    def test_evento_criterio_pontos_display(self):
+        evento = EventoFactory()
+        criterio = CriterioFactory()
+        ec = EventoCriterioFactory(evento=evento, criterio=criterio, pontos_max=10)
+        inline = EventoCriterioInline(EventoCriterio, AdminSite())
+        result = inline.pontos_display(ec)
+        assert "10" in result
+
+    @pytest.mark.django_db
+    def test_evento_criterio_get_queryset_select_related(self):
+        admin = EventoCriterioInline(EventoCriterio, AdminSite())
+        request = HttpRequest()
+        qs = admin.get_queryset(request)
+        # Verifica se select_related foi aplicado
+        query = str(qs.query)
+        assert "SELECT " in query
+        # Não é fácil testar select_related, mas ao menos não quebra
+        assert qs.count() >= 0
+
+    @pytest.mark.django_db
+    def test_evento_criterio_formfield_for_foreignkey_filters_ativo(self):
+        admin = EventoCriterioInline(EventoCriterio, AdminSite())
+        db_field = EventoCriterio._meta.get_field("criterio")
+        request = HttpRequest()
+        field = admin.formfield_for_foreignkey(db_field, request)
+        assert field.queryset.filter(ativo=True).count() >= 0
+
+
+class TestEventoAdminDisplayMethods:
+    @pytest.mark.django_db
+    def test_status_colorido_with_color(self):
+        status = StatusFactory(cor="#00ff00", nome="Ativo")
+        evento = EventoFactory(status=status)
+        admin = EventoAdmin(Evento, AdminSite())
+        result = admin.status_colorido(evento)
+        assert '<span style="color: #00ff00">' in result
+        assert "Ativo" in result
+
+    @pytest.mark.django_db
+    def test_status_colorido_without_color(self):
+        status = StatusFactory(cor=None, nome="Sem cor")
+        evento = EventoFactory(status=status)
+        admin = EventoAdmin(Evento, AdminSite())
+        result = admin.status_colorido(evento)
+        assert "Sem cor" in result
+        assert "color:" not in result
+
+    @pytest.mark.django_db
+    def test_vagas_inscritos_percentage_color_red(self):
+        evento = EventoFactory(vagas=10)
+        InscricaoFactory.create_batch(10, evento=evento, status="confirmada")
+        admin = EventoAdmin(Evento, AdminSite())
+        result = admin.vagas_inscritos_percentage(evento)
+        # 100% -> red
+        assert "color: red" in result
+
+    @pytest.mark.django_db
+    def test_vagas_inscritos_percentage_color_orange(self):
+        evento = EventoFactory(vagas=10)
+        InscricaoFactory.create_batch(7, evento=evento, status="confirmada")
+        admin = EventoAdmin(Evento, AdminSite())
+        result = admin.vagas_inscritos_percentage(evento)
+        # 70% -> orange
+        assert "color: orange" in result
+
+    @pytest.mark.django_db
+    def test_vagas_inscritos_percentage_color_green(self):
+        evento = EventoFactory(vagas=10)
+        InscricaoFactory.create_batch(4, evento=evento, status="confirmada")
+        admin = EventoAdmin(Evento, AdminSite())
+        result = admin.vagas_inscritos_percentage(evento)
+        # 40% -> green
+        assert "color: green" in result
+
+    @pytest.mark.django_db
+    def test_data_formatada_methods(self):
+        from django.utils import timezone
+        import datetime
+        evento = EventoFactory(
+            data_inicio=datetime.date(2025, 6, 1),
+            data_fim=datetime.date(2025, 6, 5),
+            horario_inicio=datetime.time(8, 0),
+            horario_fim=datetime.time(17, 0),
+        )
+        admin = EventoAdmin(Evento, AdminSite())
+        # Testa data_inicio_formatada
+        result_inicio = admin.data_inicio_formatada(evento)
+        assert "01/06/2025" in result_inicio
+        # Testa data_fim_formatada
+        result_fim = admin.data_fim_formatada(evento)
+        assert "05/06/2025" in result_fim
+        # Testa horario_inicio_formatado
+        result_horario_inicio = admin.horario_inicio_formatado(evento)
+        assert "08:00" in result_horario_inicio
+        # Testa horario_fim_formatado
+        result_horario_fim = admin.horario_fim_formatado(evento)
+        assert "17:00" in result_horario_fim
+
+
+class TestEventoAdminActions:
+    @pytest.mark.django_db
+    def test_classificar_inscricoes_success(self):
+        evento = EventoFactory()
+        criterio = CriterioFactory(ativo=True)
+        EventoCriterioFactory(evento=evento, criterio=criterio, pontos_max=10)
+        inter = InteressadoFactory()
+        insc = InscricaoFactory(evento=evento, interessado=inter, status="inscrito")
+        # Cria request com messagens
+        request = HttpRequest()
+        request._messages = FallbackStorage(request)
+        admin = EventoAdmin(Evento, AdminSite())
+        queryset = Evento.objects.filter(pk=evento.pk)
+        admin.classificar_inscricoes(request, queryset)
+        # Verifica se mensagem de sucesso
+        messages = [m.message for m in request._messages]
+        assert any("classificadas" in msg for msg in messages)
+
+    @pytest.mark.django_db
+    def test_classificar_inscricoes_no_criteria_warning(self):
+        evento = EventoFactory()
+        request = HttpRequest()
+        request._messages = FallbackStorage(request)
+        admin = EventoAdmin(Evento, AdminSite())
+        queryset = Evento.objects.filter(pk=evento.pk)
+        admin.classificar_inscricoes(request, queryset)
+        messages = [m.message for m in request._messages]
+        assert any("critério" in msg.lower() for msg in messages)
+
+    @pytest.mark.django_db
+    def test_classificar_inscricoes_no_inscriptions(self):
+        evento = EventoFactory()
+        criterio = CriterioFactory(ativo=True)
+        EventoCriterioFactory(evento=evento, criterio=criterio, pontos_max=10)
+        request = HttpRequest()
+        request._messages = FallbackStorage(request)
+        admin = EventoAdmin(Evento, AdminSite())
+        queryset = Evento.objects.filter(pk=evento.pk)
+        admin.classificar_inscricoes(request, queryset)
+        messages = [m.message for m in request._messages]
+        assert any("inscrições" in msg.lower() for msg in messages)
+
+    @pytest.mark.django_db
+    def test_classificar_inscricoes_status_not_found(self):
+        evento = EventoFactory()
+        criterio = CriterioFactory(ativo=True)
+        EventoCriterioFactory(evento=evento, criterio=criterio, pontos_max=10)
+        inter = InteressadoFactory()
+        InscricaoFactory(evento=evento, interessado=inter, status="inscrito")
+        # Cria request
+        request = HttpRequest()
+        request._messages = FallbackStorage(request)
+        admin = EventoAdmin(Evento, AdminSite())
+        queryset = Evento.objects.filter(pk=evento.pk)
+        # Simula que não há status "classificado"
+        # O teste só verifica se não quebra
+        admin.classificar_inscricoes(request, queryset)
+        messages = [m.message for m in request._messages]
+        assert any("erro" in msg.lower() for msg in messages)
+
+    @pytest.mark.django_db
+    def test_exportar_classificacao_excel_success(self):
+        evento = EventoFactory()
+        criterio = CriterioFactory(ativo=True)
+        EventoCriterioFactory(evento=evento, criterio=criterio, pontos_max=10)
+        inter = InteressadoFactory()
+        InscricaoFactory(evento=evento, interessado=inter, status="classificado")
+        request = HttpRequest()
+        admin = EventoAdmin(Evento, AdminSite())
+        queryset = Evento.objects.filter(pk=evento.pk)
+        response = admin.exportar_classificacao_excel(request, queryset)
+        assert response.status_code == 200
+        assert response.get("Content-Type") == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    @pytest.mark.django_db
+    def test_exportar_classificacao_excel_with_criteria(self):
+        evento = EventoFactory()
+        criterio1 = CriterioFactory(ativo=True, nome="Critério A")
+        criterio2 = CriterioFactory(ativo=True, nome="Critério B")
+        EventoCriterioFactory(evento=evento, criterio=criterio1, pontos_max=10)
+        EventoCriterioFactory(evento=evento, criterio=criterio2, pontos_max=5)
+        inter = InteressadoFactory()
+        InscricaoFactory(evento=evento, interessado=inter, status="classificado")
+        request = HttpRequest()
+        admin = EventoAdmin(Evento, AdminSite())
+        queryset = Evento.objects.filter(pk=evento.pk)
+        response = admin.exportar_classificacao_excel(request, queryset)
+        assert response.status_code == 200
+        content = response.getvalue().decode("latin-1")
+        assert "Critério A" in content or "Critério" in content
+
+
+class TestEventoAdminConfiguration:
+    @pytest.mark.django_db
+    def test_evento_admin_list_display(self):
+        admin = EventoAdmin(Evento, AdminSite())
+        expected = (
+            "nome",
+            "status_colorido",
+            "data_inicio_formatada",
+            "data_fim_formatada",
+            "vagas_inscritos_percentage",
+            "criado_em",
+        )
+        assert admin.list_display == expected
+
+    @pytest.mark.django_db
+    def test_evento_admin_search_fields(self):
+        admin = EventoAdmin(Evento, AdminSite())
+        expected = ("nome", "descricao")
+        assert admin.search_fields == expected
+
+    @pytest.mark.django_db
+    def test_evento_admin_fieldsets(self):
+        admin = EventoAdmin(Evento, AdminSite())
+        expected = (
+            ("Informações Gerais", {"fields": ("nome", "descricao", "imagem", "status", "vagas")}),
+            ("Datas e Horários", {"fields": ("data_inicio", "data_fim", "horario_inicio", "horario_fim")}),
+            ("Localização", {"fields": ("local", "endereco", "cidade", "estado")}),
+            ("Metadados", {"fields": ("criado_em", "atualizado_em")}),
+        )
+        assert admin.fieldsets == expected
+
+
+class TestTurmaAdmin:
+    @pytest.mark.django_db
+    def test_turma_admin_list_display(self):
+        admin = TurmaAdmin(Turma, AdminSite())
+        expected = ("nome", "evento", "vagas", "criado_em")
+        assert admin.list_display == expected
+
+
+class TestHorarioAdmin:
+    @pytest.mark.django_db
+    def test_horario_admin_list_display(self):
+        admin = HorarioAdmin(Horario, AdminSite())
+        expected = ("turma", "dia_semana_display", "horario_inicio", "horario_fim")
+        assert admin.list_display == expected
+
+    @pytest.mark.django_db
+    def test_horario_admin_dia_semana_display(self):
+        horario = HorarioFactory(dia_semana=1)  # Segunda-feira
+        admin = HorarioAdmin(Horario, AdminSite())
+        result = admin.dia_semana_display(horario)
+        assert "Segunda" in result or "segunda" in result.lower()

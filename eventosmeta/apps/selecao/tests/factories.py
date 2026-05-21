@@ -55,7 +55,7 @@ class ClassificacaoFactory(factory.django.DjangoModelFactory):
 
     inscricao = factory.SubFactory(InscricaoFactory)
     pontuacao_total = factory.Faker('random_int', min=0, max=100)
-    posicao = None
+    posicao = 1
     classificado = False
     lista_espera = False
     processado_em = factory.LazyFunction(timezone.now)

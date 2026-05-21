@@ -332,40 +332,43 @@ class ClassificadorService:
                 lista_espera=False,
                 posicao=None
             )
-            # # Etapa 4: Atribuir posições e flags
-            # classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('nota')
-            # for idx, classificacao in enumerate(classificacoes):
-            #     classificacao.refresh_from_db()
-            #     if idx < evento.vagas:
-            #         classificacao.classificado = True
-            #         classificacao.lista_espera = False
-            #     else:
-            #         classificacao.classificado = False
-            #         classificacao.lista_espera = True
-            #     classificacao.posicao = idx + 1
-            #     classificacao.save()
 
-            
             # Etapa 4: Atribuir posições e flags
             posicao = 1
             status_classificado = StatusInscricao.objects.get(nome='Classificado')
-            status_lista_espera = StatusInscricao.objects.get(nome='Lista de Espera')
-            
             for classificacao in classificacoes:
+                # Refresh para pegar os valores resetados
                 classificacao.refresh_from_db()
                 classificacao.posicao = posicao
-                
                 if posicao <= total_vagas:
                     classificacao.classificado = True
-                    classificacao.lista_espera = False
                     classificacao.inscricao.status = status_classificado
                 else:
                     classificacao.classificado = False
                     classificacao.lista_espera = True
-                
                 classificacao.save()
                 classificacao.inscricao.save()
                 posicao += 1
+
+            
+            # Etapa 4: Atribuir posições e flags
+            # posicao = 1
+            # status_classificado = StatusInscricao.objects.get(nome='Classificado')
+            
+            # for classificacao in classificacoes:
+            #     classificacao.posicao = posicao
+                
+            #     if posicao <= total_vagas:
+            #         classificacao.classificado = True
+            #         classificacao.lista_espera = False
+            #         classificacao.inscricao.status = status_classificado
+            #     else:
+            #         classificacao.classificado = False
+            #         classificacao.lista_espera = True
+                
+            #     classificacao.save()
+            #     classificacao.inscricao.save()
+            #     posicao += 1
             
             # Etapa 5: Calcular totais para retorno
             total_classificadas = Classificacao.objects.filter(
@@ -404,39 +407,4 @@ class ClassificadorService:
             }
         
 
-    @staticmethod
-    @transaction.atomic
-    def desfazer_classificacao_evento(evento):
-        """
-        Desfaz a classificação de um evento, deletando as classificações
-        e resetando o status das inscrições para 'Pendente'.
         
-        Args:
-            evento: Objeto Evento cuja classificação será desfeita
-        
-        Returns:
-            dict: { 'sucesso': True/False, 'mensagem': str, 'total_desfeitas': int }
-        """
-        try:
-            total_desfeitas = Classificacao.objects.filter(inscricao__evento=evento).count()
-            Classificacao.objects.filter(inscricao__evento=evento).delete()
-            status_pendente = StatusInscricao.objects.get(nome='Pendente')
-            Inscricao.objects.filter(evento=evento).update(status=status_pendente)
-            
-            return {
-                'sucesso': True,
-                'mensagem': f'Classificação do evento {evento.nome} desfeita com sucesso.',
-                'total_desfeitas': total_desfeitas
-            }
-        except StatusInscricao.DoesNotExist:
-            return {
-                'sucesso': False,
-                'mensagem': 'Status "Pendente" não encontrado em StatusInscricao.',
-                'total_desfeitas': 0
-            }
-        except Exception as erro:
-            return {
-                'sucesso': False,
-                'mensagem': f'Erro ao desfazer classificação: {str(erro)}',
-                'total_desfeitas': 0
-            }
