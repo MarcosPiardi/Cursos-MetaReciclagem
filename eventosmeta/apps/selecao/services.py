@@ -332,6 +332,11 @@ class ClassificadorService:
                 lista_espera=False,
                 posicao=None
             )
+
+            # RESET: Limpar status de inscricoes antes de reclassificar
+            status_listaespera = StatusInscricao.objects.get(nome='Lista de Espera')
+            Inscricao.objects.filter(evento=evento).update(status=status_listaespera)
+
             # # Etapa 4: Atribuir posições e flags
             # classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('nota')
             # for idx, classificacao in enumerate(classificacoes):

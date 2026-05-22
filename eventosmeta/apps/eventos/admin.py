@@ -146,7 +146,7 @@ class EventoAdmin(admin.ModelAdmin):
     ]
     list_filter = ['status', 'data_inicio_evento']
     search_fields = ['nome', 'descricao']
-    actions = ['classificar_inscricoes', 'exportar_classificacao_excel']
+    actions = ['classificar_inscricoes', 'desfazer_classificacao', 'exportar_classificacao_excel']
 
     fieldsets = (
         ('INFORMAÇÕES BÁSICAS', {
@@ -362,6 +362,65 @@ class EventoAdmin(admin.ModelAdmin):
             )
 
     classificar_inscricoes.short_description = '🎯 Classificar inscrições dos eventos selecionados'
+
+    def desfazer_classificacao(self, request, queryset):
+        """
+        Action para desfazer classificação de eventos selecionados.
+        Remove todas as classificações e reseta status das inscrições para 'Pendente'.
+        """
+        from apps.selecao.services import ClassificadorService
+        
+        total_eventos = queryset.count()
+        total_desfeitas = 0
+        eventos_com_erro = 0
+        
+        for evento in queryset:
+            try:
+                resultado = ClassificadorService.desfazer_classificacao_evento(evento)
+                
+                if resultado['sucesso']:
+                    total_desfeitas += resultado['total_desfeitas']
+                    messages.success(
+                        request,
+                        f'✅ {evento.nome}: {resultado["total_desfeitas"]} classificação(ões) desfeita(s). '
+                        f'Inscrições retornaram a "Pendente".'
+                    )
+                else:
+                    messages.error(
+                        request,
+                        f'❌ {evento.nome}: {resultado["mensagem"]}'
+                    )
+                    eventos_com_erro += 1
+            except Exception as e:
+                messages.error(
+                    request,
+                    f'❌ {evento.nome}: Erro inesperado - {str(e)}'
+                )
+                eventos_com_erro += 1
+        
+        # Mensagem final
+        if eventos_com_erro == 0:
+            messages.success(
+                request,
+                f'🎉 Sucesso total: {total_eventos} evento(s) desfeito(s). '
+                f'Total de {total_desfeitas} inscrição(ões) retornaram ao status Pendente.'
+            )
+        elif total_desfeitas > 0:
+            messages.warning(
+                request,
+                f'⚠️ Parcial: {total_eventos - eventos_com_erro} evento(s) desfeito(s). '
+                f'{eventos_com_erro} erro(s). Total: {total_desfeitas} inscrição(ões).'
+            )
+        else:
+            messages.error(
+                request,
+                f'❌ Nenhum evento desfeito. {eventos_com_erro} erro(s).'
+            )
+
+    desfazer_classificacao.short_description = '↩️ Desfazer classificação dos eventos selecionados'
+
+
+
 
     def exportar_classificacao_excel(self, request, queryset):
         """
