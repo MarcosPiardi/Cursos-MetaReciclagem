@@ -445,3 +445,6 @@ class ClassificadorService:
                 'mensagem': f'Erro ao desfazer classificação: {str(erro)}',
                 'total_desfeitas': 0
             }
+        
+
+        
