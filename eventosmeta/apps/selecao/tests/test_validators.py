@@ -3,6 +3,8 @@ Arquivo: test_validators.py
 Caminho: apps/selecao/tests/test_validators.py
 Testes para validadores do app Selecao
 Data: 06 de abril de 2026
+Atualizações: 
+- 27/05/2026 - Expandindo TestValidarInscricao para cobrir mais cenários de validação.
 """
 
 from django.test import TestCase
@@ -12,6 +14,7 @@ from datetime import timedelta
 from apps.selecao.validators import ClassificacaoValidator
 from apps.eventos.tests.factories import EventoFactory, CriterioFactory, EventoCriterioFactory
 from apps.interessados.tests.factories import InteressadoFactory
+from apps.selecao.models import Inscricao   
 from .factories import InscricaoFactory
 
 
@@ -114,5 +117,45 @@ class TestValidarInscricao(TestCase):
         resultado = ClassificacaoValidator.validar_inscricao(inscricao)
         self.assertTrue(resultado['valido'])
         self.assertEqual(len(resultado['erros']), 0)
+
+    def test_inscricao_sem_evento_falha(self):
+        inscricao = InscricaoFactory.build(evento=None)
+        resultado = ClassificacaoValidator.validar_inscricao(inscricao)
+        self.assertFalse(resultado['valido'])
+        self.assertGreater(len(resultado['erros']), 0)
+
+    def test_inscricao_sem_interessado_falha(self):
+        inscricao = InscricaoFactory.build(interessado=None)
+        resultado = ClassificacaoValidator.validar_inscricao(inscricao)
+        self.assertFalse(resultado['valido'])
+        self.assertGreater(len(resultado['erros']), 0)
+
+    def test_inscricao_com_data_futura_falha(self):
+        inscricao = InscricaoFactory()
+        # CORRIGIDO: Inscricao em maiusculo (classe), nao inscricao em minusculo (instancia)
+        Inscricao.objects.filter(pk=inscricao.pk).update(
+            data_inscricao=timezone.now() + timedelta(days=30)
+        )
+        inscricao.refresh_from_db()
+        resultado = ClassificacaoValidator.validar_inscricao(inscricao)
+        self.assertFalse(resultado['valido'])
+        self.assertGreater(len(resultado['erros']), 0)
+        self.assertTrue(any('futur' in erro.lower() for erro in resultado['erros']))
+
+    def test_inscricao_com_evento_sem_vagas_falha(self):
+        evento = EventoFactory(total_vagas=0)
+        inscricao = InscricaoFactory(evento=evento)
+        resultado = ClassificacaoValidator.validar_inscricao(inscricao)
+        self.assertFalse(resultado['valido'])
+        self.assertGreater(len(resultado['erros']), 0)
+        self.assertTrue(any('vagas' in erro.lower() for erro in resultado['erros']))
+
+    def test_inscricao_com_evento_sem_criterios_passa_com_aviso(self):
+        evento = EventoFactory(total_vagas=10)
+        inscricao = InscricaoFactory(evento=evento)
+        resultado = ClassificacaoValidator.validar_inscricao(inscricao)
+        self.assertTrue(resultado['valido'])
+        self.assertGreater(len(resultado['avisos']), 0)
+
 
         

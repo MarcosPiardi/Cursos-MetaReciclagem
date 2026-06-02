@@ -1,3 +1,10 @@
+"""
+Arquivo: forms.py
+Caminho: apps/accounts/forms.py
+Atualizações:
+
+"""
+
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 

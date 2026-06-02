@@ -1,23 +1,30 @@
 """
 Arquivo: test_models.py
 Caminho: apps/interessados/tests/test_models.py
-Alteração: Testes automatizados — validação CPF, login, cadastro, LGPD
+Testes dos models: Interessado, Sexo, Fototipo, PasswordResetToken, SolicitacaoExclusao
 Data: 20/03/2026
+Refatorado: 29/05/2026
+  - Removido import duplicado / nao utilizado
+  - Removido codigo comentado
+  - Consolidado classes de teste fragmentadas (Interessado)
+  - Melhorado helper com setUpTestData
 """
 
 from django.test import TestCase
 from django.utils import timezone
+from django.db import IntegrityError
+from django.core.exceptions import ValidationError
+
 from ..models import Interessado, Sexo, Fototipo, PasswordResetToken, SolicitacaoExclusao, gerar_hash_cpf
-from ..forms import CadastroInteressadoForm, LoginInteressadoForm
 from .factories import InteressadoFactory, SexoFactory, FototipoFactory, PasswordResetTokenFactory
-from ..models import Interessado, SolicitacaoExclusao, gerar_hash_cpf
+
 
 # ============================================================
-# HELPERS
+# UTILITARIO
 # ============================================================
 
-def criar_interessado(cpf='52998224725', nome='Teste Silva', senha='senha123'):
-    """Cria um interessado válido para uso nos testes."""
+def build_interessado(cpf='52998224725', nome='Teste Silva', senha='senha123'):
+    """Cria e salva um Interessado valido para testes."""
     i = Interessado(
         nome=nome,
         cpf=cpf,
@@ -31,429 +38,295 @@ def criar_interessado(cpf='52998224725', nome='Teste Silva', senha='senha123'):
 
 
 # ============================================================
-# TESTES — MODELO / CPF HASH
+# GERAR_HASH_CPF
 # ============================================================
 
 class TestHashCPF(TestCase):
 
-    def test_hash_gerado_corretamente(self):
-        """O hash do mesmo CPF deve ser sempre igual."""
-        cpf = '52998224725'
-        h1 = gerar_hash_cpf(cpf)
-        h2 = gerar_hash_cpf(cpf)
+    def test_mesmo_cpf_mesmo_hash(self):
+        h1 = gerar_hash_cpf('52998224725')
+        h2 = gerar_hash_cpf('52998224725')
         self.assertEqual(h1, h2)
 
-    def test_hashes_diferentes_para_cpfs_diferentes(self):
-        """CPFs diferentes devem gerar hashes diferentes."""
+    def test_cpfs_diferentes_hashes_diferentes(self):
         h1 = gerar_hash_cpf('52998224725')
         h2 = gerar_hash_cpf('11144477735')
         self.assertNotEqual(h1, h2)
 
     def test_hash_tem_64_caracteres(self):
-        """Hash SHA-256 deve ter 64 caracteres."""
         h = gerar_hash_cpf('52998224725')
         self.assertEqual(len(h), 64)
 
 
 # ============================================================
-# TESTES — MODELO INTERESSADO
+# INTERESSADO (consolidado)
 # ============================================================
 
 class TestInteressadoModel(TestCase):
 
-    def setUp(self):
-        self.interessado = criar_interessado()
+    @classmethod
+    def setUpTestData(cls):
+        cls.obj = build_interessado()
 
-    def test_senha_criptografada(self):
-        """A senha não deve ser armazenada em texto puro."""
-        self.assertNotEqual(self.interessado.senha, 'senha123')
-        self.assertTrue(self.interessado.senha.startswith('pbkdf2_'))
+    # --- Senha ---
 
-    def test_check_password_correto(self):
-        """check_password deve retornar True para a senha correta."""
-        self.assertTrue(self.interessado.check_password('senha123'))
+    def test_senha_nao_e_texto_puro(self):
+        self.assertNotEqual(self.obj.senha, 'senha123')
+        self.assertTrue(self.obj.senha.startswith('pbkdf2_'))
 
-    def test_check_password_incorreto(self):
-        """check_password deve retornar False para senha errada."""
-        self.assertFalse(self.interessado.check_password('senhaerrada'))
+    def test_check_password_ok(self):
+        self.assertTrue(self.obj.check_password('senha123'))
+
+    def test_check_password_errado(self):
+        self.assertFalse(self.obj.check_password('senhaerrada'))
+
+    # --- Interface de autenticacao ---
 
     def test_is_authenticated(self):
-        """Interessado deve ser autenticado."""
-        self.assertTrue(self.interessado.is_authenticated)
+        self.assertTrue(self.obj.is_authenticated)
 
-    def test_is_anonymous_false(self):
-        """Interessado não é anônimo."""
-        self.assertFalse(self.interessado.is_anonymous)
+    def test_is_anonymous(self):
+        self.assertFalse(self.obj.is_anonymous)
 
-    def test_str(self):
-        """__str__ deve conter o nome."""
-        self.assertIn('Teste Silva', str(self.interessado))
+    # --- str ---
 
-    def test_factory_interessado(self):
-        """Testa se factory cria Interessado válido."""
-        interessado = InteressadoFactory.create()
-        # ✅ Verifica que CPF foi gerado (dinâmico, não fixo)
-        self.assertIsNotNone(interessado.cpf)
-        self.assertEqual(len(interessado.cpf.replace('.', '').replace('-', '')), 11)
-        # ✅ Verifica NIS foi gerado
-        self.assertIsNotNone(interessado.num_nis)
-        # ✅ Verifica senha foi criptografada
-        self.assertTrue(interessado.check_password('senha123'))
+    def test_str_contem_nome(self):
+        self.assertIn('Teste Silva', str(self.obj))
 
-        # interessado = InteressadoFactory.create()
-        # self.assertEqual(interessado.cpf, '123.456.789-00')  # max_length=14
-        # self.assertEqual(interessado.num_nis, '123.45678.90-1')  # max_length=15
-        # self.assertEqual(interessado.cep, '12345678')  # max_length=8
-        # self.assertEqual(interessado.rg, '12.345.678-9')  # max_length=20
-        # self.assertTrue(interessado.consentimento_lgpd)
-        # self.assertTrue(interessado.check_password('senha123'))
+    # --- Criptografia CPF ---
 
-    # ============================================================
-    # BLOCO 2: VALIDADORES
-    # ============================================================
+    def test_cpf_criptografado_no_banco(self):
+        cpf_original = '12345678901'
+        i = InteressadoFactory.create(cpf=cpf_original)
+        recarregado = Interessado.objects.get(id=i.id)
+        self.assertEqual(recarregado.cpf, cpf_original)
 
-    def test_cpf_valido(self):
-        """CPF com 11 dígitos deve passar na validação."""
-        cpf_valido = '12345678901'
-        interessado = Interessado(
-            nome='Test User',
-            cpf=cpf_valido,
-            cpf_hash=gerar_hash_cpf(cpf_valido),
-            consentimento_lgpd=True,
-        )
-        interessado.set_password('senha123')
-        # Não deve lançar ValidationError
-        interessado.full_clean()
-        interessado.save()
-        self.assertEqual(interessado.cpf, cpf_valido)
+    def test_cpf_hash_unico(self):
+        i1 = InteressadoFactory.create(cpf='12345678901')
+        i2 = InteressadoFactory.create(cpf='98765432100')
+        self.assertNotEqual(i1.cpf_hash, i2.cpf_hash)
+        self.assertEqual(i1.cpf_hash, gerar_hash_cpf('12345678901'))
 
-    # def test_cpf_invalido_caracteres(self):
-    #     """CPF com caracteres não numéricos deve falhar na validação."""
-    #     from django.core.exceptions import ValidationError
-    #     cpf_invalido = '123.456.789-01'  # Formatado
-    #     interessado = Interessado(
-    #         nome='Test User',
-    #         cpf=cpf_invalido,
-    #         cpf_hash=gerar_hash_cpf(cpf_invalido),
-    #         consentimento_lgpd=True,
-    #     )
-    #     interessado.set_password('senha123')
-    #     with self.assertRaises(ValidationError):
-    #         interessado.full_clean()
+    def test_cpf_hash_busca_eficiente(self):
+        cpf = '12345678901'
+        i = InteressadoFactory.create(cpf=cpf)
+        resultado = Interessado.objects.filter(cpf_hash=gerar_hash_cpf(cpf)).first()
+        self.assertEqual(resultado.id, i.id)
 
-    def test_cpf_formatado_aceito(self):
-        """Model aceita CPF formatado (limpeza é responsabilidade da form)."""
-        cpf_formatado = '123.456.789-01'
-        interessado = Interessado(
-            nome='Test User',
-            cpf=cpf_formatado,
-            cpf_hash=gerar_hash_cpf(cpf_formatado),
-            consentimento_lgpd=True,
-        )
-        interessado.set_password('senha123')
-        # Não deve lançar erro - model aceita strings até 14 chars
-        interessado.save()
-        self.assertEqual(interessado.cpf, cpf_formatado)    
+    # --- Criptografia NIS ---
+
+    def test_nis_criptografado_no_banco(self):
+        nis_original = '12345678901'
+        i = InteressadoFactory.create(num_nis=nis_original)
+        recarregado = Interessado.objects.get(id=i.id)
+        self.assertEqual(recarregado.num_nis, nis_original)
+
+    # --- Factory cria dados validos ---
+
+    def test_factory_cria_interessado_valido(self):
+        i = InteressadoFactory.create()
+        self.assertIsNotNone(i.cpf)
+        self.assertEqual(len(i.cpf.replace('.', '').replace('-', '')), 11)
+        self.assertIsNotNone(i.num_nis)
+        self.assertIsNotNone(i.cpf_hash)
+        self.assertEqual(len(i.cpf_hash), 64)
+        self.assertTrue(i.check_password('senha123'))
+
+    # --- CPF field validation ---
+
+    def test_cpf_11_digitos_valido(self):
+        cpf = '12345678901'
+        i = Interessado(nome='Teste', cpf=cpf, cpf_hash=gerar_hash_cpf(cpf),
+                        consentimento_lgpd=True)
+        i.set_password('senha123')
+        i.full_clean()
+        i.save()
+        self.assertEqual(i.cpf, cpf)
+
+    def test_cpf_formatado_aceito_pelo_model(self):
+        """Model aceita CPF formatado (14 chars). A limpeza e da form."""
+        cpf = '123.456.789-01'
+        i = Interessado(nome='Teste', cpf=cpf, cpf_hash=gerar_hash_cpf(cpf),
+                        consentimento_lgpd=True)
+        i.set_password('senha123')
+        i.save()
+        self.assertEqual(i.cpf, cpf)
+
+    # --- NIS field validation ---
 
     def test_nis_valido(self):
-        """NIS com 11-15 dígitos deve passar na validação."""
-        nis_valido = '12345678901'  # 11 dígitos
-        interessado = InteressadoFactory.create(num_nis=nis_valido)
-        self.assertEqual(interessado.num_nis, nis_valido)
+        i = InteressadoFactory.create(num_nis='12345678901')
+        self.assertEqual(i.num_nis, '12345678901')
 
-    def test_nis_invalido_poucos_digitos(self):
-        """NIS com <11 dígitos deve falhar na validação."""
-        from django.core.exceptions import ValidationError
-        nis_invalido = '1234567890'  # 10 dígitos (menos que o mínimo)
-        interessado = Interessado(
-            nome='Test User',
-            cpf='12345678901',
-            cpf_hash=gerar_hash_cpf('12345678901'),
-            num_nis=nis_invalido,
-            consentimento_lgpd=True,
-        )
-        interessado.set_password('senha123')
+    def test_nis_muito_curto_rejeita(self):
+        i = Interessado(nome='Teste', cpf='12345678901',
+                        cpf_hash=gerar_hash_cpf('12345678901'),
+                        num_nis='1234567890',
+                        consentimento_lgpd=True)
+        i.set_password('senha123')
         with self.assertRaises(ValidationError):
-            interessado.full_clean()
+            i.full_clean()
+
+    # --- CEP field validation ---
 
     def test_cep_valido(self):
-        """CEP com exatamente 8 dígitos deve passar na validação."""
-        cep_valido = '12345678'
-        interessado = InteressadoFactory.create(cep=cep_valido)
-        self.assertEqual(interessado.cep, cep_valido)
+        i = InteressadoFactory.create(cep='12345678')
+        self.assertEqual(i.cep, '12345678')
 
-    def test_cep_invalido_formato(self):
-        """CEP com menos de 8 dígitos deve falhar na validação."""
-        from django.core.exceptions import ValidationError
-        cep_invalido = '1234567'  # 7 dígitos
-        interessado = Interessado(
-            nome='Test User',
-            cpf='12345678901',
-            cpf_hash=gerar_hash_cpf('12345678901'),
-            cep=cep_invalido,
-            consentimento_lgpd=True,
-        )
-        interessado.set_password('senha123')
+    def test_cep_muito_curto_rejeita(self):
+        i = Interessado(nome='Teste', cpf='12345678901',
+                        cpf_hash=gerar_hash_cpf('12345678901'),
+                        cep='1234567',
+                        consentimento_lgpd=True)
+        i.set_password('senha123')
         with self.assertRaises(ValidationError):
-            interessado.full_clean()
+            i.full_clean()
 
-    # ============================================================
-    # BLOCO 3: ENCRYPTEDCHARFIELD (Criptografia CPF/NIS)
-    # ============================================================
+    # --- Relacionamentos ---
 
-    def test_cpf_criptografado_salvo(self):
-        """CPF é armazenado criptografado no banco de dados."""
-        cpf_original = '12345678901'
-        interessado = InteressadoFactory.create(cpf=cpf_original)
-        # Recarrega do banco para verificar criptografia
-        interessado_reload = Interessado.objects.get(id=interessado.id)
-        # CPF descriptografado deve ser igual ao original
-        self.assertEqual(interessado_reload.cpf, cpf_original)
+    def test_relacionamento_sexo(self):
+        sexo = SexoFactory()
+        i = InteressadoFactory.create(sexo=sexo)
+        self.assertEqual(i.sexo, sexo)
 
-    def test_cpf_hash_unico_por_cpf(self):
-        """Cada CPF gera um hash único e imutável para buscas."""
-        cpf1 = '12345678901'
-        cpf2 = '98765432100'
-        i1 = InteressadoFactory.create(cpf=cpf1)
-        i2 = InteressadoFactory.create(cpf=cpf2)
-        # Hashes devem ser diferentes
-        self.assertNotEqual(i1.cpf_hash, i2.cpf_hash)
-        # Hash deve ser consistente
-        hash_cpf1 = gerar_hash_cpf(cpf1)
-        self.assertEqual(i1.cpf_hash, hash_cpf1)
+    def test_relacionamento_fototipo(self):
+        fototipo = FototipoFactory()
+        i = InteressadoFactory.create(fototipo=fototipo)
+        self.assertEqual(i.fototipo, fototipo)
 
-    def test_nis_criptografado_salvo(self):
-        """NIS é armazenado criptografado no banco de dados."""
-        nis_original = '12345678901'
-        interessado = InteressadoFactory.create(num_nis=nis_original)
-        # Recarrega do banco
-        interessado_reload = Interessado.objects.get(id=interessado.id)
-        # NIS descriptografado deve ser igual ao original
-        self.assertEqual(interessado_reload.num_nis, nis_original)
+    def test_relacionamentos_simultaneos(self):
+        sexo = SexoFactory()
+        fototipo = FototipoFactory()
+        i = InteressadoFactory.create(sexo=sexo, fototipo=fototipo)
+        self.assertEqual(i.sexo, sexo)
+        self.assertEqual(i.fototipo, fototipo)
 
-    def test_cpf_hash_facilita_busca(self):
-        """cpf_hash permite busca eficiente sem descriptografar CPF."""
-        cpf = '12345678901'
-        interessado = InteressadoFactory.create(cpf=cpf)
-        cpf_hash = gerar_hash_cpf(cpf)
-        # Busca por hash deve retornar o interessado
-        resultado = Interessado.objects.filter(cpf_hash=cpf_hash).first()
-        self.assertIsNotNone(resultado)
-        self.assertEqual(resultado.id, interessado.id)
+    # --- Flags PCD ---
 
+    def test_multiplas_deficiencias(self):
+        i = InteressadoFactory.create(necessidades_especiais=True,
+                                      pcd_fisica=True, pcd_auditiva=True)
+        self.assertTrue(i.pcd_fisica)
+        self.assertTrue(i.pcd_auditiva)
+        self.assertFalse(i.pcd_visual)
 
-    # ============================================================
-    # BLOCO 1: SOLICITACAOEXCLUSAO (LGPD — Direito ao Esquecimento)
-    # ============================================================
-
-    def test_solicitacao_exclusao_criada(self):
-        """SolicitacaoExclusao é criada com status PENDENTE."""
-        interessado = InteressadoFactory.create()
-        solicitacao = SolicitacaoExclusao.objects.create(
-            interessado=interessado,
-            nome_solicitante='João Silva',
-            email_solicitante='joao@email.com',
-            motivo='Não quero mais participar',
-            status='PENDENTE'
-        )
-        self.assertEqual(solicitacao.status, 'PENDENTE')
-        self.assertEqual(solicitacao.interessado, interessado)
-
-    def test_solicitacao_exclusao_status_choices(self):
-        """Solicitação pode ter status PENDENTE, APROVADA ou RECUSADA."""
-        interessado = InteressadoFactory.create()
-        status_validos = ['PENDENTE', 'APROVADA', 'RECUSADA']
-        
-        for status in status_validos:
-            solicitacao = SolicitacaoExclusao.objects.create(
-                interessado=interessado,
-                nome_solicitante='Teste',
-                status=status
-            )
-            self.assertEqual(solicitacao.status, status)
-
-    def test_solicitacao_exclusao_nome_obrigatorio(self):
-        """Nome do solicitante é obrigatório."""
-        interessado = InteressadoFactory.create()
-        solicitacao = SolicitacaoExclusao(
-            interessado=interessado,
-            nome_solicitante='',  # Vazio
-            status='PENDENTE'
-        )
-        # Tenta salvar sem nome
-        with self.assertRaises(Exception):
-            solicitacao.full_clean()
-
-    def test_solicitacao_exclusao_email_opcional(self):
-        """Email do solicitante é opcional."""
-        interessado = InteressadoFactory.create()
-        solicitacao = SolicitacaoExclusao.objects.create(
-            interessado=interessado,
-            nome_solicitante='Maria Santos',
-            email_solicitante='',  # Vazio é permitido
-            status='PENDENTE'
-        )
-        self.assertEqual(solicitacao.email_solicitante, '')
-
-    def test_solicitacao_exclusao_str(self):
-        """__str__ retorna formato legível com status e data."""
-        from django.utils import timezone
-        interessado = InteressadoFactory.create()
-        solicitacao = SolicitacaoExclusao.objects.create(
-            interessado=interessado,
-            nome_solicitante='Ana Costa',
-            status='APROVADA',
-            solicitado_em=timezone.now()
-        )
-        str_repr = str(solicitacao)
-        self.assertIn('APROVADA', str_repr)
-        self.assertIn('Ana Costa', str_repr)
-
-# ============================================================
-# NOVAS CLASSES DE TESTE - INTEGRAÇÃO COM FACTORIES
-# ============================================================
-
-class TestSexoModelCompleto(TestCase):
-    """Testes para modelo Sexo com constraint unique."""
-
-    def test_sexo_criado_com_factory(self):
-        """Factory cria Sexo válido."""
-        sexo = SexoFactory(nome='Masculino')
-        self.assertEqual(sexo.nome, 'Masculino')
-        self.assertIsNotNone(sexo.id)
-
-    def test_sexo_str_representation(self):
-        """__str__ retorna o nome."""
-        sexo = SexoFactory(nome='Feminino')
-        self.assertEqual(str(sexo), 'Feminino')
-
-    def test_sexo_constraint_via_model(self):
-        """Model não permite duplicar via objects.create()."""
-        from django.db import IntegrityError
-        
-        Sexo.objects.create(nome='Outro')
-        
-        # Tentar criar com mesmo nome = ERRO
-        with self.assertRaises(IntegrityError):
-            Sexo.objects.create(nome='Outro')
-
-    def test_sexo_valores_fixos(self):
-        """Sexo armazena os 4 valores fixos sem duplicatas."""
-        valores = ['Masculino', 'Feminino', 'Outro', 'Prefiro não informar']
-        
-        for valor in valores:
-            sexo = Sexo.objects.create(nome=valor)
-            self.assertIsNotNone(sexo.id)
-        
-        # Total de 4 registros no banco
-        self.assertEqual(Sexo.objects.count(), 4)
-        
-
-class TestFototipoModelCompleto(TestCase):
-    """Testes completos para modelo Fototipo com Factory."""
-
-    def test_fototipo_criado_com_factory(self):
-        """Factory cria Fototipo válido."""
-        fototipo = FototipoFactory(nome='Tipo IV')
-        self.assertEqual(fototipo.nome, 'Tipo IV')
-        self.assertIsNotNone(fototipo.id)
-
-    def test_fototipo_descricao_vazia(self):
-        """Factory pode criar Fototipo sem descrição."""
-        fototipo = FototipoFactory(descricao='')
-        self.assertEqual(fototipo.descricao, '')
-
-
-class TestInteressadoModelCriptografia2(TestCase):
-    """Testes adicionais de criptografia com Factory."""
-
-    def test_cpf_hash_gerado_automaticamente(self):
-        """cpf_hash é gerado corretamente pela factory."""
-        interessado = InteressadoFactory.create()
-        self.assertIsNotNone(interessado.cpf_hash)
-        self.assertEqual(len(interessado.cpf_hash), 64)
-
-    def test_senha_criptografada_factory(self):
-        """Senha criada por factory é criptografada."""
-        interessado = InteressadoFactory.create()
-        self.assertTrue(interessado.senha.startswith('pbkdf2_'))
-        self.assertTrue(interessado.check_password('senha123'))
-
-
-class TestInteressadoModelRelacionamentos(TestCase):
-    """Testes de relacionamentos do modelo Interessado."""
-
-    def setUp(self):
-        self.sexo = SexoFactory()
-        self.fototipo = FototipoFactory()
-
-    def test_interessado_sexo_fk(self):
-        """Interessado pode estar relacionado a Sexo."""
-        interessado = InteressadoFactory.create(sexo=self.sexo)
-        self.assertEqual(interessado.sexo, self.sexo)
-
-    def test_interessado_fototipo_fk(self):
-        """Interessado pode estar relacionado a Fototipo."""
-        interessado = InteressadoFactory.create(fototipo=self.fototipo)
-        self.assertEqual(interessado.fototipo, self.fototipo)
-
-    def test_interessado_multiplos_relacionamentos(self):
-        """Interessado com sexo e fototipo."""
-        interessado = InteressadoFactory.create(
-            sexo=self.sexo,
-            fototipo=self.fototipo
-        )
-        self.assertEqual(interessado.sexo, self.sexo)
-        self.assertEqual(interessado.fototipo, self.fototipo)
-
-
-class TestInteressadoModelFlags(TestCase):
-    """Testes para flags booleanas de PCD."""
-
-    def test_pcd_multiplas_flags(self):
-        """Pode marcar múltiplas deficiências."""
-        interessado = InteressadoFactory.create(
-            necessidades_especiais=True,
-            pcd_fisica=True,
-            pcd_auditiva=True
-        )
-        self.assertTrue(interessado.pcd_fisica)
-        self.assertTrue(interessado.pcd_auditiva)
-        self.assertFalse(interessado.pcd_visual)
-
-    def test_interessado_tem_deficiencia_property(self):
-        """Property tem_deficiencia retorna True se tem alguma deficiência."""
+    def test_tem_deficiencia_property(self):
         i1 = InteressadoFactory.create(pcd_fisica=True)
-        i2 = InteressadoFactory.create(pcd_visual=False, pcd_auditiva=False)
-        
+        i2 = InteressadoFactory.create(pcd_fisica=False, pcd_auditiva=False,
+                                        pcd_visual=False, pcd_intelectual=False,
+                                        pcd_psicossocial=False, pcd_multiplas=False)
         self.assertTrue(i1.tem_deficiencia)
         self.assertFalse(i2.tem_deficiencia)
 
 
-class TestPasswordResetTokenCompleto(TestCase):
-    """Testes completos para PasswordResetToken com Factory."""
+# ============================================================
+# SOLICITACAOEXCLUSAO (LGPD)
+# ============================================================
 
-    def test_token_criado_com_factory(self):
-        """Factory cria token válido."""
-        token = PasswordResetTokenFactory.create()
-        self.assertIsNotNone(token.id)
-        self.assertIsNotNone(token.token)
-        self.assertFalse(token.usado)
+class TestSolicitacaoExclusao(TestCase):
 
-    def test_token_expiracao(self):
-        """Token expira corretamente."""
-        token = PasswordResetTokenFactory.create()
-        self.assertTrue(token.expira_em > token.criado_em)
+    def test_criada_com_status_pendente(self):
+        i = InteressadoFactory.create()
+        s = SolicitacaoExclusao.objects.create(
+            interessado=i, nome_solicitante='Joao Silva',
+            email_solicitante='joao@email.com',
+            motivo='Nao quero mais participar',
+            status='PENDENTE',
+        )
+        self.assertEqual(s.status, 'PENDENTE')
+        self.assertEqual(s.interessado, i)
 
-    def test_token_marca_usado(self):
-        """Token pode ser marcado como usado."""
-        token = PasswordResetTokenFactory.create()
-        token.usado = True
-        token.save()
+    def test_todos_os_status_sao_validos(self):
+        i = InteressadoFactory.create()
+        for status in ['PENDENTE', 'APROVADA', 'RECUSADA']:
+            s = SolicitacaoExclusao.objects.create(
+                interessado=i, nome_solicitante='Teste',
+                status=status,
+            )
+            self.assertEqual(s.status, status)
+
+    def test_nome_solicitante_obrigatorio(self):
+        i = InteressadoFactory.create()
+        s = SolicitacaoExclusao(interessado=i, nome_solicitante='',
+                                status='PENDENTE')
+        with self.assertRaises(ValidationError):
+            s.full_clean()
+
+    def test_email_solicitante_opcional(self):
+        i = InteressadoFactory.create()
+        s = SolicitacaoExclusao.objects.create(
+            interessado=i, nome_solicitante='Maria Santos',
+            email_solicitante='', status='PENDENTE',
+        )
+        self.assertEqual(s.email_solicitante, '')
+
+    def test_str_contem_status_e_nome(self):
+        i = InteressadoFactory.create()
+        s = SolicitacaoExclusao.objects.create(
+            interessado=i, nome_solicitante='Ana Costa',
+            status='APROVADA', solicitado_em=timezone.now(),
+        )
+        self.assertIn('APROVADA', str(s))
+        self.assertIn('Ana Costa', str(s))
+
+
+# ============================================================
+# SEXO
+# ============================================================
+
+class TestSexoModel(TestCase):
+
+    def test_factory_cria_valido(self):
+        s = SexoFactory(nome='Masculino')
+        self.assertEqual(s.nome, 'Masculino')
+
+    def test_str_retorna_nome(self):
+        s = SexoFactory(nome='Feminino')
+        self.assertEqual(str(s), 'Feminino')
+
+    def test_unique_constraint_violado(self):
+        Sexo.objects.create(nome='Outro')
+        with self.assertRaises(IntegrityError):
+            Sexo.objects.create(nome='Outro')
+
+
+# ============================================================
+# FOTOTIPO
+# ============================================================
+
+class TestFototipoModel(TestCase):
+
+    def test_factory_cria_valido(self):
+        f = FototipoFactory(nome='Tipo IV')
+        self.assertEqual(f.nome, 'Tipo IV')
+
+    def test_descricao_pode_ser_vazia(self):
+        f = FototipoFactory(descricao='')
+        self.assertEqual(f.descricao, '')
+
+
+# ============================================================
+# PASSWORDRESETTOKEN
+# ============================================================
+
+class TestPasswordResetTokenModel(TestCase):
+
+    def test_factory_cria_token_valido(self):
+        t = PasswordResetTokenFactory.create()
+        self.assertIsNotNone(t.id)
+        self.assertIsNotNone(t.token)
+        self.assertFalse(t.usado)
+
+    def test_expiracao_futura(self):
+        t = PasswordResetTokenFactory.create()
+        self.assertTrue(t.expira_em > t.criado_em)
+
+    def test_marca_como_usado(self):
+        t = PasswordResetTokenFactory.create()
+        t.usado = True
+        t.save()
+        t.refresh_from_db()
+        self.assertTrue(t.usado)
+
+
         
-        token.refresh_from_db()
-        self.assertTrue(token.usado)
-
-
-
-

@@ -5,6 +5,7 @@ Alteração: Adicionado tipo_criterio em Criterio e prioridade em EventoCriterio
 Data: 09/12/2025
 """
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 
@@ -106,48 +107,57 @@ class Criterio(models.Model):
 
 
 class Evento(models.Model):
-    """
-    Eventos/Cursos oferecidos
-    """
-    nome = models.CharField('Nome do Evento', max_length=200)
-    descricao = models.TextField('Descrição', blank=True)
-    status = models.ForeignKey(
-        Status,
-        on_delete=models.PROTECT,
-        related_name='eventos',
-        verbose_name='Status'
-    )
-    
-    # Vagas
-    total_vagas = models.IntegerField(
-        'Total de Vagas',
-        validators=[MinValueValidator(1)]
-    )
-    
-    # Datas de inscrição
-    data_inicio_inscricao = models.DateTimeField('Início das Inscrições')
-    data_fim_inscricao = models.DateTimeField('Fim das Inscrições')
-    
-    # Período do evento
-    data_inicio_evento = models.DateField('Início do Evento')
-    data_fim_evento = models.DateField('Fim do Evento')
-    
-    # Metadata
+    nome = models.CharField(max_length=200)
+    descricao = models.TextField(blank=True)
+    status = models.ForeignKey(Status, on_delete=models.PROTECT)
+    total_vagas = models.IntegerField(validators=[MinValueValidator(1)])
+    data_inicio_inscricao = models.DateTimeField()
+    data_fim_inscricao = models.DateTimeField()
+    data_inicio_evento = models.DateField()
+    data_fim_evento = models.DateField()
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
-        verbose_name = 'Evento'
-        verbose_name_plural = 'Eventos'
-        ordering = ['-data_inicio_evento']
-    
+        verbose_name = "Evento"
+        verbose_name_plural = "Eventos"
+        ordering = ["-criado_em"]
+
     def __str__(self):
         return self.nome
-    
+
     def inscricoes_abertas(self):
-        """Verifica se as inscrições estão abertas"""
+        from django.utils import timezone
         agora = timezone.now()
         return self.data_inicio_inscricao <= agora <= self.data_fim_inscricao
+
+    def data_inicio_inscricao_formatada(self):
+        if self.data_inicio_inscricao:
+            return self.data_inicio_inscricao.strftime("%d/%m/%Y")
+        return ""
+
+    def data_fim_inscricao_formatada(self):
+        if self.data_fim_inscricao:
+            return self.data_fim_inscricao.strftime("%d/%m/%Y")
+        return ""
+
+    def data_inicio_evento_formatada(self):
+        if self.data_inicio_evento:
+            return self.data_inicio_evento.strftime("%d/%m/%Y")
+        return ""
+
+    def data_fim_evento_formatada(self):
+        if self.data_fim_evento:
+            return self.data_fim_evento.strftime("%d/%m/%Y")
+        return ""
+    
+    def clean(self):
+        super().clean()
+        # Regra de negócio: data de fim não pode ser menor que a de início
+        if self.data_inicio_inscricao and self.data_fim_inscricao and self.data_fim_inscricao < self.data_inicio_inscricao:
+            raise ValidationError('A data de fim das inscrições não pode ser anterior à data de início.')
+        if self.data_inicio_evento and self.data_fim_evento and self.data_fim_evento < self.data_inicio_evento:
+            raise ValidationError('A data de fim do evento não pode ser anterior à data de início.')
 
 
 class EventoCriterio(models.Model):

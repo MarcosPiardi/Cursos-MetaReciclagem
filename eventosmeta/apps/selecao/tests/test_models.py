@@ -1,8 +1,10 @@
 """
 Arquivo: test_models.py
 Caminho: apps/selecao/tests/test_models.py
+Atualizações:
 27/03/2026 - Testes de modelos para o app Selecao
 08/04/2026 - Testes de modelos para o app Seleção com validações e desempate
+27/05/2026 - Refatoração dos testes de modelos para incluir validações adicionais e teste de desempate por data de inscrição.
 """
 
 from django.test import TestCase
@@ -164,42 +166,44 @@ class TestClassificacaoModel(TestCase):
             classificacao.full_clean()
 
     def test_flags_classificacao_mutuamente_exclusivas(self):
-        """Um candidato não pode estar classificado e na lista de espera ao mesmo tempo."""
-        """Verifica se classificado e lista_espera são mutuamente exclusivos."""
-
-        from django.core.exceptions import ValidationError
-    
-        # Deve lançar erro ao tentar criar com ambas True
+        """classificado e lista_espera nao podem ser True juntos."""
+        classificacao = ClassificacaoFactory(inscricao=self.inscricao)
+        classificacao.classificado = True
+        classificacao.lista_espera = True
         with self.assertRaises(ValidationError):
-            ClassificacaoFactory(
-                classificado=True,
-                lista_espera=True
-        )
+            classificacao.full_clean()    
         
     def test_desempate_por_data_inscricao(self):
-        """Verifica se a ordenação pelo banco respeita a data de inscrição."""
-        # Funciona como uma fila de banco: quem chega primeiro, tem prioridade
+        """Ordenacao respeita data de inscricao (FIFO) para pontuacoes iguais."""
+        from django.utils import timezone
+        from datetime import timedelta, datetime
+
         interessado2 = InteressadoFactory()
         inscricao2 = InscricaoFactory(interessado=interessado2)
-        
-        classificacao1 = ClassificacaoFactory(
+
+        ClassificacaoFactory(
             inscricao=self.inscricao,
             pontuacao_total=50
         )
-        classificacao2 = ClassificacaoFactory(
+        ClassificacaoFactory(
             inscricao=inscricao2,
             pontuacao_total=50
         )
-        
-        # Força datas diferentes para simular ordem de chegada
-        self.inscricao.data_inscricao = '2026-01-01 10:00:00'
-        self.inscricao.save()
-        inscricao2.data_inscricao = '2026-01-01 11:00:00'
-        inscricao2.save()
-        
-        # Ordena por pontuação (decrescente) e data de inscrição (crescente)
-        queryset = Classificacao.objects.all().order_by('-pontuacao_total', 'inscricao__data_inscricao')
-        
-        self.assertEqual(queryset.first(), classificacao1)
-        self.assertEqual(queryset.last(), classificacao2)
+
+        # Forca datas diferentes via update (evita problema de timezone)
+        agora = timezone.now()
+        Inscricao.objects.filter(pk=self.inscricao.pk).update(
+            data_inscricao=agora - timedelta(hours=2)
+        )
+        Inscricao.objects.filter(pk=inscricao2.pk).update(
+            data_inscricao=agora - timedelta(hours=1)
+        )
+
+        # Ordena por pontuacao (decrescente) e data inscricao (crescente)
+        queryset = Classificacao.objects.all().order_by(
+            '-pontuacao_total', 'inscricao__data_inscricao'
+        )
+
+        self.assertEqual(queryset.first().inscricao, self.inscricao)
+        self.assertEqual(queryset.last().inscricao, inscricao2)
 

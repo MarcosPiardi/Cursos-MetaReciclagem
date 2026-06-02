@@ -3,11 +3,15 @@ Arquivo: validators.py
 Caminho: apps/selecao/validators.py
 Alteração: Validadores centralizados para o sistema de classificação
 Data: 11/12/2025
+Atualizações:   
+- 27/05/2026 - Adicionada validação de inscrição para verificar status e dados do interessado.
 """
 
 from datetime import date
 from decimal import Decimal
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from apps.eventos.models import EventoCriterio
 
 
 class ClassificacaoValidator:
@@ -176,42 +180,54 @@ class ClassificacaoValidator:
     
     @staticmethod
     def validar_inscricao(inscricao):
-        """
-        Valida se a inscrição pode ser classificada
-        
-        Args:
-            inscricao: Instância do modelo Inscricao
-            
-        Returns:
-            dict: {'valido': bool, 'erros': list, 'avisos': list}
-        """
         erros = []
         avisos = []
-        
+
         # 1. Verificar se tem interessado
-        if not inscricao.interessado:
+        if not inscricao.interessado_id:
             erros.append(f'Inscrição ID {inscricao.id}: interessado não informado')
             return {'valido': False, 'erros': erros, 'avisos': avisos}
-        
+
         # 2. Verificar se tem evento
-        if not inscricao.evento:
+        if not inscricao.evento_id:
             erros.append(f'Inscrição ID {inscricao.id}: evento não informado')
             return {'valido': False, 'erros': erros, 'avisos': avisos}
-        
+
         # 3. Validar interessado
         validacao_interessado = ClassificacaoValidator.validar_interessado(inscricao.interessado)
         if not validacao_interessado['valido']:
             erros.extend(validacao_interessado['erros'])
         avisos.extend(validacao_interessado['avisos'])
-        
+
         # 4. Verificar status
         if not inscricao.status:
             avisos.append(f'Inscrição {inscricao.interessado.nome} - {inscricao.evento.nome}: status não informado')
-        
+
+        # 5. Verificar data futura
+        if inscricao.data_inscricao and inscricao.data_inscricao > timezone.now():
+            erros.append(f'Inscricao {inscricao.interessado.nome}: data de inscricao no futuro ({inscricao.data_inscricao})')
+
+        # 6. Verificar se evento tem vagas
+        try:
+            if inscricao.evento.total_vagas == 0:
+                erros.append(f'Evento {inscricao.evento.nome}: nao possui vagas disponiveis')
+        except AttributeError:
+            pass
+
+        # 7. Verificar se evento tem criterios ativos (apenas aviso)
+        try:
+            qtd_criterios = EventoCriterio.objects.filter(evento=inscricao.evento, ativo=True).count()
+            if qtd_criterios == 0:
+                avisos.append(f'Evento {inscricao.evento.nome}: nao possui criterios ativos')
+        except Exception:
+            pass
+
         return {
             'valido': len(erros) == 0,
             'erros': erros,
             'avisos': avisos
         }
-    
-    
+        
+
+
+

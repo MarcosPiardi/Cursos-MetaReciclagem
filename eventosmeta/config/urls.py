@@ -1,22 +1,17 @@
 """
 URL Configuration for Eventos MetaReciclagem
 Arquivo: config/urls.py
-Alteração: Admin customizado com dashboard + estrutura completa
-Data: 20/01/2026
-Alteração: Admin customizado + rotas de dashboard integradas
-Data: 03/02/2026
-Alteração: Adicionadas rotas PDF para todos os dashboards
-Data: 05/02/2026
-Alteração: Adicionadas rotas de recuperação de senha para Staff e Interessados
-Data: 20/02/2026
-Alteração: Templates de recuperação de senha Staff renomeados com prefixo adm_
-Data: 24/02/2026
-Alteração: Adicionadas rotas de troca obrigatória de senha (Fluxo B)
-           para Staff e Interessados
-Data: 25/02/2026
-Alteração: Desabilitado Sistema 3 (Portal login duplicado)
-           Mantida apenas página inicial (/)
-Data: 13/03/2026
+
+Atualizacões: 
+ - 20/01/2026 - Admin customizado com dashboard + estrutura completa
+ - 03/02/2026 - Admin customizado + rotas de dashboard integradas
+ - 05/02/2026 - Adicionadas rotas PDF para todos os dashboards
+ - 20/02/2026 - Adicionadas rotas de recuperação de senha para Staff e Interessados
+ - 24/02/2026 - Templates de recuperação de senha Staff renomeados com prefixo adm_
+ - 25/02/2026 - Adicionadas rotas de troca obrigatória de senha (Fluxo B) para Staff e Interessados
+ - 27/02/2026 - Desabilitado Sistema 3 (Portal login duplicado)
+                Mantida apenas página inicial (/)
+ - 29/05/2026 - Correção de rotas de dashboard (removido namespace admin: e ajustado nomes)
 """
 
 from django.contrib import admin
@@ -66,7 +61,7 @@ urlpatterns = [
         path('processo-seletivo/pdf/',
              dashboard_views.dashboard_processo_seletivo_pdf,
              name='dashboard_processo_seletivo_pdf'),
-        path('admin/dashboard/lgpd/', 
+        path('lgpd/', 
              dashboard_views.dashboard_lgpd, 
              name='dashboard_lgpd'),
     ])),

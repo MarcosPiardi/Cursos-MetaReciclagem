@@ -71,4 +71,44 @@ class AccountsViewsTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertFalse('_auth_user_id' in self.client.session)
 
-        
+    def test_login_staff_inativo_falha(self):
+        inactive_user = self.User.objects.create_user(
+            username='inactive',
+            password='password123',
+            is_staff=True,
+            is_active=False
+        )
+        response = self.client.post(reverse('accounts:login_staff'), {
+            'username': 'inactive',
+            'password': 'password123'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+
+    def test_staff_acessa_pagina_restrita_apos_login(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(reverse('admin:index'))
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_nao_staff_redirecionado_ao_acessar_pagina_staff(self):
+        self.client.force_login(self.non_staff_user)
+        response = self.client.get(reverse('admin:index'))
+        self.assertEqual(response.status_code, 302)
+
+
+    def test_logout_staff_get_desloga(self):
+        self.client.force_login(self.staff_user)
+        self.assertIn('_auth_user_id', self.client.session)
+
+        response = self.client.get(reverse('accounts:logout_staff'))
+        self.assertEqual(response.status_code, 302)
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+
+    def test_login_staff_form_tem_csrf(self):
+        response = self.client.get(reverse('accounts:login_staff'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'csrfmiddlewaretoken')
+

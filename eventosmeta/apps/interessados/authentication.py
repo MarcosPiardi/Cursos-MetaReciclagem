@@ -1,87 +1,74 @@
 """
 ARQUIVO: apps/interessados/authentication.py
-AÇÃO: CRIAR novo arquivo apps/interessados/authentication.py
-MUDANÇA: Backend customizado para autenticação por CPF
-
-Alteração: Adicionada verificação de is_active nos métodos authenticate e get_user
-Data: 13/02/2026
+Finalidade: Backend customizado para autenticacao por CPF
+Atualizações: 
+13/02/2026 — Adicionada verificacao de is_active nos metodos authenticate e get_user
+29/05/2026 — Busca por cpf_hash em vez de cpf (EncryptedCharField)
 """
 
-"""
-Backend de autenticação customizado para Interessados.
-Permite login usando CPF + senha ao invés de username + senha.
-ADICIONADO: Verificação de is_active para segurança (13/02/2026)
-"""
 from django.contrib.auth.backends import BaseBackend
-from .models import Interessado
+from .models import Interessado, gerar_hash_cpf
 
 
 class InteressadoBackend(BaseBackend):
     """
-    Backend de autenticação para Interessados usando CPF.
-    ADICIONADO: Verificação de is_active em 13/02/2026
+    Backend de autenticacao para Interessados usando CPF.
+    Corrigido: busca por cpf_hash porque cpf e EncryptedCharField.
     """
-    
+
     def authenticate(self, request, cpf=None, password=None, **kwargs):
         """
         Autentica um interessado usando CPF e senha.
-        ADICIONADO: Verificação de is_active em 13/02/2026
-        
+        Busca por cpf_hash (campo de busca deterministica) em vez de cpf
+        (EncryptedCharField com criptografia nao-deterministica).
+
         Args:
             request: HttpRequest object
-            cpf: CPF do interessado (11 dígitos)
+            cpf: CPF do interessado (11 digitos, pode estar formatado)
             password: Senha em texto plano
-            
+
         Returns:
-            Interessado object se autenticado, None caso contrário
+            Interessado object se autenticado, None caso contrario
         """
         if cpf is None or password is None:
             return None
-        
+
+        # Remove formatacao (pontos, tracos) para normalizar
+        cpf_clean = ''.join(filter(str.isdigit, cpf))
+        cpf_hash = gerar_hash_cpf(cpf_clean)
+
         try:
-            # Busca interessado pelo CPF
-            interessado = Interessado.objects.get(cpf=cpf)
-            
-            # ============================================================
-            # VALIDAÇÃO CRÍTICA: VERIFICAR SE ESTÁ ATIVO
-            # Data: 13/02/2026
-            # ============================================================
+            interessado = Interessado.objects.get(cpf_hash=cpf_hash)
+
             if not interessado.is_active:
                 return None
-            
-            # Verifica a senha
+
             if interessado.check_password(password):
                 return interessado
-            
+
         except Interessado.DoesNotExist:
-            # Retorna None se não encontrar o interessado
             return None
-        
+
         return None
-    
+
     def get_user(self, user_id):
         """
         Recupera um interessado pelo ID.
-        Necessário para manter a sessão ativa.
-        ADICIONADO: Verificação de is_active em 13/02/2026
-        
+        Necessario para manter a sessao ativa.
+
         Args:
             user_id: ID do interessado
-            
+
         Returns:
-            Interessado object ou None
+            Interessado object se ativo, None caso contrario
         """
         try:
             interessado = Interessado.objects.get(pk=user_id)
-            
-            # ============================================================
-            # VALIDAÇÃO CRÍTICA: VERIFICAR SE AINDA ESTÁ ATIVO
-            # Data: 13/02/2026
-            # ============================================================
+
             if interessado.is_active:
                 return interessado
             return None
-            
+
         except Interessado.DoesNotExist:
             return None
         

@@ -1,26 +1,24 @@
 """
 Arquivo: views.py
 Caminho: apps/interessados/views.py
-Alteração: Imports corrigidos + dashboard funcional
-Data: 29/01/2026
-Alteração: Corrigido login para exibir erros no formulário, não em messages
-Alteração: Corrigido comparação de datas (datetime vs date)
-Alteração: Corrigido relacionamento inscricoes (plural) no dashboard
-Alteração: Código completo baseado nos models reais - SEM ERROS
-Data: 30/01/2026
-Alteração: Adicionada verificação de is_active em todas as views protegidas
-Data: 13/02/2026
-Alteração: Adicionadas views de recuperação de senha por CPF + e-mail
-Alteração: Token de recuperação migrado de sessão para banco de dados
-Data: 20/02/2026
-Alteração: dashboard_view — prefetch_related de matriculas e status da matricula
-Data: 24/02/2026
-Alteração: Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
-Data: 25/02/2026
-Alteração: Rate limiting via middleware axes
-Data: 12/03/2026
-Alteração: senha_recuperar_view migrada para busca por cpf_hash
-Data: 17/03/2026
+Atualizações:
+ - 29/01/2026 - Imports corrigidos + dashboard funcional
+ - 30/01/2026 - Corrigido login para exibir erros no formulário, não em messages
+                Corrigido comparação de datas (datetime vs date)
+                Corrigido relacionamento inscricoes (plural) no dashboard
+                Código completo baseado nos models reais - SEM ERROS
+ - 13/02/2026 - Adicionada verificação de is_active em todas as views protegidas
+ - 20/02/2026 - Adicionadas views de recuperação de senha por CPF + e-mail
+                Token de recuperação migrado de sessão para banco de dados
+ - 24/02/2026 - Dashboard_view — prefetch_related de matriculas e status da matricula
+ - 25/02/2026 - Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
+ - 12/03/2026 - Rate limiting via middleware axes
+ - 17/03/2026 - Senha_recuperar_view migrada para busca por cpf_hash (CPF criptografado no banco)
+ - 29/05/2026 - CORRECOES:
+                1. inscrever_evento_view: select_for_update + get_or_create (race condition)
+                2. senha_recuperar_view: try/except no send_mail (evita 500 se SMTP falhar)
+                3. senha_redefinir_view: mensagem diferente para token expirado vs ja usado
+                4. detalhes_view: fallback se template portal/detalhes_evento.html nao existir
 """
 
 import secrets
@@ -30,9 +28,11 @@ from django.contrib import messages
 from django.utils import timezone
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
+from django.core.mail import send_mail, BadHeaderError
+from django.template.loader import render_to_string, TemplateDoesNotExist
 from django.conf import settings
+from django.template import TemplateDoesNotExist
+from django.db import transaction
 
 from .models import Interessado, PasswordResetToken, gerar_hash_cpf
 from .forms import CadastroInteressadoForm, LoginInteressadoForm, EdicaoInteressadoForm
@@ -54,13 +54,13 @@ def cadastro_view(request):
                 form.save()
                 messages.success(
                     request,
-                    '✅ Cadastro realizado com sucesso! Faça login para continuar.'
+                    'Cadastro realizado com sucesso! Faça login para continuar.'
                 )
                 return redirect('interessados:login')
             except Exception as e:
-                messages.error(request, f'❌ Erro ao salvar cadastro: {str(e)}')
+                messages.error(request, f'Erro ao salvar cadastro: {str(e)}')
         else:
-            messages.error(request, '❌ Corrija os erros abaixo para continuar.')
+            messages.error(request, 'Corrija os erros abaixo para continuar.')
     else:
         form = CadastroInteressadoForm()
 
@@ -87,7 +87,7 @@ def login_view(request):
             if not interessado.is_active:
                 messages.error(
                     request,
-                    '🔒 Sua conta está inativa. Entre em contato com a administração.'
+                    'Sua conta está inativa. Entre em contato com a administração.'
                 )
                 return render(request, 'interessados/login.html', {'form': form})
 
@@ -111,7 +111,7 @@ def login_view(request):
 def logout_view(request):
     """View de logout"""
     logout(request)
-    messages.info(request, '👋 Você saiu do sistema.')
+    messages.info(request, 'Você saiu do sistema.')
     return redirect('interessados:login')
 
 
@@ -130,7 +130,7 @@ def dashboard_view(request):
 
     if not interessado.is_active:
         logout(request)
-        messages.error(request, '🔒 Sua conta foi desativada.')
+        messages.error(request, 'Sua conta foi desativada.')
         return redirect('interessados:login')
 
     inscricoes = Inscricao.objects.filter(
@@ -195,7 +195,7 @@ def meus_dados_view(request):
 
     if not interessado.is_active:
         logout(request)
-        messages.error(request, '🔒 Sua conta foi desativada.')
+        messages.error(request, 'Sua conta foi desativada.')
         return redirect('interessados:login')
 
     if request.method == 'POST':
@@ -204,12 +204,12 @@ def meus_dados_view(request):
         if form.is_valid():
             try:
                 form.save()
-                messages.success(request, '✅ Dados atualizados com sucesso!')
+                messages.success(request, 'Dados atualizados com sucesso!')
                 return redirect('interessados:meus_dados')
             except Exception as e:
-                messages.error(request, f'❌ Erro ao atualizar dados: {str(e)}')
+                messages.error(request, f'Erro ao atualizar dados: {str(e)}')
         else:
-            messages.error(request, '❌ Corrija os erros abaixo para continuar.')
+            messages.error(request, 'Corrija os erros abaixo para continuar.')
     else:
         form = EdicaoInteressadoForm(instance=interessado)
 
@@ -220,18 +220,18 @@ def meus_dados_view(request):
 
 
 # ==========================================
-# DETALHES DE INSCRIÇÃO
+# DETALHES DE INSCRICAO
 # ==========================================
 
 @login_required(login_url='interessados:login')
 def detalhes_view(request, inscricao_id):
     """
-    Detalhes de uma inscrição específica
-    ADICIONADO: Verificação de is_active (13/02/2026)
+    Detalhes de uma inscricao especifica
+    CORRIGIDO (29/05/2026): fallback se template portal/detalhes_evento.html nao existir
     """
     if not request.user.is_active:
         logout(request)
-        messages.error(request, '🔒 Sua conta foi desativada.')
+        messages.error(request, 'Sua conta foi desativada.')
         return redirect('interessados:login')
 
     inscricao = get_object_or_404(
@@ -240,7 +240,14 @@ def detalhes_view(request, inscricao_id):
         interessado=request.user
     )
 
-    return render(request, 'portal/detalhes_evento.html', {
+    # Tenta template do portal, fallback para template proprio
+    template_name = 'portal/detalhes_evento.html'
+    try:
+        render_to_string(template_name, {'inscricao': inscricao}, request=request)
+    except TemplateDoesNotExist:
+        template_name = 'interessados/detalhes_inscricao.html'
+
+    return render(request, template_name, {
         'inscricao': inscricao,
     })
 
@@ -253,31 +260,20 @@ def detalhes_view(request, inscricao_id):
 def inscrever_evento_view(request, evento_id):
     """
     Inscreve o interessado logado em um evento
-    ADICIONADO: Verificação de is_active (13/02/2026)
+    CORRIGIDO (29/05/2026): select_for_update + get_or_create para evitar duplicatas
+                            em caso de requests simultaneos
     """
     interessado = request.user
 
     if not interessado.is_active:
         logout(request)
-        messages.error(request, '🔒 Sua conta foi desativada.')
+        messages.error(request, 'Sua conta foi desativada.')
         return redirect('interessados:login')
 
     try:
         evento = Evento.objects.get(id=evento_id)
     except Evento.DoesNotExist:
-        messages.error(request, '❌ Evento não encontrado.')
-        return redirect('interessados:dashboard')
-
-    inscricao_existente = Inscricao.objects.filter(
-        interessado=interessado,
-        evento=evento
-    ).first()
-
-    if inscricao_existente:
-        messages.warning(
-            request,
-            f'⚠️ Você já está inscrito no evento "{evento.nome}".'
-        )
+        messages.error(request, 'Evento nao encontrado.')
         return redirect('interessados:dashboard')
 
     agora = timezone.now()
@@ -285,7 +281,7 @@ def inscrever_evento_view(request, evento_id):
     if not (evento.data_inicio_inscricao <= agora <= evento.data_fim_inscricao):
         messages.error(
             request,
-            f'❌ O período de inscrições para "{evento.nome}" está encerrado.'
+            f'O periodo de inscricoes para "{evento.nome}" esta encerrado.'
         )
         return redirect('interessados:dashboard')
 
@@ -294,42 +290,54 @@ def inscrever_evento_view(request, evento_id):
     except StatusInscricao.DoesNotExist:
         messages.error(
             request,
-            '❌ Status PENDENTE não encontrado. Contate o administrador.'
+            'Status PENDENTE nao encontrado. Contate o administrador.'
         )
         return redirect('interessados:dashboard')
 
-    try:
-        Inscricao.objects.create(
-            interessado    = interessado,
-            evento         = evento,
-            status         = status_pendente,
-            data_inscricao = timezone.now()
+    # Bloqueia a linha do evento para evitar duplicatas em requests concorrentes
+    with transaction.atomic():
+        Evento.objects.select_for_update().get(id=evento_id)
+
+        inscricao, created = Inscricao.objects.get_or_create(
+            interessado=interessado,
+            evento=evento,
+            defaults={
+                'status': status_pendente,
+                'data_inscricao': timezone.now(),
+            }
         )
-        messages.success(
-            request,
-            f'✅ Inscrição realizada com sucesso no evento "{evento.nome}"! '
-            f'Sua inscrição está com status PENDENTE e será analisada pela equipe.'
-        )
-    except Exception as e:
-        messages.error(request, f'❌ Erro ao criar inscrição: {str(e)}')
+
+        if not created:
+            messages.warning(
+                request,
+                f'Voce ja esta inscrito no evento "{evento.nome}".'
+            )
+            return redirect('interessados:dashboard')
+
+    messages.success(
+        request,
+        f'Inscricao realizada com sucesso no evento "{evento.nome}"! '
+        f'Sua inscricao esta com status PENDENTE e sera analisada pela equipe.'
+    )
 
     return redirect('interessados:dashboard')
 
 
 # ==========================================
-# RECUPERAÇÃO DE SENHA — INTERESSADOS
-# Alteração: 20/02/2026 — Token salvo no BANCO DE DADOS
-# Alteração: 12/03/2026 — Rate limiting via middleware
-# Alteração: 17/03/2026 — Busca por cpf_hash (CPF criptografado no banco)
+# RECUPERACAO DE SENHA — INTERESSADOS
+# Alteracao: 20/02/2026 — Token salvo no BANCO DE DADOS
+# Alteracao: 12/03/2026 — Rate limiting via middleware
+# Alteracao: 17/03/2026 — Busca por cpf_hash (CPF criptografado no banco)
+# Alteracao: 29/05/2026 — try/except no send_mail (evita 500 se SMTP falhar)
 # ==========================================
 
 def senha_recuperar_view(request):
     """
     Passo 1: Interessado informa o CPF.
-    - Com e-mail cadastrado → envia link de recuperação (válido 30 min)
-    - Sem e-mail cadastrado → redireciona para página de orientação
-    - CPF não encontrado   → exibe erro no formulário
-    ATUALIZADO: Busca por cpf_hash — sem descriptografar todos os registros
+    - Com e-mail cadastrado → envia link de recuperacao (valido 30 min)
+    - Sem e-mail cadastrado → redireciona para pagina de orientacao
+    - CPF nao encontrado   → exibe erro no formulario
+    CORRIGIDO (29/05/2026): send_mail com try/except — mensagem amigavel em vez de 500
     """
     erro      = None
     cpf_value = ''
@@ -340,7 +348,6 @@ def senha_recuperar_view(request):
         cpf_value = cpf_raw
 
         try:
-            # Busca pelo hash — rápida e sem descriptografar
             interessado = Interessado.objects.get(
                 cpf_hash=gerar_hash_cpf(cpf),
                 is_active=True
@@ -377,14 +384,24 @@ def senha_recuperar_view(request):
                     contexto_email
                 )
 
-                send_mail(
-                    subject        = 'MetaReciclagem — Recuperação de Senha',
-                    message        = corpo_txt,
-                    html_message   = corpo_html,
-                    from_email     = settings.DEFAULT_FROM_EMAIL,
-                    recipient_list = [interessado.email],
-                    fail_silently  = False,
-                )
+                try:
+                    send_mail(
+                        subject        = 'MetaReciclagem — Recuperacao de Senha',
+                        message        = corpo_txt,
+                        html_message   = corpo_html,
+                        from_email     = settings.DEFAULT_FROM_EMAIL,
+                        recipient_list = [interessado.email],
+                        fail_silently  = False,
+                    )
+                except (ConnectionRefusedError, TimeoutError, BadHeaderError, OSError) as e:
+                    erro = (
+                        'Nao foi possivel enviar o e-mail de recuperacao. '
+                        'Tente novamente mais tarde ou entre em contato com a administracao.'
+                    )
+                    return render(request, 'interessados/senha/recuperar.html', {
+                        'erro'     : erro,
+                        'cpf_value': cpf_value,
+                    })
 
                 return redirect('interessados:senha_recuperar_enviado')
 
@@ -392,7 +409,7 @@ def senha_recuperar_view(request):
                 return redirect('interessados:senha_sem_email')
 
         except Interessado.DoesNotExist:
-            erro = 'CPF não encontrado ou conta inativa no sistema.'
+            erro = 'CPF nao encontrado ou conta inativa no sistema.'
 
     return render(request, 'interessados/senha/recuperar.html', {
         'erro'     : erro,
@@ -401,27 +418,37 @@ def senha_recuperar_view(request):
 
 
 def senha_recuperar_enviado_view(request):
-    """Passo 2: Confirmação de envio."""
+    """Passo 2: Confirmacao de envio."""
     return render(request, 'interessados/senha/recuperar_enviado.html')
 
 
 def senha_redefinir_view(request, token):
     """
-    Passo 3: Formulário de nova senha.
-    Token validado via banco — funciona em qualquer aba/navegador.
+    Passo 3: Formulario de nova senha.
+    CORRIGIDO (29/05/2026): mensagem diferente para token expirado vs ja usado
     """
+    reset_token = None
     try:
         reset_token = PasswordResetToken.objects.select_related('interessado').get(
-            token         = token,
-            usado         = False,
-            expira_em__gt = timezone.now()
+            token=token,
+            usado=False,
+            expira_em__gt=timezone.now()
         )
         interessado = reset_token.interessado
 
     except PasswordResetToken.DoesNotExist:
-        return render(request, 'interessados/senha/token_invalido.html', {
-            'senha_ja_trocada': True,
-        })
+        # Verifica se o token existe mas esta expirado ou ja foi usado
+        token_existente = PasswordResetToken.objects.filter(token=token).first()
+        if token_existente and token_existente.usado:
+            return render(request, 'interessados/senha/token_invalido.html', {
+                'senha_ja_trocada': True,
+                'token_expirado': False,
+            })
+        else:
+            return render(request, 'interessados/senha/token_invalido.html', {
+                'senha_ja_trocada': False,
+                'token_expirado': True,
+            })
 
     erro = None
 
@@ -430,9 +457,9 @@ def senha_redefinir_view(request, token):
         confirmar_senha = request.POST.get('confirmar_senha', '')
 
         if len(nova_senha) < 8:
-            erro = 'A senha deve ter no mínimo 8 caracteres.'
+            erro = 'A senha deve ter no minimo 8 caracteres.'
         elif nova_senha != confirmar_senha:
-            erro = 'As senhas não coincidem.'
+            erro = 'As senhas nao coincidem.'
         else:
             interessado.set_password(nova_senha)
             interessado.save()
@@ -456,14 +483,14 @@ def senha_sem_email_view(request):
 
 
 # ==============================================================================
-# FLUXO B — TROCA OBRIGATÓRIA DE SENHA — INTERESSADOS
+# FLUXO B — TROCA OBRIGATORIA DE SENHA — INTERESSADOS
 # Adicionado: 25/02/2026
 # ==============================================================================
 
 @login_required(login_url='interessados:login')
 def trocar_senha_obrigatorio_view(request):
     """
-    View de troca obrigatória de senha para Interessados.
+    View de troca obrigatoria de senha para Interessados.
     Exibida pelo middleware quando must_change_password = True.
     """
     interessado = request.user
@@ -478,20 +505,21 @@ def trocar_senha_obrigatorio_view(request):
         confirmar_senha = request.POST.get('confirmar_senha', '').strip()
 
         if len(nova_senha) < 8:
-            erro = 'A nova senha deve ter no mínimo 8 caracteres.'
+            erro = 'A nova senha deve ter no minimo 8 caracteres.'
         elif nova_senha != confirmar_senha:
-            erro = 'As senhas não coincidem. Tente novamente.'
+            erro = 'As senhas nao coincidem. Tente novamente.'
         else:
             interessado.set_password(nova_senha)
             interessado.must_change_password = False
             interessado.save()
             login(request, interessado, backend='apps.interessados.authentication.InteressadoBackend')
-            messages.success(request, '✅ Senha alterada com sucesso! Bem-vindo ao sistema.')
+            messages.success(request, 'Senha alterada com sucesso! Bem-vindo ao sistema.')
             return redirect('interessados:dashboard')
 
     return render(request, 'interessados/senha/int_trocar_obrigatorio.html', {
         'erro'       : erro,
         'interessado': interessado,
     })
+
 
 

@@ -2,11 +2,13 @@
 Views do app PORTAL - Sistema MetaReciclagem
 Arquivo: apps/portal/views.py
 Data: 05/12/2025
-Alteração: select_related('status') em detalhes_evento + removida variável inscricoes_abertas
+Alteracao: select_related('status') em detalhes_evento + removida variavel inscricoes_abertas
 Data: 20/02/2026
-Alteração: inscricoes_confirmadas corrigido — filtro por Q objects com iexact
+Alteracao: inscricoes_confirmadas corrigido — filtro por Q objects com iexact
            case-insensitive, sem uso de exclude()
 Data: 23/02/2026
+Corrigido: 29/05/2026 — consulta_publica busca por cpf_hash (cpf e EncryptedCharField)
+           login_interessado armazena CPF mascarado na sessao
 """
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -15,14 +17,14 @@ from django.db.models import Q
 from django.utils import timezone
 
 from .forms import LoginInteressadoForm, ConsultaPublicaForm
-from apps.interessados.models import Interessado
+from apps.interessados.models import Interessado, gerar_hash_cpf
 from apps.selecao.models import Inscricao, Classificacao
 from apps.eventos.models import Evento
 
 
 def index(request):
     """
-    Página inicial do portal
+    Pagina inicial do portal
     Mostra eventos ativos (exceto FINALIZADOS e CANCELADOS)
     """
     eventos_disponiveis = Evento.objects.exclude(
@@ -49,9 +51,17 @@ def login_interessado(request):
         if form.is_valid():
             interessado = form.interessado
 
+            # CPF mascarado para exibicao na sessao (ex: ***.123.456-**)
+            cpf_raw = interessado.cpf or ''
+            cpf_mascarado = (
+                f'***.{cpf_raw[3:6]}.{cpf_raw[6:9]}-**'
+                if len(cpf_raw) == 11
+                else '***'
+            )
+
             request.session['interessado_id']   = interessado.id
             request.session['interessado_nome'] = interessado.nome
-            request.session['interessado_cpf']  = interessado.cpf
+            request.session['interessado_cpf']  = cpf_mascarado
 
             interessado.last_login = timezone.now()
             interessado.save(update_fields=['last_login'])
@@ -68,7 +78,7 @@ def logout_interessado(request):
     """Logout de interessados"""
     nome = request.session.get('interessado_nome', 'Interessado')
     request.session.flush()
-    messages.info(request, f'Até logo, {nome}!')
+    messages.info(request, f'Ate logo, {nome}!')
     return redirect('portal:index')
 
 
@@ -77,14 +87,14 @@ def dashboard(request):
     interessado_id = request.session.get('interessado_id')
 
     if not interessado_id:
-        messages.warning(request, 'Você precisa fazer login para acessar o dashboard.')
+        messages.warning(request, 'Voce precisa fazer login para acessar o dashboard.')
         return redirect('portal:login')
 
     try:
         interessado = Interessado.objects.get(id=interessado_id)
     except Interessado.DoesNotExist:
         request.session.flush()
-        messages.error(request, 'Sessão inválida. Faça login novamente.')
+        messages.error(request, 'Sessao invalida. Faca login novamente.')
         return redirect('portal:login')
 
     inscricoes = Inscricao.objects.filter(
@@ -108,9 +118,10 @@ def dashboard(request):
 
 @require_http_methods(["GET", "POST"])
 def consulta_publica(request):
-    """Consulta pública de resultados por CPF"""
+    """Consulta publica de resultados por CPF"""
     resultados     = None
     cpf_consultado = None
+    nome_interessado = None
 
     if request.method == 'POST':
         form = ConsultaPublicaForm(request.POST)
@@ -120,7 +131,9 @@ def consulta_publica(request):
             cpf_consultado = cpf
 
             try:
-                interessado = Interessado.objects.get(cpf=cpf)
+                # Busca pelo hash (cpf e EncryptedCharField nao-deterministico)
+                interessado = Interessado.objects.get(cpf_hash=gerar_hash_cpf(cpf))
+                nome_interessado = interessado.nome
 
                 resultados = Classificacao.objects.filter(
                     inscricao__interessado=interessado
@@ -132,23 +145,19 @@ def consulta_publica(request):
                 if not resultados.exists():
                     messages.info(
                         request,
-                        'Nenhuma classificação encontrada para este CPF.'
+                        'Nenhuma classificacao encontrada para este CPF.'
                     )
 
             except Interessado.DoesNotExist:
-                messages.warning(request, 'CPF não encontrado no sistema.')
+                messages.warning(request, 'CPF nao encontrado no sistema.')
     else:
         form = ConsultaPublicaForm()
 
     context = {
-        'form':             form,
-        'resultados':       resultados,
-        'nome_interessado': (
-            resultados.first().inscricao.interessado.nome
-            if resultados and resultados.exists()
-            else ''
-        ),
-        'cpf_consultado': cpf_consultado,
+        'form':              form,
+        'resultados':        resultados,
+        'nome_interessado':  nome_interessado or '',
+        'cpf_consultado':    cpf_consultado,
     }
 
     return render(request, 'portal/consulta_publica.html', context)
@@ -159,7 +168,7 @@ def resultado_evento(request, evento_id):
     try:
         evento = Evento.objects.get(id=evento_id)
     except Evento.DoesNotExist:
-        messages.error(request, 'Evento não encontrado.')
+        messages.error(request, 'Evento nao encontrado.')
         return redirect('portal:index')
 
     classificacoes = Classificacao.objects.filter(
@@ -183,28 +192,13 @@ def resultado_evento(request, evento_id):
 def detalhes_evento(request, evento_id):
     """
     Exibe detalhes completos de um evento/curso
-
-    CORREÇÃO 23/02/2026:
-    Antes: status__nome__in=['INSCRITO', 'APROVADO', 'CONFIRMADO']
-           → sempre zero (nomes reais no banco são diferentes)
-    Agora: Q objects com __iexact — case-insensitive, sem exclude()
-           Cobre todas as variações de grafia dos status válidos
     """
     try:
         evento = Evento.objects.select_related('status').get(id=evento_id)
     except Evento.DoesNotExist:
-        messages.error(request, 'Evento não encontrado.')
+        messages.error(request, 'Evento nao encontrado.')
         return redirect('portal:index')
 
-    # ==========================================
-    # CORREÇÃO 23/02/2026
-    # Q objects com iexact — case-insensitive
-    # Cobre: 'Pendente', 'PENDENTE', 'pendente'
-    #        'Confirmada', 'CONFIRMADA', 'confirmada'
-    #        'Inscrito', 'INSCRITO', 'inscrito'
-    #        'Aprovado', 'APROVADO', 'aprovado'
-    #        'Confirmado', 'CONFIRMADO', 'confirmado'
-    # ==========================================
     inscricoes_confirmadas = Inscricao.objects.filter(
         evento=evento
     ).filter(
@@ -227,15 +221,15 @@ def detalhes_evento(request, evento_id):
 
 
 def contato(request):
-    """Página de contatos da MetaReciclagem"""
+    """Pagina de contatos da MetaReciclagem"""
     context = {
         'contatos': {
             'telefone': '(15) 3417-3825',
             'whatsapp': '(15) 99999-9999',
             'email':    'meta.recicla@gmail.com',
-            'endereco': 'Avenida Armando Sales de Oliveira, 762 – Sorocaba/SP',
+            'endereco': 'Avenida Armando Sales de Oliveira, 762 - Sorocaba/SP',
             'cep':      '18000-000',
-            'horario':  'Segunda a Sexta, das 8h às 16h',
+            'horario':  'Segunda a Sexta, das 8h as 16h',
         },
         'redes_sociais': {
             'facebook':  'https://facebook.com/metareciclagemsorocaba',
@@ -247,10 +241,8 @@ def contato(request):
 
     return render(request, 'portal/contato.html', context)
 
+
 def politica_privacidade(request):
-    """Página de política de privacidade — LGPD"""
+    """Pagina de politica de privacidade - LGPD"""
     return render(request, 'portal/politica_privacidade.html')
-
-
-    
 

@@ -7,19 +7,7 @@ Historico de Alteracoes:
 - 21/05/2026 - Correção de testes que não estavam passando
 - 22/05/2026 - Implementacao inicial com 28 testes de integracao real
              - Reescrever APENAS os testes usando force_login() ao invés de login()
-
-Campos reais baseados em factories.py:
-- Evento: data_inicio_evento, data_fim_evento (SEM hora_inicio/hora_fim)
-- Horario: hora_inicio, hora_fim
-- EventoCriterio: prioridade (não pontos)
-- Inscricao: não aparece em factories, usar apenas evento
-
-NOMES REAIS dos métodos em EventoAdmin:
-- vagas_inscritos (não vagas_inscritos_percentage)
-- data_inicio_inscricao_formatada
-- data_fim_inscricao_formatada
-- data_inicio_evento_formatada
-- data_fim_evento_formatada
+- 26/05/2026 - Ajuste final para garantir que todos os testes passem com sucesso
 
 """
 

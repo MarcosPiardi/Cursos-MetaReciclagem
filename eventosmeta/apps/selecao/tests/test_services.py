@@ -10,6 +10,7 @@ Histórico de Alterações:
 - 18/05/2026 - Refatoração completa de 2 testes:
                test_calcular_pontuacao_inscricao_zero (evento sem critérios)
                test_desempate_misto_pontuacoes_diferentes_e_iguais (critérios com pontos diferentes)
+- 27/05/2026 - Refatoração para incluir mais cenários de teste, como classificação sem inscrições, chamada repetida e pontuação com múltiplos critérios acumulados.
 """
 
 from django.test import TestCase
@@ -335,4 +336,79 @@ class TestClassificadorService(TestCase):
         self.assertEqual(classificacao.pontuacao_total, Decimal('10.00'))
 
 
+    def test_classificar_evento_zero_inscricoes(self):
+        """Testa classificacao de evento sem inscricoes."""
+        evento = EventoFactory(total_vagas=5)
+        resultado = ClassificadorService.classificar_evento(evento)
+        self.assertFalse(resultado['sucesso'])
+        self.assertEqual(resultado['total_processadas'], 0)
+        self.assertEqual(Classificacao.objects.filter(inscricao__evento=evento).count(), 0)
+
+    def test_classificar_evento_chamada_repetida(self):
+        """Testa que chamar classificar duas vezes nao duplica."""
+        evento = EventoFactory(total_vagas=5)
+        for i in range(3):
+            InscricaoFactory(evento=evento, status=self.status_pendente)
+        ClassificadorService.classificar_evento(evento)
+        ClassificadorService.classificar_evento(evento)
+        classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
+        self.assertEqual(classificacoes.count(), 3)
+        self.assertEqual(classificacoes[0].posicao, 1)
+        self.assertEqual(classificacoes[1].posicao, 2)
+        self.assertEqual(classificacoes[2].posicao, 3)
+
+    def test_calcular_pontuacao_multiplos_criterios(self):
+        """Testa pontuacao com 2 criterios acumulados (10+20=30)."""
+        evento = EventoFactory(total_vagas=5)
+        criterio1 = CriterioFactory(nome='Criterio1', tipo_criterio='PONTUACAO', pontos=10)
+        criterio2 = CriterioFactory(nome='Criterio2', tipo_criterio='PONTUACAO', pontos=20)
+        ec1 = EventoCriterioFactory(evento=evento, criterio=criterio1)
+        ec2 = EventoCriterioFactory(evento=evento, criterio=criterio2)
+        interessado = InteressadoFactory()
+        inscricao = InscricaoFactory(evento=evento, interessado=interessado, status=self.status_pendente)
+        InscricaoCriterioAtendido.objects.create(inscricao=inscricao, 
+                                                 criterio=criterio1,  # FK direta para Criterio
+                                                 pontos_atribuidos=Decimal('10.00'),
+                                                 validado=True)
+        InscricaoCriterioAtendido.objects.create(inscricao=inscricao, 
+                                                 criterio=criterio2,  # FK direta para Criterio
+                                                 pontos_atribuidos=Decimal('20.00'),
+                                                 validado=True)
         
+        pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
+        self.assertEqual(pontuacao, Decimal('30.00'))
+
+    def test_classificar_evento_exatamente_1_vaga(self):
+        """Testa classificacao com apenas 1 vaga e 3 inscricoes."""
+        evento = EventoFactory(total_vagas=1)
+        criterio = CriterioFactory(nome='Criterio', tipo_criterio='PONTUACAO', pontos=5)
+        ec = EventoCriterioFactory(evento=evento, criterio=criterio)
+        inscricoes = []
+        for i in range(3):
+            insc = InscricaoFactory(
+                evento=evento,
+                status=self.status_pendente,
+                data_inscricao=timezone.now() + timedelta(hours=i)
+            )
+            InscricaoCriterioAtendido.objects.create(inscricao=insc, 
+                                                     criterio=criterio, 
+                                                     pontos_atribuidos=Decimal('5.00'),
+                                                     validado=True)
+            
+            inscricoes.append(insc)
+        ClassificadorService.classificar_evento(evento)
+        classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
+        self.assertTrue(classificacoes[0].classificado)
+        self.assertFalse(classificacoes[0].lista_espera)
+        self.assertFalse(classificacoes[1].classificado)
+        self.assertTrue(classificacoes[1].lista_espera)
+        self.assertFalse(classificacoes[2].classificado)
+        self.assertTrue(classificacoes[2].lista_espera)
+
+    def test_classificar_sem_eventocriterio_vinculado(self):
+        """Testa pontuacao zero quando criterio existe mas nao vinculado."""
+        evento = EventoFactory(total_vagas=5)
+        CriterioFactory(nome='Criterio', tipo_criterio='PONTUACAO', pontos=10)  # criado mas nao vinculado
+        inscricao = InscricaoFactory(evento=evento, status=self.status_pendente)
+        pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
+        self.assertEqual(pontuacao, Decimal('0.00'))    

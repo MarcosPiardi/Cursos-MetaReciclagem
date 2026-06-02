@@ -1,4 +1,8 @@
-
+"""
+Arquivo: apps.py
+Caminho: apps/selecao/apps.py
+Finalidade: Definir os modelos do app seleção.
+"""
 
 from django.apps import AppConfig
 

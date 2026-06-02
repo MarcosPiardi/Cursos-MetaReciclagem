@@ -90,5 +90,51 @@ class TestUsuarioModel(TestCase):
         )
         self.assertFalse(normal_user.is_staff)
 
+    def test_criar_usuario_sem_username_falha(self):
+        with self.assertRaises((ValueError)):
+            self.User.objects.create_user(
+                username=None,
+                email='semusername@example.com',
+                password='password123',
+                cpf='11122233344'
+            )
+
+    def test_criar_usuario_sem_password_falha(self):
+        usuario = self.User.objects.create_user(
+            username='sempassword',
+            email='sempassword@example.com',
+            password=None,
+            cpf='22233344455'
+        )
+        self.assertFalse(usuario.check_password('qualquercoisa'))
+
+    def test_criar_superuser_is_staff(self):
+        usuario = self.User.objects.create_superuser(
+            username='admin',
+            email='admin@ex.com',
+            password='admin123',
+            cpf='99988877766'
+        )
+        self.assertTrue(usuario.is_staff)
+
+    def test_criar_superuser_is_superuser(self):
+        usuario = self.User.objects.create_superuser(
+            username='admin2',
+            email='admin2@ex.com',
+            password='admin123',
+            cpf='88877766655'
+        )
+        self.assertTrue(usuario.is_superuser)
+
+    def test_usuario_str_retorna_username(self):
+        usuario = self.User.objects.create_user(
+            username='joaosilva',
+            email='joao@example.com',
+            password='password123',
+            cpf='33344455566'
+        )
+        self.assertEqual(str(usuario), 'joaosilva - CPF: 33344455566')
+
+
 
         

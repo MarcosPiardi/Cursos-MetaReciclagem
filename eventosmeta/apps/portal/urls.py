@@ -4,11 +4,6 @@ Arquivo: apps/portal/urls.py
 Data: 29/01/2026
 """
 
-"""
-URLs do app PORTAL - Sistema MetaReciclagem
-Arquivo: apps/portal/urls.py
-Data: 05/12/2025
-"""
 
 from django.urls import path
 from . import views

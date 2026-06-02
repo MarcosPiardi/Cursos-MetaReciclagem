@@ -9,8 +9,8 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import Interessado, SolicitacaoExclusao, gerar_hash_cpf
-from .forms import CadastroInteressadoForm, LoginInteressadoForm
+from apps.interessados.models import Interessado, SolicitacaoExclusao, gerar_hash_cpf
+from ..forms import CadastroInteressadoForm, LoginInteressadoForm
 
 
 # ============================================================

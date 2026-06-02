@@ -1,10 +1,11 @@
 """
 Arquivo: urls.py
 Caminho: apps/interessados/urls.py
-Alteração: Rota detalhes adicionada
-Data: 29/01/2026
-Alteração: Adicionadas rotas de recuperação de senha por CPF
-Data: 20/02/2026
+Atualizações:
+ - 29/01/2026 - Rota detalhes adicionada
+ - 20/02/2026 - Adicionadas rotas de recuperação de senha por CPF
+ - 15/03/2026 - Adicionadas rotas de exclusão de conta
+ - 29/05/2026 - Revisão geral e organização das rotas
 """
 
 from django.urls import path
@@ -28,8 +29,9 @@ urlpatterns = [
     # ==========================================
     path('senha/recuperar/', views.senha_recuperar_view, name='senha_recuperar'),
     path('senha/recuperar/enviado/', views.senha_recuperar_enviado_view, name='senha_recuperar_enviado'),
-    path('senha/redefinir/<str:token>/', views.senha_redefinir_view, name='senha_redefinir'),
+    # <- CONCLUIDO ANTES DE <str:token> para evitar conflito ->
     path('senha/redefinir/concluido/', views.senha_redefinir_concluido_view, name='senha_redefinir_concluido'),
+    path('senha/redefinir/<str:token>/', views.senha_redefinir_view, name='senha_redefinir'),
     path('senha/sem-email/', views.senha_sem_email_view, name='senha_sem_email'),
     
     # Adicionar no urlpatterns
@@ -38,4 +40,5 @@ urlpatterns = [
 
 
 ]
+
 
