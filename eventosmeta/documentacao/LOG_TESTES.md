@@ -704,7 +704,7 @@ Destroying test database for alias 'default' ('test_bdmetareciclagem')...
 
 
 
-## apps.accounts.test.test_models
+## apps.accounts.test.test_models.py
 
 (.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.accounts.tests.test_models -v 2
 Found 10 test(s).
@@ -3192,3 +3192,316 @@ config\urls.py                                                             14   
 config\wsgi.py                                                              4      4     0%
 -------------------------------------------------------------------------------------------
 TOTAL                                                                    4265   1374    68%
+
+
+
+##  apps/eventos/tests/test_models_evento_expanded.py
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_evento_expanded.py -v
+=========================================================================== test session starts ===========================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 15 items                                                                                                                                                         
+
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoCreation::test_criar_evento PASSED                                                                      [  6%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoCreation::test_str_evento PASSED                                                                        [ 13%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoCreation::test_defaults_evento PASSED                                                                   [ 20%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoCreation::test_status_evento PASSED                                                                     [ 26%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoCreation::test_multiplos_eventos PASSED                                                                 [ 33%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoValidacaoDatas::test_fim_inscricao_antes_inicio PASSED                                                  [ 40%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoValidacaoDatas::test_fim_evento_antes_inicio PASSED                                                     [ 46%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoValidacaoDatas::test_datas_validas PASSED                                                               [ 53%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoValidacaoDatas::test_datas_iguais PASSED                                                                [ 60%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoValidacaoVagas::test_vagas_negativas PASSED                                                             [ 66%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoValidacaoVagas::test_vagas_altas PASSED                                                                 [ 73%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoRelacionamentos::test_has_status PASSED                                                                 [ 80%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoRelacionamentos::test_status_has_eventos PASSED                                                         [ 86%]
+apps/eventos/tests/test_models_evento_expanded.py::TestEventoRelacionamentos::test_protect_status PASSED                                                             [ 93%]
+apps/eventos/tests/test_models_evento_expanded.py::TestTurmaHorario::test_turma_horario_relation PASSED                                                              [100%]
+
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   316    246    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    136     0%   9-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                134    134     0%   8-396
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   40-44, 48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                   216    216     0%   13-690
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     23    81%   28, 104-106, 130-132, 135-137, 140-142, 145-147, 150-152, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     19    86%   22, 29, 41, 132, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              133    133     0%   8-291
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   28-443
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4189   3360    20%
+Coverage HTML written to dir htmlcov
+
+
+=========================================================================== 15 passed in 3.15s ============================================================================
+
+
+
+##  pytest apps/eventos/tests/test_models_evento.py
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_evento.py -v
+========================================================== test session starts ===========================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 30 items                                                                                                                        
+
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_criar_evento_valido PASSED                                          [  3%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_ler_evento PASSED                                                   [  6%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_atualizar_evento PASSED                                             [ 10%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_deletar_evento PASSED                                               [ 13%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_multiplos_eventos PASSED                                            [ 16%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_data_inicio_inscricao_antes_fim_inscricao PASSED                    [ 20%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_data_fim_inscricao_antes_inicio_evento PASSED                       [ 23%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_data_inicio_evento_antes_fim_evento PASSED                          [ 26%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_datas_validas_factory PASSED                                        [ 30%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_clean_valida_datas PASSED                                           [ 33%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_total_vagas_positivo PASSED                                         [ 36%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_total_vagas_grande_numero PASSED                                    [ 40%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_total_vagas_zero_permitido PASSED                                   [ 43%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_evento_com_status PASSED                                            [ 46%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_evento_sem_status_invalido PASSED                                   [ 50%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_evento_com_turmas PASSED                                            [ 53%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_evento_multiplas_turmas PASSED                                      [ 56%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_evento_com_criterios PASSED                                         [ 60%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_evento_multiplos_criterios PASSED                                   [ 63%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_evento_sem_criterios PASSED                                         [ 66%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_deletar_evento_deleta_turmas PASSED                                 [ 70%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_criado_em_existe PASSED                                             [ 73%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_atualizado_em_existe PASSED                                         [ 76%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_atualizado_em_atualiza PASSED                                       [ 80%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_str_representation PASSED                                           [ 83%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_nome_obrigatorio PASSED                                             [ 86%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_filtro_por_status PASSED                                            [ 90%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_filtro_por_ativo PASSED                                             [ 93%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_queryset_count PASSED                                               [ 96%]
+apps/eventos/tests/test_models_evento.py::TestEventoModel::test_queryset_exists PASSED                                              [100%]
+
+============================================================ warnings summary ============================================================
+..\.venv\Lib\site-packages\_pytest\config\__init__.py:1373
+  c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Lib\site-packages\_pytest\config\__init__.py:1373: PytestConfigWarning: Unknown config option: python_path
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+===================================================== 30 passed, 1 warning in 1.91s =====================================================
+
+
+
+##  apps/eventos/tests/test_models_turma.py
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_turma.py -v
+========================================================== test session starts ===========================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 21 items                                                                                                                        
+
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_criar_turma_valida PASSED                                             [  4%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_ler_turma PASSED                                                      [  9%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_atualizar_turma PASSED                                                [ 14%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_deletar_turma PASSED                                                  [ 19%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_multiplas_turmas PASSED                                               [ 23%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_datas_validas_factory PASSED                                          [ 28%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_capacidade_positiva PASSED                                            [ 33%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_capacidade_grande_numero PASSED                                       [ 38%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_capacidade_zero_permitido PASSED                                      [ 42%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_turma_com_evento PASSED                                               [ 47%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_turma_sem_evento_invalido PASSED                                      [ 52%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_turma_com_horarios PASSED                                             [ 57%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_turma_multiplos_horarios PASSED                                       [ 61%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_deletar_turma_deleta_horarios PASSED                                  [ 66%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_criado_em_existe PASSED                                               [ 71%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_atualizado_em_atualiza PASSED                                         [ 76%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_str_representation PASSED                                             [ 80%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_nome_obrigatorio PASSED                                               [ 85%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_filtro_por_evento PASSED                                              [ 90%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_filtro_por_turno PASSED                                               [ 95%]
+apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_queryset_count PASSED                                                 [100%]
+
+============================================================ warnings summary ============================================================
+..\.venv\Lib\site-packages\_pytest\config\__init__.py:1373
+  c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Lib\site-packages\_pytest\config\__init__.py:1373: PytestConfigWarning: Unknown config option: python_path
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+===================================================== 21 passed, 1 warning in 1.83s ======================================================
+
+
+
+##  apps/eventos/tests/test_models_horario.py
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_horario.py -v
+========================================================== test session starts ===========================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 14 items                                                                                                                        
+
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_criar_horario_valido PASSED                                       [  7%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_ler_horario PASSED                                                [ 14%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_atualizar_horario PASSED                                          [ 21%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_deletar_horario PASSED                                            [ 28%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_dia_semana_valido PASSED                                          [ 35%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_multiplos_horarios_mesma_turma PASSED                             [ 42%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_hora_inicio_antes_fim PASSED                                      [ 50%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_hora_inicio_igual_fim_permitido PASSED                            [ 57%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_horario_com_turma PASSED                                          [ 64%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_horario_sem_turma_invalido PASSED                                 [ 71%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_turma_tem_multiplos_horarios PASSED                               [ 78%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_str_representation PASSED                                         [ 85%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_filtro_por_turma PASSED                                           [ 92%]
+apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_queryset_count PASSED                                             [100%]
+
+============================================================ warnings summary ============================================================
+..\.venv\Lib\site-packages\_pytest\config\__init__.py:1373
+  c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Lib\site-packages\_pytest\config\__init__.py:1373: PytestConfigWarning: Unknown config option: python_path
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+===================================================== 14 passed, 1 warning in 1.77s =====================================================
+
+
+
+##  apps/eventos/tests/test_models_criterio.py
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_criterio.py -v
+========================================================== test session starts ===========================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 15 items                                                                                                                        
+
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_criar_criterio_valido PASSED                                    [  6%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_ler_criterio PASSED                                             [ 13%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_atualizar_criterio PASSED                                       [ 20%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_deletar_criterio PASSED                                         [ 26%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_codigo_unico PASSED                                             [ 33%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_codigo_valido PASSED                                            [ 40%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_pontos_positivo PASSED                                          [ 46%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_pontos_zero_permitido PASSED                                    [ 53%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_criterio_ativo_padrao PASSED                                    [ 60%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_criterio_inativo PASSED                                         [ 66%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_criterio_com_eventos PASSED                                     [ 73%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_criterio_sem_eventos PASSED                                     [ 80%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_str_representation PASSED                                       [ 86%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_filtro_por_ativo PASSED                                         [ 93%]
+apps/eventos/tests/test_models_criterio.py::TestCriterioModel::test_queryset_count PASSED                                           [100%]
+
+============================================================ warnings summary ============================================================
+..\.venv\Lib\site-packages\_pytest\config\__init__.py:1373
+  c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Lib\site-packages\_pytest\config\__init__.py:1373: PytestConfigWarning: Unknown config option: python_path
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+===================================================== 15 passed, 1 warning in 1.82s ======================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
