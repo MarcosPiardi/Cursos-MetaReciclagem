@@ -24,9 +24,9 @@ def gerar_hash_cpf(cpf):
 
 
 class InteressadoFactory(BaseInteressadoFactory):
-    """Factory de Interessado com CPF sequencial único."""
     cpf = factory.Sequence(lambda n: f'{n:011d}')
     cpf_hash = factory.Sequence(lambda n: gerar_hash_cpf(f'{n:011d}'))
+    email = factory.Sequence(lambda n: f'interessado{n}@teste.com')  # EMAIL SEQUENCIAL
 
 
 class StatusInscricaoFactory(factory.django.DjangoModelFactory):
