@@ -673,3 +673,11 @@ class AvaliacaoAdmin(admin.ModelAdmin):
     download_certificados_lote_action.short_description = '📦 Baixar certificados em lote (ZIP)'
 
     
+
+    def aprovar_eventos(self, request, queryset):
+        queryset.update(status='aprovado')
+
+    def reprovar_eventos(self, request, queryset):
+        queryset.update(status='reprovado')
+
+

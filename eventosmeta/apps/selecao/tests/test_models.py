@@ -2,14 +2,17 @@
 Arquivo: test_models.py
 Caminho: apps/selecao/tests/test_models.py
 Atualizações:
-27/03/2026 - Testes de modelos para o app Selecao
-08/04/2026 - Testes de modelos para o app Seleção com validações e desempate
-27/05/2026 - Refatoração dos testes de modelos para incluir validações adicionais e teste de desempate por data de inscrição.
+ - 27/03/2026 - Testes de modelos para o app Selecao
+ - 08/04/2026 - Testes de modelos para o app Seleção com validações e desempate
+ - 27/05/2026 - Refatoração dos testes de modelos para incluir validações adicionais e teste de desempate por data de inscrição.
+ - 08/06/2026 - Refatoração para pytest (remover BaseAdminActionTest, adicionar fixtures)
 """
 
-from django.test import TestCase
+import pytest
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
 
 from apps.selecao.models import StatusInscricao, Inscricao, Classificacao
 from apps.selecao.tests.factories import (
@@ -21,32 +24,38 @@ from apps.eventos.tests.factories import EventoFactory
 from apps.interessados.tests.factories import InteressadoFactory
 
 
-class TestStatusInscricaoModel(TestCase):
+@pytest.mark.django_db
+class TestStatusInscricaoModel:
     """Testes para o modelo StatusInscricao."""
+
+    def setup_method(self):
+        """Configuração inicial para todos os testes."""
+        self.status = StatusInscricaoFactory(nome='Pendente', cor='#FF0000')
 
     def test_create_status_inscricao(self):
         """Deve criar um StatusInscricao com sucesso."""
-        status = StatusInscricaoFactory(nome='Pendente', cor='#FF0000')
-        self.assertIsNotNone(status.pk)
-        self.assertEqual(status.nome, 'Pendente')
-        self.assertEqual(status.cor, '#FF0000')
+        assert self.status.pk is not None
+        assert self.status.nome == 'Pendente'
+        assert self.status.cor == '#FF0000'
 
     def test_status_inscricao_str(self):
         """O método __str__ deve retornar o nome do status."""
         status = StatusInscricaoFactory(nome='Aprovado')
-        self.assertEqual(str(status), 'Aprovado')
+        assert str(status) == 'Aprovado'
 
     def test_status_inscricao_unique_name(self):
         """Não deve permitir dois status com o mesmo nome."""
         StatusInscricaoFactory(nome='Unico')
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             StatusInscricao.objects.create(nome='Unico', cor='#FF0000')
 
 
-class TestInscricaoModel(TestCase):
+@pytest.mark.django_db
+class TestInscricaoModel:
     """Testes para o modelo Inscricao."""
 
-    def setUp(self):
+    def setup_method(self):
+        """Configuração inicial para todos os testes."""
         self.interessado = InteressadoFactory()
         self.evento = EventoFactory()
         self.status_pendente = StatusInscricaoFactory(nome='Pendente')
@@ -58,9 +67,9 @@ class TestInscricaoModel(TestCase):
             evento=self.evento,
             status=self.status_pendente
         )
-        self.assertIsNotNone(inscricao.pk)
-        self.assertEqual(inscricao.interessado, self.interessado)
-        self.assertEqual(inscricao.evento, self.evento)
+        assert inscricao.pk is not None
+        assert inscricao.interessado == self.interessado
+        assert inscricao.evento == self.evento
 
     def test_inscricao_str(self):
         """O método __str__ deve retornar formato legível."""
@@ -69,8 +78,8 @@ class TestInscricaoModel(TestCase):
             evento=self.evento,
             status=self.status_pendente
         )
-        self.assertIn(self.interessado.nome, str(inscricao))
-        self.assertIn(self.evento.nome, str(inscricao))
+        assert self.interessado.nome in str(inscricao)
+        assert self.evento.nome in str(inscricao)
 
     def test_inscricao_unique_together(self):
         """Não deve permitir duas inscrições do mesmo interessado no mesmo evento."""
@@ -79,7 +88,7 @@ class TestInscricaoModel(TestCase):
             evento=self.evento,
             status=self.status_pendente
         )
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             InscricaoFactory(
                 interessado=self.interessado,
                 evento=self.evento,
@@ -93,15 +102,17 @@ class TestInscricaoModel(TestCase):
             evento=self.evento,
             status=self.status_pendente
         )
-        self.assertEqual(inscricao.interessado.nome, self.interessado.nome)
-        self.assertEqual(inscricao.evento.nome, self.evento.nome)
-        self.assertEqual(inscricao.status.nome, self.status_pendente.nome)
+        assert inscricao.interessado.nome == self.interessado.nome
+        assert inscricao.evento.nome == self.evento.nome
+        assert inscricao.status.nome == self.status_pendente.nome
 
 
-class TestClassificacaoModel(TestCase):
+@pytest.mark.django_db
+class TestClassificacaoModel:
     """Testes para o modelo Classificacao."""
 
-    def setUp(self):
+    def setup_method(self):
+        """Configuração inicial para todos os testes."""
         self.inscricao = InscricaoFactory()
 
     def test_create_classificacao(self):
@@ -112,12 +123,12 @@ class TestClassificacaoModel(TestCase):
             posicao=1,
             classificado=True
         )
-        self.assertIsNotNone(classificacao.pk)
-        self.assertEqual(classificacao.inscricao, self.inscricao)
-        self.assertEqual(classificacao.pontuacao_total, 50)
-        self.assertEqual(classificacao.posicao, 1)
-        self.assertTrue(classificacao.classificado)
-        self.assertFalse(classificacao.lista_espera)
+        assert classificacao.pk is not None
+        assert classificacao.inscricao == self.inscricao
+        assert classificacao.pontuacao_total == 50
+        assert classificacao.posicao == 1
+        assert classificacao.classificado is True
+        assert classificacao.lista_espera is False
 
     def test_classificacao_str(self):
         """O método __str__ deve retornar formato legível."""
@@ -127,8 +138,8 @@ class TestClassificacaoModel(TestCase):
             posicao=3
         )
         resultado_str = str(classificacao)
-        self.assertIn('3º', resultado_str)
-        self.assertIn(self.inscricao.interessado.nome, resultado_str)
+        assert '3º' in resultado_str
+        assert self.inscricao.interessado.nome in resultado_str
 
     def test_classificacao_posicao_null_default(self):
         """A posição deve ser nula por padrão."""
@@ -137,32 +148,26 @@ class TestClassificacaoModel(TestCase):
             pontuacao_total=60,
             posicao=None
         )
-        self.assertIsNone(classificacao.posicao)
-        self.assertFalse(classificacao.classificado)
-        self.assertFalse(classificacao.lista_espera)
+        assert classificacao.posicao is None
+        assert classificacao.classificado is False
+        assert classificacao.lista_espera is False
 
     def test_classificacao_unique_inscricao(self):
         """Cada inscrição deve ter apenas uma classificacao."""
         ClassificacaoFactory(inscricao=self.inscricao)
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             ClassificacaoFactory(inscricao=self.inscricao)
-
-    # ==========================================
-    # NOVOS TESTES DE VALIDAÇÃO
-    # ==========================================
 
     def test_pontuacao_total_validacao_range(self):
         """A pontuação total não deve ser menor que 0 ou maior que 100."""
         classificacao = ClassificacaoFactory(inscricao=self.inscricao)
         
-        # Teste menor que zero
         classificacao.pontuacao_total = -1
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             classificacao.full_clean()
             
-        # Teste maior que 100
         classificacao.pontuacao_total = 101
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             classificacao.full_clean()
 
     def test_flags_classificacao_mutuamente_exclusivas(self):
@@ -170,14 +175,11 @@ class TestClassificacaoModel(TestCase):
         classificacao = ClassificacaoFactory(inscricao=self.inscricao)
         classificacao.classificado = True
         classificacao.lista_espera = True
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             classificacao.full_clean()    
         
     def test_desempate_por_data_inscricao(self):
         """Ordenacao respeita data de inscricao (FIFO) para pontuacoes iguais."""
-        from django.utils import timezone
-        from datetime import timedelta, datetime
-
         interessado2 = InteressadoFactory()
         inscricao2 = InscricaoFactory(interessado=interessado2)
 
@@ -190,7 +192,6 @@ class TestClassificacaoModel(TestCase):
             pontuacao_total=50
         )
 
-        # Forca datas diferentes via update (evita problema de timezone)
         agora = timezone.now()
         Inscricao.objects.filter(pk=self.inscricao.pk).update(
             data_inscricao=agora - timedelta(hours=2)
@@ -199,11 +200,10 @@ class TestClassificacaoModel(TestCase):
             data_inscricao=agora - timedelta(hours=1)
         )
 
-        # Ordena por pontuacao (decrescente) e data inscricao (crescente)
         queryset = Classificacao.objects.all().order_by(
             '-pontuacao_total', 'inscricao__data_inscricao'
         )
 
-        self.assertEqual(queryset.first().inscricao, self.inscricao)
-        self.assertEqual(queryset.last().inscricao, inscricao2)
+        assert queryset.first().inscricao == self.inscricao
+        assert queryset.last().inscricao == inscricao2
 

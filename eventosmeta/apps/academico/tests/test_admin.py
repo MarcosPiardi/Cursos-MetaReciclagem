@@ -1,174 +1,188 @@
 """
 Arquivo: test_admin.py
 Caminho: apps/academico/tests/test_admin.py
-Atualizações
-28/05/2026 - Criação do arquivo 
+Descrição: Testes de admin para StatusMatricula, Matricula e Avaliacao
+Histórico de Alterações:
+ - 28/05/2026 - Criação do arquivo
+ - 09/06/2026 - Correção de testes para refletir mudanças no modelo e admin
 """
 
-from datetime import date, timedelta
-from django.test import TestCase, Client
+
+import pytest
+from django.test import Client
 from django.urls import reverse
 from django.contrib.messages import get_messages
+from django.utils import timezone
+from datetime import timedelta
 
 from apps.accounts.admin import admin_site
-from apps.academico.admin import (
-    StatusMatriculaAdmin,
-    MatriculaAdmin,
-    AvaliacaoAdmin,
-)
+from apps.academico.admin import StatusMatriculaAdmin, MatriculaAdmin, AvaliacaoAdmin
 from apps.academico.models import StatusMatricula, Matricula, Avaliacao
 from apps.eventos.models import Evento, Turma, Status
 from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
 from apps.accounts.models import Usuario
 from apps.interessados.tests.factories import InteressadoFactory
 
+@pytest.mark.django_db
+class TestStatusMatriculaAdmin:
+    """Testes para StatusMatriculaAdmin"""
 
-class TestStatusMatriculaAdmin(TestCase):
-    def setUp(self):
-        self.model_admin = StatusMatriculaAdmin(StatusMatricula, admin_site)
+    def setup_method(self):
+        self.admin = StatusMatriculaAdmin(StatusMatricula, admin_site)
 
     def test_cor_display_com_cor(self):
-        obj = StatusMatricula(cor="#ff0000")
-        result = self.model_admin.cor_display(obj)
-        self.assertIn("#ff0000", result)
-        self.assertIn("background-color", result)
+        """Deve exibir quadrado colorido quando cor está preenchida"""
+        obj = StatusMatricula(cor='#ff0000')
+        result = self.admin.cor_display(obj)
+        assert '#ff0000' in result
+        assert 'background-color' in result
 
     def test_cor_display_sem_cor(self):
-        obj = StatusMatricula(cor="")
-        result = self.model_admin.cor_display(obj)
-        self.assertEqual(result, "\u2014")
+        """Deve exibir travessão quando cor está vazia"""
+        obj = StatusMatricula(cor='')
+        result = self.admin.cor_display(obj)
+        assert result == '—'
 
+@pytest.mark.django_db
+class TestMatriculaAdmin:
+    """Testes para MatriculaAdmin"""
 
-class TestMatriculaAdmin(TestCase):
-    def setUp(self):
+    def setup_method(self):
+        self.admin = MatriculaAdmin(Matricula, admin_site)
         self.interessado = InteressadoFactory()
-
-        status_evento = Status.objects.create(nome="Ativo")
-        status_inscricao = StatusInscricao.objects.create(nome="Confirmada")
-
+        
+        status_evento = Status.objects.create(nome='Ativo')
+        status_inscricao = StatusInscricao.objects.create(nome='Confirmada')
+        
+        agora = timezone.now()
         self.evento = Evento.objects.create(
-            nome="Evento Teste",
+            nome='Evento Teste',
             status=status_evento,
             total_vagas=50,
-            data_inicio_inscricao=date.today(),
-            data_fim_inscricao=date.today() + timedelta(days=30),
-            data_inicio_evento=date.today() + timedelta(days=60),
-            data_fim_evento=date.today() + timedelta(days=61),
+            data_inicio_inscricao=agora,
+            data_fim_inscricao=agora + timedelta(days=30),
+            data_inicio_evento=agora.date() + timedelta(days=60),
+            data_fim_evento=agora.date() + timedelta(days=61),
         )
+        
         self.turma = Turma.objects.create(
-            nome="Turma Teste",
+            nome='Turma Teste',
             evento=self.evento,
             capacidade=40,
-            data_inicio=date.today() + timedelta(days=60),
-            data_fim=date.today() + timedelta(days=61),
+            data_inicio=agora.date() + timedelta(days=60),
+            data_fim=agora.date() + timedelta(days=61),
         )
+        
         self.inscricao = Inscricao.objects.create(
             interessado=self.interessado,
             evento=self.evento,
             status=status_inscricao,
         )
+        
         self.matricula = Matricula.objects.create(
-            numero_matricula="123",
+            numero_matricula='123',
             interessado=self.interessado,
             turma=self.turma,
             status=StatusMatricula.objects.create(
-                nome="Ativa", cor="#00ff00", ordem=1
+                nome='Ativa', cor='#00ff00', ordem=1
             ),
             inscricao=self.inscricao,
         )
-        self.model_admin = MatriculaAdmin(Matricula, admin_site)
 
     def test_get_interessado(self):
-        result = self.model_admin.get_interessado(self.matricula)
-        self.assertEqual(result, self.interessado.nome)
+        """Deve retornar nome do interessado"""
+        result = self.admin.get_interessado(self.matricula)
+        assert result == self.interessado.nome
 
     def test_get_evento(self):
-        result = self.model_admin.get_evento(self.matricula)
-        self.assertEqual(result, "Evento Teste")
+        """Deve retornar nome do evento"""
+        result = self.admin.get_evento(self.matricula)
+        assert result == 'Evento Teste'
 
+@pytest.mark.django_db
+class TestAvaliacaoAdmin:
+    """Testes para AvaliacaoAdmin"""
 
-class TestAvaliacaoAdmin(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.superuser = Usuario.objects.create_user(
-            username="admin2",
-            email="admin2@ex.com",
-            password="123",
-            cpf="22222222222",
+    def setup_method(self):
+        self.superuser = Usuario.objects.create_user(
+            username='admin2',
+            email='admin2@ex.com',
+            password='123',
+            cpf='22222222222',
             is_staff=True,
             is_superuser=True,
         )
-
-    def setUp(self):
         self.client = Client()
         self.client.force_login(self.superuser)
-
-        hoj = date.today()
-        status_evento = Status.objects.create(nome="Ativo")
-        status_inscricao = StatusInscricao.objects.create(nome="Confirmada")
-
+        
+        agora = timezone.now()
+        status_evento = Status.objects.create(nome='Ativo')
+        status_inscricao = StatusInscricao.objects.create(nome='Confirmada')
+        
         self.evento = Evento.objects.create(
-            nome="Evento Teste",
+            nome='Evento Teste',
             status=status_evento,
             total_vagas=50,
-            data_inicio_inscricao=hoj,
-            data_fim_inscricao=hoj + timedelta(days=30),
-            data_inicio_evento=hoj + timedelta(days=60),
-            data_fim_evento=hoj + timedelta(days=61),
+            data_inicio_inscricao=agora,
+            data_fim_inscricao=agora + timedelta(days=30),
+            data_inicio_evento=agora.date() + timedelta(days=60),
+            data_fim_evento=agora.date() + timedelta(days=61),
         )
+        
         self.turma = Turma.objects.create(
-            nome="Turma Teste",
+            nome='Turma Teste',
             evento=self.evento,
             capacidade=40,
-            data_inicio=hoj + timedelta(days=60),
-            data_fim=hoj + timedelta(days=61),
+            data_inicio=agora.date() + timedelta(days=60),
+            data_fim=agora.date() + timedelta(days=61),
         )
+        
         self.status = StatusMatricula.objects.create(
-            nome="Ativa", cor="#00ff00", ordem=1
+            nome='Ativa', cor='#00ff00', ordem=1
         )
+        
         self.interessado = InteressadoFactory()
         self.inscricao = Inscricao.objects.create(
             interessado=self.interessado,
             evento=self.evento,
             status=status_inscricao,
         )
+        
         self.matricula = Matricula.objects.create(
-            numero_matricula="456",
+            numero_matricula='456',
             interessado=self.interessado,
             turma=self.turma,
             status=self.status,
             inscricao=self.inscricao,
         )
-
-        # CORRECAO: update_or_create garante aprovado=True mesmo se Matricula.save() criou com False
+        
         self.avaliacao, _ = Avaliacao.objects.update_or_create(
             matricula=self.matricula,
             defaults={
-                "nota_final": 8.5,
-                "frequencia": 90,
-                "aprovado": True,
+                'nota_final': 8.5,
+                'frequencia': 90,
+                'aprovado': True,
             },
         )
-
+        
         Classificacao.objects.create(
             inscricao=self.inscricao,
             classificado=True,
             pontuacao_total=100,
             posicao=1,
         )
-        self.model_admin = AvaliacaoAdmin(Avaliacao, admin_site)
+        self.admin = AvaliacaoAdmin(Avaliacao, admin_site)
 
     def _criar_matricula_extra(self):
-        """Helper para criar matricula extra para testes que precisam de outro Avaliacao"""
-        hoj = date.today()
+        """Helper para criar matrícula extra"""
         interessado2 = InteressadoFactory()
         inscricao2 = Inscricao.objects.create(
             interessado=interessado2,
             evento=self.evento,
-            status=StatusInscricao.objects.create(nome="Pendente"),
+            status=StatusInscricao.objects.create(nome='Pendente'),
         )
         matricula2 = Matricula.objects.create(
-            numero_matricula="789",
+            numero_matricula='789',
             interessado=interessado2,
             turma=self.turma,
             status=self.status,
@@ -183,98 +197,96 @@ class TestAvaliacaoAdmin(TestCase):
         return matricula2
 
     def test_acoes_certificado_aprovado(self):
-        result = self.model_admin.acoes_certificado(self.avaliacao)
-        self.assertIn("button", result)
-        self.assertIn(str(self.avaliacao.pk), result)
+        """Deve exibir botão para certificado aprovado"""
+        result = self.admin.acoes_certificado(self.avaliacao)
+        assert 'button' in result
+        assert str(self.avaliacao.pk) in result
 
     def test_acoes_certificado_nao_aprovado(self):
+        """Deve exibir travessão para não aprovado"""
         matricula2 = self._criar_matricula_extra()
         avaliacao2, _ = Avaliacao.objects.update_or_create(
             matricula=matricula2,
             defaults={
-                "nota_final": 5.0,
-                "frequencia": 70,
-                "aprovado": False,
+                'nota_final': 5.0,
+                'frequencia': 70,
+                'aprovado': False,
             },
         )
-        result = self.model_admin.acoes_certificado(avaliacao2)
-        self.assertEqual(result, '<span style="color: #999;">-</span>')
+        result = self.admin.acoes_certificado(avaliacao2)
+        assert result == '<span style="color: #999;">-</span>'
 
     def test_changelist_view_contexto(self):
-        response = self.client.get(
-            reverse("admin:academico_avaliacao_changelist")
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("eventos_disponiveis", response.context)
+        """Deve incluir eventos_disponiveis no contexto"""
+        response = self.client.get(reverse('admin:academico_avaliacao_changelist'))
+        assert response.status_code == 200
+        assert 'eventos_disponiveis' in response.context
 
     def test_gerar_certificados_marca_emitidos(self):
-        self.assertFalse(self.avaliacao.certificado_emitido)
+        """Deve marcar certificado como emitido"""
+        assert not self.avaliacao.certificado_emitido
         self.client.post(
-            reverse("admin:academico_avaliacao_changelist"),
+            reverse('admin:academico_avaliacao_changelist'),
             {
-                "action": "gerar_certificados",
-                "_selected_action": [self.avaliacao.pk],
-                "index": "0",
+                'action': 'gerar_certificados',
+                '_selected_action': [self.avaliacao.pk],
+                'index': '0',
             },
         )
         self.avaliacao.refresh_from_db()
-        self.assertTrue(self.avaliacao.certificado_emitido)
-        self.assertEqual(
-            self.avaliacao.data_emissao_certificado, date.today()
-        )
+        assert self.avaliacao.certificado_emitido
+        assert self.avaliacao.data_emissao_certificado == timezone.now().date()
 
     def test_gerar_certificados_sem_aprovados(self):
+        """Deve exibir mensagem quando nenhum aprovado"""
         matricula2 = self._criar_matricula_extra()
         avaliacao2, _ = Avaliacao.objects.update_or_create(
             matricula=matricula2,
             defaults={
-                "nota_final": 5.0,
-                "frequencia": 70,
-                "aprovado": False,
+                'nota_final': 5.0,
+                'frequencia': 70,
+                'aprovado': False,
             },
         )
         response = self.client.post(
-            reverse("admin:academico_avaliacao_changelist"),
+            reverse('admin:academico_avaliacao_changelist'),
             {
-                "action": "gerar_certificados",
-                "_selected_action": [avaliacao2.pk],
-                "index": "0",
+                'action': 'gerar_certificados',
+                '_selected_action': [avaliacao2.pk],
+                'index': '0',
             },
             follow=True,
         )
         msg_list = list(get_messages(response.wsgi_request))
-        self.assertTrue(
-            any("Nenhum aluno aprovado" in str(m) for m in msg_list)
-        )
+        assert any('Nenhum aluno aprovado' in str(m) for m in msg_list)
 
     def test_gerar_certificados_ja_emitido(self):
+        """Deve exibir aviso se certificado já emitido"""
         self.avaliacao.certificado_emitido = True
         self.avaliacao.save()
         response = self.client.post(
-            reverse("admin:academico_avaliacao_changelist"),
+            reverse('admin:academico_avaliacao_changelist'),
             {
-                "action": "gerar_certificados",
-                "_selected_action": [self.avaliacao.pk],
-                "index": "0",
+                'action': 'gerar_certificados',
+                '_selected_action': [self.avaliacao.pk],
+                'index': '0',
             },
             follow=True,
         )
         msg_list = list(get_messages(response.wsgi_request))
-        self.assertTrue(
-            any("já possui certificado" in str(m) for m in msg_list)
-        )
+        assert any('já possui certificado' in str(m) for m in msg_list)
 
     def test_download_certificados_lote_action_redirect(self):
+        """Deve redirecionar para download em lote"""
         response = self.client.post(
-            reverse("admin:academico_avaliacao_changelist"),
+            reverse('admin:academico_avaliacao_changelist'),
             {
-                "action": "download_certificados_lote_action",
-                "_selected_action": [self.avaliacao.pk],
-                "index": "0",
+                'action': 'download_certificados_lote_action',
+                '_selected_action': [self.avaliacao.pk],
+                'index': '0',
             },
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("certificados/download-lote", response.url)
-
+        assert response.status_code == 302
+        assert 'certificados/download-lote' in response.url
 
 

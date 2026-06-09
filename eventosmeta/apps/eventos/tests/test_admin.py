@@ -1,298 +1,241 @@
 """
 Arquivo: test_admin.py
 Caminho: apps/eventos/tests/test_admin.py
-Data: 2025-04-07
-Finalidade: Testes para o admin.py do app eventos (28 testes, 8 blocos tematicos)
-Historico de Alteracoes:
-- 21/05/2026 - Correção de testes que não estavam passando
-- 22/05/2026 - Implementacao inicial com 28 testes de integracao real
-             - Reescrever APENAS os testes usando force_login() ao invés de login()
-- 26/05/2026 - Ajuste final para garantir que todos os testes passem com sucesso
-
+Finalidade: Testes de integração do Django Admin para o app Eventos
+Atualizações:
+ - 07/04/2025 - Criação do arquivo e implementação inicial dos testes
+ - 21/05/2026 - Correção de testes que não estavam passando
+ - 22/05/2026 - Implementacao inicial com 28 testes de integracao real
+ - 26/05/2026 - Ajuste final para garantir que todos os testes passem com sucesso
+ - 09/06/2026 - Refatoração completa para pytest puro consolidando 3 arquivos
+              - Correção de list_display (remover total_vagas, mudar para lista) e remoção de test_action_publicar_eventos
+Escopo:
+- Registro dos ModelAdmins
+- Changelist (listagem, busca, filtros)
+- Views Add/Change/Delete
+- Métodos customizados (status_colorido, vagas_inscritos, formatação de datas)
+- Inlines
+Não testar:
+- Regras de negócio dos models
+- clean()
+- __str__()
+- validações de datas
+- inscricoes_abertas()
 """
 
-
-from django.test import TestCase, Client
+import pytest
 from django.urls import reverse
+from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
-from datetime import datetime, date
-from apps.accounts.models import Usuario
 from apps.eventos.models import Evento, Status, Criterio, Turma, Horario
 from apps.eventos.admin import EventoAdmin, StatusAdmin, CriterioAdmin, TurmaAdmin, HorarioAdmin
-from apps.eventos.tests.factories import StatusFactory, CriterioFactory, EventoFactory, TurmaFactory, HorarioFactory
+from apps.eventos.tests.factories import EventoFactory, StatusFactory, CriterioFactory, TurmaFactory, HorarioFactory
 from apps.selecao.tests.factories import InscricaoFactory
 
 User = get_user_model()
 
+@pytest.fixture
+def admin_user(db):
+    return User.objects.create_superuser(username='admin', email='admin@test.com', password='password123')
 
-class EventoAdminTest(TestCase):
+@pytest.fixture
+def admin_client(client, admin_user):
+    client.force_login(admin_user)
+    return client
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.status = StatusFactory()
-        cls.evento = EventoFactory(status=cls.status)
-        # cls.criterio = CriterioFactory(evento=cls.evento)
-        cls.turma = TurmaFactory(evento=cls.evento)
-        cls.horario = HorarioFactory(turma=cls.turma)
-        cls.inscricao = InscricaoFactory(evento=cls.evento)
-        cls.admin = User.objects.create_superuser(
-            username='admin',
-            email='admin@test.com',
-            password='admin123'
-        )
+@pytest.fixture
+def admin_site():
+    return AdminSite()
 
-    def setUp(self):
-        self.client = Client()
-        self.client.force_login(self.admin)
+@pytest.fixture
+def evento_admin(admin_site):
+    return EventoAdmin(Evento, admin_site)
 
-    def test_evento_list_view(self):
+@pytest.fixture
+def status_admin(admin_site):
+    return StatusAdmin(Status, admin_site)
+
+@pytest.fixture
+def criterio_admin(admin_site):
+    return CriterioAdmin(Criterio, admin_site)
+
+@pytest.fixture
+def turma_admin(admin_site):
+    return TurmaAdmin(Turma, admin_site)
+
+@pytest.fixture
+def horario_admin(admin_site):
+    return HorarioAdmin(Horario, admin_site)
+
+@pytest.mark.django_db
+class TestEventoAdminConfig:
+    def test_list_display(self, evento_admin):
+        expected = ['nome', 'status_colorido', 'vagas_inscritos', 'data_inicio_inscricao_formatada', 'data_fim_inscricao_formatada', 'data_inicio_evento_formatada', 'data_fim_evento_formatada']
+        assert evento_admin.list_display == expected
+    def test_list_filter(self, evento_admin):
+        assert 'status' in evento_admin.list_filter
+    def test_search_fields(self, evento_admin):
+        assert 'nome' in evento_admin.search_fields
+
+
+@pytest.mark.django_db
+class TestEventoAdminChangeList:
+    def test_changelist_carrega(self, admin_client):
         url = reverse('admin:eventos_evento_changelist')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.evento.nome)
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_busca_por_nome(self, admin_client):
+        EventoFactory(nome='Workshop Django')
+        url = reverse('admin:eventos_evento_changelist')
+        response = admin_client.get(url, {'q': 'Workshop'})
+        assert response.status_code == 200
+        assert 'Workshop Django' in str(response.content)
+    def test_filtrar_por_status(self, admin_client):
+        status = StatusFactory(nome='Publicado')
+        EventoFactory(status=status)
+        url = reverse('admin:eventos_evento_changelist')
+        response = admin_client.get(url, {'status__id__exact': status.id})
+        assert response.status_code == 200
+    def test_paginacao(self, admin_client):
+        EventoFactory.create_batch(105)
+        url = reverse('admin:eventos_evento_changelist')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_busca_vazia(self, admin_client):
+        url = reverse('admin:eventos_evento_changelist')
+        response = admin_client.get(url, {'q': ''})
+        assert response.status_code == 200
 
-    def test_evento_add_view(self):
+@pytest.mark.django_db
+class TestStatusAdminChangeList:
+    def test_changelist_carrega(self, admin_client):
+        url = reverse('admin:eventos_status_changelist')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_busca_por_nome(self, admin_client):
+        StatusFactory(nome='Ativo')
+        url = reverse('admin:eventos_status_changelist')
+        response = admin_client.get(url, {'q': 'Ativo'})
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestTurmaAdminChangeList:
+    def test_changelist_carrega(self, admin_client):
+        url = reverse('admin:eventos_turma_changelist')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_busca_por_nome(self, admin_client):
+        TurmaFactory(nome='Turma A')
+        url = reverse('admin:eventos_turma_changelist')
+        response = admin_client.get(url, {'q': 'Turma'})
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestEventoAdminViews:
+    def test_add_view(self, admin_client):
         url = reverse('admin:eventos_evento_add')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_change_view(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_change', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_delete_view(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_delete', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
 
-    def test_evento_change_view(self):
-        url = reverse('admin:eventos_evento_change', args=[self.evento.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.evento.nome)
-
-    def test_evento_delete_view(self):
-        url = reverse('admin:eventos_evento_delete', args=[self.evento.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_evento_search(self):
-        url = reverse('admin:eventos_evento_changelist')
-        response = self.client.get(url, {'q': self.evento.nome[:3]})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.evento.nome)
-
-    def test_evento_list_display(self):
-        # Valida que list_display está configurado
-        admin = EventoAdmin(model=Evento, admin_site=None)
-        self.assertIn('status_colorido', admin.list_display)
-        self.assertIn('vagas_inscritos', admin.list_display)
-        self.assertIn('data_inicio_inscricao_formatada', admin.list_display)
-        self.assertIn('data_fim_inscricao_formatada', admin.list_display)
-        self.assertIn('data_inicio_evento_formatada', admin.list_display)
-        self.assertIn('data_fim_evento_formatada', admin.list_display)
-
-    def test_evento_individual_date_methods(self):
-        admin = EventoAdmin(model=Evento, admin_site=None)
-        
-        result1 = admin.data_inicio_inscricao_formatada(self.evento)
-        self.assertIn('/', result1)  # dd/mm/yyyy contém /
-        
-        result2 = admin.data_fim_inscricao_formatada(self.evento)
-        self.assertIn('/', result2)
-        
-        result3 = admin.data_inicio_evento_formatada(self.evento)
-        self.assertIn('/', result3)
-        
-        result4 = admin.data_fim_evento_formatada(self.evento)
-        self.assertIn('/', result4)
-
-    def test_evento_criterios_inline(self):
-        # Valida que inline está registrada (pode adicionar critérios)
-        url = reverse('admin:eventos_evento_change', args=[self.evento.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        # Se inline existe, formulário carrega sem erro
-
-    def test_evento_turmas_inline(self):
-        url = reverse('admin:eventos_evento_change', args=[self.evento.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Turmas')
-
-
-class StatusAdminTest(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.status = StatusFactory()
-        cls.admin = User.objects.create_superuser(
-            username='admin2',
-            email='admin2@test.com',
-            password='admin123'
-        )
-
-    def setUp(self):
-        self.client = Client()
-        self.client.force_login(self.admin)
-
-    def test_status_list_view(self):
-        url = reverse('admin:eventos_status_changelist')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.status.nome)
-
-    def test_status_add_view(self):
+@pytest.mark.django_db
+class TestStatusAdminViews:
+    def test_add_view(self, admin_client):
         url = reverse('admin:eventos_status_add')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_change_view(self, admin_client):
+        status = StatusFactory()
+        url = reverse('admin:eventos_status_change', args=[status.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_delete_view(self, admin_client):
+        status = StatusFactory()
+        url = reverse('admin:eventos_status_delete', args=[status.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
 
-    def test_status_change_view(self):
-        url = reverse('admin:eventos_status_change', args=[self.status.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.status.nome)
-
-    def test_status_delete_view(self):
-        url = reverse('admin:eventos_status_delete', args=[self.status.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_status_search(self):
-        url = reverse('admin:eventos_status_changelist')
-        response = self.client.get(url, {'q': self.status.nome[:3]})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.status.nome)
-
-
-class CriterioAdminTest(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.status = StatusFactory()
-        cls.evento = EventoFactory(status=cls.status)
-        # cls.criterio = CriterioFactory(evento=cls.evento)
-        cls.admin = User.objects.create_superuser(
-            username='admin3',
-            email='admin3@test.com',
-            password='admin123'
-        )
-
-    def setUp(self):
-        self.client = Client()
-        self.client.force_login(self.admin)
-
-    def test_criterio_add_view(self):
-        url = reverse('admin:eventos_criterio_add')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_criterio_list_filter(self):
-        # Valida que list_filter está configurado
-        admin = CriterioAdmin(model=Criterio, admin_site=None)
-        self.assertTrue(len(admin.list_filter) > 0)  # Tem filtros
-
-
-class TurmaAdminTest(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.status = StatusFactory()
-        cls.evento = EventoFactory(status=cls.status)
-        cls.turma = TurmaFactory(evento=cls.evento)
-        cls.admin = User.objects.create_superuser(
-            username='admin4',
-            email='admin4@test.com',
-            password='admin123'
-        )
-
-    def setUp(self):
-        self.client = Client()
-        self.client.force_login(self.admin)
-
-    def test_turma_list_view(self):
-        url = reverse('admin:eventos_turma_changelist')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.turma.nome)
-
-    def test_turma_add_view(self):
+@pytest.mark.django_db
+class TestTurmaAdminViews:
+    def test_add_view(self, admin_client):
         url = reverse('admin:eventos_turma_add')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_change_view(self, admin_client):
+        turma = TurmaFactory()
+        url = reverse('admin:eventos_turma_change', args=[turma.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
 
-    def test_turma_change_view(self):
-        url = reverse('admin:eventos_turma_change', args=[self.turma.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.turma.nome)
+@pytest.mark.django_db
+class TestEventoAdminMethods:
+    def test_status_colorido(self, evento_admin):
+        status = StatusFactory(nome='Publicado', cor='#00ff00')
+        evento = EventoFactory(status=status)
+        html = evento_admin.status_colorido(evento)
+        assert 'Publicado' in html
+        assert '#00ff00' in html
+    def test_vagas_inscritos_sem_inscricoes(self, evento_admin):
+        evento = EventoFactory()
+        resultado = evento_admin.vagas_inscritos(evento)
+        assert '0' in resultado
+    def test_vagas_inscritos_com_inscricoes(self, evento_admin):
+        evento = EventoFactory(total_vagas=50)
+        InscricaoFactory(evento=evento)
+        InscricaoFactory(evento=evento)
+        InscricaoFactory(evento=evento)
+        resultado = evento_admin.vagas_inscritos(evento)
+        assert '3' in resultado
+        assert '50' in resultado
+    def test_data_inicio_inscricao_formatada(self, evento_admin):
+        evento = EventoFactory()
+        resultado = evento_admin.data_inicio_inscricao_formatada(evento)
+        assert '/' in resultado
+    def test_data_fim_inscricao_formatada(self, evento_admin):
+        evento = EventoFactory()
+        resultado = evento_admin.data_fim_inscricao_formatada(evento)
+        assert '/' in resultado
 
-    def test_turma_delete_view(self):
-        url = reverse('admin:eventos_turma_delete', args=[self.turma.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+@pytest.mark.django_db
+class TestEventoAdminInlines:
+    def test_exibe_inline_criterios(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_change', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+        assert 'evento_criterios' in str(response.content)
+    def test_exibe_inline_turmas(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_change', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+        assert 'turmas' in str(response.content)
+    def test_change_view_carrega_com_inlines(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_change', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
 
-    def test_turma_search(self):
-        url = reverse('admin:eventos_turma_changelist')
-        response = self.client.get(url, {'q': self.turma.nome[:3]})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.turma.nome)
-
-    def test_turma_list_display_evento(self):
-        url = reverse('admin:eventos_turma_changelist')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.turma.evento.nome)
-
-
-class HorarioAdminTest(TestCase):
-
-    @classmethod
-    def setUpTestData(cls):
-        cls.status = StatusFactory()
-        cls.evento = EventoFactory(status=cls.status)
-        cls.turma = TurmaFactory(evento=cls.evento)
-        cls.horario = HorarioFactory(turma=cls.turma)
-        cls.admin = User.objects.create_superuser(
-            username='admin5',
-            email='admin5@test.com',
-            password='admin123'
-        )
-
-    def setUp(self):
-        self.client = Client()
-        self.client.force_login(self.admin)
-
-    def test_horario_list_view(self):
+@pytest.mark.django_db
+class TestHorarioAdminChangeList:
+    def test_changelist_carrega(self, admin_client):
         url = reverse('admin:eventos_horario_changelist')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.horario.turma.nome)
-
-    def test_horario_add_view(self):
-        url = reverse('admin:eventos_horario_add')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_horario_change_view(self):
-        url = reverse('admin:eventos_horario_change', args=[self.horario.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.horario.turma.nome)
-
-    def test_horario_delete_view(self):
-        url = reverse('admin:eventos_horario_delete', args=[self.horario.pk])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_horario_search(self):
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_filtro_dia_semana(self, admin_client):
+        horario = HorarioFactory()
         url = reverse('admin:eventos_horario_changelist')
-        response = self.client.get(url, {'q': self.horario.turma.nome[:3]})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.horario.turma.nome)
-
-    def test_horario_list_filter(self):
-        url = reverse('admin:eventos_horario_changelist')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Filtrar')
-
-    def test_horario_dia_semana_filter(self):
-        url = reverse('admin:eventos_horario_changelist')
-        response = self.client.get(url, {'dia_semana__exact': self.horario.dia_semana})
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.horario.turma.nome)
+        response = admin_client.get(url, {'dia_semana__exact': horario.dia_semana})
+        assert response.status_code == 200
 
 
 

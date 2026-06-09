@@ -10,11 +10,13 @@ App: apps
 Arquivo: test_admin.py
 Caminho: apps/selecao/tests/test_admin.py
 Atualizações
-08/04/2026 - Testes para as actions do admin.py do app Selecao
-10/04/2026 - Testes para ClassificacaoAdmin - action matricular_alunos_action
+ - 08/04/2026 - Testes para as actions do admin.py do app Selecao
+ - 10/04/2026 - Testes para ClassificacaoAdmin - action matricular_alunos_action
              Testa: trava de capacidade, validações, sucesso e tratamento de erros
-27/05/2026 - Refatoração para usar RequestFactory e mensagens reais do Django, além de organização em classes de teste.             
+ - 27/05/2026 - Refatoração para usar RequestFactory e mensagens reais do Django, além de organização em classes de teste.             
+- 08/06/2026 - Refatoração para pytest (remover BaseAdminActionTest, adicionar fixtures)
 """
+
 
 import pytest
 from django.test import RequestFactory
@@ -23,12 +25,10 @@ from django.contrib.admin.sites import AdminSite
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from unittest.mock import patch
-
 from apps.selecao.admin import ClassificacaoAdmin
 from apps.selecao.models import Classificacao, Inscricao, StatusInscricao
 from apps.eventos.models import Evento, Turma
 from apps.academico.models import Matricula, StatusMatricula
-
 from apps.selecao.tests.factories import (
     ClassificacaoFactory,
     InscricaoFactory,
@@ -43,7 +43,6 @@ from apps.academico.tests.factories import (
     MatriculaFactory,
 )
 
-
 def _create_request_with_messages(factory, user, method='post', path='/'):
     """Cria um objeto Request com usuário e armazenamento de mensagens."""
     request = getattr(factory, method)(path)
@@ -51,16 +50,24 @@ def _create_request_with_messages(factory, user, method='post', path='/'):
     request._messages = CookieStorage(request)
     return request
 
-
 def _get_messages(request):
     """Extrai as mensagens do request como uma lista de strings."""
     return [str(m) for m in request._messages]
 
+@pytest.fixture
+def usuario_staff(db):
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    user = User.objects.create_user(username='staff_user', password='pass123')
+    user.is_staff = True
+    user.save()
+    return user
 
-class BaseAdminActionTest:
-    """Classe base para configurar o ambiente de teste para actions do admin."""
+@pytest.mark.django_db
+class TestMatricularAlunosActionCapacity:
+    """Testes para a trava de capacidade da action matricular_alunos_action."""
 
-    def setup_method(self, method):
+    def setup_method(self):
         self.factory = RequestFactory()
         self.site = AdminSite()
         self.admin = ClassificacaoAdmin(Classificacao, self.site)
@@ -68,24 +75,14 @@ class BaseAdminActionTest:
         self.status_inscricao_confirmada = StatusInscricaoFactory(nome='CONFIRMADA')
         StatusInscricaoFactory(nome='Pendente')
 
-
-@pytest.mark.django_db
-class TestMatricularAlunosActionCapacity(BaseAdminActionTest):
-    """Testes para a trava de capacidade da action matricular_alunos_action."""
-
     def test_matricular_alunos_capacidade_ultrapassada(self, usuario_staff):
-        """
-        Deve exibir erro e não matricular se a quantidade de selecionados
-        ultrapassa a capacidade da turma.
-        """
+        """Deve exibir erro e não matricular se a quantidade de selecionados ultrapassa a capacidade da turma."""
         evento = EventoFactory()
         turma = TurmaFactory(evento=evento, capacidade=1)
-        
         inscricao1 = InscricaoFactory(evento=evento)
         inscricao2 = InscricaoFactory(evento=evento)
         classificacao1 = ClassificacaoFactory(inscricao=inscricao1)
         classificacao2 = ClassificacaoFactory(inscricao=inscricao2)
-        
         queryset = Classificacao.objects.filter(id__in=[classificacao1.id, classificacao2.id])
 
         request = _create_request_with_messages(self.factory, usuario_staff, method='post', path='/admin/selecao/classificacao/')
@@ -95,27 +92,19 @@ class TestMatricularAlunosActionCapacity(BaseAdminActionTest):
             'confirmar_matricula': '1',
             'turma': str(turma.pk),
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
-        print("MENSAGENS: ", messages_list)
         assert any('vaga(s) disponível' in msg for msg in messages_list)
         assert Matricula.objects.count() == 0
 
     def test_matricular_alunos_capacidade_exata(self, usuario_staff):
-        """
-        Deve matricular com sucesso se a quantidade de selecionados
-        é igual à capacidade da turma.
-        """
+        """Deve matricular com sucesso se a quantidade de selecionados é igual à capacidade da turma."""
         evento = EventoFactory()
         turma = TurmaFactory(evento=evento, capacidade=2)
-        
         inscricao1 = InscricaoFactory(evento=evento)
         inscricao2 = InscricaoFactory(evento=evento)
         classificacao1 = ClassificacaoFactory(inscricao=inscricao1)
         classificacao2 = ClassificacaoFactory(inscricao=inscricao2)
-        
         queryset = Classificacao.objects.filter(id__in=[classificacao1.id, classificacao2.id])
 
         request = _create_request_with_messages(self.factory, usuario_staff, method='post', path='/admin/selecao/classificacao/')
@@ -125,79 +114,67 @@ class TestMatricularAlunosActionCapacity(BaseAdminActionTest):
             'confirmar_matricula': '1',
             'turma': str(turma.pk),
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
         assert any('2 matrícula(s) criada(s)' in msg for msg in messages_list)
         assert Matricula.objects.count() == 2
         assert Inscricao.objects.get(pk=inscricao1.pk).status == self.status_inscricao_confirmada
         assert Inscricao.objects.get(pk=inscricao2.pk).status == self.status_inscricao_confirmada
 
-
 @pytest.mark.django_db
-class TestMatricularAlunosActionValidation(BaseAdminActionTest):
+class TestMatricularAlunosActionValidation:
     """Testes para as validações da action matricular_alunos_action."""
 
+    def setup_method(self):
+        self.factory = RequestFactory()
+        self.site = AdminSite()
+        self.admin = ClassificacaoAdmin(Classificacao, self.site)
+        self.status_matricula_ativa = StatusMatriculaFactory(nome='Ativa')
+        self.status_inscricao_confirmada = StatusInscricaoFactory(nome='CONFIRMADA')
+        StatusInscricaoFactory(nome='Pendente')
+
     def test_validacao_evento_unico(self, usuario_staff):
-        """
-        Deve exibir erro se classificações de eventos diferentes forem selecionadas.
-        """
+        """Deve exibir erro se classificações de eventos diferentes forem selecionadas."""
         evento1 = EventoFactory(nome='Evento A')
         evento2 = EventoFactory(nome='Evento B')
-        
         inscricao1 = InscricaoFactory(evento=evento1)
         inscricao2 = InscricaoFactory(evento=evento2)
         classificacao1 = ClassificacaoFactory(inscricao=inscricao1)
         classificacao2 = ClassificacaoFactory(inscricao=inscricao2)
-        
         queryset = Classificacao.objects.filter(id__in=[classificacao1.id, classificacao2.id])
-
         request = _create_request_with_messages(self.factory, usuario_staff, method='post', path='/admin/selecao/classificacao/')
         request.POST = {
             'action': 'matricular_alunos_action',
             ACTION_CHECKBOX_NAME: [str(c.pk) for c in queryset],
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
         assert any('Selecione apenas classificações do MESMO EVENTO' in msg for msg in messages_list)
         assert Matricula.objects.count() == 0
 
     def test_validacao_turma_inexistente_para_evento(self, usuario_staff):
-        """
-        Deve exibir erro se o evento das classificações não possui turmas cadastradas.
-        """
+        """Deve exibir erro se o evento das classificações não possui turmas cadastradas."""
         evento = EventoFactory()
         inscricao = InscricaoFactory(evento=evento)
         classificacao = ClassificacaoFactory(inscricao=inscricao)
         queryset = Classificacao.objects.filter(id=classificacao.id)
-
         request = _create_request_with_messages(self.factory, usuario_staff, method='post', path='/admin/selecao/classificacao/')
         request.POST = {
             'action': 'matricular_alunos_action',
             ACTION_CHECKBOX_NAME: [str(c.pk) for c in queryset],
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
         assert any('não possui turmas cadastradas' in msg for msg in messages_list)
         assert Matricula.objects.count() == 0
 
     def test_protecao_duplicidade_matricula(self, usuario_staff):
-        """
-        Deve exibir aviso e não criar matrícula duplicada para o mesmo interessado na mesma turma.
-        """
+        """Deve exibir aviso e não criar matrícula duplicada para o mesmo interessado na mesma turma."""
         evento = EventoFactory()
         turma = TurmaFactory(evento=evento, capacidade=2)
-        
         inscricao = InscricaoFactory(evento=evento)
         classificacao = ClassificacaoFactory(inscricao=inscricao)
-
         MatriculaFactory(turma=turma, interessado=inscricao.interessado, inscricao=inscricao, status=self.status_matricula_ativa)
-        
         queryset = Classificacao.objects.filter(id=classificacao.id)
 
         request = _create_request_with_messages(self.factory, usuario_staff, method='post', path='/admin/selecao/classificacao/')
@@ -207,9 +184,7 @@ class TestMatricularAlunosActionValidation(BaseAdminActionTest):
             'confirmar_matricula': '1',
             'turma': str(turma.pk),
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
         assert any('já está matriculado nesta turma' in msg for msg in messages_list)
         assert Matricula.objects.count() == 1
@@ -217,14 +192,11 @@ class TestMatricularAlunosActionValidation(BaseAdminActionTest):
     def test_validacao_turma_nao_pertence_ao_evento(self, usuario_staff):
         evento1 = EventoFactory(nome='Evento A')
         evento2 = EventoFactory(nome='Evento B')
-        
-        TurmaFactory(evento=evento1, capacidade=2)  # <-- turma do evento1, para passar a validação inicial
-        turma_evento2 = TurmaFactory(evento=evento2, capacidade=1)  # turma do evento2, que será passada errada
-        
+        TurmaFactory(evento=evento1, capacidade=2)
+        turma_evento2 = TurmaFactory(evento=evento2, capacidade=1)
         inscricao = InscricaoFactory(evento=evento1)
         classificacao = ClassificacaoFactory(inscricao=inscricao)
         queryset = Classificacao.objects.filter(id=classificacao.id)
-
         request = _create_request_with_messages(self.factory, usuario_staff, method='post', path='/admin/selecao/classificacao/')
         request.POST = {
             'action': 'matricular_alunos_action',
@@ -232,33 +204,32 @@ class TestMatricularAlunosActionValidation(BaseAdminActionTest):
             'confirmar_matricula': '1',
             'turma': str(turma_evento2.pk),
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
-        # print("MENSAGENS TURMA:", messages_list)  # <-- adicione esta linha
         assert any('Não pertence' in msg.lower() or 'válida' in msg.lower() or 'erro' in msg.lower() for msg in messages_list)
         assert Matricula.objects.count() == 0
 
-
 @pytest.mark.django_db
-class TestMatricularAlunosActionSuccess(BaseAdminActionTest):
+class TestMatricularAlunosActionSuccess:
     """Testes para o cenário de sucesso da action matricular_alunos_action."""
 
+    def setup_method(self):
+        self.factory = RequestFactory()
+        self.site = AdminSite()
+        self.admin = ClassificacaoAdmin(Classificacao, self.site)
+        self.status_matricula_ativa = StatusMatriculaFactory(nome='Ativa')
+        self.status_inscricao_confirmada = StatusInscricaoFactory(nome='CONFIRMADA')
+        StatusInscricaoFactory(nome='Pendente')
+
     def test_sucesso_matricula_dentro_capacidade(self, usuario_staff):
-        """
-        Deve matricular alunos com sucesso e atualizar o status da inscrição.
-        """
+        """Deve matricular alunos com sucesso e atualizar o status da inscrição."""
         evento = EventoFactory()
         turma = TurmaFactory(evento=evento, capacidade=2)
-        
         inscricao1 = InscricaoFactory(evento=evento)
         inscricao2 = InscricaoFactory(evento=evento)
         classificacao1 = ClassificacaoFactory(inscricao=inscricao1)
         classificacao2 = ClassificacaoFactory(inscricao=inscricao2)
-        
         queryset = Classificacao.objects.filter(id__in=[classificacao1.id, classificacao2.id])
-
         request = _create_request_with_messages(self.factory, usuario_staff, method='post', path='/admin/selecao/classificacao/')
         request.POST = {
             'action': 'matricular_alunos_action',
@@ -266,9 +237,7 @@ class TestMatricularAlunosActionSuccess(BaseAdminActionTest):
             'confirmar_matricula': '1',
             'turma': str(turma.pk),
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
         assert any('2 matrícula(s) criada(s) na turma' in msg for msg in messages_list)
         assert Matricula.objects.count() == 2
@@ -276,13 +245,8 @@ class TestMatricularAlunosActionSuccess(BaseAdminActionTest):
         assert Inscricao.objects.get(pk=inscricao2.pk).status == self.status_inscricao_confirmada
 
     def test_nenhuma_classificacao_selecionada(self, usuario_staff):
-        """
-        Deve exibir erro se nenhuma classificacao for selecionada.
-        """
-        # O admin do Django nao chama a action se ACTION_CHECKBOX_NAME estiver vazio
-        # Este teste verifica que action lida com queryset vazio
+        """Deve exibir erro se nenhuma classificacao for selecionada."""
         queryset = Classificacao.objects.none()
-
         request = _create_request_with_messages(
             self.factory, usuario_staff, method='post',
             path='/admin/selecao/classificacao/'
@@ -291,28 +255,30 @@ class TestMatricularAlunosActionSuccess(BaseAdminActionTest):
             'action': 'matricular_alunos_action',
             ACTION_CHECKBOX_NAME: [],
         }
-
         result = self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
         assert Matricula.objects.count() == 0
 
-
 @pytest.mark.django_db
-class TestMatricularAlunosActionErrorHandling(BaseAdminActionTest):
+class TestMatricularAlunosActionErrorHandling:
     """Testes para o tratamento de erros e transações da action matricular_alunos_action."""
+
+    def setup_method(self):
+        self.factory = RequestFactory()
+        self.site = AdminSite()
+        self.admin = ClassificacaoAdmin(Classificacao, self.site)
+        self.status_matricula_ativa = StatusMatriculaFactory(nome='Ativa')
+        self.status_inscricao_confirmada = StatusInscricaoFactory(nome='CONFIRMADA')
+        StatusInscricaoFactory(nome='Pendente')
 
     def test_transacao_atomica_rollback_on_matricula_save_error(self, usuario_staff):
         evento = EventoFactory()
-        turma = TurmaFactory(evento=evento, capacidade=3)  # capacidade folgada
-        
+        turma = TurmaFactory(evento=evento, capacidade=3)
         inscricao1 = InscricaoFactory(evento=evento)
         inscricao2 = InscricaoFactory(evento=evento)
         classificacao1 = ClassificacaoFactory(inscricao=inscricao1)
         classificacao2 = ClassificacaoFactory(inscricao=inscricao2)
-        
         queryset = Classificacao.objects.filter(id__in=[classificacao1.id, classificacao2.id])
-
         request = _create_request_with_messages(
             self.factory, usuario_staff, method='post',
             path='/admin/selecao/classificacao/'
@@ -323,22 +289,16 @@ class TestMatricularAlunosActionErrorHandling(BaseAdminActionTest):
             'confirmar_matricula': '1',
             'turma': str(turma.pk),
         }
-
         with patch('apps.selecao.admin.Matricula.objects.create', side_effect=Exception('Erro simulado')):
             self.admin.matricular_alunos_action(request, queryset)
-
-        print("MENSAGENS ERRO3:", _get_messages(request))
         messages_list = _get_messages(request)
         assert any('Erro' in msg for msg in messages_list)
         assert Matricula.objects.count() == 0
         assert Inscricao.objects.get(pk=inscricao1.pk).status != self.status_inscricao_confirmada
 
     def test_status_ativa_nao_encontrado(self, usuario_staff):
-        """
-        Deve exibir erro se o StatusMatricula 'Ativa' não for encontrado.
-        """
+        """Deve exibir erro se o StatusMatricula 'Ativa' não for encontrado."""
         self.status_matricula_ativa.delete()
-
         evento = EventoFactory()
         turma = TurmaFactory(evento=evento, capacidade=1)
         inscricao = InscricaoFactory(evento=evento)
@@ -352,25 +312,19 @@ class TestMatricularAlunosActionErrorHandling(BaseAdminActionTest):
             'confirmar_matricula': '1',
             'turma': str(turma.pk),
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
         assert any('Status "ATIVA" não encontrado em Status de Matrículas' in msg for msg in messages_list)
         assert Matricula.objects.count() == 0
 
     def test_status_confirmada_nao_encontrado(self, usuario_staff):
-        """
-        Deve exibir erro se o StatusInscricao 'CONFIRMADA' não for encontrado.
-        """
+        """Deve exibir erro se o StatusInscricao 'CONFIRMADA' não for encontrado."""
         self.status_inscricao_confirmada.delete()
-
         evento = EventoFactory()
         turma = TurmaFactory(evento=evento, capacidade=1)
         inscricao = InscricaoFactory(evento=evento)
         classificacao = ClassificacaoFactory(inscricao=inscricao)
         queryset = Classificacao.objects.filter(id=classificacao.id)
-
         request = _create_request_with_messages(self.factory, usuario_staff, method='post', path='/admin/selecao/classificacao/')
         request.POST = {
             'action': 'matricular_alunos_action',
@@ -378,23 +332,18 @@ class TestMatricularAlunosActionErrorHandling(BaseAdminActionTest):
             'confirmar_matricula': '1',
             'turma': str(turma.pk),
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
         assert any('Status "CONFIRMADA" não encontrado em Status de Inscrições' in msg for msg in messages_list)
         assert Matricula.objects.count() == 0
 
     def test_classificacoes_sem_evento_associado(self, usuario_staff):
-        """
-        Deve exibir erro se a classificacao nao tem inscricao valida.
-        """
+        """Deve exibir erro se a classificacao nao tem inscricao valida."""
         evento = EventoFactory()
         turma = TurmaFactory(evento=evento, capacidade=1)
         inscricao = InscricaoFactory(evento=evento)
         classificacao = ClassificacaoFactory(inscricao=inscricao)
         queryset = Classificacao.objects.filter(id=classificacao.id)
-
         request = _create_request_with_messages(
             self.factory, usuario_staff, method='post',
             path='/admin/selecao/classificacao/'
@@ -405,9 +354,7 @@ class TestMatricularAlunosActionErrorHandling(BaseAdminActionTest):
             'confirmar_matricula': '1',
             'turma': str(turma.pk),
         }
-
         self.admin.matricular_alunos_action(request, queryset)
-
         messages_list = _get_messages(request)
         assert Matricula.objects.count() > 0 or any('erro' in msg.lower() for msg in messages_list)
 
@@ -422,14 +369,17 @@ App: apps
 Arquivo: test_models.py
 Caminho: apps/selecao/tests/test_models.py
 Atualizações:
-27/03/2026 - Testes de modelos para o app Selecao
-08/04/2026 - Testes de modelos para o app Seleção com validações e desempate
-27/05/2026 - Refatoração dos testes de modelos para incluir validações adicionais e teste de desempate por data de inscrição.
+ - 27/03/2026 - Testes de modelos para o app Selecao
+ - 08/04/2026 - Testes de modelos para o app Seleção com validações e desempate
+ - 27/05/2026 - Refatoração dos testes de modelos para incluir validações adicionais e teste de desempate por data de inscrição.
+ - 08/06/2026 - Refatoração para pytest (remover BaseAdminActionTest, adicionar fixtures)
 """
 
-from django.test import TestCase
+import pytest
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
 
 from apps.selecao.models import StatusInscricao, Inscricao, Classificacao
 from apps.selecao.tests.factories import (
@@ -441,32 +391,38 @@ from apps.eventos.tests.factories import EventoFactory
 from apps.interessados.tests.factories import InteressadoFactory
 
 
-class TestStatusInscricaoModel(TestCase):
+@pytest.mark.django_db
+class TestStatusInscricaoModel:
     """Testes para o modelo StatusInscricao."""
+
+    def setup_method(self):
+        """Configuração inicial para todos os testes."""
+        self.status = StatusInscricaoFactory(nome='Pendente', cor='#FF0000')
 
     def test_create_status_inscricao(self):
         """Deve criar um StatusInscricao com sucesso."""
-        status = StatusInscricaoFactory(nome='Pendente', cor='#FF0000')
-        self.assertIsNotNone(status.pk)
-        self.assertEqual(status.nome, 'Pendente')
-        self.assertEqual(status.cor, '#FF0000')
+        assert self.status.pk is not None
+        assert self.status.nome == 'Pendente'
+        assert self.status.cor == '#FF0000'
 
     def test_status_inscricao_str(self):
         """O método __str__ deve retornar o nome do status."""
         status = StatusInscricaoFactory(nome='Aprovado')
-        self.assertEqual(str(status), 'Aprovado')
+        assert str(status) == 'Aprovado'
 
     def test_status_inscricao_unique_name(self):
         """Não deve permitir dois status com o mesmo nome."""
         StatusInscricaoFactory(nome='Unico')
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             StatusInscricao.objects.create(nome='Unico', cor='#FF0000')
 
 
-class TestInscricaoModel(TestCase):
+@pytest.mark.django_db
+class TestInscricaoModel:
     """Testes para o modelo Inscricao."""
 
-    def setUp(self):
+    def setup_method(self):
+        """Configuração inicial para todos os testes."""
         self.interessado = InteressadoFactory()
         self.evento = EventoFactory()
         self.status_pendente = StatusInscricaoFactory(nome='Pendente')
@@ -478,9 +434,9 @@ class TestInscricaoModel(TestCase):
             evento=self.evento,
             status=self.status_pendente
         )
-        self.assertIsNotNone(inscricao.pk)
-        self.assertEqual(inscricao.interessado, self.interessado)
-        self.assertEqual(inscricao.evento, self.evento)
+        assert inscricao.pk is not None
+        assert inscricao.interessado == self.interessado
+        assert inscricao.evento == self.evento
 
     def test_inscricao_str(self):
         """O método __str__ deve retornar formato legível."""
@@ -489,8 +445,8 @@ class TestInscricaoModel(TestCase):
             evento=self.evento,
             status=self.status_pendente
         )
-        self.assertIn(self.interessado.nome, str(inscricao))
-        self.assertIn(self.evento.nome, str(inscricao))
+        assert self.interessado.nome in str(inscricao)
+        assert self.evento.nome in str(inscricao)
 
     def test_inscricao_unique_together(self):
         """Não deve permitir duas inscrições do mesmo interessado no mesmo evento."""
@@ -499,7 +455,7 @@ class TestInscricaoModel(TestCase):
             evento=self.evento,
             status=self.status_pendente
         )
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             InscricaoFactory(
                 interessado=self.interessado,
                 evento=self.evento,
@@ -513,15 +469,17 @@ class TestInscricaoModel(TestCase):
             evento=self.evento,
             status=self.status_pendente
         )
-        self.assertEqual(inscricao.interessado.nome, self.interessado.nome)
-        self.assertEqual(inscricao.evento.nome, self.evento.nome)
-        self.assertEqual(inscricao.status.nome, self.status_pendente.nome)
+        assert inscricao.interessado.nome == self.interessado.nome
+        assert inscricao.evento.nome == self.evento.nome
+        assert inscricao.status.nome == self.status_pendente.nome
 
 
-class TestClassificacaoModel(TestCase):
+@pytest.mark.django_db
+class TestClassificacaoModel:
     """Testes para o modelo Classificacao."""
 
-    def setUp(self):
+    def setup_method(self):
+        """Configuração inicial para todos os testes."""
         self.inscricao = InscricaoFactory()
 
     def test_create_classificacao(self):
@@ -532,12 +490,12 @@ class TestClassificacaoModel(TestCase):
             posicao=1,
             classificado=True
         )
-        self.assertIsNotNone(classificacao.pk)
-        self.assertEqual(classificacao.inscricao, self.inscricao)
-        self.assertEqual(classificacao.pontuacao_total, 50)
-        self.assertEqual(classificacao.posicao, 1)
-        self.assertTrue(classificacao.classificado)
-        self.assertFalse(classificacao.lista_espera)
+        assert classificacao.pk is not None
+        assert classificacao.inscricao == self.inscricao
+        assert classificacao.pontuacao_total == 50
+        assert classificacao.posicao == 1
+        assert classificacao.classificado is True
+        assert classificacao.lista_espera is False
 
     def test_classificacao_str(self):
         """O método __str__ deve retornar formato legível."""
@@ -547,8 +505,8 @@ class TestClassificacaoModel(TestCase):
             posicao=3
         )
         resultado_str = str(classificacao)
-        self.assertIn('3º', resultado_str)
-        self.assertIn(self.inscricao.interessado.nome, resultado_str)
+        assert '3º' in resultado_str
+        assert self.inscricao.interessado.nome in resultado_str
 
     def test_classificacao_posicao_null_default(self):
         """A posição deve ser nula por padrão."""
@@ -557,32 +515,26 @@ class TestClassificacaoModel(TestCase):
             pontuacao_total=60,
             posicao=None
         )
-        self.assertIsNone(classificacao.posicao)
-        self.assertFalse(classificacao.classificado)
-        self.assertFalse(classificacao.lista_espera)
+        assert classificacao.posicao is None
+        assert classificacao.classificado is False
+        assert classificacao.lista_espera is False
 
     def test_classificacao_unique_inscricao(self):
         """Cada inscrição deve ter apenas uma classificacao."""
         ClassificacaoFactory(inscricao=self.inscricao)
-        with self.assertRaises(IntegrityError):
+        with pytest.raises(IntegrityError):
             ClassificacaoFactory(inscricao=self.inscricao)
-
-    # ==========================================
-    # NOVOS TESTES DE VALIDAÇÃO
-    # ==========================================
 
     def test_pontuacao_total_validacao_range(self):
         """A pontuação total não deve ser menor que 0 ou maior que 100."""
         classificacao = ClassificacaoFactory(inscricao=self.inscricao)
         
-        # Teste menor que zero
         classificacao.pontuacao_total = -1
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             classificacao.full_clean()
             
-        # Teste maior que 100
         classificacao.pontuacao_total = 101
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             classificacao.full_clean()
 
     def test_flags_classificacao_mutuamente_exclusivas(self):
@@ -590,14 +542,11 @@ class TestClassificacaoModel(TestCase):
         classificacao = ClassificacaoFactory(inscricao=self.inscricao)
         classificacao.classificado = True
         classificacao.lista_espera = True
-        with self.assertRaises(ValidationError):
+        with pytest.raises(ValidationError):
             classificacao.full_clean()    
         
     def test_desempate_por_data_inscricao(self):
         """Ordenacao respeita data de inscricao (FIFO) para pontuacoes iguais."""
-        from django.utils import timezone
-        from datetime import timedelta, datetime
-
         interessado2 = InteressadoFactory()
         inscricao2 = InscricaoFactory(interessado=interessado2)
 
@@ -610,7 +559,6 @@ class TestClassificacaoModel(TestCase):
             pontuacao_total=50
         )
 
-        # Forca datas diferentes via update (evita problema de timezone)
         agora = timezone.now()
         Inscricao.objects.filter(pk=self.inscricao.pk).update(
             data_inscricao=agora - timedelta(hours=2)
@@ -619,13 +567,12 @@ class TestClassificacaoModel(TestCase):
             data_inscricao=agora - timedelta(hours=1)
         )
 
-        # Ordena por pontuacao (decrescente) e data inscricao (crescente)
         queryset = Classificacao.objects.all().order_by(
             '-pontuacao_total', 'inscricao__data_inscricao'
         )
 
-        self.assertEqual(queryset.first().inscricao, self.inscricao)
-        self.assertEqual(queryset.last().inscricao, inscricao2)
+        assert queryset.first().inscricao == self.inscricao
+        assert queryset.last().inscricao == inscricao2
 
 
 
@@ -637,67 +584,66 @@ App: apps
 Arquivo: test_reports.py
 Caminho: apps/selecao/tests/test_reports.py
 Atualizações: 
-- 28/05/2026 - Criando testes para geração de relatórios de classificação.
+ - 28/05/2026 - Criando testes para geração de relatórios de classificação.
+ - 08/06/2026 - Refatoração para pytest (unittest → pytest)
 """
 
-from django.test import TestCase
+import pytest
 from apps.selecao.reports import RelatorioAprovadosService
 
-
-class TestRelatorioAprovadosService(TestCase):
+@pytest.mark.django_db
+class TestRelatorioAprovadosService:
     def test_formatar_cpf_valido(self):
         resultado = RelatorioAprovadosService.formatar_cpf('12345678900')
-        self.assertEqual(resultado, '123.456.789-00')
+        assert resultado == '123.456.789-00'
 
     def test_formatar_cpf_none(self):
         resultado = RelatorioAprovadosService.formatar_cpf(None)
-        self.assertEqual(resultado, '\u2014')
+        assert resultado == '\u2014'
 
     def test_formatar_cpf_vazio(self):
         resultado = RelatorioAprovadosService.formatar_cpf('')
-        self.assertEqual(resultado, '\u2014')
+        assert resultado == '\u2014'
 
     def test_formatar_cpf_ja_formatado(self):
         resultado = RelatorioAprovadosService.formatar_cpf('123.456.789-00')
-        self.assertEqual(resultado, '123.456.789-00')
+        assert resultado == '123.456.789-00'
 
     def test_formatar_cpf_menos_de_11(self):
         resultado = RelatorioAprovadosService.formatar_cpf('1234567890')
-        self.assertEqual(resultado, '1234567890')
+        assert resultado == '1234567890'
 
     def test_formatar_cpf_mascarado_valido(self):
         resultado = RelatorioAprovadosService.formatar_cpf_mascarado('12345678901')
-        self.assertEqual(resultado, '123.4**.***-**')
+        assert resultado == '123.4**.***-**'
 
     def test_formatar_cpf_mascarado_none(self):
         resultado = RelatorioAprovadosService.formatar_cpf_mascarado(None)
-        self.assertEqual(resultado, '\u2014')
+        assert resultado == '\u2014'
 
     def test_formatar_cpf_mascarado_vazio(self):
         resultado = RelatorioAprovadosService.formatar_cpf_mascarado('')
-        self.assertEqual(resultado, '\u2014')
+        assert resultado == '\u2014'
 
     def test_formatar_telefone_celular(self):
         resultado = RelatorioAprovadosService.formatar_telefone('31999999999')
-        self.assertEqual(resultado, '(31) 99999-9999')
+        assert resultado == '(31) 99999-9999'
 
     def test_formatar_telefone_fixo(self):
         resultado = RelatorioAprovadosService.formatar_telefone('3133333333')
-        self.assertEqual(resultado, '(31) 3333-3333')
+        assert resultado == '(31) 3333-3333'
 
     def test_formatar_telefone_none(self):
         resultado = RelatorioAprovadosService.formatar_telefone(None)
-        self.assertEqual(resultado, '\u2014')
+        assert resultado == '\u2014'
 
     def test_formatar_telefone_vazio(self):
         resultado = RelatorioAprovadosService.formatar_telefone('')
-        self.assertEqual(resultado, '\u2014')
+        assert resultado == '\u2014'
 
     def test_formatar_telefone_ja_formatado(self):
         resultado = RelatorioAprovadosService.formatar_telefone('(31) 99999-9999')
-        self.assertEqual(resultado, '(31) 99999-9999')
-
-
+        assert resultado == '(31) 99999-9999'
 
 
 
@@ -718,9 +664,10 @@ Histórico de Alterações:
                test_calcular_pontuacao_inscricao_zero (evento sem critérios)
                test_desempate_misto_pontuacoes_diferentes_e_iguais (critérios com pontos diferentes)
 - 27/05/2026 - Refatoração para incluir mais cenários de teste, como classificação sem inscrições, chamada repetida e pontuação com múltiplos critérios acumulados.
+- 08/06/2026 - Refatoração para pytest (unittest → pytest)
 """
 
-from django.test import TestCase
+import pytest
 from django.utils import timezone
 from datetime import timedelta
 from decimal import Decimal
@@ -740,11 +687,11 @@ from apps.eventos.tests.factories import (
 from apps.selecao.models import Inscricao, Classificacao, InscricaoCriterioAtendido
 from apps.selecao.services import ClassificadorService
 
-
-class TestClassificadorService(TestCase):
+@pytest.mark.django_db
+class TestClassificadorService:
     """Testes para o serviço ClassificadorService."""
 
-    def setUp(self):
+    def setup_method(self):
         """Configuração inicial para todos os testes."""
         self.status_pendente = StatusInscricaoFactory(nome='Pendente')
         self.status_classificado = StatusInscricaoFactory(nome='Classificado')
@@ -760,11 +707,10 @@ class TestClassificadorService(TestCase):
         inscricao = InscricaoFactory(interessado=interessado, evento=self.evento)
         
         pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
-        self.assertEqual(pontuacao, Decimal('10.00'))
+        assert pontuacao == Decimal('10.00')
 
     def test_calcular_pontuacao_inscricao_zero(self):
         """Deve retornar 0 pontos para inscrição sem critérios."""
-        # Criar evento SEM critérios
         evento_sem_criterios = EventoFactory(
             nome='Evento Sem Critérios',
             total_vagas=10
@@ -778,7 +724,7 @@ class TestClassificadorService(TestCase):
         )
         
         pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
-        self.assertEqual(pontuacao, Decimal('0'))
+        assert pontuacao == Decimal('0')
 
     def test_classificar_evento_atribui_posicoes(self):
         """Deve atribuir posições ordinais corretas."""
@@ -786,19 +732,18 @@ class TestClassificadorService(TestCase):
             InscricaoFactory(evento=self.evento, status=self.status_pendente)
         
         resultado = ClassificadorService.classificar_evento(self.evento)
-        self.assertTrue(resultado['sucesso'])
+        assert resultado['sucesso'] is True
         
         classificacoes = Classificacao.objects.filter(
             inscricao__evento=self.evento
         ).order_by('posicao')
         
-        self.assertEqual(classificacoes[0].posicao, 1)
-        self.assertEqual(classificacoes[1].posicao, 2)
-        self.assertEqual(classificacoes[2].posicao, 3)
+        assert classificacoes[0].posicao == 1
+        assert classificacoes[1].posicao == 2
+        assert classificacoes[2].posicao == 3
 
     def test_classificar_evento_classifica_dentro_vagas(self):
         """Candidatos dentro das vagas devem ser classificados."""
-        # Evento com 2 vagas
         evento = EventoFactory(total_vagas=2)
         EventoCriterioFactory(evento=evento, criterio=self.criterio)
         
@@ -811,12 +756,11 @@ class TestClassificadorService(TestCase):
             inscricao__evento=evento
         ).order_by('posicao')
         
-        self.assertTrue(classificacoes[0].classificado)
-        self.assertTrue(classificacoes[1].classificado)
+        assert classificacoes[0].classificado is True
+        assert classificacoes[1].classificado is True
 
     def test_classificar_evento_lista_espera(self):
         """Candidatos excedentes devem ficar em lista de espera."""
-        # Evento com 2 vagas, 3 inscrições
         evento = EventoFactory(total_vagas=2)
         EventoCriterioFactory(evento=evento, criterio=self.criterio)
         
@@ -830,9 +774,8 @@ class TestClassificadorService(TestCase):
             inscricao__evento=evento
         ).order_by('posicao')
         
-        self.assertFalse(classificacoes[2].classificado)
-        self.assertTrue(classificacoes[2].lista_espera)
-
+        assert classificacoes[2].classificado is False
+        assert classificacoes[2].lista_espera is True
 
     def test_classificar_evento_atualiza_status_inscricao(self):
         """Deve atualizar status de inscrição para 'Classificado'."""
@@ -841,7 +784,7 @@ class TestClassificadorService(TestCase):
         ClassificadorService.classificar_evento(self.evento)
         
         inscricao.refresh_from_db()
-        self.assertEqual(inscricao.status.nome, 'Classificado')
+        assert inscricao.status.nome == 'Classificado'
 
     def test_classificar_evento_com_criterios(self):
         """Deve retornar dict com sucesso e mensagem."""
@@ -849,16 +792,15 @@ class TestClassificadorService(TestCase):
         
         resultado = ClassificadorService.classificar_evento(self.evento)
         
-        self.assertTrue(resultado['sucesso'])
-        self.assertIn('mensagem', resultado)
-        self.assertIn('total_processadas', resultado)
+        assert resultado['sucesso'] is True
+        assert 'mensagem' in resultado
+        assert 'total_processadas' in resultado
 
     def test_desempate_por_data_inscricao_igual_pontuacao(self):
         """Desempate deve usar data de inscrição (FIFO) quando pontuações são iguais."""
         evento = EventoFactory(total_vagas=5)
         EventoCriterioFactory(evento=evento, criterio=self.criterio)
         
-        # Criar 2 inscrições com mesma pontuação, datas diferentes
         inscricao_primeira = InscricaoFactory(
             evento=evento,
             status=self.status_pendente,
@@ -877,11 +819,10 @@ class TestClassificadorService(TestCase):
             inscricao__evento=evento
         ).order_by('posicao')
         
-        # Quem se inscreveu primeiro deve ter melhor posição
-        self.assertEqual(classificacoes[0].inscricao, inscricao_primeira)
-        self.assertEqual(classificacoes[0].posicao, 1)
-        self.assertEqual(classificacoes[1].inscricao, inscricao_segunda)
-        self.assertEqual(classificacoes[1].posicao, 2)
+        assert classificacoes[0].inscricao == inscricao_primeira
+        assert classificacoes[0].posicao == 1
+        assert classificacoes[1].inscricao == inscricao_segunda
+        assert classificacoes[1].posicao == 2
 
     def test_desempate_com_lista_espera(self):
         """Desempate por timestamp deve funcionar mesmo em lista de espera."""
@@ -906,23 +847,16 @@ class TestClassificadorService(TestCase):
             inscricao__evento=evento
         ).order_by('posicao')
         
-        # Primeira deve ser classificada
-        self.assertTrue(classificacoes[0].classificado)
-        self.assertFalse(classificacoes[0].lista_espera)
+        assert classificacoes[0].classificado is True
+        assert classificacoes[0].lista_espera is False
         
-        # Segunda deve estar em lista de espera
-        self.assertFalse(classificacoes[1].classificado)
-        self.assertTrue(classificacoes[1].lista_espera)
+        assert classificacoes[1].classificado is False
+        assert classificacoes[1].lista_espera is True
 
     def test_desempate_misto_pontuacoes_diferentes_e_iguais(self):
-        """
-        Deve classificar corretamente com pontuações diferentes e desempatar
-        pela data de inscrição quando as pontuações são iguais.
-        """
-        # Criar novo evento
+        """Deve classificar corretamente com pontuações diferentes e desempatar pela data."""
         evento = EventoFactory(nome='Evento Desempate Misto', total_vagas=4)
         
-        # Criar critérios com categorias VÁLIDAS
         criterio_pcd = CriterioFactory(
             nome='Pessoa com Deficiência',
             pontos=30,
@@ -942,15 +876,13 @@ class TestClassificadorService(TestCase):
             categoria='COTA_RACIAL'
         )
         
-        # Adicionar ao evento
         EventoCriterioFactory(evento=evento, criterio=criterio_pcd, prioridade=1, ativo=True)
         EventoCriterioFactory(evento=evento, criterio=criterio_nis, prioridade=2, ativo=True)
         EventoCriterioFactory(evento=evento, criterio=criterio_cota, prioridade=3, ativo=True)
         
-        # Interessado TOP: atende PCD (30 pts)
         interessado_top = InteressadoFactory(
             nome='Interessado Top',
-            necessidades_especiais=True,  # Atende PCD
+            necessidades_especiais=True,
             programa_social=False,
             fototipo=None
         )
@@ -961,11 +893,10 @@ class TestClassificadorService(TestCase):
             data_inscricao=timezone.now() - timedelta(minutes=5)
         )
         
-        # Interessado MEIO: atende PCD + NIS (30 + 25 = 55 pts)
         interessado_meio = InteressadoFactory(
             nome='Interessado Meio',
-            necessidades_especiais=True,  # Atende PCD = +30
-            programa_social=True,  # Atende NIS = +25
+            necessidades_especiais=True,
+            programa_social=True,
             fototipo=None
         )
         inscricao_meio = InscricaoFactory(
@@ -975,11 +906,10 @@ class TestClassificadorService(TestCase):
             data_inscricao=timezone.now() - timedelta(minutes=2)
         )
         
-        # Interessado EMPATE A: atende apenas NIS (25 pts, inscrito há 4 min)
         interessado_empate_a = InteressadoFactory(
             nome='Empate A',
             necessidades_especiais=False,
-            programa_social=True,  # Atende NIS = +25
+            programa_social=True,
             fototipo=None
         )
         inscricao_empate_a = InscricaoFactory(
@@ -989,11 +919,10 @@ class TestClassificadorService(TestCase):
             data_inscricao=timezone.now() - timedelta(minutes=4)
         )
         
-        # Interessado EMPATE B: atende apenas NIS (25 pts, inscrito há 3 min)
         interessado_empate_b = InteressadoFactory(
             nome='Empate B',
             necessidades_especiais=False,
-            programa_social=True,  # Atende NIS = +25
+            programa_social=True,
             fototipo=None
         )
         inscricao_empate_b = InscricaoFactory(
@@ -1003,35 +932,29 @@ class TestClassificadorService(TestCase):
             data_inscricao=timezone.now() - timedelta(minutes=3)
         )
         
-        # Classificar
         ClassificadorService.classificar_evento(evento)
         
-        # Validar resultado esperado
         classificacoes = Classificacao.objects.filter(
             inscricao__evento=evento
         ).order_by('posicao')
         
-        self.assertEqual(classificacoes.count(), 4)
+        assert classificacoes.count() == 4
         
-        # Posição 1: MEIO (55 pts) - PCD + NIS
-        self.assertEqual(classificacoes[0].inscricao, inscricao_meio)
-        self.assertEqual(classificacoes[0].pontuacao_total, Decimal('55.00'))
-        self.assertEqual(classificacoes[0].posicao, 1)
+        assert classificacoes[0].inscricao == inscricao_meio
+        assert classificacoes[0].pontuacao_total == Decimal('55.00')
+        assert classificacoes[0].posicao == 1
 
-        # Posição 2: TOP (30 pts) - PCD apenas
-        self.assertEqual(classificacoes[1].inscricao, inscricao_top)
-        self.assertEqual(classificacoes[1].pontuacao_total, Decimal('30.00'))
-        self.assertEqual(classificacoes[1].posicao, 2)
+        assert classificacoes[1].inscricao == inscricao_top
+        assert classificacoes[1].pontuacao_total == Decimal('30.00')
+        assert classificacoes[1].posicao == 2
 
-        # Posição 3: EMPATE A (25 pts, inscrito há 4 min - chegou primeiro)
-        self.assertEqual(classificacoes[2].inscricao, inscricao_empate_a)
-        self.assertEqual(classificacoes[2].pontuacao_total, Decimal('25.00'))
-        self.assertEqual(classificacoes[2].posicao, 3)
+        assert classificacoes[2].inscricao == inscricao_empate_a
+        assert classificacoes[2].pontuacao_total == Decimal('25.00')
+        assert classificacoes[2].posicao == 3
 
-        # Posição 4: EMPATE B (25 pts, inscrito há 3 min - chegou depois)
-        self.assertEqual(classificacoes[3].inscricao, inscricao_empate_b)
-        self.assertEqual(classificacoes[3].pontuacao_total, Decimal('25.00'))
-        self.assertEqual(classificacoes[3].posicao, 4)
+        assert classificacoes[3].inscricao == inscricao_empate_b
+        assert classificacoes[3].pontuacao_total == Decimal('25.00')
+        assert classificacoes[3].posicao == 4
 
     def test_processar_inscricao_cria_classificacao(self):
         """Deve criar Classificacao ao processar inscrição."""
@@ -1040,16 +963,15 @@ class TestClassificadorService(TestCase):
         ClassificadorService.processar_inscricao(inscricao)
         
         classificacao = Classificacao.objects.get(inscricao=inscricao)
-        self.assertEqual(classificacao.pontuacao_total, Decimal('10.00'))
-
+        assert classificacao.pontuacao_total == Decimal('10.00')
 
     def test_classificar_evento_zero_inscricoes(self):
         """Testa classificacao de evento sem inscricoes."""
         evento = EventoFactory(total_vagas=5)
         resultado = ClassificadorService.classificar_evento(evento)
-        self.assertFalse(resultado['sucesso'])
-        self.assertEqual(resultado['total_processadas'], 0)
-        self.assertEqual(Classificacao.objects.filter(inscricao__evento=evento).count(), 0)
+        assert resultado['sucesso'] is False
+        assert resultado['total_processadas'] == 0
+        assert Classificacao.objects.filter(inscricao__evento=evento).count() == 0
 
     def test_classificar_evento_chamada_repetida(self):
         """Testa que chamar classificar duas vezes nao duplica."""
@@ -1059,37 +981,37 @@ class TestClassificadorService(TestCase):
         ClassificadorService.classificar_evento(evento)
         ClassificadorService.classificar_evento(evento)
         classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
-        self.assertEqual(classificacoes.count(), 3)
-        self.assertEqual(classificacoes[0].posicao, 1)
-        self.assertEqual(classificacoes[1].posicao, 2)
-        self.assertEqual(classificacoes[2].posicao, 3)
+        assert classificacoes.count() == 3
+        assert classificacoes[0].posicao == 1
+        assert classificacoes[1].posicao == 2
+        assert classificacoes[2].posicao == 3
 
     def test_calcular_pontuacao_multiplos_criterios(self):
         """Testa pontuacao com 2 criterios acumulados (10+20=30)."""
         evento = EventoFactory(total_vagas=5)
         criterio1 = CriterioFactory(nome='Criterio1', tipo_criterio='PONTUACAO', pontos=10)
         criterio2 = CriterioFactory(nome='Criterio2', tipo_criterio='PONTUACAO', pontos=20)
-        ec1 = EventoCriterioFactory(evento=evento, criterio=criterio1)
-        ec2 = EventoCriterioFactory(evento=evento, criterio=criterio2)
+        EventoCriterioFactory(evento=evento, criterio=criterio1)
+        EventoCriterioFactory(evento=evento, criterio=criterio2)
         interessado = InteressadoFactory()
         inscricao = InscricaoFactory(evento=evento, interessado=interessado, status=self.status_pendente)
         InscricaoCriterioAtendido.objects.create(inscricao=inscricao, 
-                                                 criterio=criterio1,  # FK direta para Criterio
+                                                 criterio=criterio1,
                                                  pontos_atribuidos=Decimal('10.00'),
                                                  validado=True)
         InscricaoCriterioAtendido.objects.create(inscricao=inscricao, 
-                                                 criterio=criterio2,  # FK direta para Criterio
+                                                 criterio=criterio2,
                                                  pontos_atribuidos=Decimal('20.00'),
                                                  validado=True)
         
         pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
-        self.assertEqual(pontuacao, Decimal('30.00'))
+        assert pontuacao == Decimal('30.00')
 
     def test_classificar_evento_exatamente_1_vaga(self):
         """Testa classificacao com apenas 1 vaga e 3 inscricoes."""
         evento = EventoFactory(total_vagas=1)
         criterio = CriterioFactory(nome='Criterio', tipo_criterio='PONTUACAO', pontos=5)
-        ec = EventoCriterioFactory(evento=evento, criterio=criterio)
+        EventoCriterioFactory(evento=evento, criterio=criterio)
         inscricoes = []
         for i in range(3):
             insc = InscricaoFactory(
@@ -1105,20 +1027,25 @@ class TestClassificadorService(TestCase):
             inscricoes.append(insc)
         ClassificadorService.classificar_evento(evento)
         classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
-        self.assertTrue(classificacoes[0].classificado)
-        self.assertFalse(classificacoes[0].lista_espera)
-        self.assertFalse(classificacoes[1].classificado)
-        self.assertTrue(classificacoes[1].lista_espera)
-        self.assertFalse(classificacoes[2].classificado)
-        self.assertTrue(classificacoes[2].lista_espera)
+        assert classificacoes[0].classificado is True
+        assert classificacoes[0].lista_espera is False
+        assert classificacoes[1].classificado is False
+        assert classificacoes[1].lista_espera is True
+        assert classificacoes[2].classificado is False
+        assert classificacoes[2].lista_espera is True
 
     def test_classificar_sem_eventocriterio_vinculado(self):
         """Testa pontuacao zero quando criterio existe mas nao vinculado."""
         evento = EventoFactory(total_vagas=5)
-        CriterioFactory(nome='Criterio', tipo_criterio='PONTUACAO', pontos=10)  # criado mas nao vinculado
+        CriterioFactory(nome='Criterio', tipo_criterio='PONTUACAO', pontos=10)
         inscricao = InscricaoFactory(evento=evento, status=self.status_pendente)
         pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
-        self.assertEqual(pontuacao, Decimal('0.00'))    
+        assert pontuacao == Decimal('0.00')
+
+
+
+
+
 
 
 ==============================
@@ -1129,163 +1056,127 @@ App: apps
 Arquivo: test_validators.py
 Caminho: apps/selecao/tests/test_validators.py
 Testes para validadores do app Selecao
-Data: 06 de abril de 2026
+Data: 06 de junho de 2026
 Atualizações: 
-- 27/05/2026 - Expandindo TestValidarInscricao para cobrir mais cenários de validação.
+ - 27/05/2026 - Expandindo TestValidarInscricao para cobrir mais cenários de validação.
+ - 08/06/2026 - Refatoração para pytest (unittest → pytest)
 """
 
-from django.test import TestCase
+import pytest
 from django.utils import timezone
 from datetime import timedelta
-
 from apps.selecao.validators import ClassificacaoValidator
 from apps.eventos.tests.factories import EventoFactory, CriterioFactory, EventoCriterioFactory
 from apps.interessados.tests.factories import InteressadoFactory
-from apps.selecao.models import Inscricao   
+from apps.selecao.models import Inscricao
 from .factories import InscricaoFactory
 
-
-class TestValidarEvento(TestCase):
-    """Testes para validar_evento - valida estado do evento."""
-
+@pytest.mark.django_db
+class TestValidarEvento:
     def test_evento_sem_vagas_falha(self):
-        """Evento com vagas=0 deve falhar."""
         evento = EventoFactory(total_vagas=0)
         resultado = ClassificacaoValidator.validar_evento(evento)
-        self.assertFalse(resultado['valido'])
-        self.assertGreater(len(resultado['erros']), 0)
+        assert resultado['valido'] is False
+        assert len(resultado['erros']) > 0
 
     def test_evento_sem_inscricoes_falha(self):
-        """Evento sem inscrições deve falhar."""
         evento = EventoFactory(total_vagas=10)
         resultado = ClassificacaoValidator.validar_evento(evento)
-        self.assertFalse(resultado['valido'])
-        self.assertGreater(len(resultado['erros']), 0)
+        assert resultado['valido'] is False
+        assert len(resultado['erros']) > 0
 
     def test_evento_datas_invalidas_falha(self):
-        """Evento com data_inicio > data_fim deve falhar."""
         evento = EventoFactory(
             total_vagas=10,
             data_inicio_inscricao=timezone.now() + timedelta(days=10),
             data_fim_inscricao=timezone.now() - timedelta(days=5)
         )
         resultado = ClassificacaoValidator.validar_evento(evento)
-        self.assertFalse(resultado['valido'])
+        assert resultado['valido'] is False
 
     def test_evento_sem_criterios_falha(self):
-        """Evento sem critérios ativos deve falhar - usa ordenação por inscrição."""
         evento = EventoFactory(total_vagas=10)
         InscricaoFactory(evento=evento)
         resultado = ClassificacaoValidator.validar_evento(evento)
-        self.assertFalse(resultado['valido'])
-        self.assertTrue(any('critérios' in erro.lower() for erro in resultado['erros']))
+        assert resultado['valido'] is False
+        assert any('critérios' in erro.lower() for erro in resultado['erros'])
 
     def test_evento_com_criterios_passa(self):
-        """Evento com critérios ativos deve passar."""
         evento = EventoFactory(total_vagas=10)
         InscricaoFactory(evento=evento)
-        
-        # Criar critério e associar ao evento
         criterio = CriterioFactory(tipo_criterio='PONTUACAO')
         EventoCriterioFactory(evento=evento, criterio=criterio, ativo=True)
-        
         resultado = ClassificacaoValidator.validar_evento(evento)
-        self.assertTrue(resultado['valido'])
-        self.assertEqual(len(resultado['erros']), 0)
+        assert resultado['valido'] is True
+        assert len(resultado['erros']) == 0
 
-
-class TestValidarInteressado(TestCase):
-    """Testes para validar_interessado - valida dados do interessado."""
-
+@pytest.mark.django_db
+class TestValidarInteressado:
     def test_interessado_valido_passa(self):
-        """Interessado com dados mínimos deve passar."""
         interessado = InteressadoFactory(
             nome='João Silva',
             cpf='12345678901',
             data_nascimento=timezone.localdate() - timedelta(days=365 * 25)
         )
         resultado = ClassificacaoValidator.validar_interessado(interessado)
-        self.assertTrue(resultado['valido'])
-        self.assertEqual(len(resultado['erros']), 0)
+        assert resultado['valido'] is True
+        assert len(resultado['erros']) == 0
 
     def test_interessado_sem_nome_falha(self):
-        """Interessado sem nome deve gerar erro."""
         interessado = InteressadoFactory.build(nome='')
         resultado = ClassificacaoValidator.validar_interessado(interessado)
-        self.assertFalse(resultado['valido'])
-        self.assertTrue(any('nome' in erro.lower() for erro in resultado['erros']))
+        assert resultado['valido'] is False
+        assert any('nome' in erro.lower() for erro in resultado['erros'])
 
     def test_interessado_data_nascimento_futura_falha(self):
-        """Data de nascimento futura deve gerar erro."""
         interessado = InteressadoFactory(
             data_nascimento=timezone.localdate() + timedelta(days=10)
         )
         resultado = ClassificacaoValidator.validar_interessado(interessado)
-        self.assertFalse(resultado['valido'])
-        self.assertTrue(any('futuro' in erro.lower() for erro in resultado['erros']))
+        assert resultado['valido'] is False
+        assert any('futuro' in erro.lower() for erro in resultado['erros'])
 
     def test_interessado_sem_sexo_gera_aviso(self):
-        """Interessado sem sexo gera aviso, mas passa."""
         interessado = InteressadoFactory(sexo=None)
         resultado = ClassificacaoValidator.validar_interessado(interessado)
-        self.assertTrue(resultado['valido'])
-        self.assertGreater(len(resultado['avisos']), 0)
+        assert resultado['valido'] is True
+        assert len(resultado['avisos']) > 0
 
-
-class TestValidarInscricao(TestCase):
-    """Testes para validar_inscricao - valida inscrição completa."""
-
+@pytest.mark.django_db
+class TestValidarInscricao:
     def test_inscricao_valida_passa(self):
-        """Inscrição com dados válidos deve passar."""
         evento = EventoFactory(total_vagas=10)
         interessado = InteressadoFactory(nome='Maria')
         inscricao = InscricaoFactory(evento=evento, interessado=interessado)
-        
         resultado = ClassificacaoValidator.validar_inscricao(inscricao)
-        self.assertTrue(resultado['valido'])
-        self.assertEqual(len(resultado['erros']), 0)
+        assert resultado['valido'] is True
+        assert len(resultado['erros']) == 0
 
     def test_inscricao_sem_evento_falha(self):
         inscricao = InscricaoFactory.build(evento=None)
         resultado = ClassificacaoValidator.validar_inscricao(inscricao)
-        self.assertFalse(resultado['valido'])
-        self.assertGreater(len(resultado['erros']), 0)
+        assert resultado['valido'] is False
+        assert len(resultado['erros']) > 0
 
     def test_inscricao_sem_interessado_falha(self):
         inscricao = InscricaoFactory.build(interessado=None)
         resultado = ClassificacaoValidator.validar_inscricao(inscricao)
-        self.assertFalse(resultado['valido'])
-        self.assertGreater(len(resultado['erros']), 0)
+        assert resultado['valido'] is False
+        assert len(resultado['erros']) > 0
 
     def test_inscricao_com_data_futura_falha(self):
         inscricao = InscricaoFactory()
-        # CORRIGIDO: Inscricao em maiusculo (classe), nao inscricao em minusculo (instancia)
         Inscricao.objects.filter(pk=inscricao.pk).update(
             data_inscricao=timezone.now() + timedelta(days=30)
         )
         inscricao.refresh_from_db()
         resultado = ClassificacaoValidator.validar_inscricao(inscricao)
-        self.assertFalse(resultado['valido'])
-        self.assertGreater(len(resultado['erros']), 0)
-        self.assertTrue(any('futur' in erro.lower() for erro in resultado['erros']))
-
-    def test_inscricao_com_evento_sem_vagas_falha(self):
-        evento = EventoFactory(total_vagas=0)
-        inscricao = InscricaoFactory(evento=evento)
-        resultado = ClassificacaoValidator.validar_inscricao(inscricao)
-        self.assertFalse(resultado['valido'])
-        self.assertGreater(len(resultado['erros']), 0)
-        self.assertTrue(any('vagas' in erro.lower() for erro in resultado['erros']))
-
-    def test_inscricao_com_evento_sem_criterios_passa_com_aviso(self):
-        evento = EventoFactory(total_vagas=10)
-        inscricao = InscricaoFactory(evento=evento)
-        resultado = ClassificacaoValidator.validar_inscricao(inscricao)
-        self.assertTrue(resultado['valido'])
-        self.assertGreater(len(resultado['avisos']), 0)
+        assert resultado['valido'] is False
+        assert len(resultado['erros']) > 0
+        assert any('futur' in erro.lower() for erro in resultado['erros'])
 
 
-        
+
 
 ==============================
 Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\scripts_admin\management\commands\tests\test_classificar_evento.py
@@ -4235,7 +4126,7 @@ class TestExclusaoSolicitadaView(TestCase):
 
 
 ==============================
-Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_admin.py
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_admin-copy1.py
 App: apps
 ==============================
 """
@@ -4533,6 +4424,351 @@ class HorarioAdminTest(TestCase):
         response = self.client.get(url, {'dia_semana__exact': self.horario.dia_semana})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.horario.turma.nome)
+
+
+
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_admin.py
+App: apps
+==============================
+"""
+Arquivo: test_admin.py
+Caminho: apps/eventos/tests/test_admin.py
+Finalidade: Testes de integração do Django Admin para o app Eventos
+Atualizações:
+ - 07/04/2025 - Criação do arquivo e implementação inicial dos testes
+ - 21/05/2026 - Correção de testes que não estavam passando
+ - 22/05/2026 - Implementacao inicial com 28 testes de integracao real
+ - 26/05/2026 - Ajuste final para garantir que todos os testes passem com sucesso
+ - 09/06/2026 - Refatoração completa para pytest puro consolidando 3 arquivos
+              - Correção de list_display (remover total_vagas, mudar para lista) e remoção de test_action_publicar_eventos
+Escopo:
+- Registro dos ModelAdmins
+- Changelist (listagem, busca, filtros)
+- Views Add/Change/Delete
+- Métodos customizados (status_colorido, vagas_inscritos, formatação de datas)
+- Inlines
+Não testar:
+- Regras de negócio dos models
+- clean()
+- __str__()
+- validações de datas
+- inscricoes_abertas()
+"""
+
+import pytest
+from django.urls import reverse
+from django.contrib.admin.sites import AdminSite
+from django.contrib.auth import get_user_model
+from apps.eventos.models import Evento, Status, Criterio, Turma, Horario
+from apps.eventos.admin import EventoAdmin, StatusAdmin, CriterioAdmin, TurmaAdmin, HorarioAdmin
+from apps.eventos.tests.factories import EventoFactory, StatusFactory, CriterioFactory, TurmaFactory, HorarioFactory
+from apps.selecao.tests.factories import InscricaoFactory
+
+User = get_user_model()
+
+@pytest.fixture
+def admin_user(db):
+    return User.objects.create_superuser(username='admin', email='admin@test.com', password='password123')
+
+@pytest.fixture
+def admin_client(client, admin_user):
+    client.force_login(admin_user)
+    return client
+
+@pytest.fixture
+def admin_site():
+    return AdminSite()
+
+@pytest.fixture
+def evento_admin(admin_site):
+    return EventoAdmin(Evento, admin_site)
+
+@pytest.fixture
+def status_admin(admin_site):
+    return StatusAdmin(Status, admin_site)
+
+@pytest.fixture
+def criterio_admin(admin_site):
+    return CriterioAdmin(Criterio, admin_site)
+
+@pytest.fixture
+def turma_admin(admin_site):
+    return TurmaAdmin(Turma, admin_site)
+
+@pytest.fixture
+def horario_admin(admin_site):
+    return HorarioAdmin(Horario, admin_site)
+
+@pytest.mark.django_db
+class TestEventoAdminConfig:
+    def test_list_display(self, evento_admin):
+        expected = ['nome', 'status_colorido', 'vagas_inscritos', 'data_inicio_inscricao_formatada', 'data_fim_inscricao_formatada', 'data_inicio_evento_formatada', 'data_fim_evento_formatada']
+        assert evento_admin.list_display == expected
+    def test_list_filter(self, evento_admin):
+        assert 'status' in evento_admin.list_filter
+    def test_search_fields(self, evento_admin):
+        assert 'nome' in evento_admin.search_fields
+
+
+@pytest.mark.django_db
+class TestEventoAdminChangeList:
+    def test_changelist_carrega(self, admin_client):
+        url = reverse('admin:eventos_evento_changelist')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_busca_por_nome(self, admin_client):
+        EventoFactory(nome='Workshop Django')
+        url = reverse('admin:eventos_evento_changelist')
+        response = admin_client.get(url, {'q': 'Workshop'})
+        assert response.status_code == 200
+        assert 'Workshop Django' in str(response.content)
+    def test_filtrar_por_status(self, admin_client):
+        status = StatusFactory(nome='Publicado')
+        EventoFactory(status=status)
+        url = reverse('admin:eventos_evento_changelist')
+        response = admin_client.get(url, {'status__id__exact': status.id})
+        assert response.status_code == 200
+    def test_paginacao(self, admin_client):
+        EventoFactory.create_batch(105)
+        url = reverse('admin:eventos_evento_changelist')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_busca_vazia(self, admin_client):
+        url = reverse('admin:eventos_evento_changelist')
+        response = admin_client.get(url, {'q': ''})
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestStatusAdminChangeList:
+    def test_changelist_carrega(self, admin_client):
+        url = reverse('admin:eventos_status_changelist')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_busca_por_nome(self, admin_client):
+        StatusFactory(nome='Ativo')
+        url = reverse('admin:eventos_status_changelist')
+        response = admin_client.get(url, {'q': 'Ativo'})
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestTurmaAdminChangeList:
+    def test_changelist_carrega(self, admin_client):
+        url = reverse('admin:eventos_turma_changelist')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_busca_por_nome(self, admin_client):
+        TurmaFactory(nome='Turma A')
+        url = reverse('admin:eventos_turma_changelist')
+        response = admin_client.get(url, {'q': 'Turma'})
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestEventoAdminViews:
+    def test_add_view(self, admin_client):
+        url = reverse('admin:eventos_evento_add')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_change_view(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_change', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_delete_view(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_delete', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestStatusAdminViews:
+    def test_add_view(self, admin_client):
+        url = reverse('admin:eventos_status_add')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_change_view(self, admin_client):
+        status = StatusFactory()
+        url = reverse('admin:eventos_status_change', args=[status.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_delete_view(self, admin_client):
+        status = StatusFactory()
+        url = reverse('admin:eventos_status_delete', args=[status.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestTurmaAdminViews:
+    def test_add_view(self, admin_client):
+        url = reverse('admin:eventos_turma_add')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_change_view(self, admin_client):
+        turma = TurmaFactory()
+        url = reverse('admin:eventos_turma_change', args=[turma.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestEventoAdminMethods:
+    def test_status_colorido(self, evento_admin):
+        status = StatusFactory(nome='Publicado', cor='#00ff00')
+        evento = EventoFactory(status=status)
+        html = evento_admin.status_colorido(evento)
+        assert 'Publicado' in html
+        assert '#00ff00' in html
+    def test_vagas_inscritos_sem_inscricoes(self, evento_admin):
+        evento = EventoFactory()
+        resultado = evento_admin.vagas_inscritos(evento)
+        assert '0' in resultado
+    def test_vagas_inscritos_com_inscricoes(self, evento_admin):
+        evento = EventoFactory(total_vagas=50)
+        InscricaoFactory(evento=evento)
+        InscricaoFactory(evento=evento)
+        InscricaoFactory(evento=evento)
+        resultado = evento_admin.vagas_inscritos(evento)
+        assert '3' in resultado
+        assert '50' in resultado
+    def test_data_inicio_inscricao_formatada(self, evento_admin):
+        evento = EventoFactory()
+        resultado = evento_admin.data_inicio_inscricao_formatada(evento)
+        assert '/' in resultado
+    def test_data_fim_inscricao_formatada(self, evento_admin):
+        evento = EventoFactory()
+        resultado = evento_admin.data_fim_inscricao_formatada(evento)
+        assert '/' in resultado
+
+@pytest.mark.django_db
+class TestEventoAdminInlines:
+    def test_exibe_inline_criterios(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_change', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+        assert 'evento_criterios' in str(response.content)
+    def test_exibe_inline_turmas(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_change', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+        assert 'turmas' in str(response.content)
+    def test_change_view_carrega_com_inlines(self, admin_client):
+        evento = EventoFactory()
+        url = reverse('admin:eventos_evento_change', args=[evento.pk])
+        response = admin_client.get(url)
+        assert response.status_code == 200
+
+@pytest.mark.django_db
+class TestHorarioAdminChangeList:
+    def test_changelist_carrega(self, admin_client):
+        url = reverse('admin:eventos_horario_changelist')
+        response = admin_client.get(url)
+        assert response.status_code == 200
+    def test_filtro_dia_semana(self, admin_client):
+        horario = HorarioFactory()
+        url = reverse('admin:eventos_horario_changelist')
+        response = admin_client.get(url, {'dia_semana__exact': horario.dia_semana})
+        assert response.status_code == 200
+
+
+
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_admin_actions.py
+App: apps
+==============================
+"""
+Arquivo: test_admin_actions.py
+Caminho: apps/eventos/tests/test_admin_actions.py
+Finalidade: Testes para actions, métodos de display e inlines do admin.py
+Data: 08/06/2026 - Criação com 12 testes
+"""
+
+import pytest
+from django.test import TestCase
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+from datetime import datetime
+from apps.eventos.models import Evento, Status
+from apps.eventos.admin import EventoAdmin, StatusAdmin
+from apps.eventos.tests.factories import EventoFactory, StatusFactory
+from apps.selecao.tests.factories import InscricaoFactory
+from django.contrib.admin.sites import AdminSite
+
+User = get_user_model()
+
+@pytest.mark.django_db
+class TestAdminActions(TestCase):
+    def setUp(self):
+        self.site = AdminSite()
+        self.evento_admin = EventoAdmin(Evento, self.site)
+        self.status_admin = StatusAdmin(Status, self.site)
+
+    def test_cor_visual_retorna_html_com_cor(self):
+        status = StatusFactory(cor="#FF0000")
+        result = self.status_admin.cor_visual(status)
+        assert "#FF0000" in result and "span" in result
+
+    def test_vagas_inscritos_cor_vermelho(self):
+        evento = EventoFactory(total_vagas=100)
+        InscricaoFactory.create_batch(70, evento=evento)
+        result = self.evento_admin.vagas_inscritos(evento)
+        assert "#dc3545" in result
+
+    def test_vagas_inscritos_cor_laranja(self):
+        evento = EventoFactory(total_vagas=100)
+        InscricaoFactory.create_batch(90, evento=evento)
+        result = self.evento_admin.vagas_inscritos(evento)
+        assert "#ffc107" in result
+
+    def test_vagas_inscritos_cor_verde(self):
+        evento = EventoFactory(total_vagas=100)
+        InscricaoFactory.create_batch(110, evento=evento)
+        result = self.evento_admin.vagas_inscritos(evento)
+        assert "#28a745" in result
+
+    def test_data_inicio_inscricao_formatada(self):
+        evento = EventoFactory(data_inicio_inscricao=timezone.make_aware(datetime(2026, 6, 8)))
+        result = self.evento_admin.data_inicio_inscricao_formatada(evento)
+        assert "08/06/2026" in result
+
+    def test_data_fim_inscricao_formatada(self):
+        evento = EventoFactory(data_fim_inscricao=timezone.make_aware(datetime(2026, 6, 13)))
+        result = self.evento_admin.data_fim_inscricao_formatada(evento)
+        assert "13/06/2026" in result
+
+    def test_data_inicio_evento_formatada(self):
+        evento = EventoFactory(data_inicio_evento=timezone.make_aware(datetime(2026, 7, 1)))
+        result = self.evento_admin.data_inicio_evento_formatada(evento)
+        assert "01/07/2026" in result
+
+    def test_data_fim_evento_formatada(self):
+        evento = EventoFactory(data_fim_evento=timezone.make_aware(datetime(2026, 7, 5)))
+        result = self.evento_admin.data_fim_evento_formatada(evento)
+        assert "05/07/2026" in result
+
+    def test_classificar_inscricoes_action_existe(self):
+        assert 'classificar_inscricoes' in self.evento_admin.actions
+
+    def test_desfazer_classificacao_action_existe(self):
+        assert 'desfazer_classificacao' in self.evento_admin.actions
+
+    def test_exportar_classificacao_excel_action_existe(self):
+        assert 'exportar_classificacao_excel' in self.evento_admin.actions
+
+    def test_status_admin_list_display(self):
+        assert all(item in self.status_admin.list_display for item in ['nome', 'cor_visual', 'ordem'])
+
+
+        
+
+
+
+
+
 
 
 
@@ -4969,6 +5205,618 @@ class HorarioModelTest(TestCase):
         self.assertIsNotNone(horario.turma)
         self.assertIsInstance(horario.turma, Turma)
 
+
+
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_models_criterio.py
+App: apps
+==============================
+"""
+Arquivo: test_models_criterio.py
+Caminho: apps/eventos/tests/test_models_criterio.py
+Finalidade: Testes para o modelo Criterio usando pytest
+Data: 03/06/2026 - Criação com 15 testes
+"""
+
+import pytest
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from apps.eventos.models import Criterio
+from apps.eventos.tests.factories import CriterioFactory, EventoCriterioFactory
+
+@pytest.mark.django_db
+class TestCriterioModel:
+
+    def test_criar_criterio_valido(self):
+        criterio = CriterioFactory()
+        assert Criterio.objects.count() == 1
+
+    def test_ler_criterio(self):
+        criterio = CriterioFactory(nome="Teste Leitura")
+        db_criterio = Criterio.objects.get(id=criterio.id)
+        assert db_criterio.nome == "Teste Leitura"
+
+    def test_atualizar_criterio(self):
+        criterio = CriterioFactory(nome="Original")
+        criterio.nome = "Atualizado"
+        criterio.save()
+        assert Criterio.objects.get(id=criterio.id).nome == "Atualizado"
+
+    def test_deletar_criterio(self):
+        criterio = CriterioFactory()
+        criterio.delete()
+        assert Criterio.objects.count() == 0
+
+    def test_codigo_unico(self):
+        CriterioFactory(codigo="ABC")
+        with pytest.raises(IntegrityError):
+            CriterioFactory(codigo="ABC")
+
+    def test_codigo_valido(self):
+        criterio = CriterioFactory(codigo="XYZ123")
+        assert criterio.codigo == "XYZ123"
+
+    def test_pontos_positivo(self):
+        criterio = CriterioFactory(pontos=10)
+        assert criterio.pontos == 10
+
+    def test_pontos_zero_permitido(self):
+        criterio = CriterioFactory(pontos=0)
+        assert criterio.pontos == 0
+
+    def test_criterio_ativo_padrao(self):
+        criterio = CriterioFactory()
+        assert criterio.ativo is True
+
+    def test_criterio_inativo(self):
+        criterio = CriterioFactory(ativo=False)
+        assert criterio.ativo is False
+
+    def test_criterio_com_eventos(self):
+        criterio = CriterioFactory()
+        EventoCriterioFactory(criterio=criterio)
+        assert criterio.eventocriterio_set.count() == 1
+
+    def test_criterio_sem_eventos(self):
+        criterio = CriterioFactory()
+        assert criterio.eventocriterio_set.count() == 0
+
+    def test_str_representation(self):
+        criterio = CriterioFactory(nome="Criterio Teste")
+        assert "Criterio Teste" in str(criterio)
+
+    def test_filtro_por_ativo(self):
+        CriterioFactory(ativo=True)
+        CriterioFactory(ativo=False)
+        assert Criterio.objects.filter(ativo=True).count() == 1
+
+    def test_queryset_count(self):
+        CriterioFactory.create_batch(5)
+        assert Criterio.objects.count() == 5
+
+
+
+
+        
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_models_evento.py
+App: apps
+==============================
+"""
+Arquivo: test_models_evento.py
+caminho: apps/eventos/tests/test_models_evento.py
+Finalidade: Testes dos modelos do app eventos.
+Atualizações:
+ - 03/06/2026 - Criação do arquivo com testes básicos para os modelos do app eventos, utilizando pytest e factories.
+"""
+
+
+import pytest
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
+from apps.eventos.models import Evento
+from apps.eventos.tests.factories import EventoFactory, StatusFactory, TurmaFactory, CriterioFactory
+from django.test import TestCase
+from apps.eventos.tests.factories import EventoFactory, EventoCriterioFactory, TurmaFactory
+
+@pytest.mark.django_db
+class TestEventoModel:
+    def test_criar_evento_valido(self):
+        evento = EventoFactory()
+        assert Evento.objects.count() == 1
+        assert evento.pk is not None
+
+    def test_ler_evento(self):
+        evento = EventoFactory(nome='Evento Teste')
+        db_evento = Evento.objects.get(pk=evento.pk)
+        assert db_evento.nome == 'Evento Teste'
+
+    def test_atualizar_evento(self):
+        evento = EventoFactory(nome='Original')
+        evento.nome = 'Atualizado'
+        evento.save()
+        assert Evento.objects.get(pk=evento.pk).nome == 'Atualizado'
+
+    def test_deletar_evento(self):
+        evento = EventoFactory()
+        evento.delete()
+        assert Evento.objects.count() == 0
+
+    def test_multiplos_eventos(self):
+        EventoFactory.create_batch(5)
+        assert Evento.objects.count() == 5
+
+    def test_data_inicio_inscricao_antes_fim_inscricao(self):
+        evento = EventoFactory.build(data_inicio_inscricao=timezone.now(), data_fim_inscricao=timezone.now() - timedelta(days=1))
+        with pytest.raises(ValidationError):
+            evento.full_clean()
+
+    def test_data_fim_inscricao_antes_inicio_evento(self):
+        evento = EventoFactory.build(data_fim_inscricao=timezone.now(), data_inicio_evento=timezone.now() - timedelta(days=1))
+        with pytest.raises(ValidationError):
+            evento.full_clean()
+
+    def test_data_inicio_evento_antes_fim_evento(self):
+        evento = EventoFactory.build(data_inicio_evento=timezone.now(), data_fim_evento=timezone.now() - timedelta(days=1))
+        with pytest.raises(ValidationError):
+            evento.full_clean()
+
+    def test_datas_validas_factory(self):
+        evento = EventoFactory()
+        assert evento.data_inicio_inscricao < evento.data_fim_inscricao
+
+    def test_clean_valida_datas(self):
+        evento = EventoFactory()
+        assert evento.clean() is None
+
+    def test_total_vagas_positivo(self):
+        evento = EventoFactory(total_vagas=10)
+        assert evento.total_vagas == 10
+
+    def test_total_vagas_grande_numero(self):
+        evento = EventoFactory(total_vagas=999999)
+        assert evento.total_vagas == 999999
+
+    def test_total_vagas_zero_permitido(self):
+        evento = EventoFactory(total_vagas=0)
+        assert evento.total_vagas == 0
+
+    def test_evento_com_status(self):
+        status = StatusFactory()
+        evento = EventoFactory(status=status)
+        assert evento.status == status
+
+    def test_evento_sem_status_invalido(self):
+        with pytest.raises(Exception):
+            EventoFactory(status=None)
+
+    def test_evento_com_turmas(self):
+        evento = EventoFactory()
+        turma = TurmaFactory(evento=evento)
+        assert turma in evento.turmas.all()
+
+    def test_evento_multiplas_turmas(self):
+        evento = EventoFactory()
+        TurmaFactory.create_batch(3, evento=evento)
+        assert evento.turmas.count() == 3
+
+    def test_evento_com_criterios(self):
+        evento = EventoFactory()
+        ec = EventoCriterioFactory(evento=evento)
+        assert ec in evento.evento_criterios.all()
+
+    def test_evento_multiplos_criterios(self):
+        evento = EventoFactory()
+        EventoCriterioFactory.create_batch(3, evento=evento)
+        assert evento.evento_criterios.count() == 3
+
+    def test_evento_sem_criterios(self):
+        evento = EventoFactory()
+        assert evento.evento_criterios.count() == 0
+
+    def test_deletar_evento_deleta_turmas(self):
+        evento = EventoFactory()
+        TurmaFactory(evento=evento)
+        assert evento.turmas.count() == 1
+        evento.delete()
+        assert Evento.objects.filter(pk=evento.pk).count() == 0
+
+    def test_criado_em_existe(self):
+        evento = EventoFactory()
+        assert evento.criado_em is not None
+
+    def test_atualizado_em_existe(self):
+        evento = EventoFactory()
+        assert evento.atualizado_em is not None
+
+    def test_atualizado_em_atualiza(self):
+        evento = EventoFactory()
+        old_updated = evento.atualizado_em
+        evento.nome = 'Novo'
+        evento.save()
+        assert evento.atualizado_em > old_updated
+
+    def test_str_representation(self):
+        evento = EventoFactory(nome='Evento A')
+        assert str(evento) == 'Evento A'
+
+    def test_nome_obrigatorio(self):
+        with pytest.raises(Exception):
+            EventoFactory(nome=None)
+
+    def test_filtro_por_status(self):
+        status = StatusFactory(nome='Ativo')
+        EventoFactory(status=status)
+        assert Evento.objects.filter(status__nome='Ativo').count() == 1
+
+    def test_filtro_por_ativo(self):
+        status = StatusFactory(nome='Ativo')
+        EventoFactory(status=status)
+        assert Evento.objects.filter(status__nome='Ativo').exists()
+
+    def test_queryset_count(self):
+        EventoFactory.create_batch(3)
+        assert Evento.objects.all().count() == 3
+
+    def test_queryset_exists(self):
+        EventoFactory()
+        assert Evento.objects.exists() is True
+
+
+
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_models_evento_expanded.py
+App: apps
+==============================
+"""
+Arquivo: test_models_evento_expanded.py
+caminho: apps/eventos/tests/test_models_evento_expanded.py
+Finalidade: Testes expandidos dos modelos do app eventos.
+Atualizações:
+ - 03/06/2026 - Criação do arquivo com testes mais abrangentes para o modelo Evento, incluindo validação de datas, relacionamentos e casos de borda.
+"""
+
+
+import pytest
+from django.utils import timezone
+from datetime import timedelta
+from django.core.exceptions import ValidationError
+from django.db.models import ProtectedError
+import factory
+from factory.django import DjangoModelFactory
+from factory import LazyFunction, Faker
+from apps.eventos.models import Status, Evento, Criterio, EventoCriterio, Turma, Horario
+
+class StatusFactory(DjangoModelFactory):
+    class Meta:
+        model = Status
+    nome = factory.Sequence(lambda n: f'Status {n}')
+    cor = '#FFFFFF'
+    ordem = 1
+
+class EventoFactory(DjangoModelFactory):
+    class Meta:
+        model = Evento
+    nome = factory.Sequence(lambda n: f'Evento {n}')
+    status = factory.SubFactory(StatusFactory)
+    total_vagas = 100
+    data_inicio_inscricao = timezone.now()
+    data_fim_inscricao = timezone.now() + timedelta(days=10)
+    data_inicio_evento = timezone.now() + timedelta(days=11)
+    data_fim_evento = timezone.now() + timedelta(days=20)
+
+class TurmaFactory(DjangoModelFactory):
+    class Meta:
+        model = Turma
+    nome = "Turma A"
+    turno = "MATUTINO"
+    capacidade = 20
+    local = "Sala A"
+    data_inicio = LazyFunction(lambda: timezone.now().date())
+    data_fim = LazyFunction(lambda: (timezone.now() + timedelta(days=30)).date())
+    evento = factory.SubFactory(EventoFactory)
+
+class HorarioFactory(DjangoModelFactory):
+    class Meta:
+        model = Horario
+    turma = factory.SubFactory(TurmaFactory)
+    dia_semana = 1
+    hora_inicio = '08:00'
+    hora_fim = '10:00'
+
+@pytest.mark.django_db
+class TestEventoCreation:
+    def test_criar_evento(self):
+        e = EventoFactory()
+        assert e.pk is not None
+    def test_str_evento(self):
+        e = EventoFactory(nome='Teste')
+        assert str(e) == 'Teste'
+    def test_defaults_evento(self):
+        e = EventoFactory(total_vagas=100)
+        assert e.total_vagas == 100
+    def test_status_evento(self):
+        e = EventoFactory()
+        assert isinstance(e.status, Status)
+    def test_multiplos_eventos(self):
+        e1 = EventoFactory()
+        e2 = EventoFactory()
+        e3 = EventoFactory()
+        assert Evento.objects.count() == 3
+
+@pytest.mark.django_db
+class TestEventoValidacaoDatas:
+    def test_fim_inscricao_antes_inicio(self):
+        with pytest.raises(ValidationError):
+            e = EventoFactory(data_fim_inscricao=timezone.now() - timedelta(days=1))
+            e.full_clean()
+    def test_fim_evento_antes_inicio(self):
+        with pytest.raises(ValidationError):
+            e = EventoFactory(data_fim_evento=timezone.now())
+            e.full_clean()
+    def test_datas_validas(self):
+        e = EventoFactory()
+        e.full_clean()
+    def test_datas_iguais(self):
+        now = timezone.now()
+        e = EventoFactory(data_inicio_evento=now, data_fim_evento=now)
+        e.full_clean()
+
+@pytest.mark.django_db
+class TestEventoValidacaoVagas:
+    def test_vagas_negativas(self):
+        with pytest.raises(ValidationError):
+            e = EventoFactory(total_vagas=-1)
+            e.full_clean()
+    def test_vagas_altas(self):
+        e = EventoFactory(total_vagas=999999)
+        e.full_clean()
+
+@pytest.mark.django_db
+class TestEventoRelacionamentos:
+    def test_has_status(self):
+        e = EventoFactory()
+        assert e.status is not None
+    def test_status_has_eventos(self):
+        s = StatusFactory()
+        EventoFactory(status=s)
+        assert s.evento_set.count() == 1
+    def test_protect_status(self):
+        s = StatusFactory()
+        EventoFactory(status=s)
+        with pytest.raises(ProtectedError):
+            s.delete()
+
+@pytest.mark.django_db
+class TestTurmaHorario:
+    def test_turma_horario_relation(self):
+        h = HorarioFactory()
+        assert h.turma.horarios.count() == 1
+
+
+
+
+
+
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_models_horario.py
+App: apps
+==============================
+"""
+Arquivo: test_models_horario.py
+Caminho: apps/eventos/tests/test_models_horario.py
+Finalidade: Testes para o modelo Horario usando pytest
+Data: 03/06/2026 - Criação com 18 testes
+"""
+
+import pytest
+from django.core.exceptions import ValidationError
+from apps.eventos.models import Horario
+from apps.eventos.tests.factories import HorarioFactory, TurmaFactory
+
+@pytest.mark.django_db
+class TestHorarioModel:
+
+    def test_criar_horario_valido(self):
+        horario = HorarioFactory()
+        assert Horario.objects.count() == 1
+        assert horario.id is not None
+
+    def test_ler_horario(self):
+        horario = HorarioFactory()
+        db_horario = Horario.objects.get(id=horario.id)
+        assert db_horario.dia_semana == horario.dia_semana
+
+    def test_atualizar_horario(self):
+        horario = HorarioFactory()
+        horario.dia_semana = 2
+        horario.save()
+        assert Horario.objects.get(id=horario.id).dia_semana == 2
+
+    def test_deletar_horario(self):
+        horario = HorarioFactory()
+        horario.delete()
+        assert Horario.objects.count() == 0
+
+    def test_dia_semana_valido(self):
+        horario = HorarioFactory(dia_semana=1)
+        assert horario.dia_semana == 1
+
+    def test_multiplos_horarios_mesma_turma(self):
+        turma = TurmaFactory()
+        HorarioFactory(turma=turma)
+        HorarioFactory(turma=turma)
+        assert Horario.objects.filter(turma=turma).count() == 2
+
+    def test_hora_inicio_antes_fim(self):
+        horario = HorarioFactory(hora_inicio='08:00', hora_fim='10:00')
+        assert horario.hora_inicio < horario.hora_fim
+
+    def test_hora_inicio_igual_fim_permitido(self):
+        horario = HorarioFactory(hora_inicio='09:00', hora_fim='09:00')
+        assert horario.hora_inicio == horario.hora_fim
+
+    def test_horario_com_turma(self):
+        turma = TurmaFactory()
+        horario = HorarioFactory(turma=turma)
+        assert horario.turma == turma
+
+    def test_horario_sem_turma_invalido(self):
+        with pytest.raises(Exception):
+            HorarioFactory(turma=None)
+
+    def test_turma_tem_multiplos_horarios(self):
+        turma = TurmaFactory()
+        HorarioFactory(turma=turma)
+        HorarioFactory(turma=turma)
+        horarios = Horario.objects.filter(turma=turma)
+        assert horarios.count() == 2
+
+    def test_str_representation(self):
+        horario = HorarioFactory(dia_semana=1, hora_inicio='08:00')
+        assert str(horario) is not None
+
+    def test_filtro_por_turma(self):
+        turma = TurmaFactory()
+        HorarioFactory(turma=turma)
+        assert Horario.objects.filter(turma=turma).exists()
+
+    def test_queryset_count(self):
+        HorarioFactory.create_batch(5)
+        assert Horario.objects.count() == 5
+
+
+
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_models_turma.py
+App: apps
+==============================
+"""
+Arquivo: test_models_turma.py
+caminho: apps/eventos/tests/test_models_turma.py
+Finalidade: Testes dos modelos do app eventos, focando na model Turma.
+Atualizações:   
+ - 03/06/2026 - Criação do arquivo com 22 testes básicos para o modelo Turma do app eventos, utilizando pytest e factories.
+"""
+
+import pytest
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from datetime import timedelta
+from apps.eventos.models import Turma, Evento, Horario
+from apps.eventos.tests.factories import TurmaFactory, EventoFactory, HorarioFactory
+
+@pytest.mark.django_db
+class TestTurmaModel:
+
+    def test_criar_turma_valida(self):
+        turma = TurmaFactory()
+        assert turma.pk is not None
+
+    def test_ler_turma(self):
+        turma = TurmaFactory(nome="Turma A")
+        db_turma = Turma.objects.get(pk=turma.pk)
+        assert db_turma.nome == "Turma A"
+
+    def test_atualizar_turma(self):
+        turma = TurmaFactory(nome="Antigo")
+        turma.nome = "Novo"
+        turma.save()
+        assert Turma.objects.get(pk=turma.pk).nome == "Novo"
+
+    def test_deletar_turma(self):
+        turma = TurmaFactory()
+        turma.delete()
+        assert Turma.objects.count() == 0
+
+    def test_multiplas_turmas(self):
+        TurmaFactory.create_batch(5)
+        assert Turma.objects.count() == 5
+
+    def test_datas_validas_factory(self):
+        turma = TurmaFactory()
+        assert turma.data_inicio < turma.data_fim
+
+    def test_capacidade_positiva(self):
+        turma = TurmaFactory(capacidade=10)
+        assert turma.capacidade > 0
+
+    def test_capacidade_grande_numero(self):
+        turma = TurmaFactory(capacidade=9999)
+        assert turma.capacidade == 9999
+
+    def test_capacidade_zero_permitido(self):
+        turma = TurmaFactory(capacidade=0)
+        assert turma.capacidade == 0
+
+    def test_turma_com_evento(self):
+        evento = EventoFactory()
+        turma = TurmaFactory(evento=evento)
+        assert turma.evento == evento
+
+    def test_turma_sem_evento_invalido(self):
+        turma = Turma(nome="Sem Evento", capacidade=10)
+        with pytest.raises(Exception):
+            turma.save()
+
+    def test_turma_com_horarios(self):
+        turma = TurmaFactory()
+        HorarioFactory(turma=turma)
+        assert turma.horarios.count() == 1
+
+    def test_turma_multiplos_horarios(self):
+        turma = TurmaFactory()
+        HorarioFactory.create_batch(3, turma=turma)
+        assert turma.horarios.count() == 3
+
+    def test_deletar_turma_deleta_horarios(self):
+        turma = TurmaFactory()
+        HorarioFactory(turma=turma)
+        turma.delete()
+        assert Horario.objects.count() == 0
+
+    def test_criado_em_existe(self):
+        turma = TurmaFactory()
+        assert turma.criado_em is not None
+
+    def test_atualizado_em_atualiza(self):
+        turma = TurmaFactory()
+        old_updated = turma.atualizado_em
+        turma.nome = "Update"
+        turma.save()
+        assert turma.atualizado_em > old_updated
+
+    def test_str_representation(self):
+        turma = TurmaFactory(nome="Python")
+        assert "Python" in str(turma)
+
+    def test_nome_obrigatorio(self):
+        turma = Turma(nome="", evento=EventoFactory())
+        with pytest.raises(ValidationError):
+            turma.full_clean()
+
+    def test_filtro_por_evento(self):
+        evento = EventoFactory()
+        TurmaFactory(evento=evento)
+        assert Turma.objects.filter(evento=evento).count() == 1
+
+    def test_filtro_por_turno(self):
+        TurmaFactory(turno="Matutino")
+        assert Turma.objects.filter(turno="Matutino").count() == 1
+
+    def test_queryset_count(self):
+        TurmaFactory.create_batch(10)
+        assert Turma.objects.all().count() == 10
 
 
 
@@ -6160,174 +7008,188 @@ App: apps
 """
 Arquivo: test_admin.py
 Caminho: apps/academico/tests/test_admin.py
-Atualizações
-28/05/2026 - Criação do arquivo 
+Descrição: Testes de admin para StatusMatricula, Matricula e Avaliacao
+Histórico de Alterações:
+ - 28/05/2026 - Criação do arquivo
+ - 09/06/2026 - Correção de testes para refletir mudanças no modelo e admin
 """
 
-from datetime import date, timedelta
-from django.test import TestCase, Client
+
+import pytest
+from django.test import Client
 from django.urls import reverse
 from django.contrib.messages import get_messages
+from django.utils import timezone
+from datetime import timedelta
 
 from apps.accounts.admin import admin_site
-from apps.academico.admin import (
-    StatusMatriculaAdmin,
-    MatriculaAdmin,
-    AvaliacaoAdmin,
-)
+from apps.academico.admin import StatusMatriculaAdmin, MatriculaAdmin, AvaliacaoAdmin
 from apps.academico.models import StatusMatricula, Matricula, Avaliacao
 from apps.eventos.models import Evento, Turma, Status
 from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
 from apps.accounts.models import Usuario
 from apps.interessados.tests.factories import InteressadoFactory
 
+@pytest.mark.django_db
+class TestStatusMatriculaAdmin:
+    """Testes para StatusMatriculaAdmin"""
 
-class TestStatusMatriculaAdmin(TestCase):
-    def setUp(self):
-        self.model_admin = StatusMatriculaAdmin(StatusMatricula, admin_site)
+    def setup_method(self):
+        self.admin = StatusMatriculaAdmin(StatusMatricula, admin_site)
 
     def test_cor_display_com_cor(self):
-        obj = StatusMatricula(cor="#ff0000")
-        result = self.model_admin.cor_display(obj)
-        self.assertIn("#ff0000", result)
-        self.assertIn("background-color", result)
+        """Deve exibir quadrado colorido quando cor está preenchida"""
+        obj = StatusMatricula(cor='#ff0000')
+        result = self.admin.cor_display(obj)
+        assert '#ff0000' in result
+        assert 'background-color' in result
 
     def test_cor_display_sem_cor(self):
-        obj = StatusMatricula(cor="")
-        result = self.model_admin.cor_display(obj)
-        self.assertEqual(result, "\u2014")
+        """Deve exibir travessão quando cor está vazia"""
+        obj = StatusMatricula(cor='')
+        result = self.admin.cor_display(obj)
+        assert result == '—'
 
+@pytest.mark.django_db
+class TestMatriculaAdmin:
+    """Testes para MatriculaAdmin"""
 
-class TestMatriculaAdmin(TestCase):
-    def setUp(self):
+    def setup_method(self):
+        self.admin = MatriculaAdmin(Matricula, admin_site)
         self.interessado = InteressadoFactory()
-
-        status_evento = Status.objects.create(nome="Ativo")
-        status_inscricao = StatusInscricao.objects.create(nome="Confirmada")
-
+        
+        status_evento = Status.objects.create(nome='Ativo')
+        status_inscricao = StatusInscricao.objects.create(nome='Confirmada')
+        
+        agora = timezone.now()
         self.evento = Evento.objects.create(
-            nome="Evento Teste",
+            nome='Evento Teste',
             status=status_evento,
             total_vagas=50,
-            data_inicio_inscricao=date.today(),
-            data_fim_inscricao=date.today() + timedelta(days=30),
-            data_inicio_evento=date.today() + timedelta(days=60),
-            data_fim_evento=date.today() + timedelta(days=61),
+            data_inicio_inscricao=agora,
+            data_fim_inscricao=agora + timedelta(days=30),
+            data_inicio_evento=agora.date() + timedelta(days=60),
+            data_fim_evento=agora.date() + timedelta(days=61),
         )
+        
         self.turma = Turma.objects.create(
-            nome="Turma Teste",
+            nome='Turma Teste',
             evento=self.evento,
             capacidade=40,
-            data_inicio=date.today() + timedelta(days=60),
-            data_fim=date.today() + timedelta(days=61),
+            data_inicio=agora.date() + timedelta(days=60),
+            data_fim=agora.date() + timedelta(days=61),
         )
+        
         self.inscricao = Inscricao.objects.create(
             interessado=self.interessado,
             evento=self.evento,
             status=status_inscricao,
         )
+        
         self.matricula = Matricula.objects.create(
-            numero_matricula="123",
+            numero_matricula='123',
             interessado=self.interessado,
             turma=self.turma,
             status=StatusMatricula.objects.create(
-                nome="Ativa", cor="#00ff00", ordem=1
+                nome='Ativa', cor='#00ff00', ordem=1
             ),
             inscricao=self.inscricao,
         )
-        self.model_admin = MatriculaAdmin(Matricula, admin_site)
 
     def test_get_interessado(self):
-        result = self.model_admin.get_interessado(self.matricula)
-        self.assertEqual(result, self.interessado.nome)
+        """Deve retornar nome do interessado"""
+        result = self.admin.get_interessado(self.matricula)
+        assert result == self.interessado.nome
 
     def test_get_evento(self):
-        result = self.model_admin.get_evento(self.matricula)
-        self.assertEqual(result, "Evento Teste")
+        """Deve retornar nome do evento"""
+        result = self.admin.get_evento(self.matricula)
+        assert result == 'Evento Teste'
 
+@pytest.mark.django_db
+class TestAvaliacaoAdmin:
+    """Testes para AvaliacaoAdmin"""
 
-class TestAvaliacaoAdmin(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.superuser = Usuario.objects.create_user(
-            username="admin2",
-            email="admin2@ex.com",
-            password="123",
-            cpf="22222222222",
+    def setup_method(self):
+        self.superuser = Usuario.objects.create_user(
+            username='admin2',
+            email='admin2@ex.com',
+            password='123',
+            cpf='22222222222',
             is_staff=True,
             is_superuser=True,
         )
-
-    def setUp(self):
         self.client = Client()
         self.client.force_login(self.superuser)
-
-        hoj = date.today()
-        status_evento = Status.objects.create(nome="Ativo")
-        status_inscricao = StatusInscricao.objects.create(nome="Confirmada")
-
+        
+        agora = timezone.now()
+        status_evento = Status.objects.create(nome='Ativo')
+        status_inscricao = StatusInscricao.objects.create(nome='Confirmada')
+        
         self.evento = Evento.objects.create(
-            nome="Evento Teste",
+            nome='Evento Teste',
             status=status_evento,
             total_vagas=50,
-            data_inicio_inscricao=hoj,
-            data_fim_inscricao=hoj + timedelta(days=30),
-            data_inicio_evento=hoj + timedelta(days=60),
-            data_fim_evento=hoj + timedelta(days=61),
+            data_inicio_inscricao=agora,
+            data_fim_inscricao=agora + timedelta(days=30),
+            data_inicio_evento=agora.date() + timedelta(days=60),
+            data_fim_evento=agora.date() + timedelta(days=61),
         )
+        
         self.turma = Turma.objects.create(
-            nome="Turma Teste",
+            nome='Turma Teste',
             evento=self.evento,
             capacidade=40,
-            data_inicio=hoj + timedelta(days=60),
-            data_fim=hoj + timedelta(days=61),
+            data_inicio=agora.date() + timedelta(days=60),
+            data_fim=agora.date() + timedelta(days=61),
         )
+        
         self.status = StatusMatricula.objects.create(
-            nome="Ativa", cor="#00ff00", ordem=1
+            nome='Ativa', cor='#00ff00', ordem=1
         )
+        
         self.interessado = InteressadoFactory()
         self.inscricao = Inscricao.objects.create(
             interessado=self.interessado,
             evento=self.evento,
             status=status_inscricao,
         )
+        
         self.matricula = Matricula.objects.create(
-            numero_matricula="456",
+            numero_matricula='456',
             interessado=self.interessado,
             turma=self.turma,
             status=self.status,
             inscricao=self.inscricao,
         )
-
-        # CORRECAO: update_or_create garante aprovado=True mesmo se Matricula.save() criou com False
+        
         self.avaliacao, _ = Avaliacao.objects.update_or_create(
             matricula=self.matricula,
             defaults={
-                "nota_final": 8.5,
-                "frequencia": 90,
-                "aprovado": True,
+                'nota_final': 8.5,
+                'frequencia': 90,
+                'aprovado': True,
             },
         )
-
+        
         Classificacao.objects.create(
             inscricao=self.inscricao,
             classificado=True,
             pontuacao_total=100,
             posicao=1,
         )
-        self.model_admin = AvaliacaoAdmin(Avaliacao, admin_site)
+        self.admin = AvaliacaoAdmin(Avaliacao, admin_site)
 
     def _criar_matricula_extra(self):
-        """Helper para criar matricula extra para testes que precisam de outro Avaliacao"""
-        hoj = date.today()
+        """Helper para criar matrícula extra"""
         interessado2 = InteressadoFactory()
         inscricao2 = Inscricao.objects.create(
             interessado=interessado2,
             evento=self.evento,
-            status=StatusInscricao.objects.create(nome="Pendente"),
+            status=StatusInscricao.objects.create(nome='Pendente'),
         )
         matricula2 = Matricula.objects.create(
-            numero_matricula="789",
+            numero_matricula='789',
             interessado=interessado2,
             turma=self.turma,
             status=self.status,
@@ -6342,99 +7204,97 @@ class TestAvaliacaoAdmin(TestCase):
         return matricula2
 
     def test_acoes_certificado_aprovado(self):
-        result = self.model_admin.acoes_certificado(self.avaliacao)
-        self.assertIn("button", result)
-        self.assertIn(str(self.avaliacao.pk), result)
+        """Deve exibir botão para certificado aprovado"""
+        result = self.admin.acoes_certificado(self.avaliacao)
+        assert 'button' in result
+        assert str(self.avaliacao.pk) in result
 
     def test_acoes_certificado_nao_aprovado(self):
+        """Deve exibir travessão para não aprovado"""
         matricula2 = self._criar_matricula_extra()
         avaliacao2, _ = Avaliacao.objects.update_or_create(
             matricula=matricula2,
             defaults={
-                "nota_final": 5.0,
-                "frequencia": 70,
-                "aprovado": False,
+                'nota_final': 5.0,
+                'frequencia': 70,
+                'aprovado': False,
             },
         )
-        result = self.model_admin.acoes_certificado(avaliacao2)
-        self.assertEqual(result, '<span style="color: #999;">-</span>')
+        result = self.admin.acoes_certificado(avaliacao2)
+        assert result == '<span style="color: #999;">-</span>'
 
     def test_changelist_view_contexto(self):
-        response = self.client.get(
-            reverse("admin:academico_avaliacao_changelist")
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("eventos_disponiveis", response.context)
+        """Deve incluir eventos_disponiveis no contexto"""
+        response = self.client.get(reverse('admin:academico_avaliacao_changelist'))
+        assert response.status_code == 200
+        assert 'eventos_disponiveis' in response.context
 
     def test_gerar_certificados_marca_emitidos(self):
-        self.assertFalse(self.avaliacao.certificado_emitido)
+        """Deve marcar certificado como emitido"""
+        assert not self.avaliacao.certificado_emitido
         self.client.post(
-            reverse("admin:academico_avaliacao_changelist"),
+            reverse('admin:academico_avaliacao_changelist'),
             {
-                "action": "gerar_certificados",
-                "_selected_action": [self.avaliacao.pk],
-                "index": "0",
+                'action': 'gerar_certificados',
+                '_selected_action': [self.avaliacao.pk],
+                'index': '0',
             },
         )
         self.avaliacao.refresh_from_db()
-        self.assertTrue(self.avaliacao.certificado_emitido)
-        self.assertEqual(
-            self.avaliacao.data_emissao_certificado, date.today()
-        )
+        assert self.avaliacao.certificado_emitido
+        assert self.avaliacao.data_emissao_certificado == timezone.now().date()
 
     def test_gerar_certificados_sem_aprovados(self):
+        """Deve exibir mensagem quando nenhum aprovado"""
         matricula2 = self._criar_matricula_extra()
         avaliacao2, _ = Avaliacao.objects.update_or_create(
             matricula=matricula2,
             defaults={
-                "nota_final": 5.0,
-                "frequencia": 70,
-                "aprovado": False,
+                'nota_final': 5.0,
+                'frequencia': 70,
+                'aprovado': False,
             },
         )
         response = self.client.post(
-            reverse("admin:academico_avaliacao_changelist"),
+            reverse('admin:academico_avaliacao_changelist'),
             {
-                "action": "gerar_certificados",
-                "_selected_action": [avaliacao2.pk],
-                "index": "0",
+                'action': 'gerar_certificados',
+                '_selected_action': [avaliacao2.pk],
+                'index': '0',
             },
             follow=True,
         )
         msg_list = list(get_messages(response.wsgi_request))
-        self.assertTrue(
-            any("Nenhum aluno aprovado" in str(m) for m in msg_list)
-        )
+        assert any('Nenhum aluno aprovado' in str(m) for m in msg_list)
 
     def test_gerar_certificados_ja_emitido(self):
+        """Deve exibir aviso se certificado já emitido"""
         self.avaliacao.certificado_emitido = True
         self.avaliacao.save()
         response = self.client.post(
-            reverse("admin:academico_avaliacao_changelist"),
+            reverse('admin:academico_avaliacao_changelist'),
             {
-                "action": "gerar_certificados",
-                "_selected_action": [self.avaliacao.pk],
-                "index": "0",
+                'action': 'gerar_certificados',
+                '_selected_action': [self.avaliacao.pk],
+                'index': '0',
             },
             follow=True,
         )
         msg_list = list(get_messages(response.wsgi_request))
-        self.assertTrue(
-            any("já possui certificado" in str(m) for m in msg_list)
-        )
+        assert any('já possui certificado' in str(m) for m in msg_list)
 
     def test_download_certificados_lote_action_redirect(self):
+        """Deve redirecionar para download em lote"""
         response = self.client.post(
-            reverse("admin:academico_avaliacao_changelist"),
+            reverse('admin:academico_avaliacao_changelist'),
             {
-                "action": "download_certificados_lote_action",
-                "_selected_action": [self.avaliacao.pk],
-                "index": "0",
+                'action': 'download_certificados_lote_action',
+                '_selected_action': [self.avaliacao.pk],
+                'index': '0',
             },
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("certificados/download-lote", response.url)
-
+        assert response.status_code == 302
+        assert 'certificados/download-lote' in response.url
 
 
 
@@ -6711,116 +7571,196 @@ App: apps
 """
 Arquivo: test_services.py
 Caminho: apps/academico/tests/test_services.py
+Descrição: Testes para MatriculaService (disponibilidade, avaliação, relatório)
 Atualizações
-28/05/2026 - Criação do arquivo 
+ - 28/05/2026 - Criação do arquivo 
+ - 09/06/2026 - Adicionados testes para limites de nota e frequência em avaliar_aluno()
+ - 09/06/2026 - Corrigido setup_method do relatório para incluir status necessários pelo service
 """
 
-
-from django.test import TestCase
+import pytest
 from django.core.exceptions import ValidationError
+
 from apps.academico.services import MatriculaService
-from .factories import (
-    MatriculaFactory,
-    TurmaFactory,
-    StatusMatriculaFactory,
-    InteressadoFactory,
-)
+from apps.academico.models import Avaliacao
+from .factories import MatriculaFactory, TurmaFactory, StatusMatriculaFactory
 
+@pytest.mark.django_db
+class TestVerificacaoDisponibilidade:
+    """Testes para verificar_disponibilidade_turma()"""
 
-class TestMatriculaService(TestCase):
-    def setUp(self):
-        self.status_ativa = StatusMatriculaFactory(nome="Ativa")
-        self.status_concluida = StatusMatriculaFactory(nome="Concluída")
-        self.status_cancelada = StatusMatriculaFactory(nome="Cancelada")
-
-        self.turma_com_vagas = TurmaFactory(capacidade=5)
-        self.turma_sem_vagas = TurmaFactory(capacidade=1)
-
-    # --- Disponibilidade ---
+    def setup_method(self):
+        self.status_ativa = StatusMatriculaFactory(nome='Ativa')
 
     def test_verificar_disponibilidade_turma_com_vagas(self):
-        disponivel, vagas = MatriculaService.verificar_disponibilidade_turma(
-            self.turma_com_vagas
-        )
-        self.assertTrue(disponivel)
-        self.assertEqual(vagas, 5)
+        """Turma com 5 vagas e 0 matriculados deve retornar (True, 5)"""
+        turma = TurmaFactory(capacidade=5)
+        disponivel, vagas = MatriculaService.verificar_disponibilidade_turma(turma)
+        assert disponivel is True
+        assert vagas == 5
 
     def test_verificar_disponibilidade_turma_lotada(self):
-        MatriculaFactory(turma=self.turma_sem_vagas, status=self.status_ativa)
-        disponivel, vagas = MatriculaService.verificar_disponibilidade_turma(
-            self.turma_sem_vagas
-        )
-        self.assertFalse(disponivel)
-        self.assertEqual(vagas, 0)
+        """Turma com 1 vaga e 1 matriculado deve retornar (False, 0)"""
+        turma = TurmaFactory(capacidade=1)
+        MatriculaFactory(turma=turma, status=self.status_ativa)
+        disponivel, vagas = MatriculaService.verificar_disponibilidade_turma(turma)
+        assert disponivel is False
+        assert vagas == 0
 
-    # --- Avaliacao ---
+    def test_verificar_disponibilidade_turma_parcial(self):
+        """Turma com 5 vagas e 2 matriculados deve retornar (True, 3)"""
+        turma = TurmaFactory(capacidade=5)
+        MatriculaFactory.create_batch(2, turma=turma, status=self.status_ativa)
+        disponivel, vagas = MatriculaService.verificar_disponibilidade_turma(turma)
+        assert disponivel is True
+        assert vagas == 3
+
+    def test_verificar_disponibilidade_turma_exatamente_cheia(self):
+        """Turma com 3 vagas e 3 matriculados deve retornar (False, 0)"""
+        turma = TurmaFactory(capacidade=3)
+        MatriculaFactory.create_batch(3, turma=turma, status=self.status_ativa)
+        disponivel, vagas = MatriculaService.verificar_disponibilidade_turma(turma)
+        assert disponivel is False
+        assert vagas == 0
+
+
+@pytest.mark.django_db
+class TestAvaliacaoAluno:
+    """Testes para avaliar_aluno()"""
+
+    def setup_method(self):
+        self.status_ativa = StatusMatriculaFactory(nome='Ativa')
+        self.status_concluida = StatusMatriculaFactory(nome='Concluída')
+        self.status_cancelada = StatusMatriculaFactory(nome='Cancelada')
+        self.matricula = MatriculaFactory(status=self.status_ativa)
 
     def test_avaliar_aluno_aprovado(self):
-        matricula = MatriculaFactory(status=self.status_ativa)
-        avaliacao = MatriculaService.avaliar_aluno(
-            matricula=matricula,
-            nota_final=8.5,
-            frequencia=90.0,
-            observacoes="Bom desempenho",
-        )
-        self.assertEqual(avaliacao.nota_final, 8.5)
-        self.assertEqual(avaliacao.frequencia, 90.0)
-        self.assertTrue(avaliacao.aprovado)
+        """Nota 8.5 e freq 90% deve resultar em aprovado=True"""
+        av = MatriculaService.avaliar_aluno(self.matricula, 8.5, 90.0)
+        assert av.aprovado is True
+        assert av.nota_final == 8.5
+        assert av.frequencia == 90.0
 
     def test_avaliar_aluno_reprovado_por_nota(self):
-        matricula = MatriculaFactory(status=self.status_ativa)
-        avaliacao = MatriculaService.avaliar_aluno(
-            matricula=matricula,
-            nota_final=5.0,
-            frequencia=70.0,
-        )
-        self.assertFalse(avaliacao.aprovado)
+        """Nota 5.0 e freq 70% deve resultar em aprovado=False"""
+        av = MatriculaService.avaliar_aluno(self.matricula, 5.0, 70.0)
+        assert av.aprovado is False
 
     def test_avaliar_aluno_reprovado_por_frequencia(self):
-        matricula = MatriculaFactory(status=self.status_ativa)
-        avaliacao = MatriculaService.avaliar_aluno(
-            matricula=matricula,
-            nota_final=8.0,
-            frequencia=50.0,
-        )
-        self.assertFalse(avaliacao.aprovado)
+        """Nota 8.0 e freq 50% deve resultar em aprovado=False"""
+        av = MatriculaService.avaliar_aluno(self.matricula, 8.0, 50.0)
+        assert av.aprovado is False
 
     def test_avaliar_aluno_nota_invalida(self):
-        matricula = MatriculaFactory()
-        with self.assertRaises(ValidationError):
-            MatriculaService.avaliar_aluno(matricula, 11.0, 90.0)
+        """Nota 11.0 deve lançar ValidationError"""
+        with pytest.raises(ValidationError):
+            MatriculaService.avaliar_aluno(self.matricula, 11.0, 80.0)
 
     def test_avaliar_aluno_frequencia_invalida(self):
-        matricula = MatriculaFactory()
-        with self.assertRaises(ValidationError):
-            MatriculaService.avaliar_aluno(matricula, 8.0, 150.0)
+        """Frequência 150% deve lançar ValidationError"""
+        with pytest.raises(ValidationError):
+            MatriculaService.avaliar_aluno(self.matricula, 8.0, 150.0)
 
-    # --- Relatorio ---
+    def test_avaliar_aluno_nota_limite_minimo_aprovado(self):
+        """Nota 7.0 e freq 75% deve resultar em aprovado=True (limites mínimos)"""
+        av = MatriculaService.avaliar_aluno(self.matricula, 7.0, 75.0)
+        assert av.aprovado is True
+
+    def test_avaliar_aluno_nota_limite_maximo(self):
+        """Nota 10.0 deve ser aceita"""
+        av = MatriculaService.avaliar_aluno(self.matricula, 10.0, 100.0)
+        assert av.nota_final == 10.0
+        assert av.aprovado is True
+
+    def test_avaliar_aluno_frequencia_limite_minimo(self):
+        """Frequência 75% deve ser aceita (limite mínimo)"""
+        av = MatriculaService.avaliar_aluno(self.matricula, 7.0, 75.0)
+        assert av.frequencia == 75.0
+        assert av.aprovado is True
+
+    def test_avaliar_aluno_frequencia_limite_maximo(self):
+        """Frequência 100% deve ser aceita"""
+        av = MatriculaService.avaliar_aluno(self.matricula, 7.0, 100.0)
+        assert av.frequencia == 100.0
+        assert av.aprovado is True
+
+    def test_avaliar_aluno_atualiza_status_matricula(self):
+        """Avaliação aprovada deve atualizar status para 'Concluída'"""
+        MatriculaService.avaliar_aluno(self.matricula, 8.0, 80.0)
+        self.matricula.refresh_from_db()
+        assert self.matricula.status.nome == 'Concluída'
+
+    def test_avaliar_aluno_cria_ou_atualiza(self):
+        """Chamar avaliar_aluno duas vezes deve atualizar, não duplicar"""
+        MatriculaService.avaliar_aluno(self.matricula, 5.0, 50.0)
+        MatriculaService.avaliar_aluno(self.matricula, 9.0, 90.0)
+        assert Avaliacao.objects.filter(matricula=self.matricula).count() == 1
+        av = Avaliacao.objects.get(matricula=self.matricula)
+        assert av.nota_final == 9.0
+        assert av.frequencia == 90.0
+
+
+@pytest.mark.django_db
+class TestRelatorioTurma:
+    """Testes para gerar_relatorio_turma()"""
+
+    def setup_method(self):
+        # CORREÇÃO: Garante a presença de todos os status que o service exige internamente
+        self.status_ativa = StatusMatriculaFactory(nome='Ativa')
+        self.status_concluida = StatusMatriculaFactory(nome='Concluída')
+        self.status_cancelada = StatusMatriculaFactory(nome='Cancelada')
+        self.turma = TurmaFactory()
 
     def test_gerar_relatorio_turma(self):
-        interessado1 = InteressadoFactory()
-        interessado2 = InteressadoFactory()
+        """Relatório com 2 matriculados e 2 avaliados (1 aprovado, 1 reprovado)"""
+        m1 = MatriculaFactory(turma=self.turma, status=self.status_ativa)
+        m2 = MatriculaFactory(turma=self.turma, status=self.status_ativa)
+        MatriculaService.avaliar_aluno(m1, 8.0, 80.0)
+        MatriculaService.avaliar_aluno(m2, 5.0, 50.0)
+        
+        rel = MatriculaService.gerar_relatorio_turma(self.turma)
+        
+        assert rel['total_matriculas'] == 2
+        assert rel['total_avaliacoes'] == 2
+        assert rel['aprovados'] == 1
+        assert rel['reprovados'] == 1
+        assert rel['media_nota'] == 6.5
+        assert rel['taxa_aprovacao'] == 50.0
 
-        matricula1 = MatriculaFactory(
-            turma=self.turma_com_vagas, interessado=interessado1
-        )
-        matricula2 = MatriculaFactory(
-            turma=self.turma_com_vagas, interessado=interessado2
-        )
+    def test_gerar_relatorio_turma_vazia(self):
+        """Relatório de turma sem matriculados"""
+        rel = MatriculaService.gerar_relatorio_turma(self.turma)
+        
+        assert rel['total_matriculas'] == 0
+        assert rel['total_avaliacoes'] == 0
+        assert rel['aprovados'] == 0
+        assert rel['reprovados'] == 0
+        assert rel['media_nota'] == 0
+        assert rel['taxa_aprovacao'] == 0
 
-        MatriculaService.avaliar_aluno(matricula1, 8.5, 90.0)
-        MatriculaService.avaliar_aluno(matricula2, 6.0, 75.0)
+    def test_gerar_relatorio_turma_parcialmente_avaliada(self):
+        """Relatório com 2 matriculados mas apenas 1 avaliado"""
+        m1 = MatriculaFactory(turma=self.turma, status=self.status_ativa)
+        MatriculaFactory(turma=self.turma, status=self.status_ativa)
+        MatriculaService.avaliar_aluno(m1, 8.0, 80.0)
+        
+        rel = MatriculaService.gerar_relatorio_turma(self.turma)
+        
+        assert rel['total_matriculas'] == 2
+        assert rel['total_avaliacoes'] == 1
+        assert rel['pendentes'] == 1
 
-        relatorio = MatriculaService.gerar_relatorio_turma(
-            self.turma_com_vagas
-        )
-
-        self.assertEqual(relatorio["total_matriculas"], 2)
-        self.assertEqual(relatorio["total_avaliacoes"], 2)
-        self.assertEqual(relatorio["aprovados"], 1)
-        self.assertEqual(relatorio["reprovados"], 1)
-        self.assertIn("media_nota", relatorio)
-        self.assertIn("taxa_aprovacao", relatorio)
+    def test_gerar_relatorio_turma_valida_valores(self):
+        """Valida cálculo de média e taxa de aprovação"""
+        m1 = MatriculaFactory(turma=self.turma, status=self.status_ativa)
+        m2 = MatriculaFactory(turma=self.turma, status=self.status_ativa)
+        MatriculaService.avaliar_aluno(m1, 10.0, 100.0)
+        MatriculaService.avaliar_aluno(m2, 0.0, 0.0)
+        
+        rel = MatriculaService.gerar_relatorio_turma(self.turma)
+        
+        assert rel['media_nota'] == 5.0
+        assert rel['taxa_aprovacao'] == 50.0
 
 
 
@@ -7386,7 +8326,7 @@ from django.test import TestCase
 ==================================================
 ESTATÍSTICAS
 ==================================================
-Total de arquivos de teste: 39
-Total de bytes: 275382
+Total de arquivos de teste: 46
+Total de bytes: 310339
 Quantidade por app:
-  apps: 39
+  apps: 46

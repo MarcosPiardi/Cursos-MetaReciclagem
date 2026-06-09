@@ -1,23 +1,31 @@
 """
 Arquivo: test_models_evento.py
-caminho: apps/eventos/tests/test_models_evento.py
-Finalidade: Testes dos modelos do app eventos.
+Caminho: apps/eventos/tests/test_models_evento.py
+Finalidade: Testes dos modelos Evento do app eventos (CRUD, validações, métodos)
 Atualizações:
  - 03/06/2026 - Criação do arquivo com testes básicos para os modelos do app eventos, utilizando pytest e factories.
+ - 09/06/2026 - Refatoração completa para pytest puro e adição de 5 testes de métodos
 """
 
 
 import pytest
-from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
+from django.core.exceptions import ValidationError
 from apps.eventos.models import Evento
-from apps.eventos.tests.factories import EventoFactory, StatusFactory, TurmaFactory, CriterioFactory
-from django.test import TestCase
-from apps.eventos.tests.factories import EventoFactory, EventoCriterioFactory, TurmaFactory
+from apps.eventos.tests.factories import EventoFactory, StatusFactory, TurmaFactory, EventoCriterioFactory
 
-@pytest.mark.django_db
-class TestEventoModel:
+pytestmark = pytest.mark.django_db
+
+@pytest.fixture
+def status_ativo():
+    return StatusFactory(nome="Ativo")
+
+@pytest.fixture
+def evento_padrao(status_ativo):
+    return EventoFactory(status=status_ativo)
+
+class TestEventoCRUD:
     def test_criar_evento_valido(self):
         evento = EventoFactory()
         assert Evento.objects.count() == 1
@@ -43,20 +51,30 @@ class TestEventoModel:
         EventoFactory.create_batch(5)
         assert Evento.objects.count() == 5
 
+class TestEventoValidacoes:
     def test_data_inicio_inscricao_antes_fim_inscricao(self):
-        evento = EventoFactory.build(data_inicio_inscricao=timezone.now(), data_fim_inscricao=timezone.now() - timedelta(days=1))
+        evento = EventoFactory.build(
+            data_inicio_inscricao=timezone.now(),
+            data_fim_inscricao=timezone.now() - timedelta(days=1)
+        )
         with pytest.raises(ValidationError):
-            evento.full_clean()
+            evento.clean()
 
     def test_data_fim_inscricao_antes_inicio_evento(self):
-        evento = EventoFactory.build(data_fim_inscricao=timezone.now(), data_inicio_evento=timezone.now() - timedelta(days=1))
+        evento = EventoFactory.build(
+            data_fim_inscricao=timezone.now(),
+            data_inicio_evento=timezone.now() - timedelta(days=1)
+        )
         with pytest.raises(ValidationError):
-            evento.full_clean()
+            evento.clean()
 
     def test_data_inicio_evento_antes_fim_evento(self):
-        evento = EventoFactory.build(data_inicio_evento=timezone.now(), data_fim_evento=timezone.now() - timedelta(days=1))
+        evento = EventoFactory.build(
+            data_inicio_evento=timezone.now(),
+            data_fim_evento=timezone.now() - timedelta(days=1)
+        )
         with pytest.raises(ValidationError):
-            evento.full_clean()
+            evento.clean()
 
     def test_datas_validas_factory(self):
         evento = EventoFactory()
@@ -78,6 +96,7 @@ class TestEventoModel:
         evento = EventoFactory(total_vagas=0)
         assert evento.total_vagas == 0
 
+class TestEventoStatus:
     def test_evento_com_status(self):
         status = StatusFactory()
         evento = EventoFactory(status=status)
@@ -107,6 +126,7 @@ class TestEventoModel:
         EventoCriterioFactory.create_batch(3, evento=evento)
         assert evento.evento_criterios.count() == 3
 
+class TestEventoTimestamps:
     def test_evento_sem_criterios(self):
         evento = EventoFactory()
         assert evento.evento_criterios.count() == 0
@@ -133,14 +153,45 @@ class TestEventoModel:
         evento.save()
         assert evento.atualizado_em > old_updated
 
-    def test_str_representation(self):
-        evento = EventoFactory(nome='Evento A')
-        assert str(evento) == 'Evento A'
+class TestEventoMetodos:
+    def test_inscricoes_abertas(self):
+        evento = EventoFactory(
+            data_inicio_inscricao=timezone.now() - timedelta(days=1),
+            data_fim_inscricao=timezone.now() + timedelta(days=1)
+        )
+        assert evento.inscricoes_abertas() is True
 
-    def test_nome_obrigatorio(self):
-        with pytest.raises(Exception):
-            EventoFactory(nome=None)
+    def test_inscricoes_fechadas(self):
+        evento = EventoFactory(
+            data_inicio_inscricao=timezone.now() - timedelta(days=10),
+            data_fim_inscricao=timezone.now() - timedelta(days=1)
+        )
+        assert evento.inscricoes_abertas() is False
 
+    def test_validacao_datas_inscricao(self):
+        evento = EventoFactory.build(
+            data_inicio_inscricao=timezone.now() + timedelta(days=2),
+            data_fim_inscricao=timezone.now() + timedelta(days=1)
+        )
+        with pytest.raises(ValidationError):
+            evento.full_clean()
+
+    def test_validacao_datas_evento(self):
+        evento = EventoFactory.build(
+            data_inicio_evento=(timezone.now() + timedelta(days=2)).date(),
+            data_fim_evento=(timezone.now() + timedelta(days=1)).date()
+        )
+        with pytest.raises(ValidationError):
+            evento.full_clean()
+
+    def test_formatacao_datas(self):
+        evento = EventoFactory()
+        assert evento.data_inicio_inscricao_formatada() is not None
+        assert evento.data_fim_inscricao_formatada() is not None
+        assert evento.data_inicio_evento_formatada() is not None
+        assert evento.data_fim_evento_formatada() is not None
+
+class TestEventoQueryset:
     def test_filtro_por_status(self):
         status = StatusFactory(nome='Ativo')
         EventoFactory(status=status)
@@ -159,5 +210,12 @@ class TestEventoModel:
         EventoFactory()
         assert Evento.objects.exists() is True
 
+    def test_nome_obrigatorio(self):
+        with pytest.raises(Exception):
+            EventoFactory(nome=None)
 
+    def test_str_representation(self):
+        evento = EventoFactory(nome='Evento A')
+        assert str(evento) == 'Evento A'
 
+        
