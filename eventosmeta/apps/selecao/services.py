@@ -25,12 +25,13 @@ Funcionalidades:
 - Retorno estruturado com métricas detalhadas
 """
 
+# Linha 28
 from decimal import Decimal
 from django.db import transaction
 from django.utils import timezone
 from datetime import date
 
-from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
+from apps.selecao.models import Inscricao, Classificacao, StatusInscricao, InscricaoCriterioAtendido
 from apps.eventos.models import Evento
 
 
@@ -189,7 +190,7 @@ class ClassificadorService:
         Returns:
             Decimal: Pontuação total calculada e salva
         """
-        from apps.selecao.models import InscricaoCriterioAtendido
+        # from apps.selecao.models import InscricaoCriterioAtendido  - 
         
         pontuacao_total = Decimal('0.00')
         
@@ -334,23 +335,10 @@ class ClassificadorService:
             )
 
             # RESET: Limpar status de inscricoes antes de reclassificar
-            status_listaespera = StatusInscricao.objects.get(nome='Lista de Espera')
-            Inscricao.objects.filter(evento=evento).update(status=status_listaespera)
+            status_lista_espera = StatusInscricao.objects.get(nome='Lista de Espera')
+            Inscricao.objects.filter(evento=evento).update(status=status_lista_espera)
 
-            # # Etapa 4: Atribuir posições e flags
-            # classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('nota')
-            # for idx, classificacao in enumerate(classificacoes):
-            #     classificacao.refresh_from_db()
-            #     if idx < evento.vagas:
-            #         classificacao.classificado = True
-            #         classificacao.lista_espera = False
-            #     else:
-            #         classificacao.classificado = False
-            #         classificacao.lista_espera = True
-            #     classificacao.posicao = idx + 1
-            #     classificacao.save()
-
-            
+           
             # Etapa 4: Atribuir posições e flags
             posicao = 1
             status_classificado = StatusInscricao.objects.get(nome='Classificado')
@@ -367,6 +355,7 @@ class ClassificadorService:
                 else:
                     classificacao.classificado = False
                     classificacao.lista_espera = True
+                    classificacao.inscricao.status = status_lista_espera
                 
                 classificacao.save()
                 classificacao.inscricao.save()

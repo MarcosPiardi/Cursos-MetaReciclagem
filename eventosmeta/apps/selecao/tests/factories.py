@@ -3,71 +3,60 @@ Arquivo: factories.py
 caminho: apps/selecao/tests/factories.py
 Finalidade: Definir factories para testes do app seleção.
 
-Histórico de Alterações:
-- 15/05/2026 - Inclusão de cabeçalho 
+Atualizações:
+ - 15/05/2026 - Criação do arquivo - Implementação inicial das factories para o app seleção
+ - 15/05/2026 - Inclusão de cabeçalho 
+ - 10/06/2026 - Adição de factory para StatusInscricao, Inscricao, Classificacao e InscricaoCriterioAtendido
 """
 
+
 import factory
-import hashlib
+from decimal import Decimal
 from django.utils import timezone
-from datetime import timedelta
+from factory.django import DjangoModelFactory
+from apps.selecao.models import StatusInscricao, Inscricao, Classificacao, InscricaoCriterioAtendido
+from apps.interessados.tests.factories import InteressadoFactory
+from apps.eventos.tests.factories import EventoFactory, CriterioFactory
 
-from apps.interessados.tests.factories import InteressadoFactory as BaseInteressadoFactory
-from apps.eventos.models import Evento, Status, Criterio, EventoCriterio
-from apps.eventos.tests.factories import EventoFactory, StatusFactory, CriterioFactory
-from ..models import StatusInscricao, Inscricao, Classificacao, InscricaoCriterioAtendido
-
-
-def gerar_hash_cpf(cpf):
-    """Gera um hash para o CPF."""
-    return hashlib.md5(cpf.encode()).hexdigest()
-
-
-class InteressadoFactory(BaseInteressadoFactory):
-    cpf = factory.Sequence(lambda n: f'{n:011d}')
-    cpf_hash = factory.Sequence(lambda n: gerar_hash_cpf(f'{n:011d}'))
-    email = factory.Sequence(lambda n: f'interessado{n}@teste.com')  # EMAIL SEQUENCIAL
-
-
-class StatusInscricaoFactory(factory.django.DjangoModelFactory):
+class StatusInscricaoFactory(DjangoModelFactory):
     class Meta:
         model = StatusInscricao
         django_get_or_create = ('nome',)
 
-    nome = factory.Sequence(lambda n: f'StatusInscricao {n}')
+    nome = factory.Faker('word')
     cor = factory.Faker('hex_color')
-    ordem = factory.Faker('random_int', min=0, max=10)
+    ordem = factory.Sequence(lambda n: n)
 
-
-class InscricaoFactory(factory.django.DjangoModelFactory):
+class InscricaoFactory(DjangoModelFactory):
     class Meta:
         model = Inscricao
 
     interessado = factory.SubFactory(InteressadoFactory)
     evento = factory.SubFactory(EventoFactory)
     status = factory.SubFactory(StatusInscricaoFactory, nome='Pendente')
-    data_inscricao = factory.LazyFunction(timezone.now)
+    # data_inscricao = factory.LazyFunction(timezone.now)   para evitar warning de naive datetime em testes
+    observacoes = factory.Faker('text', max_nb_chars=200)
 
-
-class ClassificacaoFactory(factory.django.DjangoModelFactory):
+class ClassificacaoFactory(DjangoModelFactory):
     class Meta:
         model = Classificacao
 
     inscricao = factory.SubFactory(InscricaoFactory)
-    pontuacao_total = factory.Faker('random_int', min=0, max=100)
-    posicao = 1
-    classificado = False
-    lista_espera = False
+    posicao = factory.Faker('random_int', min=1, max=100)
+    pontuacao_total = factory.Faker('pydecimal', left_digits=2, right_digits=2, positive=True, min_value=0, max_value=100)
+    classificado = factory.Faker('boolean')
+    lista_espera = factory.Faker('boolean')
     processado_em = factory.LazyFunction(timezone.now)
+    atualizado_em = factory.LazyFunction(timezone.now)
 
-
-class InscricaoCriterioAtendidoFactory(factory.django.DjangoModelFactory):
+class InscricaoCriterioAtendidoFactory(DjangoModelFactory):
     class Meta:
         model = InscricaoCriterioAtendido
 
     inscricao = factory.SubFactory(InscricaoFactory)
     criterio = factory.SubFactory(CriterioFactory)
     pontos_atribuidos = factory.Faker('random_int', min=1, max=20)
-    validado = False
+    validado = factory.Faker('boolean')
+    observacao_validacao = factory.Faker('sentence')
 
     

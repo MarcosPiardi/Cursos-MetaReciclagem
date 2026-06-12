@@ -654,25 +654,25 @@ App: apps
 """
 Arquivo: test_services.py
 Caminho: apps/selecao/tests/test_services.py
-Finalidade: Testar os serviços relacionados à classificação de inscrições para eventos.
-
-Histórico de Alterações:
-- 27/03/2026 - Testes iniciais de serviços
-- 08/04/2026 - Adicionados 3 testes de desempate
-- 15/05/2026 - Inclusão de cabeçalho
-- 18/05/2026 - Refatoração completa de 2 testes:
-               test_calcular_pontuacao_inscricao_zero (evento sem critérios)
-               test_desempate_misto_pontuacoes_diferentes_e_iguais (critérios com pontos diferentes)
-- 27/05/2026 - Refatoração para incluir mais cenários de teste, como classificação sem inscrições, chamada repetida e pontuação com múltiplos critérios acumulados.
-- 08/06/2026 - Refatoração para pytest (unittest → pytest)
+Finalidade: Testar os serviços relacionados à classificação de inscrições para eventos
+Atualizações:
+ - 27/03/2026 - Testes iniciais de serviços
+ - 08/04/2026 - Adicionados 3 testes de desempate
+ - 15/05/2026 - Inclusão de cabeçalho
+ - 18/05/2026 - Refatoração completa de 2 testes
+                test_calcular_pontuacao_inscricao_zero (evento sem critérios)
+                test_desempate_misto_pontuacoes_diferentes_e_iguais (critérios com pontos diferentes)
+ - 27/05/2026 - Refatoração para incluir mais cenários de teste, como classificação sem inscrições, chamada repetida e pontuação com múltiplos critérios acumulados.
+ - 08/06/2026 - Refatoração para pytest (unittest → pytest)
+ - 10/06/2026 - Refatoração completa para pytest puro com fixtures reutilizáveis
+              - Correção: adicionados status_classificado e status_lista_espera aos testes de classificação
 """
 
 import pytest
 from django.utils import timezone
 from datetime import timedelta
 from decimal import Decimal
-
-from .factories import (
+from apps.selecao.tests.factories import (
     InscricaoFactory,
     StatusInscricaoFactory,
     ClassificacaoFactory
@@ -683,301 +683,123 @@ from apps.eventos.tests.factories import (
     EventoCriterioFactory,
     CriterioFactory
 )
-
 from apps.selecao.models import Inscricao, Classificacao, InscricaoCriterioAtendido
 from apps.selecao.services import ClassificadorService
 
-@pytest.mark.django_db
-class TestClassificadorService:
-    """Testes para o serviço ClassificadorService."""
+pytestmark = pytest.mark.django_db
 
-    def setup_method(self):
-        """Configuração inicial para todos os testes."""
-        self.status_pendente = StatusInscricaoFactory(nome='Pendente')
-        self.status_classificado = StatusInscricaoFactory(nome='Classificado')
-        self.status_lista_espera = StatusInscricaoFactory(nome='Lista de Espera')
-        
-        self.evento = EventoFactory(total_vagas=5)
-        self.criterio = CriterioFactory(nome='PCD', tipo_criterio='PONTUACAO', pontos=10)
-        self.evento_criterio = EventoCriterioFactory(evento=self.evento, criterio=self.criterio)
+@pytest.fixture
+def status_pendente():
+    return StatusInscricaoFactory(nome='Pendente')
 
-    def test_calcular_pontuacao_inscricao_com_criterios(self):
-        """Deve retornar pontuação correta para inscrição com critérios."""
+@pytest.fixture
+def status_classificado():
+    return StatusInscricaoFactory(nome='Classificado')
+
+@pytest.fixture
+def status_lista_espera():
+    return StatusInscricaoFactory(nome='Lista de Espera')
+
+@pytest.fixture
+def criterio():
+    return CriterioFactory(nome='PCD', tipo_criterio='PONTUACAO', pontos=10)
+
+@pytest.fixture
+def evento(criterio):
+    evento = EventoFactory(total_vagas=5)
+    EventoCriterioFactory(evento=evento, criterio=criterio)
+    return evento
+
+class TestClassificadorServicePontuacao:
+    def test_calcular_pontuacao_inscricao_com_criterios(self, evento, status_pendente):
         interessado = InteressadoFactory()
-        inscricao = InscricaoFactory(interessado=interessado, evento=self.evento)
-        
+        inscricao = InscricaoFactory(interessado=interessado, evento=evento, status=status_pendente)
         pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
         assert pontuacao == Decimal('10.00')
 
-    def test_calcular_pontuacao_inscricao_zero(self):
-        """Deve retornar 0 pontos para inscrição sem critérios."""
-        evento_sem_criterios = EventoFactory(
-            nome='Evento Sem Critérios',
-            total_vagas=10
-        )
-        
+    def test_calcular_pontuacao_inscricao_zero(self, status_pendente):
+        evento_sem_criterios = EventoFactory(nome='Evento Sem Critérios', total_vagas=10)
         interessado = InteressadoFactory()
-        inscricao = InscricaoFactory(
-            interessado=interessado,
-            evento=evento_sem_criterios,
-            status=self.status_pendente
-        )
-        
+        inscricao = InscricaoFactory(interessado=interessado, evento=evento_sem_criterios, status=status_pendente)
         pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
         assert pontuacao == Decimal('0')
 
-    def test_classificar_evento_atribui_posicoes(self):
-        """Deve atribuir posições ordinais corretas."""
+    def test_calcular_pontuacao_multiplos_criterios(self, status_pendente):
+        evento = EventoFactory(total_vagas=5)
+        criterio1 = CriterioFactory(nome='Criterio1', tipo_criterio='PONTUACAO', pontos=10)
+        criterio2 = CriterioFactory(nome='Criterio2', tipo_criterio='PONTUACAO', pontos=20)
+        EventoCriterioFactory(evento=evento, criterio=criterio1)
+        EventoCriterioFactory(evento=evento, criterio=criterio2)
+        interessado = InteressadoFactory()
+        inscricao = InscricaoFactory(evento=evento, interessado=interessado, status=status_pendente)
+        InscricaoCriterioAtendido.objects.create(inscricao=inscricao, criterio=criterio1, pontos_atribuidos=Decimal('10.00'), validado=True)
+        InscricaoCriterioAtendido.objects.create(inscricao=inscricao, criterio=criterio2, pontos_atribuidos=Decimal('20.00'), validado=True)
+        pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
+        assert pontuacao == Decimal('30.00')
+
+    def test_classificar_sem_eventocriterio_vinculado(self, status_pendente):
+        evento = EventoFactory(total_vagas=5)
+        CriterioFactory(nome='Criterio', tipo_criterio='PONTUACAO', pontos=10)
+        inscricao = InscricaoFactory(evento=evento, status=status_pendente)
+        pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
+        assert pontuacao == Decimal('0.00')
+
+class TestClassificadorServiceClassificacao:
+    def test_classificar_evento_atribui_posicoes(self, evento, status_pendente, status_classificado, status_lista_espera):
         for i in range(3):
-            InscricaoFactory(evento=self.evento, status=self.status_pendente)
-        
-        resultado = ClassificadorService.classificar_evento(self.evento)
+            InscricaoFactory(evento=evento, status=status_pendente)
+        resultado = ClassificadorService.classificar_evento(evento)
         assert resultado['sucesso'] is True
-        
-        classificacoes = Classificacao.objects.filter(
-            inscricao__evento=self.evento
-        ).order_by('posicao')
-        
+        classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
         assert classificacoes[0].posicao == 1
         assert classificacoes[1].posicao == 2
         assert classificacoes[2].posicao == 3
 
-    def test_classificar_evento_classifica_dentro_vagas(self):
-        """Candidatos dentro das vagas devem ser classificados."""
+    def test_classificar_evento_classifica_dentro_vagas(self, status_pendente, status_classificado, status_lista_espera, criterio):
         evento = EventoFactory(total_vagas=2)
-        EventoCriterioFactory(evento=evento, criterio=self.criterio)
-        
-        InscricaoFactory(evento=evento, status=self.status_pendente)
-        InscricaoFactory(evento=evento, status=self.status_pendente)
-        
+        EventoCriterioFactory(evento=evento, criterio=criterio)
+        InscricaoFactory(evento=evento, status=status_pendente)
+        InscricaoFactory(evento=evento, status=status_pendente)
         ClassificadorService.classificar_evento(evento)
-        
-        classificacoes = Classificacao.objects.filter(
-            inscricao__evento=evento
-        ).order_by('posicao')
-        
+        classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
         assert classificacoes[0].classificado is True
         assert classificacoes[1].classificado is True
 
-    def test_classificar_evento_lista_espera(self):
-        """Candidatos excedentes devem ficar em lista de espera."""
+    def test_classificar_evento_lista_espera(self, status_pendente, status_classificado, status_lista_espera, criterio):
         evento = EventoFactory(total_vagas=2)
-        EventoCriterioFactory(evento=evento, criterio=self.criterio)
-        
-        InscricaoFactory(evento=evento, status=self.status_pendente)
-        InscricaoFactory(evento=evento, status=self.status_pendente)
-        InscricaoFactory(evento=evento, status=self.status_pendente)
-        
+        EventoCriterioFactory(evento=evento, criterio=criterio)
+        InscricaoFactory(evento=evento, status=status_pendente)
+        InscricaoFactory(evento=evento, status=status_pendente)
+        InscricaoFactory(evento=evento, status=status_pendente)
         ClassificadorService.classificar_evento(evento)
-        
-        classificacoes = Classificacao.objects.filter(
-            inscricao__evento=evento
-        ).order_by('posicao')
-        
+        classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
         assert classificacoes[2].classificado is False
         assert classificacoes[2].lista_espera is True
 
-    def test_classificar_evento_atualiza_status_inscricao(self):
-        """Deve atualizar status de inscrição para 'Classificado'."""
-        inscricao = InscricaoFactory(evento=self.evento, status=self.status_pendente)
-        
-        ClassificadorService.classificar_evento(self.evento)
-        
+    def test_classificar_evento_atualiza_status_inscricao(self, evento, status_pendente, status_classificado, status_lista_espera):
+        inscricao = InscricaoFactory(evento=evento, status=status_pendente)
+        ClassificadorService.classificar_evento(evento)
         inscricao.refresh_from_db()
         assert inscricao.status.nome == 'Classificado'
 
-    def test_classificar_evento_com_criterios(self):
-        """Deve retornar dict com sucesso e mensagem."""
-        InscricaoFactory(evento=self.evento, status=self.status_pendente)
-        
-        resultado = ClassificadorService.classificar_evento(self.evento)
-        
+    def test_classificar_evento_com_criterios(self, evento, status_pendente, status_classificado, status_lista_espera):
+        InscricaoFactory(evento=evento, status=status_pendente)
+        resultado = ClassificadorService.classificar_evento(evento)
         assert resultado['sucesso'] is True
         assert 'mensagem' in resultado
         assert 'total_processadas' in resultado
 
-    def test_desempate_por_data_inscricao_igual_pontuacao(self):
-        """Desempate deve usar data de inscrição (FIFO) quando pontuações são iguais."""
-        evento = EventoFactory(total_vagas=5)
-        EventoCriterioFactory(evento=evento, criterio=self.criterio)
-        
-        inscricao_primeira = InscricaoFactory(
-            evento=evento,
-            status=self.status_pendente,
-            data_inscricao=timezone.now() - timedelta(minutes=2)
-        )
-        
-        inscricao_segunda = InscricaoFactory(
-            evento=evento,
-            status=self.status_pendente,
-            data_inscricao=timezone.now() - timedelta(minutes=1)
-        )
-        
-        ClassificadorService.classificar_evento(evento)
-        
-        classificacoes = Classificacao.objects.filter(
-            inscricao__evento=evento
-        ).order_by('posicao')
-        
-        assert classificacoes[0].inscricao == inscricao_primeira
-        assert classificacoes[0].posicao == 1
-        assert classificacoes[1].inscricao == inscricao_segunda
-        assert classificacoes[1].posicao == 2
-
-    def test_desempate_com_lista_espera(self):
-        """Desempate por timestamp deve funcionar mesmo em lista de espera."""
-        evento = EventoFactory(total_vagas=1)
-        EventoCriterioFactory(evento=evento, criterio=self.criterio)
-        
-        inscricao_primeira = InscricaoFactory(
-            evento=evento,
-            status=self.status_pendente,
-            data_inscricao=timezone.now() - timedelta(minutes=2)
-        )
-        
-        inscricao_segunda = InscricaoFactory(
-            evento=evento,
-            status=self.status_pendente,
-            data_inscricao=timezone.now() - timedelta(minutes=1)
-        )
-        
-        ClassificadorService.classificar_evento(evento)
-        
-        classificacoes = Classificacao.objects.filter(
-            inscricao__evento=evento
-        ).order_by('posicao')
-        
-        assert classificacoes[0].classificado is True
-        assert classificacoes[0].lista_espera is False
-        
-        assert classificacoes[1].classificado is False
-        assert classificacoes[1].lista_espera is True
-
-    def test_desempate_misto_pontuacoes_diferentes_e_iguais(self):
-        """Deve classificar corretamente com pontuações diferentes e desempatar pela data."""
-        evento = EventoFactory(nome='Evento Desempate Misto', total_vagas=4)
-        
-        criterio_pcd = CriterioFactory(
-            nome='Pessoa com Deficiência',
-            pontos=30,
-            tipo_criterio='PONTUACAO',
-            categoria='PCD'
-        )
-        criterio_nis = CriterioFactory(
-            nome='Programa Social',
-            pontos=25,
-            tipo_criterio='PONTUACAO',
-            categoria='NIS'
-        )
-        criterio_cota = CriterioFactory(
-            nome='Cota Racial',
-            pontos=10,
-            tipo_criterio='PONTUACAO',
-            categoria='COTA_RACIAL'
-        )
-        
-        EventoCriterioFactory(evento=evento, criterio=criterio_pcd, prioridade=1, ativo=True)
-        EventoCriterioFactory(evento=evento, criterio=criterio_nis, prioridade=2, ativo=True)
-        EventoCriterioFactory(evento=evento, criterio=criterio_cota, prioridade=3, ativo=True)
-        
-        interessado_top = InteressadoFactory(
-            nome='Interessado Top',
-            necessidades_especiais=True,
-            programa_social=False,
-            fototipo=None
-        )
-        inscricao_top = InscricaoFactory(
-            interessado=interessado_top,
-            evento=evento,
-            status=self.status_pendente,
-            data_inscricao=timezone.now() - timedelta(minutes=5)
-        )
-        
-        interessado_meio = InteressadoFactory(
-            nome='Interessado Meio',
-            necessidades_especiais=True,
-            programa_social=True,
-            fototipo=None
-        )
-        inscricao_meio = InscricaoFactory(
-            interessado=interessado_meio,
-            evento=evento,
-            status=self.status_pendente,
-            data_inscricao=timezone.now() - timedelta(minutes=2)
-        )
-        
-        interessado_empate_a = InteressadoFactory(
-            nome='Empate A',
-            necessidades_especiais=False,
-            programa_social=True,
-            fototipo=None
-        )
-        inscricao_empate_a = InscricaoFactory(
-            interessado=interessado_empate_a,
-            evento=evento,
-            status=self.status_pendente,
-            data_inscricao=timezone.now() - timedelta(minutes=4)
-        )
-        
-        interessado_empate_b = InteressadoFactory(
-            nome='Empate B',
-            necessidades_especiais=False,
-            programa_social=True,
-            fototipo=None
-        )
-        inscricao_empate_b = InscricaoFactory(
-            interessado=interessado_empate_b,
-            evento=evento,
-            status=self.status_pendente,
-            data_inscricao=timezone.now() - timedelta(minutes=3)
-        )
-        
-        ClassificadorService.classificar_evento(evento)
-        
-        classificacoes = Classificacao.objects.filter(
-            inscricao__evento=evento
-        ).order_by('posicao')
-        
-        assert classificacoes.count() == 4
-        
-        assert classificacoes[0].inscricao == inscricao_meio
-        assert classificacoes[0].pontuacao_total == Decimal('55.00')
-        assert classificacoes[0].posicao == 1
-
-        assert classificacoes[1].inscricao == inscricao_top
-        assert classificacoes[1].pontuacao_total == Decimal('30.00')
-        assert classificacoes[1].posicao == 2
-
-        assert classificacoes[2].inscricao == inscricao_empate_a
-        assert classificacoes[2].pontuacao_total == Decimal('25.00')
-        assert classificacoes[2].posicao == 3
-
-        assert classificacoes[3].inscricao == inscricao_empate_b
-        assert classificacoes[3].pontuacao_total == Decimal('25.00')
-        assert classificacoes[3].posicao == 4
-
-    def test_processar_inscricao_cria_classificacao(self):
-        """Deve criar Classificacao ao processar inscrição."""
-        inscricao = InscricaoFactory(evento=self.evento)
-        
-        ClassificadorService.processar_inscricao(inscricao)
-        
-        classificacao = Classificacao.objects.get(inscricao=inscricao)
-        assert classificacao.pontuacao_total == Decimal('10.00')
-
-    def test_classificar_evento_zero_inscricoes(self):
-        """Testa classificacao de evento sem inscricoes."""
+    def test_classificar_evento_zero_inscricoes(self, status_classificado, status_lista_espera):
         evento = EventoFactory(total_vagas=5)
         resultado = ClassificadorService.classificar_evento(evento)
         assert resultado['sucesso'] is False
         assert resultado['total_processadas'] == 0
         assert Classificacao.objects.filter(inscricao__evento=evento).count() == 0
 
-    def test_classificar_evento_chamada_repetida(self):
-        """Testa que chamar classificar duas vezes nao duplica."""
+    def test_classificar_evento_chamada_repetida(self, status_pendente, status_classificado, status_lista_espera):
         evento = EventoFactory(total_vagas=5)
         for i in range(3):
-            InscricaoFactory(evento=evento, status=self.status_pendente)
+            InscricaoFactory(evento=evento, status=status_pendente)
         ClassificadorService.classificar_evento(evento)
         ClassificadorService.classificar_evento(evento)
         classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
@@ -986,44 +808,14 @@ class TestClassificadorService:
         assert classificacoes[1].posicao == 2
         assert classificacoes[2].posicao == 3
 
-    def test_calcular_pontuacao_multiplos_criterios(self):
-        """Testa pontuacao com 2 criterios acumulados (10+20=30)."""
-        evento = EventoFactory(total_vagas=5)
-        criterio1 = CriterioFactory(nome='Criterio1', tipo_criterio='PONTUACAO', pontos=10)
-        criterio2 = CriterioFactory(nome='Criterio2', tipo_criterio='PONTUACAO', pontos=20)
-        EventoCriterioFactory(evento=evento, criterio=criterio1)
-        EventoCriterioFactory(evento=evento, criterio=criterio2)
-        interessado = InteressadoFactory()
-        inscricao = InscricaoFactory(evento=evento, interessado=interessado, status=self.status_pendente)
-        InscricaoCriterioAtendido.objects.create(inscricao=inscricao, 
-                                                 criterio=criterio1,
-                                                 pontos_atribuidos=Decimal('10.00'),
-                                                 validado=True)
-        InscricaoCriterioAtendido.objects.create(inscricao=inscricao, 
-                                                 criterio=criterio2,
-                                                 pontos_atribuidos=Decimal('20.00'),
-                                                 validado=True)
-        
-        pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
-        assert pontuacao == Decimal('30.00')
-
-    def test_classificar_evento_exatamente_1_vaga(self):
-        """Testa classificacao com apenas 1 vaga e 3 inscricoes."""
+    def test_classificar_evento_exatamente_1_vaga(self, status_pendente, status_classificado, status_lista_espera):
         evento = EventoFactory(total_vagas=1)
         criterio = CriterioFactory(nome='Criterio', tipo_criterio='PONTUACAO', pontos=5)
         EventoCriterioFactory(evento=evento, criterio=criterio)
         inscricoes = []
         for i in range(3):
-            insc = InscricaoFactory(
-                evento=evento,
-                status=self.status_pendente,
-                data_inscricao=timezone.now() + timedelta(hours=i)
-            )
-            InscricaoCriterioAtendido.objects.create(inscricao=insc, 
-                                                     criterio=criterio, 
-                                                     pontos_atribuidos=Decimal('5.00'),
-                                                     validado=True)
-            
+            insc = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=timezone.now() + timedelta(hours=i))
+            InscricaoCriterioAtendido.objects.create(inscricao=insc, criterio=criterio, pontos_atribuidos=Decimal('5.00'), validado=True)
             inscricoes.append(insc)
         ClassificadorService.classificar_evento(evento)
         classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
@@ -1034,16 +826,69 @@ class TestClassificadorService:
         assert classificacoes[2].classificado is False
         assert classificacoes[2].lista_espera is True
 
-    def test_classificar_sem_eventocriterio_vinculado(self):
-        """Testa pontuacao zero quando criterio existe mas nao vinculado."""
+class TestClassificadorServiceDesempate:
+    def test_desempate_por_data_inscricao_igual_pontuacao(self, status_pendente, status_classificado, status_lista_espera, criterio):
         evento = EventoFactory(total_vagas=5)
-        CriterioFactory(nome='Criterio', tipo_criterio='PONTUACAO', pontos=10)
-        inscricao = InscricaoFactory(evento=evento, status=self.status_pendente)
-        pontuacao = ClassificadorService.calcular_pontuacao_inscricao(inscricao)
-        assert pontuacao == Decimal('0.00')
+        EventoCriterioFactory(evento=evento, criterio=criterio)
+        inscricao_primeira = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=2))
+        inscricao_segunda = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=1))
+        ClassificadorService.classificar_evento(evento)
+        classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
+        assert classificacoes[0].inscricao == inscricao_primeira
+        assert classificacoes[0].posicao == 1
+        assert classificacoes[1].inscricao == inscricao_segunda
+        assert classificacoes[1].posicao == 2
 
+    def test_desempate_com_lista_espera(self, status_pendente, status_classificado, status_lista_espera, criterio):
+        evento = EventoFactory(total_vagas=1)
+        EventoCriterioFactory(evento=evento, criterio=criterio)
+        inscricao_primeira = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=2))
+        inscricao_segunda = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=1))
+        ClassificadorService.classificar_evento(evento)
+        classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
+        assert classificacoes[0].classificado is True
+        assert classificacoes[0].lista_espera is False
+        assert classificacoes[1].classificado is False
+        assert classificacoes[1].lista_espera is True
 
+    def test_desempate_misto_pontuacoes_diferentes_e_iguais(self, status_pendente, status_classificado, status_lista_espera):
+        evento = EventoFactory(nome='Evento Desempate Misto', total_vagas=4)
+        criterio_pcd = CriterioFactory(nome='Pessoa com Deficiência', pontos=30, tipo_criterio='PONTUACAO', categoria='PCD')
+        criterio_nis = CriterioFactory(nome='Programa Social', pontos=25, tipo_criterio='PONTUACAO', categoria='NIS')
+        criterio_cota = CriterioFactory(nome='Cota Racial', pontos=10, tipo_criterio='PONTUACAO', categoria='COTA_RACIAL')
+        EventoCriterioFactory(evento=evento, criterio=criterio_pcd, prioridade=1, ativo=True)
+        EventoCriterioFactory(evento=evento, criterio=criterio_nis, prioridade=2, ativo=True)
+        EventoCriterioFactory(evento=evento, criterio=criterio_cota, prioridade=3, ativo=True)
+        interessado_top = InteressadoFactory(nome='Interessado Top', necessidades_especiais=True, programa_social=False, fototipo=None)
+        inscricao_top = InscricaoFactory(interessado=interessado_top, evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=5))
+        interessado_meio = InteressadoFactory(nome='Interessado Meio', necessidades_especiais=True, programa_social=True, fototipo=None)
+        inscricao_meio = InscricaoFactory(interessado=interessado_meio, evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=2))
+        interessado_empate_a = InteressadoFactory(nome='Empate A', necessidades_especiais=False, programa_social=True, fototipo=None)
+        inscricao_empate_a = InscricaoFactory(interessado=interessado_empate_a, evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=4))
+        interessado_empate_b = InteressadoFactory(nome='Empate B', necessidades_especiais=False, programa_social=True, fototipo=None)
+        inscricao_empate_b = InscricaoFactory(interessado=interessado_empate_b, evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=3))
+        ClassificadorService.classificar_evento(evento)
+        classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
+        assert classificacoes.count() == 4
+        assert classificacoes[0].inscricao == inscricao_meio
+        assert classificacoes[0].pontuacao_total == Decimal('55.00')
+        assert classificacoes[0].posicao == 1
+        assert classificacoes[1].inscricao == inscricao_top
+        assert classificacoes[1].pontuacao_total == Decimal('30.00')
+        assert classificacoes[1].posicao == 2
+        assert classificacoes[2].inscricao == inscricao_empate_a
+        assert classificacoes[2].pontuacao_total == Decimal('25.00')
+        assert classificacoes[2].posicao == 3
+        assert classificacoes[3].inscricao == inscricao_empate_b
+        assert classificacoes[3].pontuacao_total == Decimal('25.00')
+        assert classificacoes[3].posicao == 4
 
+class TestClassificadorServiceProcessamento:
+    def test_processar_inscricao_cria_classificacao(self, evento):
+        inscricao = InscricaoFactory(evento=evento)
+        ClassificadorService.processar_inscricao(inscricao)
+        classificacao = Classificacao.objects.get(inscricao=inscricao)
+        assert classificacao.pontuacao_total == Decimal('10.00')
 
 
 
@@ -5307,24 +5152,32 @@ App: apps
 ==============================
 """
 Arquivo: test_models_evento.py
-caminho: apps/eventos/tests/test_models_evento.py
-Finalidade: Testes dos modelos do app eventos.
+Caminho: apps/eventos/tests/test_models_evento.py
+Finalidade: Testes dos modelos Evento do app eventos (CRUD, validações, métodos)
 Atualizações:
  - 03/06/2026 - Criação do arquivo com testes básicos para os modelos do app eventos, utilizando pytest e factories.
+ - 09/06/2026 - Refatoração completa para pytest puro e adição de 5 testes de métodos
 """
 
 
 import pytest
-from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
+from django.core.exceptions import ValidationError
 from apps.eventos.models import Evento
-from apps.eventos.tests.factories import EventoFactory, StatusFactory, TurmaFactory, CriterioFactory
-from django.test import TestCase
-from apps.eventos.tests.factories import EventoFactory, EventoCriterioFactory, TurmaFactory
+from apps.eventos.tests.factories import EventoFactory, StatusFactory, TurmaFactory, EventoCriterioFactory
 
-@pytest.mark.django_db
-class TestEventoModel:
+pytestmark = pytest.mark.django_db
+
+@pytest.fixture
+def status_ativo():
+    return StatusFactory(nome="Ativo")
+
+@pytest.fixture
+def evento_padrao(status_ativo):
+    return EventoFactory(status=status_ativo)
+
+class TestEventoCRUD:
     def test_criar_evento_valido(self):
         evento = EventoFactory()
         assert Evento.objects.count() == 1
@@ -5350,20 +5203,30 @@ class TestEventoModel:
         EventoFactory.create_batch(5)
         assert Evento.objects.count() == 5
 
+class TestEventoValidacoes:
     def test_data_inicio_inscricao_antes_fim_inscricao(self):
-        evento = EventoFactory.build(data_inicio_inscricao=timezone.now(), data_fim_inscricao=timezone.now() - timedelta(days=1))
+        evento = EventoFactory.build(
+            data_inicio_inscricao=timezone.now(),
+            data_fim_inscricao=timezone.now() - timedelta(days=1)
+        )
         with pytest.raises(ValidationError):
-            evento.full_clean()
+            evento.clean()
 
     def test_data_fim_inscricao_antes_inicio_evento(self):
-        evento = EventoFactory.build(data_fim_inscricao=timezone.now(), data_inicio_evento=timezone.now() - timedelta(days=1))
+        evento = EventoFactory.build(
+            data_fim_inscricao=timezone.now(),
+            data_inicio_evento=timezone.now() - timedelta(days=1)
+        )
         with pytest.raises(ValidationError):
-            evento.full_clean()
+            evento.clean()
 
     def test_data_inicio_evento_antes_fim_evento(self):
-        evento = EventoFactory.build(data_inicio_evento=timezone.now(), data_fim_evento=timezone.now() - timedelta(days=1))
+        evento = EventoFactory.build(
+            data_inicio_evento=timezone.now(),
+            data_fim_evento=timezone.now() - timedelta(days=1)
+        )
         with pytest.raises(ValidationError):
-            evento.full_clean()
+            evento.clean()
 
     def test_datas_validas_factory(self):
         evento = EventoFactory()
@@ -5385,6 +5248,7 @@ class TestEventoModel:
         evento = EventoFactory(total_vagas=0)
         assert evento.total_vagas == 0
 
+class TestEventoStatus:
     def test_evento_com_status(self):
         status = StatusFactory()
         evento = EventoFactory(status=status)
@@ -5414,6 +5278,7 @@ class TestEventoModel:
         EventoCriterioFactory.create_batch(3, evento=evento)
         assert evento.evento_criterios.count() == 3
 
+class TestEventoTimestamps:
     def test_evento_sem_criterios(self):
         evento = EventoFactory()
         assert evento.evento_criterios.count() == 0
@@ -5440,14 +5305,45 @@ class TestEventoModel:
         evento.save()
         assert evento.atualizado_em > old_updated
 
-    def test_str_representation(self):
-        evento = EventoFactory(nome='Evento A')
-        assert str(evento) == 'Evento A'
+class TestEventoMetodos:
+    def test_inscricoes_abertas(self):
+        evento = EventoFactory(
+            data_inicio_inscricao=timezone.now() - timedelta(days=1),
+            data_fim_inscricao=timezone.now() + timedelta(days=1)
+        )
+        assert evento.inscricoes_abertas() is True
 
-    def test_nome_obrigatorio(self):
-        with pytest.raises(Exception):
-            EventoFactory(nome=None)
+    def test_inscricoes_fechadas(self):
+        evento = EventoFactory(
+            data_inicio_inscricao=timezone.now() - timedelta(days=10),
+            data_fim_inscricao=timezone.now() - timedelta(days=1)
+        )
+        assert evento.inscricoes_abertas() is False
 
+    def test_validacao_datas_inscricao(self):
+        evento = EventoFactory.build(
+            data_inicio_inscricao=timezone.now() + timedelta(days=2),
+            data_fim_inscricao=timezone.now() + timedelta(days=1)
+        )
+        with pytest.raises(ValidationError):
+            evento.full_clean()
+
+    def test_validacao_datas_evento(self):
+        evento = EventoFactory.build(
+            data_inicio_evento=(timezone.now() + timedelta(days=2)).date(),
+            data_fim_evento=(timezone.now() + timedelta(days=1)).date()
+        )
+        with pytest.raises(ValidationError):
+            evento.full_clean()
+
+    def test_formatacao_datas(self):
+        evento = EventoFactory()
+        assert evento.data_inicio_inscricao_formatada() is not None
+        assert evento.data_fim_inscricao_formatada() is not None
+        assert evento.data_inicio_evento_formatada() is not None
+        assert evento.data_fim_evento_formatada() is not None
+
+class TestEventoQueryset:
     def test_filtro_por_status(self):
         status = StatusFactory(nome='Ativo')
         EventoFactory(status=status)
@@ -5466,9 +5362,15 @@ class TestEventoModel:
         EventoFactory()
         assert Evento.objects.exists() is True
 
+    def test_nome_obrigatorio(self):
+        with pytest.raises(Exception):
+            EventoFactory(nome=None)
 
+    def test_str_representation(self):
+        evento = EventoFactory(nome='Evento A')
+        assert str(evento) == 'Evento A'
 
-
+        
 
 ==============================
 Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\test_models_evento_expanded.py
@@ -5820,6 +5722,69 @@ class TestTurmaModel:
 
 
 
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\dashboard\tests\test_services.py
+App: apps
+==============================
+"""
+Arquivo: test_services.py
+Caminho: apps/dashboard/tests/test_services.py
+Finalidade: Testes para os serviços de dashboard.
+
+Atualizações:
+  - 10/06/2026 - Criação do arquivo - Implementação inicial dos testes de serviços de dashboard
+  - 11/06/2026 - Refatorado após leitura de todos os models.py do projeto
+ """
+
+
+from django.test import TestCase
+from apps.interessados.models import Sexo, Fototipo, Interessado
+from apps.interessados.tests.factories import InteressadoFactory
+from apps.academico.models import StatusMatricula, Matricula, Avaliacao
+from apps.academico.tests.factories import MatriculaFactory, AvaliacaoFactory
+from apps.eventos.models import Status, Evento, Turma, Criterio, EventoCriterio
+from apps.eventos.tests.factories import EventoFactory, TurmaFactory
+from apps.selecao.models import StatusInscricao, Inscricao, Classificacao
+from apps.selecao.tests.factories import InscricaoFactory, ClassificacaoFactory
+from apps.dashboard.services import DashboardInteressadosService, DashboardEventosService, DashboardAcademicoService, DashboardProcessoSeletivoService
+
+class TestDashboardInteressadosService(TestCase):
+    def setUp(self):
+        self.service = DashboardInteressadosService()
+    def test_get_total_interessados(self): [InteressadoFactory() for _ in range(3)]; self.assertEqual(self.service.get_total_interessados(), 3)
+    def test_get_interessados_por_sexo(self): self.assertIsInstance(self.service.get_interessados_por_sexo(), dict)
+    def test_get_interessados_por_fototipo(self): self.assertIsInstance(self.service.get_interessados_por_fototipo(), dict)
+    def test_get_novos_interessados_mes(self): self.assertIsInstance(self.service.get_novos_interessados_mes(), int)
+    def test_get_taxa_conversao(self): self.assertIsInstance(self.service.get_taxa_conversao(), float)
+    def test_get_interessados_ativos(self): self.assertIsInstance(self.service.get_interessados_ativos(), list)
+    def test_get_interessados_inativos(self): self.assertIsInstance(self.service.get_interessados_inativos(), list)
+    def test_get_distribuicao_idade(self): self.assertIsInstance(self.service.get_distribuicao_idade(), dict)
+    def test_get_resumo_geral(self): self.assertIsInstance(self.service.get_resumo_geral(), dict)
+
+class TestDashboardEventosService(TestCase):
+    def setUp(self): self.service = DashboardEventosService()
+    def test_get_total_eventos(self): [EventoFactory() for _ in range(2)]; self.assertEqual(self.service.get_total_eventos(), 2)
+    def test_get_eventos_por_status(self): self.assertIsInstance(self.service.get_eventos_por_status(), dict)
+    def test_get_turmas_ativas(self): [TurmaFactory() for _ in range(2)]; self.assertIsInstance(self.service.get_turmas_ativas(), list)
+    def test_get_proximos_eventos(self): self.assertIsInstance(self.service.get_proximos_eventos(), list)
+    def test_get_ocupacao_turmas(self): self.assertIsInstance(self.service.get_ocupacao_turmas(), dict)
+
+class TestDashboardAcademicoService(TestCase):
+    def setUp(self): self.service = DashboardAcademicoService()
+    def test_get_total_matriculas(self): [MatriculaFactory() for _ in range(3)]; self.assertEqual(self.service.get_total_matriculas(), 3)
+    def test_get_media_notas(self): [AvaliacaoFactory(frequencia=80) for _ in range(2)]; self.assertIsInstance(self.service.get_media_notas(), float)
+    def test_get_matriculas_por_status(self): self.assertIsInstance(self.service.get_matriculas_por_status(), dict)
+    def test_get_evasao_escolar(self): self.assertIsInstance(self.service.get_evasao_escolar(), float)
+
+class TestDashboardProcessoSeletivoService(TestCase):
+    def setUp(self): self.service = DashboardProcessoSeletivoService()
+    def test_get_total_inscricoes(self): [InscricaoFactory() for _ in range(4)]; self.assertEqual(self.service.get_total_inscricoes(), 4)
+    def test_get_inscricoes_por_status(self): self.assertIsInstance(self.service.get_inscricoes_por_status(), dict)
+    def test_get_classificacao_final(self): [ClassificacaoFactory() for _ in range(2)]; self.assertIsInstance(self.service.get_classificacao_final(), list)
+    def test_get_taxa_aprovacao(self): self.assertIsInstance(self.service.get_taxa_aprovacao(), float)
+
+    
 
 ==============================
 Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\dashboard\tests\test_utils_pdf.py
@@ -8323,10 +8288,667 @@ from django.test import TestCase
 # Create your tests here.
 
 
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao\tests\factories.py
+App: apps
+==============================
+"""
+Arquivo: factories.py
+caminho: apps/selecao/tests/factories.py
+Finalidade: Definir factories para testes do app seleção.
+
+Atualizações:
+ - 15/05/2026 - Criação do arquivo - Implementação inicial das factories para o app seleção
+ - 15/05/2026 - Inclusão de cabeçalho 
+ - 10/06/2026 - Adição de factory para StatusInscricao, Inscricao, Classificacao e InscricaoCriterioAtendido
+"""
+
+
+import factory
+from decimal import Decimal
+from django.utils import timezone
+from factory.django import DjangoModelFactory
+from apps.selecao.models import StatusInscricao, Inscricao, Classificacao, InscricaoCriterioAtendido
+from apps.interessados.tests.factories import InteressadoFactory
+from apps.eventos.tests.factories import EventoFactory, CriterioFactory
+
+class StatusInscricaoFactory(DjangoModelFactory):
+    class Meta:
+        model = StatusInscricao
+        django_get_or_create = ('nome',)
+
+    nome = factory.Faker('word')
+    cor = factory.Faker('hex_color')
+    ordem = factory.Sequence(lambda n: n)
+
+class InscricaoFactory(DjangoModelFactory):
+    class Meta:
+        model = Inscricao
+
+    interessado = factory.SubFactory(InteressadoFactory)
+    evento = factory.SubFactory(EventoFactory)
+    status = factory.SubFactory(StatusInscricaoFactory, nome='Pendente')
+    data_inscricao = factory.LazyFunction(timezone.now)
+    observacoes = factory.Faker('text', max_nb_chars=200)
+
+class ClassificacaoFactory(DjangoModelFactory):
+    class Meta:
+        model = Classificacao
+
+    inscricao = factory.SubFactory(InscricaoFactory)
+    posicao = factory.Faker('random_int', min=1, max=100)
+    pontuacao_total = factory.Faker('pydecimal', left_digits=2, right_digits=2, positive=True, min_value=0, max_value=100)
+    classificado = factory.Faker('boolean')
+    lista_espera = factory.Faker('boolean')
+    processado_em = factory.LazyFunction(timezone.now)
+    atualizado_em = factory.LazyFunction(timezone.now)
+
+class InscricaoCriterioAtendidoFactory(DjangoModelFactory):
+    class Meta:
+        model = InscricaoCriterioAtendido
+
+    inscricao = factory.SubFactory(InscricaoFactory)
+    criterio = factory.SubFactory(CriterioFactory)
+    pontos_atribuidos = factory.Faker('random_int', min=1, max=20)
+    validado = factory.Faker('boolean')
+    observacao_validacao = factory.Faker('sentence')
+
+    
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\tests\factory.py
+App: apps
+==============================
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\tests\factories.py
+App: apps
+==============================
+"""
+factories.py - Factory Boy para app interessados
+
+Gera Interessado com dados realistas (CPFs válidos, nomes PT-BR).
+Baseado em models.py: EncryptedCharField para CPF/NIS, choices para escolaridade/status.
+
+Instale: pip install factory-boy faker
+"""
+
+import factory
+from factory.fuzzy import FuzzyChoice
+from faker import Faker
+from django.utils import timezone
+
+from datetime import timedelta
+from ..models import Interessado, Sexo, Fototipo, PasswordResetToken, gerar_hash_cpf
+
+fake = Faker('pt_BR')
+
+
+class SexoFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Sexo
+        django_get_or_create = ('nome',)  # ← ADICIONADO 18/05/2026: evita duplicatas
+
+    nome = factory.Iterator(['Masculino', 'Feminino', 'Outro'])
+
+
+class FototipoFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Fototipo
+        django_get_or_create = ('nome',)  # ← ADICIONADO 18/05/2026: evita duplicatas
+
+    nome = factory.Iterator(['Tipo I', 'Tipo II', 'Tipo III', 'Tipo IV', 'Tipo V', 'Tipo VI'])
+    descricao = factory.Faker('sentence', nb_words=5)
+
+
+class InteressadoFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Interessado
+        skip_postgeneration_save = True
+
+    nome = factory.LazyAttribute(lambda obj: fake.first_name() + ' ' + fake.last_name())
+    
+    # ✅ FIX: CPF DINÂMICO (único por factory)
+    cpf = factory.LazyAttribute(lambda obj: f"{fake.numerify('###.###.###-##')}")
+    
+    # ✅ FIX: cpf_hash gerado do CPF dinâmico
+    cpf_hash = factory.LazyAttribute(lambda obj: gerar_hash_cpf(obj.cpf.replace('.', '').replace('-', '')))
+
+    rg = factory.LazyAttribute(lambda obj: f"{fake.numerify('##.###.###-#')}")
+    data_nascimento = factory.LazyAttribute(lambda obj: fake.date_of_birth(minimum_age=18, maximum_age=65))
+    
+    sexo = factory.SubFactory(SexoFactory)
+    cidade_nascimento = 'São Paulo'
+    uf_nascimento = 'SP'
+    nacionalidade = 'Brasileira'
+    fototipo = factory.SubFactory(FototipoFactory)
+    
+    escolaridade = FuzzyChoice([
+        'FUNDAMENTAL_COMPLETO', 'MEDIO_COMPLETO',
+        'SUPERIOR_INCOMPLETO', 'SUPERIOR_COMPLETO'
+    ])
+
+    # Endereço
+    cep = factory.LazyAttribute(lambda obj: fake.numerify('########'))  # 8 dígitos
+    endereco_residencial = factory.LazyAttribute(lambda obj: fake.street_name())
+    num_endereco = factory.LazyAttribute(lambda obj: fake.numerify('###'))
+    bairro = factory.LazyAttribute(lambda obj: fake.city())
+    complemento = ''
+    cidade_residencia = 'São Paulo'
+    uf_residencia = 'SP'
+
+    # Contato
+    telefone = factory.LazyAttribute(lambda obj: fake.numerify('##########'))  # 10 dígitos
+    celular = factory.LazyAttribute(lambda obj: fake.numerify('###########'))  # 11 dígitos
+    email = factory.LazyAttribute(lambda obj: f'{fake.user_name()}@teste.com')
+
+    # Programa social
+    programa_social = False
+    num_nis = factory.LazyAttribute(lambda obj: fake.numerify('###.#####.##-#'))
+
+    # PCD
+    necessidades_especiais = False
+    pcd_fisica = False
+    pcd_visual = False
+    pcd_auditiva = False
+    pcd_intelectual = False
+    pcd_psicossocial = False
+    pcd_multiplas = False
+
+    # Responsável
+    nome_responsavel = factory.LazyAttribute(lambda obj: fake.first_name() + ' ' + fake.last_name())
+    telefone_responsavel = factory.LazyAttribute(lambda obj: fake.numerify('##########'))
+    celular_responsavel = factory.LazyAttribute(lambda obj: fake.numerify('###########'))
+    email_responsavel = factory.LazyAttribute(lambda obj: f'{fake.user_name()}@teste.com')
+
+    observacao = ''
+
+    # Autenticação e LGPD
+    is_active = True
+    consentimento_lgpd = True
+    consentimento_lgpd_em = factory.LazyAttribute(lambda obj: timezone.now())
+
+    @factory.post_generation
+    def set_password(self, create, extracted, **kwargs):
+        """Criptografa senha padrão 'senha123'."""
+        self.set_password('senha123')
+        if create:
+            self.save()
+
+class PasswordResetTokenFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = PasswordResetToken
+    
+    interessado = factory.SubFactory(InteressadoFactory)
+    token = factory.LazyAttribute(lambda obj: fake.sha256())
+    criado_em = factory.LazyAttribute(lambda obj: timezone.now())
+    expira_em = factory.LazyAttribute(lambda obj: timezone.now() + timedelta(hours=2))
+    usado = False
+
+
+
+    
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\factories copy.py
+App: apps
+==============================
+"""
+Arquivo: factories.py
+Caminho: apps/eventos/tests/factories.py
+Finalidade: Fornecer dados de teste para os modelos do app eventos usando Factory Boy
+Atualizações:
+ - 15/05/2026 - Criação do arquivo com factories para os modelos do app eventos, utilizando Factory
+ - 26/05/2026 - Adicionando factory
+ - 03/06/2026 - Ajustando factories para refletir as relações entre os modelos e garantir a criação de dados consistentes para os testes.
+"""
+
+import factory
+from factory import Faker, SubFactory, Sequence, LazyAttribute, LazyFunction
+from datetime import timedelta
+from django.utils import timezone
+from apps.eventos.models import Status, Criterio, Evento, EventoCriterio, Turma, Horario
+
+class StatusFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Status
+        django_get_or_create = ('nome',)
+
+    nome = Sequence(lambda n: f'Status {n}')
+    cor = Faker('hex_color')
+    ordem = Faker('random_int', min=1, max=100)
+
+class CriterioFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Criterio
+
+    tipo_criterio = Faker('word')
+    codigo = Sequence(lambda n: f'CRIT-{n:03d}')
+    nome = Faker('sentence', nb_words=3)
+    descricao = Faker('text')
+    pontos = Faker('random_int', min=1, max=10)
+    categoria = Faker('word')
+    ativo = True
+
+class EventoFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Evento
+
+    nome = Faker('catch_phrase')
+    descricao = Faker('paragraph')
+    status = SubFactory(StatusFactory)
+    total_vagas = Faker('random_int', min=10, max=100)
+    data_inicio_inscricao = LazyFunction(timezone.now)
+    data_fim_inscricao = LazyAttribute(lambda o: o.data_inicio_inscricao + timedelta(days=5))
+    data_inicio_evento = LazyAttribute(lambda o: o.data_fim_inscricao + timedelta(days=1))
+    data_fim_evento = LazyAttribute(lambda o: o.data_inicio_evento + timedelta(days=2))
+
+class EventoCriterioFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EventoCriterio
+
+    evento = SubFactory(EventoFactory)
+    criterio = SubFactory(CriterioFactory)
+    prioridade = Faker('random_int', min=1, max=5)
+    ativo = True
+
+
+class TurmaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Turma
+
+    evento = SubFactory(EventoFactory)
+    nome = Faker('word')
+    turno = Faker('random_element', elements=['M', 'T', 'N'])
+    capacidade = Faker('random_int', min=20, max=50)
+    local = Faker('address')
+    data_inicio = LazyFunction(timezone.now)
+    data_fim = LazyAttribute(lambda o: o.data_inicio + timedelta(days=30))
+
+class HorarioFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Horario
+
+    turma = SubFactory(TurmaFactory)
+    dia_semana = Faker('random_int', min=1, max=7)
+    hora_inicio = Faker('time')
+    hora_fim = Faker('time')
+
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\eventos\tests\factories.py
+App: apps
+==============================
+"""
+Arquivo: factories.py
+Caminho: apps/eventos/tests/factories.py
+Finalidade: Fornecer dados de teste para os modelos do app eventos usando Factory Boy
+Atualizações:
+ - 15/05/2026 - Criação do arquivo com factories para os modelos do app eventos, utilizando Factory
+ - 26/05/2026 - Adicionando factory
+ - 03/06/2026 - Ajustando factories para refletir as relações entre os modelos e garantir a criação de dados consistentes para os testes.
+ - 09/06/2026 - Correção de choices e validações dos models, garantindo que as factories gerem dados válidos e coerentes com as regras de negócio definidas nos modelos.
+ """
+
+
+from datetime import time, timedelta
+
+import factory
+from django.utils import timezone
+
+from apps.eventos.models import (
+    Status,
+    Criterio,
+    Evento,
+    EventoCriterio,
+    Turma,
+    Horario,
+)
+
+
+# ============================================================
+# STATUS
+# ============================================================
+
+class StatusFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Status
+        django_get_or_create = ("nome",)
+
+    nome = factory.Sequence(lambda n: f"Status {n}")
+    cor = factory.Faker("hex_color")
+    ordem = factory.Sequence(lambda n: n + 1)
+
+
+# ============================================================
+# CRITERIO
+# ============================================================
+
+class CriterioFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Criterio
+
+    tipo_criterio = factory.Iterator(
+        [
+            "PONTUACAO",
+            "ORDENACAO",
+        ]
+    )
+
+    codigo = factory.Sequence(
+        lambda n: f"CRIT-{n:03d}"
+    )
+
+    nome = factory.Faker(
+        "sentence",
+        nb_words=3
+    )
+
+    descricao = factory.Faker("text")
+
+    pontos = factory.Faker(
+        "random_int",
+        min=0,
+        max=20
+    )
+
+    categoria = factory.Iterator(
+        [
+            "ORDENACAO",
+            "CRONOLÓGICA",
+            "IDADE",
+            "VULNERABILIDADE",
+            "FAIXA_ETARIA",
+            "ESCOLARIDADE",
+            "COTA_RACIAL",
+        ]
+    )
+
+    ativo = True
+
+
+# ============================================================
+# EVENTO
+# ============================================================
+
+class EventoFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Evento
+
+    nome = factory.Faker("catch_phrase")
+
+    descricao = factory.Faker("paragraph")
+
+    status = factory.SubFactory(StatusFactory)
+
+    total_vagas = factory.Faker(
+        "random_int",
+        min=10,
+        max=100
+    )
+
+    data_inicio_inscricao = factory.LazyFunction(
+        timezone.now
+    )
+
+    data_fim_inscricao = factory.LazyAttribute(
+        lambda o: o.data_inicio_inscricao + timedelta(days=5)
+    )
+
+    data_inicio_evento = factory.LazyAttribute(
+        lambda o: o.data_fim_inscricao + timedelta(days=1)
+    )
+
+    data_fim_evento = factory.LazyAttribute(
+        lambda o: o.data_inicio_evento + timedelta(days=2)
+    )
+
+
+# ============================================================
+# EVENTO CRITERIO
+# ============================================================
+
+class EventoCriterioFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EventoCriterio
+
+    evento = factory.SubFactory(EventoFactory)
+
+    criterio = factory.SubFactory(CriterioFactory)
+
+    prioridade = factory.Faker(
+        "random_int",
+        min=1,
+        max=5
+    )
+
+    ativo = True
+
+
+# ============================================================
+# TURMA
+# ============================================================
+
+class TurmaFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Turma
+
+    evento = factory.SubFactory(EventoFactory)
+
+    nome = factory.Sequence(
+        lambda n: f"Turma {n}"
+    )
+
+    turno = factory.Iterator(
+        [
+            "MATUTINO",
+            "VESPERTINO",
+            "NOTURNO",
+            "INTEGRAL",
+        ]
+    )
+
+    capacidade = factory.Faker(
+        "random_int",
+        min=20,
+        max=50
+    )
+
+    local = factory.Faker("street_address")
+
+    data_inicio = factory.LazyFunction(
+        lambda: timezone.now().date()
+    )
+
+    data_fim = factory.LazyAttribute(
+        lambda o: o.data_inicio + timedelta(days=30)
+    )
+
+
+# ============================================================
+# HORARIO
+# ============================================================
+
+class HorarioFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Horario
+
+    turma = factory.SubFactory(TurmaFactory)
+
+    dia_semana = factory.Iterator(
+        [0, 1, 2, 3, 4, 5, 6]
+    )
+
+    hora_inicio = factory.LazyFunction(
+        lambda: time(8, 0)
+    )
+
+    hora_fim = factory.LazyFunction(
+        lambda: time(10, 0)
+    )
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\dashboard\tests\factories.py
+App: apps
+==============================
+"""
+Arquivo: factories.py
+Caminho: apps/dashboard/tests/factories.py
+Finalidade: Factory para criação de dados de teste.
+Atualizações:
+ - 10/06/2026: Criação do arquivo - Implementação inicial da factory para os modelos de dashboard
+"""
+
+import factory
+from faker import Faker
+from django.contrib.auth.hashers import make_password
+from apps.interessados.models import Interessado
+
+faker = Faker('pt_BR')
+
+class InteressadoFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Interessado
+
+    nome = factory.LazyAttribute(lambda _: faker.name())
+    cpf = factory.LazyAttribute(lambda _: faker.cpf())
+    email = factory.LazyAttribute(lambda _: faker.email())
+    senha = factory.LazyAttribute(lambda _: make_password(faker.password()))
+    data_cadastro = factory.LazyAttribute(lambda _: faker.date_time_this_year())
+
+
+
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\tests\factories.py
+App: apps
+==============================
+import factory
+from django.contrib.auth import get_user_model
+from faker import Faker
+
+fake = Faker('pt_BR')
+
+
+class UsuarioFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = get_user_model()
+        django_get_or_create = ('username', 'email', 'cpf',)
+
+    username = factory.Sequence(lambda n: f'user_{n}')
+    email = factory.Sequence(lambda n: f'user_{n}@example.com')
+    
+    # CPF sequencial para garantir unicidade nos testes
+    cpf = factory.Sequence(lambda n: f'{n:011d}')
+    
+    is_staff = False
+    is_active = True
+    
+    setor_trabalho = factory.Faker('job', locale='pt_BR')
+    local_trabalho = factory.Faker('company', locale='pt_BR')
+    telefone = factory.Faker('phone_number', locale='pt_BR')
+    celular = factory.Faker('phone_number', locale='pt_BR')
+
+    # Define a senha após a criação do objeto
+    password = factory.PostGenerationMethodCall('set_password', 'password123')
+
+    
+
+==============================
+Arquivo: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\academico\tests\factories.py
+App: apps
+==============================
+"""
+Arquivo: factories.py
+Caminho: apps/academico/tests/factories.py
+Finalidade: Factories para criação de objetos de teste relacionados ao app academico
+Atualizações:
+ - 29/05/2026 - Criação do arquivo com 2 factories: StatusFactory e EventoFactory
+ - 09/06/2026 - Adicionada AvaliacaoFactory e MatriculaFactory
+ - 09/06/2026 - Corrigida MatriculaFactory para garantir consistência dinâmica de eventos
+"""
+
+import factory
+from django.utils import timezone
+from datetime import timedelta
+from decimal import Decimal
+
+from apps.academico.models import StatusMatricula, Matricula, Avaliacao
+from apps.eventos.models import Turma
+from apps.selecao.tests.factories import InscricaoFactory
+
+class StatusMatriculaFactory(factory.django.DjangoModelFactory):
+    """Factory para StatusMatricula"""
+    class Meta:
+        model = StatusMatricula
+    
+    nome = factory.Sequence(lambda n: f'Status {n}')
+    cor = '#007bff'
+    ordem = factory.Sequence(lambda n: n)
+
+
+class TurmaFactory(factory.django.DjangoModelFactory):
+    """Factory para Turma"""
+    class Meta:
+        model = Turma
+    
+    nome = factory.Sequence(lambda n: f'Turma {n}')
+    evento = factory.SubFactory('apps.eventos.tests.factories.EventoFactory')
+    capacidade = 30
+    data_inicio = factory.LazyFunction(lambda: timezone.now().date())
+    data_fim = factory.LazyFunction(lambda: (timezone.now() + timedelta(days=30)).date())
+
+
+class MatriculaFactory(factory.django.DjangoModelFactory):
+    """
+    Factory para Matricula
+    
+    BOA PRÁTICA: Resolve inteligentemente a dependência circular.
+    Se a turma for passada explicitamente, a inscrição herdará o evento dessa turma.
+    Se a turma não for passada, uma nova turma será gerada com o evento da inscrição.
+    """
+    class Meta:
+        model = Matricula
+
+    # Se uma turma já foi fornecida, cria a inscrição apontando para o evento daquela turma
+    inscricao = factory.SubFactory(
+        InscricaoFactory,
+        evento=factory.SelfAttribute('..turma.evento')
+    )
+    
+    # Se uma turma NÃO foi fornecida, gera uma nova baseada no evento da inscrição
+    @factory.lazy_attribute
+    def turma(self):
+        return TurmaFactory()
+
+    # O interessado é obrigatoriamente o mesmo da inscrição (evita fraudar o clean do model)
+    interessado = factory.SelfAttribute('inscricao.interessado')
+    
+    status = factory.SubFactory(StatusMatriculaFactory, nome='Ativa')
+    observacoes = ''
+
+
+class AvaliacaoFactory(factory.django.DjangoModelFactory):
+    """Factory para Avaliacao"""
+    class Meta:
+        model = Avaliacao
+    
+    matricula = factory.SubFactory(MatriculaFactory)
+    nota_final = Decimal('8.5')
+    frequencia = Decimal('90.0')
+    aprovado = True
+    observacoes = ''
+
+
+    
+
 ==================================================
 ESTATÍSTICAS
 ==================================================
-Total de arquivos de teste: 46
-Total de bytes: 310339
+Total de arquivos de teste: 55
+Total de bytes: 333738
 Quantidade por app:
-  apps: 46
+  apps: 55

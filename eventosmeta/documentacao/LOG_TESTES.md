@@ -195,45 +195,45 @@ OK
 Destroying test database for alias 'default' ('test_bdmetareciclagem')...
 
 
-## apps.selecao.tests.test_services.py
+## apps.selecao.tests.test_services.py em 10/06/2026
 
 (.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/selecao/tests/test_services.py -v
-========================================================== test session starts ===========================================================
+=========================================================================== test session starts ===========================================================================
 platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
 cachedir: .pytest_cache
 django: version: 5.2.4, settings: config.settings (from ini)
 rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
 configfile: pytest.ini
 plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
-collected 16 items                                                                                                                        
+collected 16 items                                                                                                                                                         
 
-apps/selecao/tests/test_services.py::TestClassificadorService::test_calcular_pontuacao_inscricao_com_criterios PASSED               [  6%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_calcular_pontuacao_inscricao_zero PASSED                        [ 12%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_classificar_evento_atribui_posicoes PASSED                      [ 18%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_classificar_evento_classifica_dentro_vagas PASSED               [ 25%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_classificar_evento_lista_espera PASSED                          [ 31%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_classificar_evento_atualiza_status_inscricao PASSED             [ 37%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_classificar_evento_com_criterios PASSED                         [ 43%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_desempate_por_data_inscricao_igual_pontuacao PASSED             [ 50%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_desempate_com_lista_espera PASSED                               [ 56%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_desempate_misto_pontuacoes_diferentes_e_iguais PASSED           [ 62%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_processar_inscricao_cria_classificacao PASSED                   [ 68%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_classificar_evento_zero_inscricoes PASSED                       [ 75%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_classificar_evento_chamada_repetida PASSED                      [ 81%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_calcular_pontuacao_multiplos_criterios PASSED                   [ 87%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_classificar_evento_exatamente_1_vaga PASSED                     [ 93%]
-apps/selecao/tests/test_services.py::TestClassificadorService::test_classificar_sem_eventocriterio_vinculado PASSED                 [100%]
+apps/selecao/tests/test_services.py::TestClassificadorServicePontuacao::test_calcular_pontuacao_inscricao_com_criterios PASSED                                       [  6%]
+apps/selecao/tests/test_services.py::TestClassificadorServicePontuacao::test_calcular_pontuacao_inscricao_zero PASSED                                                [ 12%]
+apps/selecao/tests/test_services.py::TestClassificadorServicePontuacao::test_calcular_pontuacao_multiplos_criterios PASSED                                           [ 18%]
+apps/selecao/tests/test_services.py::TestClassificadorServicePontuacao::test_classificar_sem_eventocriterio_vinculado PASSED                                         [ 25%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceClassificacao::test_classificar_evento_atribui_posicoes PASSED                                          [ 31%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceClassificacao::test_classificar_evento_classifica_dentro_vagas PASSED                                   [ 37%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceClassificacao::test_classificar_evento_lista_espera PASSED                                              [ 43%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceClassificacao::test_classificar_evento_atualiza_status_inscricao PASSED                                 [ 50%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceClassificacao::test_classificar_evento_com_criterios PASSED                                             [ 56%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceClassificacao::test_classificar_evento_zero_inscricoes PASSED                                           [ 62%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceClassificacao::test_classificar_evento_chamada_repetida PASSED                                          [ 68%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceClassificacao::test_classificar_evento_exatamente_1_vaga PASSED                                         [ 75%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceDesempate::test_desempate_por_data_inscricao_igual_pontuacao PASSED                                     [ 81%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceDesempate::test_desempate_com_lista_espera PASSED                                                       [ 87%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceDesempate::test_desempate_misto_pontuacoes_diferentes_e_iguais PASSED                                   [ 93%]
+apps/selecao/tests/test_services.py::TestClassificadorServiceProcessamento::test_processar_inscricao_cria_classificacao PASSED                                       [100%]
 
 ---------- coverage: platform win32, python 3.13.2-final-0 -----------
 Name                                                                    Stmts   Miss  Cover   Missing
 -----------------------------------------------------------------------------------------------------
 apps\__init__.py                                                            0      0   100%
 apps\academico\__init__.py                                                  0      0   100%
-apps\academico\admin.py                                                   316    246    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
 apps\academico\apps.py                                                      5      0   100%
 apps\academico\certificado.py                                             136    136     0%   9-254
 apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
-apps\academico\services.py                                                134    134     0%   8-396
+apps\academico\services.py                                                136    136     0%   8-402
 apps\academico\urls.py                                                      5      5     0%   8-19
 apps\academico\views.py                                                    63     63     0%   8-124
 apps\accounts\__init__.py                                                   0      0   100%
@@ -295,15 +295,15 @@ apps\selecao\management\__init__.py                                         0   
 apps\selecao\management\commands\__init__.py                                0      0   100%
 apps\selecao\models.py                                                     71      8    89%   38, 74, 129, 133-134, 137, 155, 188
 apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
-apps\selecao\services.py                                                  125     28    78%   81-84, 88-91, 96, 101, 105, 109, 113, 295, 394-403, 425-443
+apps\selecao\services.py                                                  125     26    79%   82-85, 89-92, 102, 106, 110, 114, 383-392, 414-432
 apps\selecao\validators.py                                                105    105     0%   10-225
 apps\selecao\views.py                                                       1      1     0%   1
 -----------------------------------------------------------------------------------------------------
-TOTAL                                                                    4189   3260    22%
+TOTAL                                                                    4195   3262    22%
 Coverage HTML written to dir htmlcov
 
 
-========================================================== 16 passed in 17.97s ===========================================================
+=========================================================================== 16 passed in 17.49s ===================================================================
 
 
 
@@ -1769,6 +1769,125 @@ Ran 22 tests in 3.275s
 OK
 Destroying test database for alias 'default' ('test_bdmetareciclagem')...
 
+
+
+
+##  apps/dashboard/tests/test_services.py em 12/06/2026
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/dashboard/tests/test_services.py -v
+========================================================= test session starts ==========================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 22 items                                                                                                                      
+
+apps/dashboard/tests/test_services.py::TestDashboardInteressadosService::test_calcular_distribuicao_deficiencias PASSED           [  4%]
+apps/dashboard/tests/test_services.py::TestDashboardInteressadosService::test_calcular_distribuicao_escolaridade PASSED           [  9%]
+apps/dashboard/tests/test_services.py::TestDashboardInteressadosService::test_calcular_distribuicao_fototipo PASSED               [ 13%]
+apps/dashboard/tests/test_services.py::TestDashboardInteressadosService::test_calcular_distribuicao_programas_sociais PASSED      [ 18%]
+apps/dashboard/tests/test_services.py::TestDashboardInteressadosService::test_calcular_distribuicao_sexo PASSED                   [ 22%]
+apps/dashboard/tests/test_services.py::TestDashboardInteressadosService::test_calcular_faixas_etarias PASSED                      [ 27%]
+apps/dashboard/tests/test_services.py::TestDashboardInteressadosService::test_calcular_metricas_gerais PASSED                     [ 31%]
+apps/dashboard/tests/test_services.py::TestDashboardInteressadosService::test_calcular_tipos_deficiencia PASSED                   [ 36%]
+apps/dashboard/tests/test_services.py::TestDashboardInteressadosService::test_obter_contexto_completo PASSED                      [ 40%]
+apps/dashboard/tests/test_services.py::TestDashboardEventosService::test_calcular_eventos_por_status PASSED                       [ 45%]
+apps/dashboard/tests/test_services.py::TestDashboardEventosService::test_calcular_metricas_gerais PASSED                          [ 50%]
+apps/dashboard/tests/test_services.py::TestDashboardEventosService::test_calcular_top_eventos_inscricoes PASSED                   [ 54%]
+apps/dashboard/tests/test_services.py::TestDashboardEventosService::test_calcular_turmas_por_status PASSED                        [ 59%]
+apps/dashboard/tests/test_services.py::TestDashboardEventosService::test_obter_contexto_completo PASSED                           [ 63%]
+apps/dashboard/tests/test_services.py::TestDashboardAcademicoService::test_calcular_metricas_avaliacoes PASSED                    [ 68%]
+apps/dashboard/tests/test_services.py::TestDashboardAcademicoService::test_calcular_taxa_aprovacao PASSED                         [ 72%]
+apps/dashboard/tests/test_services.py::TestDashboardAcademicoService::test_calcular_top_cursos_aprovados PASSED                   [ 77%]
+apps/dashboard/tests/test_services.py::TestDashboardAcademicoService::test_obter_contexto_completo PASSED                         [ 81%]
+apps/dashboard/tests/test_services.py::TestDashboardProcessoSeletivoService::test_calcular_metricas_classificacoes PASSED         [ 86%]
+apps/dashboard/tests/test_services.py::TestDashboardProcessoSeletivoService::test_calcular_metricas_inscricoes PASSED             [ 90%]
+apps/dashboard/tests/test_services.py::TestDashboardProcessoSeletivoService::test_calcular_top_eventos_inscricoes PASSED          [ 95%]
+apps/dashboard/tests/test_services.py::TestDashboardProcessoSeletivoService::test_obter_contexto_completo PASSED                  [100%]
+
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    136     0%   9-254
+apps\academico\models.py                                                  110     28    75%   45, 122, 133, 142, 154, 168, 201-206, 282-283, 300-316, 339-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   40-44, 48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157      6    96%   88, 111, 161, 282, 308, 371
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                    71     71     0%   13-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     17    88%   29, 41, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              133    133     0%   8-291
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71      8    89%   38, 74, 129, 133-134, 137, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4207   3199    24%
+Coverage HTML written to dir htmlcov
+
+
+========================================================= 22 passed in 14.56s ==========================================================
 
 
 ## apps.eventos.tests.test_context_processors.py
