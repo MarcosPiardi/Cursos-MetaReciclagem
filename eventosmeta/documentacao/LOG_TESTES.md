@@ -1,198 +1,251 @@
 ## Saída do LOG de execução de testes
 
 
-## apps.eventos.tests.test_admin.py
+## apps.eventos.tests.test_admin.py em 17/06/2026
 
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest apps/eventos/tests/test_admin.py -v  
+=============================================================== test session starts ================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 30 items                                                                                                                                  
 
-Found 29 test(s).
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-test_criterio_add_view (apps.eventos.tests.test_admin.CriterioAdminTest.test_criterio_add_view) ... ok
-test_criterio_list_filter (apps.eventos.tests.test_admin.CriterioAdminTest.test_criterio_list_filter) ... ok
-test_evento_add_view (apps.eventos.tests.test_admin.EventoAdminTest.test_evento_add_view) ... ok
-test_evento_change_view (apps.eventos.tests.test_admin.EventoAdminTest.test_evento_change_view) ... ok
-test_evento_criterios_inline (apps.eventos.tests.test_admin.EventoAdminTest.test_evento_criterios_inline) ... ok
-test_evento_delete_view (apps.eventos.tests.test_admin.EventoAdminTest.test_evento_delete_view) ... ok
-test_evento_individual_date_methods (apps.eventos.tests.test_admin.EventoAdminTest.test_evento_individual_date_methods) ... ok
-test_evento_list_display (apps.eventos.tests.test_admin.EventoAdminTest.test_evento_list_display) ... ok
-test_evento_list_view (apps.eventos.tests.test_admin.EventoAdminTest.test_evento_list_view) ... ok
-test_evento_search (apps.eventos.tests.test_admin.EventoAdminTest.test_evento_search) ... ok
-test_evento_turmas_inline (apps.eventos.tests.test_admin.EventoAdminTest.test_evento_turmas_inline) ... ok
-test_horario_add_view (apps.eventos.tests.test_admin.HorarioAdminTest.test_horario_add_view) ... ok
-test_horario_change_view (apps.eventos.tests.test_admin.HorarioAdminTest.test_horario_change_view) ... ok
-test_horario_delete_view (apps.eventos.tests.test_admin.HorarioAdminTest.test_horario_delete_view) ... ok
-test_horario_dia_semana_filter (apps.eventos.tests.test_admin.HorarioAdminTest.test_horario_dia_semana_filter) ... ok
-test_horario_list_filter (apps.eventos.tests.test_admin.HorarioAdminTest.test_horario_list_filter) ... ok
-test_horario_list_view (apps.eventos.tests.test_admin.HorarioAdminTest.test_horario_list_view) ... ok
-test_horario_search (apps.eventos.tests.test_admin.HorarioAdminTest.test_horario_search) ... ok
-test_status_add_view (apps.eventos.tests.test_admin.StatusAdminTest.test_status_add_view) ... ok
-test_status_change_view (apps.eventos.tests.test_admin.StatusAdminTest.test_status_change_view) ... ok
-test_status_delete_view (apps.eventos.tests.test_admin.StatusAdminTest.test_status_delete_view) ... ok
-test_status_list_view (apps.eventos.tests.test_admin.StatusAdminTest.test_status_list_view) ... ok
-test_status_search (apps.eventos.tests.test_admin.StatusAdminTest.test_status_search) ... ok
-test_turma_add_view (apps.eventos.tests.test_admin.TurmaAdminTest.test_turma_add_view) ... ok
-test_turma_change_view (apps.eventos.tests.test_admin.TurmaAdminTest.test_turma_change_view) ... ok
-test_turma_delete_view (apps.eventos.tests.test_admin.TurmaAdminTest.test_turma_delete_view) ... ok
-test_turma_list_display_evento (apps.eventos.tests.test_admin.TurmaAdminTest.test_turma_list_display_evento) ... ok
-test_turma_list_view (apps.eventos.tests.test_admin.TurmaAdminTest.test_turma_list_view) ... ok
-test_turma_search (apps.eventos.tests.test_admin.TurmaAdminTest.test_turma_search) ... ok
+apps/eventos/tests/test_admin.py::TestEventoAdminConfig::test_list_display PASSED                                                             [  3%]
+apps/eventos/tests/test_admin.py::TestEventoAdminConfig::test_list_filter PASSED                                                              [  6%]
+apps/eventos/tests/test_admin.py::TestEventoAdminConfig::test_search_fields PASSED                                                            [ 10%]
+apps/eventos/tests/test_admin.py::TestEventoAdminChangeList::test_changelist_carrega PASSED                                                   [ 13%]
+apps/eventos/tests/test_admin.py::TestEventoAdminChangeList::test_busca_por_nome PASSED                                                       [ 16%]
+apps/eventos/tests/test_admin.py::TestEventoAdminChangeList::test_filtrar_por_status PASSED                                                   [ 20%]
+apps/eventos/tests/test_admin.py::TestEventoAdminChangeList::test_paginacao PASSED                                                            [ 23%]
+apps/eventos/tests/test_admin.py::TestEventoAdminChangeList::test_busca_vazia PASSED                                                          [ 26%]
+apps/eventos/tests/test_admin.py::TestStatusAdminChangeList::test_changelist_carrega PASSED                                                   [ 30%]
+apps/eventos/tests/test_admin.py::TestStatusAdminChangeList::test_busca_por_nome PASSED                                                       [ 33%]
+apps/eventos/tests/test_admin.py::TestTurmaAdminChangeList::test_changelist_carrega PASSED                                                    [ 36%]
+apps/eventos/tests/test_admin.py::TestTurmaAdminChangeList::test_busca_por_nome PASSED                                                        [ 40%]
+apps/eventos/tests/test_admin.py::TestEventoAdminViews::test_add_view PASSED                                                                  [ 43%]
+apps/eventos/tests/test_admin.py::TestEventoAdminViews::test_change_view PASSED                                                               [ 46%]
+apps/eventos/tests/test_admin.py::TestEventoAdminViews::test_delete_view PASSED                                                               [ 50%]
+apps/eventos/tests/test_admin.py::TestStatusAdminViews::test_add_view PASSED                                                                  [ 53%]
+apps/eventos/tests/test_admin.py::TestStatusAdminViews::test_change_view PASSED                                                               [ 56%]
+apps/eventos/tests/test_admin.py::TestStatusAdminViews::test_delete_view PASSED                                                               [ 60%]
+apps/eventos/tests/test_admin.py::TestTurmaAdminViews::test_add_view PASSED                                                                   [ 63%]
+apps/eventos/tests/test_admin.py::TestTurmaAdminViews::test_change_view PASSED                                                                [ 66%]
+apps/eventos/tests/test_admin.py::TestEventoAdminMethods::test_status_colorido PASSED                                                         [ 70%]
+apps/eventos/tests/test_admin.py::TestEventoAdminMethods::test_vagas_inscritos_sem_inscricoes PASSED                                          [ 73%]
+apps/eventos/tests/test_admin.py::TestEventoAdminMethods::test_vagas_inscritos_com_inscricoes PASSED                                          [ 76%]
+apps/eventos/tests/test_admin.py::TestEventoAdminMethods::test_data_inicio_inscricao_formatada PASSED                                         [ 80%]
+apps/eventos/tests/test_admin.py::TestEventoAdminMethods::test_data_fim_inscricao_formatada PASSED                                            [ 83%]
+apps/eventos/tests/test_admin.py::TestEventoAdminInlines::test_exibe_inline_criterios PASSED                                                  [ 86%]
+apps/eventos/tests/test_admin.py::TestEventoAdminInlines::test_exibe_inline_turmas PASSED                                                     [ 90%]
+apps/eventos/tests/test_admin.py::TestEventoAdminInlines::test_change_view_carrega_com_inlines PASSED                                         [ 93%]
+apps/eventos/tests/test_admin.py::TestHorarioAdminChangeList::test_changelist_carrega PASSED                                                  [ 96%]
+apps/eventos/tests/test_admin.py::TestHorarioAdminChangeList::test_filtro_dia_semana PASSED                                                   [100%]
 
-----------------------------------------------------------------------
-Ran 29 tests in 3.675s
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    118    13%   24-37, 43-67, 72-79, 83-104, 108-116, 120-163, 167-208, 212-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      0   100%
+apps\academico\views.py                                                    63     45    29%   31-52, 61-77, 87-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     16    69%   48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20      9    55%   66-81
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      0   100%
+apps\accounts\views.py                                                     47     38    19%   26-52, 60-62, 83-114
+apps\accounts\views_exclusao.py                                            77     66    14%   19, 25-33, 43-83, 94-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    105    33%   23-26, 34-43, 47-56, 60-81, 85-93, 108-116, 131-152, 156-199, 203, 220-222, 233-236, 247-249, 255-257, 265, 278-293, 304-311, 315-317, 325-326, 338-343, 367-381, 390-392, 400
+apps\dashboard\utils_pdf.py                                               373    350     6%   25-56, 61-80, 86-87, 90-91, 94-99, 102-107, 112-298, 303-464, 469-608, 613-751
+apps\dashboard\views.py                                                    71     47    34%   33-42, 47-56, 61-70, 75-84, 89-109, 118-125, 130-137, 142-149, 154-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212     89    58%   67, 111-114, 181, 196, 201-204, 223, 234, 245, 256, 269-358, 371-415, 430-519
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     23    55%   25, 39, 67-81, 87-95, 101-112
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     25    80%   104-106, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    117    46%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    106    32%   167-171, 179-213, 220-230, 234-235, 239-243, 247, 251, 255, 259, 263, 267, 271, 275-280, 287-302, 335-358, 392-396, 401-402, 406-410, 414, 418, 422, 426, 430, 434, 438, 445-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     17    88%   29, 41, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      0   100%
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    167    17%   49-67, 81-107, 113-115, 129-181, 194-216, 232-250, 266-323, 342-414, 422, 430-472, 477, 482, 496-519
+apps\interessados\views_exclusao.py                                        29     20    31%   22-67, 76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     24    29%   45-51, 55-76, 98-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      0   100%
+apps\portal\views.py                                                       99     79    20%   30-39, 45-74, 79-82, 87-116, 122-163, 168-189, 196-220, 225-242, 247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    158    43%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 661, 667
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3000    29%
+Coverage HTML written to dir htmlcov
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
 
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
+=============================================================== 30 passed in 16.95s ================================================================
 
 
 
+## apps.eventos.tests.test_models.py em 17/06/2026
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest apps/eventos/tests/test_models.py -v
+=============================================================== test session starts ================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 22 items                                                                                                                                  
+
+apps/eventos/tests/test_models.py::TestStatusModel::test_create_status PASSED                                                                 [  4%]
+apps/eventos/tests/test_models.py::TestStatusModel::test_status_str PASSED                                                                    [  9%]
+apps/eventos/tests/test_models.py::TestStatusModel::test_status_ordem_unique PASSED                                                           [ 13%]
+apps/eventos/tests/test_models.py::TestStatusModel::test_status_cor_valid_hex PASSED                                                          [ 18%]
+apps/eventos/tests/test_models.py::TestEventoModel::test_create_evento PASSED                                                                 [ 22%]
+apps/eventos/tests/test_models.py::TestEventoModel::test_evento_str PASSED                                                                    [ 27%]
+apps/eventos/tests/test_models.py::TestEventoModel::test_evento_foreign_key_status PASSED                                                     [ 31%]
+apps/eventos/tests/test_models.py::TestEventoModel::test_evento_total_vagas_positive PASSED                                                   [ 36%]
+apps/eventos/tests/test_models.py::TestEventoModel::test_evento_data_inicio_inscricao_before_fim PASSED                                       [ 40%]
+apps/eventos/tests/test_models.py::TestEventoModel::test_evento_data_inicio_evento_before_fim PASSED                                          [ 45%]
+apps/eventos/tests/test_models.py::TestEventoModel::test_evento_datas_evento_validas PASSED                                                   [ 50%]
+apps/eventos/tests/test_models.py::TestCriterioModel::test_create_criterio PASSED                                                             [ 54%]
+apps/eventos/tests/test_models.py::TestCriterioModel::test_criterio_str PASSED                                                                [ 59%]
+apps/eventos/tests/test_models.py::TestCriterioModel::test_criterio_codigo_unique PASSED                                                      [ 63%]
+apps/eventos/tests/test_models.py::TestCriterioModel::test_criterio_pontos_non_negative PASSED                                                [ 68%]
+apps/eventos/tests/test_models.py::TestCriterioModel::test_criterio_categoria_choices PASSED                                                  [ 72%]
+apps/eventos/tests/test_models.py::TestTurmaModel::test_create_turma PASSED                                                                   [ 77%]
+apps/eventos/tests/test_models.py::TestTurmaModel::test_turma_str PASSED                                                                      [ 81%]
+apps/eventos/tests/test_models.py::TestTurmaModel::test_turma_foreign_key_evento PASSED                                                       [ 86%]
+apps/eventos/tests/test_models.py::TestTurmaModel::test_turma_capacidade_positive PASSED                                                      [ 90%]
+apps/eventos/tests/test_models.py::TestHorarioModel::test_create_horario PASSED                                                               [ 95%]
+apps/eventos/tests/test_models.py::TestHorarioModel::test_horario_foreign_key_turma PASSED                                                    [100%]
+
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    136     0%   9-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   40-44, 48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    157     0%   12-400
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                    71     71     0%   13-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     19    84%   106, 130-132, 135-137, 140-142, 145-147, 150-152, 201, 206, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     19    86%   22, 29, 41, 132, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3373    20%
+Coverage HTML written to dir htmlcov
 
 
-## apps.eventos.tests.test_models.py
+================================================================ 22 passed in 4.37s ================================================================
 
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.eventos.tests.test_models -v 2
-Found 22 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_create_criterio (apps.eventos.tests.test_models.CriterioModelTest.test_create_criterio) ... ok
-test_criterio_categoria_choices (apps.eventos.tests.test_models.CriterioModelTest.test_criterio_categoria_choices) ... ok
-test_criterio_codigo_unique (apps.eventos.tests.test_models.CriterioModelTest.test_criterio_codigo_unique) ... ok
-test_criterio_pontos_non_negative (apps.eventos.tests.test_models.CriterioModelTest.test_criterio_pontos_non_negative) ... ok
-test_criterio_str (apps.eventos.tests.test_models.CriterioModelTest.test_criterio_str) ... ok
-test_create_evento (apps.eventos.tests.test_models.EventoModelTest.test_create_evento) ... ok
-test_evento_data_inicio_evento_before_fim (apps.eventos.tests.test_models.EventoModelTest.test_evento_data_inicio_evento_before_fim) ... ok
-test_evento_data_inicio_inscricao_before_fim (apps.eventos.tests.test_models.EventoModelTest.test_evento_data_inicio_inscricao_before_fim) ... ok
-test_evento_datas_evento_validas (apps.eventos.tests.test_models.EventoModelTest.test_evento_datas_evento_validas) ... ok
-test_evento_foreign_key_status (apps.eventos.tests.test_models.EventoModelTest.test_evento_foreign_key_status) ... ok
-test_evento_str (apps.eventos.tests.test_models.EventoModelTest.test_evento_str) ... ok
-test_evento_total_vagas_positive (apps.eventos.tests.test_models.EventoModelTest.test_evento_total_vagas_positive) ... ok
-test_create_horario (apps.eventos.tests.test_models.HorarioModelTest.test_create_horario) ... ok
-test_horario_foreign_key_turma (apps.eventos.tests.test_models.HorarioModelTest.test_horario_foreign_key_turma) ... ok
-test_create_status (apps.eventos.tests.test_models.StatusModelTest.test_create_status) ... ok
-test_status_cor_valid_hex (apps.eventos.tests.test_models.StatusModelTest.test_status_cor_valid_hex) ... ok
-test_status_ordem_unique (apps.eventos.tests.test_models.StatusModelTest.test_status_ordem_unique) ... ok
-test_status_str (apps.eventos.tests.test_models.StatusModelTest.test_status_str) ... ok
-test_create_turma (apps.eventos.tests.test_models.TurmaModelTest.test_create_turma) ... ok
-test_turma_capacidade_positive (apps.eventos.tests.test_models.TurmaModelTest.test_turma_capacidade_positive) ... ok
-test_turma_foreign_key_evento (apps.eventos.tests.test_models.TurmaModelTest.test_turma_foreign_key_evento) ... ok
-test_turma_str (apps.eventos.tests.test_models.TurmaModelTest.test_turma_str) ... ok
-
-----------------------------------------------------------------------
-Ran 22 tests in 0.323s
-
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
 
 
 ## apps.selecao.tests.test_services.py em 10/06/2026
@@ -640,340 +693,435 @@ Coverage HTML written to dir htmlcov
 
 ## apps.accounts.test.test_models.py
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.accounts.tests.test_models -v 2
-Found 10 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_cpf_unico (apps.accounts.tests.test_models.TestUsuarioModel.test_cpf_unico)
-Verifica se CPF duplicado falha. ... ok
-test_criar_superuser_is_staff (apps.accounts.tests.test_models.TestUsuarioModel.test_criar_superuser_is_staff) ... ok
-test_criar_superuser_is_superuser (apps.accounts.tests.test_models.TestUsuarioModel.test_criar_superuser_is_superuser) ... ok
-test_criar_usuario_com_cpf_invalido (apps.accounts.tests.test_models.TestUsuarioModel.test_criar_usuario_com_cpf_invalido)
-Verifica se a criação falha com CPF que não tem 11 dígitos. ... ok
-test_criar_usuario_com_cpf_valido (apps.accounts.tests.test_models.TestUsuarioModel.test_criar_usuario_com_cpf_valido)
-Verifica se um usuário pode ser criado com um CPF válido de 11 dígitos. ... ok
-test_criar_usuario_sem_password_falha (apps.accounts.tests.test_models.TestUsuarioModel.test_criar_usuario_sem_password_falha) ... ok
-test_criar_usuario_sem_username_falha (apps.accounts.tests.test_models.TestUsuarioModel.test_criar_usuario_sem_username_falha) ... ok
-test_usuario_nao_staff_nao_pode_login_staff (apps.accounts.tests.test_models.TestUsuarioModel.test_usuario_nao_staff_nao_pode_login_staff)
-Verifica se um usuário não staff é criado com is_staff=False. ... ok
-test_usuario_staff_pode_login (apps.accounts.tests.test_models.TestUsuarioModel.test_usuario_staff_pode_login)
-Verifica se um usuário staff é criado com is_staff=True. ... ok
-test_usuario_str_retorna_username (apps.accounts.tests.test_models.TestUsuarioModel.test_usuario_str_retorna_username) ... ok
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/accounts/tests/test_models.py -v    
+=================================================== test session starts ===================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 11 items                                                                                                         
 
-----------------------------------------------------------------------
-Ran 10 tests in 4.498s
+apps/accounts/tests/test_models.py::test_criar_usuario_com_cpf_valido PASSED                                         [  9%]
+apps/accounts/tests/test_models.py::test_criar_usuario_com_cpf_invalido[1234567890] PASSED                           [ 18%]
+apps/accounts/tests/test_models.py::test_criar_usuario_com_cpf_invalido[123456789012] PASSED                         [ 27%]
+apps/accounts/tests/test_models.py::test_cpf_unico PASSED                                                            [ 36%]
+apps/accounts/tests/test_models.py::test_usuario_staff_pode_login PASSED                                             [ 45%]
+apps/accounts/tests/test_models.py::test_usuario_nao_staff_nao_pode_login_staff PASSED                               [ 54%]
+apps/accounts/tests/test_models.py::test_criar_usuario_sem_username_falha PASSED                                     [ 63%]
+apps/accounts/tests/test_models.py::test_criar_usuario_sem_password_falha PASSED                                     [ 72%]
+apps/accounts/tests/test_models.py::test_criar_superuser_is_staff PASSED                                             [ 81%]
+apps/accounts/tests/test_models.py::test_criar_superuser_is_superuser PASSED                                         [ 90%]
+apps/accounts/tests/test_models.py::test_usuario_str_retorna_username PASSED                                         [100%]
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
-
-
-## apps.accounts.test.test_views.py
-
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.accounts.tests.test_views -v 2
-Found 10 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_login_staff_form_tem_csrf (apps.accounts.tests.test_views.AccountsViewsTest.test_login_staff_form_tem_csrf) ... ok
-test_login_staff_get (apps.accounts.tests.test_views.AccountsViewsTest.test_login_staff_get)
-Verifica se a página de login é acessível via GET. ... ok
-test_login_staff_inativo_falha (apps.accounts.tests.test_views.AccountsViewsTest.test_login_staff_inativo_falha) ... AXES: New login failure by {username: "********************", ip_address: "********************", user_agent: "<unknown>", path_info: "/staff/login/"}. Created new record in the database.
-ok
-test_login_staff_invalido (apps.accounts.tests.test_views.AccountsViewsTest.test_login_staff_invalido)
-Verifica se credenciais inválidas falham. ... AXES: New login failure by {username: "********************", ip_address: "********************", user_agent: "<unknown>", path_info: "/staff/login/"}. Created new record in the database.
-ok
-test_login_staff_nao_staff (apps.accounts.tests.test_views.AccountsViewsTest.test_login_staff_nao_staff)
-Verifica se usuário não-staff não consegue fazer login. ... ok
-test_login_staff_valido (apps.accounts.tests.test_views.AccountsViewsTest.test_login_staff_valido)
-Verifica se credenciais válidas realizam login e redirecionam. ... ok
-test_logout_staff (apps.accounts.tests.test_views.AccountsViewsTest.test_logout_staff)
-Verifica se logout funciona corretamente. ... ok
-test_logout_staff_get_desloga (apps.accounts.tests.test_views.AccountsViewsTest.test_logout_staff_get_desloga) ... ok
-test_nao_staff_redirecionado_ao_acessar_pagina_staff (apps.accounts.tests.test_views.AccountsViewsTest.test_nao_staff_redirecionado_ao_acessar_pagina_staff) ... ok
-test_staff_acessa_pagina_restrita_apos_login (apps.accounts.tests.test_views.AccountsViewsTest.test_staff_acessa_pagina_restrita_apos_login) ... ok
-
-----------------------------------------------------------------------
-Ran 10 tests in 12.662s
-
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    136     0%   9-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   40-44, 48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      1    95%   105
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    157     0%   12-400
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                    71     71     0%   13-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     19    86%   22, 29, 41, 132, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3380    20%
+Coverage HTML written to dir htmlcov
 
 
-## apps.accounts.test.test_views_exclusao.py
-
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.accounts.tests.test_views_exclusao -v 2
-Found 15 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_anonimizar_interessado_limpa_campos (apps.accounts.tests.test_views_exclusao.TestAnonimizarInteressado.test_anonimizar_interessado_limpa_campos) ... ok
-test_anonimizar_interessado_mantem_registro (apps.accounts.tests.test_views_exclusao.TestAnonimizarInteressado.test_anonimizar_interessado_mantem_registro) ... ok
-test_detalhe_solicitacao_404 (apps.accounts.tests.test_views_exclusao.TestDetalheSolicitacaoView.test_detalhe_solicitacao_404) ... ok
-test_detalhe_solicitacao_acao_invalida (apps.accounts.tests.test_views_exclusao.TestDetalheSolicitacaoView.test_detalhe_solicitacao_acao_invalida) ... ok
-test_detalhe_solicitacao_aprovar (apps.accounts.tests.test_views_exclusao.TestDetalheSolicitacaoView.test_detalhe_solicitacao_aprovar) ... ok
-test_detalhe_solicitacao_recusar (apps.accounts.tests.test_views_exclusao.TestDetalheSolicitacaoView.test_detalhe_solicitacao_recusar) ... ok
-test_detalhe_solicitacao_sem_login_redirect (apps.accounts.tests.test_views_exclusao.TestDetalheSolicitacaoView.test_detalhe_solicitacao_sem_login_redirect) ... ok
-test_detalhe_solicitacao_sem_parecer (apps.accounts.tests.test_views_exclusao.TestDetalheSolicitacaoView.test_detalhe_solicitacao_sem_parecer) ... ok
-test_detalhe_solicitacao_status_200 (apps.accounts.tests.test_views_exclusao.TestDetalheSolicitacaoView.test_detalhe_solicitacao_status_200) ... ok
-test_listar_solicitacoes_contexto_tem_aprovadas (apps.accounts.tests.test_views_exclusao.TestListarSolicitacoesView.test_listar_solicitacoes_contexto_tem_aprovadas) ... ok
-test_listar_solicitacoes_contexto_tem_pendentes (apps.accounts.tests.test_views_exclusao.TestListarSolicitacoesView.test_listar_solicitacoes_contexto_tem_pendentes) ... ok
-test_listar_solicitacoes_contexto_tem_recusadas (apps.accounts.tests.test_views_exclusao.TestListarSolicitacoesView.test_listar_solicitacoes_contexto_tem_recusadas) ... ok
-test_listar_solicitacoes_nao_staff_redirect (apps.accounts.tests.test_views_exclusao.TestListarSolicitacoesView.test_listar_solicitacoes_nao_staff_redirect) ... ok
-test_listar_solicitacoes_sem_login_redirect (apps.accounts.tests.test_views_exclusao.TestListarSolicitacoesView.test_listar_solicitacoes_sem_login_redirect) ... ok
-test_listar_solicitacoes_status_200 (apps.accounts.tests.test_views_exclusao.TestListarSolicitacoesView.test_listar_solicitacoes_status_200) ... ok
-
-----------------------------------------------------------------------
-Ran 15 tests in 23.915s
-
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+=================================================== 11 passed in 7.05s ====================================================
 
 
 
-## apps.accounts.test.test_admin.py
+## apps.accounts.test.test_views.py em 17/06/2026
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.accounts.tests.test_admin -v 2
-Found 11 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_admin_index_sem_login_redirect (apps.accounts.tests.test_admin.TestCustomAdminSite.test_admin_index_sem_login_redirect) ... ok
-test_admin_index_status_200 (apps.accounts.tests.test_admin.TestCustomAdminSite.test_admin_index_status_200) ... ok
-test_dashboard_sem_login_redirect (apps.accounts.tests.test_admin.TestCustomAdminSite.test_dashboard_sem_login_redirect) ... ok
-test_dashboard_status_200 (apps.accounts.tests.test_admin.TestCustomAdminSite.test_dashboard_status_200) ... C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Lib\site-packages\django\db\models\fields\__init__.py:1612: RuntimeWarning: DateTimeField Evento.data_fim_inscricao received a naive datetime (2026-05-28 00:00:00) while time zone support is active.
-  warnings.warn(
-ok
-test_gerar_senha_provisoria_seleciona_1 (apps.accounts.tests.test_admin.TestUsuarioAdminActionGerarSenhaProvisoria.test_gerar_senha_provisoria_seleciona_1) ... ok
-test_gerar_senha_provisoria_seleciona_2_falha (apps.accounts.tests.test_admin.TestUsuarioAdminActionGerarSenhaProvisoria.test_gerar_senha_provisoria_seleciona_2_falha) ... ok
-test_usuario_admin_add_status_200 (apps.accounts.tests.test_admin.TestUsuarioAdminAdd.test_usuario_admin_add_status_200) ... ok
-test_usuario_admin_add_usuario (apps.accounts.tests.test_admin.TestUsuarioAdminAdd.test_usuario_admin_add_usuario) ... ok
-test_usuario_admin_list_pesquisa_por_username (apps.accounts.tests.test_admin.TestUsuarioAdminList.test_usuario_admin_list_pesquisa_por_username) ... ok
-test_usuario_admin_list_sem_login_redirect (apps.accounts.tests.test_admin.TestUsuarioAdminList.test_usuario_admin_list_sem_login_redirect) ... ok
-test_usuario_admin_list_status_200 (apps.accounts.tests.test_admin.TestUsuarioAdminList.test_usuario_admin_list_status_200) ... ok
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest apps/accounts/tests/test_views.py -v
+=============================================================== test session starts ================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 10 items                                                                                                                                  
 
-----------------------------------------------------------------------
-Ran 11 tests in 10.662s
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_login_staff_form_tem_csrf PASSED                                                   [ 10%]
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_login_staff_get PASSED                                                             [ 20%]
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_login_staff_inativo_falha PASSED                                                   [ 30%]
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_login_staff_invalido PASSED                                                        [ 40%]
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_login_staff_nao_staff PASSED                                                       [ 50%]
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_login_staff_valido PASSED                                                          [ 60%]
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_logout_staff PASSED                                                                [ 70%]
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_logout_staff_get_desloga PASSED                                                    [ 80%]
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_nao_staff_redirecionado_ao_acessar_pagina_staff PASSED                             [ 90%]
+apps/accounts/tests/test_views.py::AccountsViewsTest::test_staff_acessa_pagina_restrita_apos_login PASSED                                     [100%]
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    118    13%   24-37, 43-67, 72-79, 83-104, 108-116, 120-163, 167-208, 212-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      0   100%
+apps\academico\views.py                                                    63     45    29%   31-52, 61-77, 87-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     16    69%   48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20      9    55%   66-81
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      0   100%
+apps\accounts\views.py                                                     47     20    57%   27, 83-114
+apps\accounts\views_exclusao.py                                            77     66    14%   19, 25-33, 43-83, 94-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    105    33%   23-26, 34-43, 47-56, 60-81, 85-93, 108-116, 131-152, 156-199, 203, 220-222, 233-236, 247-249, 255-257, 265, 278-293, 304-311, 315-317, 325-326, 338-343, 367-381, 390-392, 400
+apps\dashboard\utils_pdf.py                                               373    350     6%   25-56, 61-80, 86-87, 90-91, 94-99, 102-107, 112-298, 303-464, 469-608, 613-751
+apps\dashboard\views.py                                                    71     47    34%   33-42, 47-56, 61-70, 75-84, 89-109, 118-125, 130-137, 142-149, 154-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     40    22%   37-112
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     18    28%   37-52, 65-73
+apps\interessados\forms.py                                                157    106    32%   167-171, 179-213, 220-230, 234-235, 239-243, 247, 251, 255, 259, 263, 267, 271, 275-280, 287-302, 335-358, 392-396, 401-402, 406-410, 414, 418, 422, 426, 430, 434, 438, 445-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     19    86%   22, 29, 41, 132, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      0   100%
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    167    17%   49-67, 81-107, 113-115, 129-181, 194-216, 232-250, 266-323, 342-414, 422, 430-472, 477, 482, 496-519
+apps\interessados\views_exclusao.py                                        29     20    31%   22-67, 76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     24    29%   45-51, 55-76, 98-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      0   100%
+apps\portal\views.py                                                       99     79    20%   30-39, 45-74, 79-82, 87-116, 122-163, 168-189, 196-220, 225-242, 247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3034    28%
+Coverage HTML written to dir htmlcov
 
+
+=============================================================== 10 passed in 15.62s ================================================================
+
+
+## apps.accounts.test.test_views_exclusao.py em 17/06/2026
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest apps/accounts/tests/test_views_exclusao.py -v
+=============================================================== test session starts ================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 15 items                                                                                                                                  
+
+apps/accounts/tests/test_views_exclusao.py::TestListarSolicitacoesView::test_listar_solicitacoes_status_200 PASSED                            [  6%]
+apps/accounts/tests/test_views_exclusao.py::TestListarSolicitacoesView::test_listar_solicitacoes_sem_login_redirect PASSED                    [ 13%]
+apps/accounts/tests/test_views_exclusao.py::TestListarSolicitacoesView::test_listar_solicitacoes_nao_staff_redirect PASSED                    [ 20%]
+apps/accounts/tests/test_views_exclusao.py::TestListarSolicitacoesView::test_listar_solicitacoes_contexto_tem_pendentes PASSED                [ 26%]
+apps/accounts/tests/test_views_exclusao.py::TestListarSolicitacoesView::test_listar_solicitacoes_contexto_tem_aprovadas PASSED                [ 33%]
+apps/accounts/tests/test_views_exclusao.py::TestListarSolicitacoesView::test_listar_solicitacoes_contexto_tem_recusadas PASSED                [ 40%]
+apps/accounts/tests/test_views_exclusao.py::TestDetalheSolicitacaoView::test_detalhe_solicitacao_status_200 PASSED                            [ 46%]
+apps/accounts/tests/test_views_exclusao.py::TestDetalheSolicitacaoView::test_detalhe_solicitacao_sem_login_redirect PASSED                    [ 53%]
+apps/accounts/tests/test_views_exclusao.py::TestDetalheSolicitacaoView::test_detalhe_solicitacao_404 PASSED                                   [ 60%]
+apps/accounts/tests/test_views_exclusao.py::TestDetalheSolicitacaoView::test_detalhe_solicitacao_aprovar PASSED                               [ 66%]
+apps/accounts/tests/test_views_exclusao.py::TestDetalheSolicitacaoView::test_detalhe_solicitacao_recusar PASSED                               [ 73%]
+apps/accounts/tests/test_views_exclusao.py::TestDetalheSolicitacaoView::test_detalhe_solicitacao_acao_invalida PASSED                         [ 80%]
+apps/accounts/tests/test_views_exclusao.py::TestDetalheSolicitacaoView::test_detalhe_solicitacao_sem_parecer PASSED                           [ 86%]
+apps/accounts/tests/test_views_exclusao.py::TestAnonimizarInteressado::test_anonimizar_interessado_limpa_campos PASSED                        [ 93%]
+apps/accounts/tests/test_views_exclusao.py::TestAnonimizarInteressado::test_anonimizar_interessado_mantem_registro PASSED                     [100%]
+
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    118    13%   24-37, 43-67, 72-79, 83-104, 108-116, 120-163, 167-208, 212-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      0   100%
+apps\academico\views.py                                                    63     45    29%   31-52, 61-77, 87-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     16    69%   48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20      9    55%   66-81
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      0   100%
+apps\accounts\views.py                                                     47     38    19%   26-52, 60-62, 83-114
+apps\accounts\views_exclusao.py                                            77      2    97%   44-45
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    105    33%   23-26, 34-43, 47-56, 60-81, 85-93, 108-116, 131-152, 156-199, 203, 220-222, 233-236, 247-249, 255-257, 265, 278-293, 304-311, 315-317, 325-326, 338-343, 367-381, 390-392, 400
+apps\dashboard\utils_pdf.py                                               373    350     6%   25-56, 61-80, 86-87, 90-91, 94-99, 102-107, 112-298, 303-464, 469-608, 613-751
+apps\dashboard\views.py                                                    71     47    34%   33-42, 47-56, 61-70, 75-84, 89-109, 118-125, 130-137, 142-149, 154-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     41    20%   25, 37-112
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    106    32%   167-171, 179-213, 220-230, 234-235, 239-243, 247, 251, 255, 259, 263, 267, 271, 275-280, 287-302, 335-358, 392-396, 401-402, 406-410, 414, 418, 422, 426, 430, 434, 438, 445-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     17    88%   29, 41, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      0   100%
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    167    17%   49-67, 81-107, 113-115, 129-181, 194-216, 232-250, 266-323, 342-414, 422, 430-472, 477, 482, 496-519
+apps\interessados\views_exclusao.py                                        29     20    31%   22-67, 76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     24    29%   45-51, 55-76, 98-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      0   100%
+apps\portal\views.py                                                       99     79    20%   30-39, 45-74, 79-82, 87-116, 122-163, 168-189, 196-220, 225-242, 247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   2994    29%
+Coverage HTML written to dir htmlcov
+
+
+=============================================================== 15 passed in 26.90s ================================================================
+
+
+
+## apps.accounts.test.test_admin.py em 17/06/2026
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest apps/accounts/tests/test_admin.py -v
+================================================================================ test session starts ================================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 11 items                                                                                                                                                                   
+
+apps/accounts/tests/test_admin.py::TestCustomAdminSite::test_admin_index_status_200 PASSED                                                                                     [  9%]
+apps/accounts/tests/test_admin.py::TestCustomAdminSite::test_admin_index_sem_login_redirect PASSED                                                                             [ 18%]
+apps/accounts/tests/test_admin.py::TestCustomAdminSite::test_dashboard_status_200 PASSED                                                                                       [ 27%]
+apps/accounts/tests/test_admin.py::TestCustomAdminSite::test_dashboard_sem_login_redirect PASSED                                                                               [ 36%]
+apps/accounts/tests/test_admin.py::TestUsuarioAdminList::test_usuario_admin_list_status_200 PASSED                                                                             [ 45%]
+apps/accounts/tests/test_admin.py::TestUsuarioAdminList::test_usuario_admin_list_sem_login_redirect PASSED                                                                     [ 54%]
+apps/accounts/tests/test_admin.py::TestUsuarioAdminList::test_usuario_admin_list_pesquisa_por_username PASSED                                                                  [ 63%]
+apps/accounts/tests/test_admin.py::TestUsuarioAdminAdd::test_usuario_admin_add_status_200 PASSED                                                                               [ 72%]
+apps/accounts/tests/test_admin.py::TestUsuarioAdminAdd::test_usuario_admin_add_usuario PASSED                                                                                  [ 81%]
+apps/accounts/tests/test_admin.py::TestUsuarioAdminActionGerarSenhaProvisoria::test_gerar_senha_provisoria_seleciona_1 PASSED                                                  [ 90%]
+apps/accounts/tests/test_admin.py::TestUsuarioAdminActionGerarSenhaProvisoria::test_gerar_senha_provisoria_seleciona_2_falha PASSED                                            [100%]
+
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    118    13%   24-37, 43-67, 72-79, 83-104, 108-116, 120-163, 167-208, 212-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      0   100%
+apps\academico\views.py                                                    63     45    29%   31-52, 61-77, 87-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52      0   100%
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20      9    55%   66-81
+apps\accounts\models.py                                                    22      1    95%   105
+apps\accounts\urls.py                                                       5      0   100%
+apps\accounts\views.py                                                     47     38    19%   26-52, 60-62, 83-114
+apps\accounts\views_exclusao.py                                            77     66    14%   19, 25-33, 43-83, 94-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    105    33%   23-26, 34-43, 47-56, 60-81, 85-93, 108-116, 131-152, 156-199, 203, 220-222, 233-236, 247-249, 255-257, 265, 278-293, 304-311, 315-317, 325-326, 338-343, 367-381, 390-392, 400
+apps\dashboard\utils_pdf.py                                               373    350     6%   25-56, 61-80, 86-87, 90-91, 94-99, 102-107, 112-298, 303-464, 469-608, 613-751
+apps\dashboard\views.py                                                    71     47    34%   33-42, 47-56, 61-70, 75-84, 89-109, 118-125, 130-137, 142-149, 154-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    116    45%   61-67, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     41    20%   25, 37-112
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    117    46%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    106    32%   167-171, 179-213, 220-230, 234-235, 239-243, 247, 251, 255, 259, 263, 267, 271, 275-280, 287-302, 335-358, 392-396, 401-402, 406-410, 414, 418, 422, 426, 430, 434, 438, 445-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     19    86%   22, 29, 41, 132, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      0   100%
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    167    17%   49-67, 81-107, 113-115, 129-181, 194-216, 232-250, 266-323, 342-414, 422, 430-472, 477, 482, 496-519
+apps\interessados\views_exclusao.py                                        29     20    31%   22-67, 76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     24    29%   45-51, 55-76, 98-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      0   100%
+apps\portal\views.py                                                       99     79    20%   30-39, 45-74, 79-82, 87-116, 122-163, 168-189, 196-220, 225-242, 247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    158    43%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 661, 667
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3032    28%
+Coverage HTML written to dir htmlcov
+
+
+================================================================================ 11 passed in 13.84s ================================================================================
 
 
 ## apps.selecao.tests.test_reports.py
@@ -1086,82 +1234,109 @@ Coverage HTML written to dir htmlcov
 
 
 
-## apps.accounts.tests.test_middleware.py
+## apps.accounts.tests.test_middleware.py em 17/06/2026
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.accounts.tests.test_middleware -v 2
-Found 9 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_interessado_com_must_change_password_url_restrita (apps.accounts.tests.test_middleware.TestTrocarSenhaObrigatorioMiddleware.test_interessado_com_must_change_password_url_restrita) ... ok
-test_media_url_liberada_mesmo_com_must_change_password (apps.accounts.tests.test_middleware.TestTrocarSenhaObrigatorioMiddleware.test_media_url_liberada_mesmo_com_must_change_password) ... ok
-test_static_url_liberada_mesmo_com_must_change_password (apps.accounts.tests.test_middleware.TestTrocarSenhaObrigatorioMiddleware.test_static_url_liberada_mesmo_com_must_change_password) ... ok
-test_url_admin_login_liberada (apps.accounts.tests.test_middleware.TestTrocarSenhaObrigatorioMiddleware.test_url_admin_login_liberada) ... ok
-test_url_admin_logout_liberada (apps.accounts.tests.test_middleware.TestTrocarSenhaObrigatorioMiddleware.test_url_admin_logout_liberada) ... ok
-test_usuario_com_must_change_password_url_liberada_staff (apps.accounts.tests.test_middleware.TestTrocarSenhaObrigatorioMiddleware.test_usuario_com_must_change_password_url_liberada_staff) ... ok
-test_usuario_com_must_change_password_url_restrita_staff (apps.accounts.tests.test_middleware.TestTrocarSenhaObrigatorioMiddleware.test_usuario_com_must_change_password_url_restrita_staff) ... ok
-test_usuario_nao_autenticado_passa (apps.accounts.tests.test_middleware.TestTrocarSenhaObrigatorioMiddleware.test_usuario_nao_autenticado_passa) ... ok
-test_usuario_sem_must_change_password_passa (apps.accounts.tests.test_middleware.TestTrocarSenhaObrigatorioMiddleware.test_usuario_sem_must_change_password_passa) ... ok
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest apps/accounts/tests/test_middleware.py -v
+================================================================================ test session starts ================================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 9 items                                                                                                                                                                    
 
-----------------------------------------------------------------------
-Ran 9 tests in 12.263s
+apps/accounts/tests/test_middleware.py::test_usuario_nao_autenticado_passa PASSED                                                                                              [ 11%]
+apps/accounts/tests/test_middleware.py::test_usuario_sem_must_change_password_passa PASSED                                                                                     [ 22%]
+apps/accounts/tests/test_middleware.py::test_usuario_com_must_change_password_url_liberada_staff PASSED                                                                        [ 33%]
+apps/accounts/tests/test_middleware.py::test_usuario_com_must_change_password_url_restrita_staff PASSED                                                                        [ 44%]
+apps/accounts/tests/test_middleware.py::test_interessado_com_must_change_password_url_restrita PASSED                                                                          [ 55%]
+apps/accounts/tests/test_middleware.py::test_static_url_liberada_mesmo_com_must_change_password PASSED                                                                         [ 66%]
+apps/accounts/tests/test_middleware.py::test_media_url_liberada_mesmo_com_must_change_password PASSED                                                                          [ 77%]
+apps/accounts/tests/test_middleware.py::test_url_admin_login_liberada PASSED                                                                                                   [ 88%]
+apps/accounts/tests/test_middleware.py::test_url_admin_logout_liberada PASSED                                                                                                  [100%]
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    118    13%   24-37, 43-67, 72-79, 83-104, 108-116, 120-163, 167-208, 212-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      0   100%
+apps\academico\views.py                                                    63     45    29%   31-52, 61-77, 87-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     16    69%   50-65, 141-158
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20      0   100%
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      0   100%
+apps\accounts\views.py                                                     47     38    19%   26-52, 60-62, 83-114
+apps\accounts\views_exclusao.py                                            77     66    14%   19, 25-33, 43-83, 94-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    105    33%   23-26, 34-43, 47-56, 60-81, 85-93, 108-116, 131-152, 156-199, 203, 220-222, 233-236, 247-249, 255-257, 265, 278-293, 304-311, 315-317, 325-326, 338-343, 367-381, 390-392, 400
+apps\dashboard\utils_pdf.py                                               373    350     6%   25-56, 61-80, 86-87, 90-91, 94-99, 102-107, 112-298, 303-464, 469-608, 613-751
+apps\dashboard\views.py                                                    71     47    34%   33-42, 47-56, 61-70, 75-84, 89-109, 118-125, 130-137, 142-149, 154-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    106    32%   167-171, 179-213, 220-230, 234-235, 239-243, 247, 251, 255, 259, 263, 267, 271, 275-280, 287-302, 335-358, 392-396, 401-402, 406-410, 414, 418, 422, 426, 430, 434, 438, 445-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     16    88%   29, 41, 135, 138, 141, 144, 147, 151, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      0   100%
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    167    17%   49-67, 81-107, 113-115, 129-181, 194-216, 232-250, 266-323, 342-414, 422, 430-472, 477, 482, 496-519
+apps\interessados\views_exclusao.py                                        29     20    31%   22-67, 76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     24    29%   45-51, 55-76, 98-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      0   100%
+apps\portal\views.py                                                       99     79    20%   30-39, 45-74, 79-82, 87-116, 122-163, 168-189, 196-220, 225-242, 247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3058    27%
+Coverage HTML written to dir htmlcov
+
+
+================================================================================= 9 passed in 6.99s =================================================================================
 
 
 
@@ -1284,174 +1459,211 @@ Coverage HTML written to dir htmlcov
 
 
 
-## apps.academico.tests.test_certificad.py
+## apps.academico.tests.test_certificad.py em 17/06/2026
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.academico.tests.test_certificado -v 2
-Found 10 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_carga_horaria_fallback_40h (apps.academico.tests.test_certificado.TestGeradorCertificado.test_carga_horaria_fallback_40h)
-Verifica se quando carga_horaria nao existe no evento, ... C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Lib\site-packages\django\db\models\fields\__init__.py:1612: RuntimeWarning: DateTimeField Evento.data_inicio_inscricao received a naive datetime (2026-05-29 00:00:00) while time zone support is active.
-  warnings.warn(
-C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Lib\site-packages\django\db\models\fields\__init__.py:1612: RuntimeWarning: DateTimeField Evento.data_fim_inscricao received a naive datetime (2026-05-29 00:00:00) while time zone support is active.
-  warnings.warn(
-ok
-test_cpf_formatado (apps.academico.tests.test_certificado.TestGeradorCertificado.test_cpf_formatado)
-Verifica a formatacao do CPF: XXX.XXX.XXX-XX ... ok
-test_data_emissao_fallback_para_agora (apps.academico.tests.test_certificado.TestGeradorCertificado.test_data_emissao_fallback_para_agora)
-Verifica se quando data_emissao_certificado e None, ... ok
-test_gerar_pdf_multiplas_chamadas (apps.academico.tests.test_certificado.TestGeradorCertificado.test_gerar_pdf_multiplas_chamadas)
-Verifica se pode gerar multiplos PDFs sem erro ... ok
-test_gerar_pdf_retorna_buffer_valido (apps.academico.tests.test_certificado.TestGeradorCertificado.test_gerar_pdf_retorna_buffer_valido)
-Verifica se gerar_pdf retorna um buffer com PDF valido (%PDF) ... ok
-test_inicializacao_atributos (apps.academico.tests.test_certificado.TestGeradorCertificado.test_inicializacao_atributos)
-Verifica se o construtor extrai corretamente a cadeia de FK ... ok
-test_pagesize_a4_paisagem (apps.academico.tests.test_certificado.TestGeradorCertificado.test_pagesize_a4_paisagem)
-Verifica se o tamanho da pagina e A4 em modo paisagem ... ok
-test_static_path_construido (apps.academico.tests.test_certificado.TestGeradorCertificado.test_static_path_construido)
-Verifica se static_path foi construido com BASE_DIR ... ok
-test_traducao_mes_agosto (apps.academico.tests.test_certificado.TestGeradorCertificado.test_traducao_mes_agosto)
-Verifica se 'August' e traduzido para 'agosto' ... ok
-test_traducao_mes_janeiro (apps.academico.tests.test_certificado.TestGeradorCertificado.test_traducao_mes_janeiro)
-Verifica se 'January' e traduzido para 'janeiro' ... ok
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest apps/academico/tests/test_certificado.py -v
+================================================================================ test session starts ================================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 10 items                                                                                                                                                                   
 
-----------------------------------------------------------------------
-Ran 10 tests in 6.572s
+apps/academico/tests/test_certificado.py::TestAtributos::test_inicializacao_atributos PASSED                                                                                   [ 10%]
+apps/academico/tests/test_certificado.py::TestAtributos::test_pagesize_a4_paisagem PASSED                                                                                      [ 20%]
+apps/academico/tests/test_certificado.py::TestAtributos::test_static_path_construido PASSED                                                                                    [ 30%]
+apps/academico/tests/test_certificado.py::TestFormatacao::test_cpf_formatado PASSED                                                                                            [ 40%]
+apps/academico/tests/test_certificado.py::TestTraducaoMes::test_traducao_mes[data0-15 de janeiro de 2026] PASSED                                                               [ 50%]
+apps/academico/tests/test_certificado.py::TestTraducaoMes::test_traducao_mes[data1-03 de agosto de 2026] PASSED                                                                [ 60%]
+apps/academico/tests/test_certificado.py::TestFallback::test_data_emissao_fallback_para_agora PASSED                                                                           [ 70%]
+apps/academico/tests/test_certificado.py::TestFallback::test_carga_horaria_fallback_40h PASSED                                                                                 [ 80%]
+apps/academico/tests/test_certificado.py::TestGeracaoPDF::test_gerar_pdf_retorna_buffer_valido PASSED                                                                          [ 90%]
+apps/academico/tests/test_certificado.py::TestGeracaoPDF::test_gerar_pdf_multiplas_chamadas PASSED                                                                             [100%]
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136      3    98%   103-104, 193
+apps\academico\models.py                                                  110     36    67%   45, 122, 133, 142, 154, 168, 174, 191-214, 282-283, 300-316, 339-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   42-46, 50-65, 141-158
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    157     0%   12-400
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                    71     71     0%   13-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     17    88%   29, 41, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3233    23%
+Coverage HTML written to dir htmlcov
+
+
+================================================================================ 10 passed in 7.43s =================================================================================
 
 
 
-## apps.academico.tests.test_models.py
+## apps.academico.tests.test_models.py em 17/06/2026
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.academico.tests.test_models -v 2     
-Found 4 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_matricula_criada_corretamente (apps.academico.tests.test_models.TestMatriculaModel.test_matricula_criada_corretamente) ... ok
-test_matricula_unique_together_turma_interessado (apps.academico.tests.test_models.TestMatriculaModel.test_matricula_unique_together_turma_interessado)
-unique_together = ['turma', 'interessado'] ... ok
-test_status_criado_corretamente (apps.academico.tests.test_models.TestStatusMatriculaModel.test_status_criado_corretamente) ... ok
-test_status_nome_unique_no_banco (apps.academico.tests.test_models.TestStatusMatriculaModel.test_status_nome_unique_no_banco)
-Testa a constraint real, nao o comportamento da factory ... ok
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest apps/academico/tests/test_models.py -v
+================================================================================ test session starts ================================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 4 items                                                                                                                                                                    
 
-----------------------------------------------------------------------
-Ran 4 tests in 1.085s
+apps/academico/tests/test_models.py::TestStatusMatriculaModel::test_status_criado_corretamente PASSED                                                                          [ 25%]
+apps/academico/tests/test_models.py::TestStatusMatriculaModel::test_status_nome_unique_no_banco PASSED                                                                         [ 50%]
+apps/academico/tests/test_models.py::TestMatriculaModel::test_matricula_criada_corretamente PASSED                                                                             [ 75%]
+apps/academico/tests/test_models.py::TestMatriculaModel::test_matricula_unique_together_turma_interessado PASSED                                                               [100%]
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    136     0%   9-254
+apps\academico\models.py                                                  110     27    75%   45, 122, 133, 142, 168, 201-206, 282-283, 300-316, 339-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   42-46, 50-65, 141-158
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    157     0%   12-400
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                    71     71     0%   13-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     17    88%   29, 41, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3357    20%
+Coverage HTML written to dir htmlcov
 
+
+================================================================================= 4 passed in 3.55s =================================================================================
 
 
 
@@ -1571,85 +1783,111 @@ Coverage HTML written to dir htmlcov
 
 
 
-## apps.academico.tests.test_views.py
+## apps.academico.tests.test_views.py em 17/06/2026
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest apps/academico/tests/test_views.py -v
+================================================================================ test session starts ================================================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 11 items                                                                                                                                                                   
+
+apps/academico/tests/test_views.py::TestDownloadCertificadoIndividual::test_sem_autenticacao_redireciona PASSED                                                                [  9%]
+apps/academico/tests/test_views.py::TestDownloadCertificadoIndividual::test_aluno_aprovado_gera_pdf PASSED                                                                     [ 18%]
+apps/academico/tests/test_views.py::TestDownloadCertificadoIndividual::test_aluno_reprovado_retorna_400 PASSED                                                                 [ 27%]
+apps/academico/tests/test_views.py::TestDownloadCertificadoIndividual::test_avaliacao_inexistente_retorna_404 PASSED                                                           [ 36%]
+apps/academico/tests/test_views.py::TestPreviewCertificado::test_sem_autenticacao_redireciona PASSED                                                                           [ 45%]
+apps/academico/tests/test_views.py::TestPreviewCertificado::test_aluno_aprovado_inline PASSED                                                                                  [ 54%]
+apps/academico/tests/test_views.py::TestPreviewCertificado::test_aluno_reprovado_retorna_400 PASSED                                                                            [ 63%]
+apps/academico/tests/test_views.py::TestDownloadCertificadosLote::test_sem_ids_retorna_400 PASSED                                                                              [ 72%]
+apps/academico/tests/test_views.py::TestDownloadCertificadosLote::test_ids_invalidos_retorna_400 PASSED                                                                        [ 81%]
+apps/academico/tests/test_views.py::TestDownloadCertificadosLote::test_apenas_aprovados_no_zip PASSED                                                                          [ 90%]
+apps/academico/tests/test_views.py::TestDownloadCertificadosLote::test_zip_com_multiplos_certificados PASSED                                                                   [100%]
+
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136      4    97%   103-104, 193, 219
+apps\academico\models.py                                                  110     25    77%   45, 122, 133, 142, 154, 168, 204-206, 282-283, 300-316, 339-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      0   100%
+apps\academico\views.py                                                    63      0   100%
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     16    69%   50-65, 141-158
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20      9    55%   66-81
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      0   100%
+apps\accounts\views.py                                                     47     38    19%   26-52, 60-62, 83-114
+apps\accounts\views_exclusao.py                                            77     66    14%   19, 25-33, 43-83, 94-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    105    33%   23-26, 34-43, 47-56, 60-81, 85-93, 108-116, 131-152, 156-199, 203, 220-222, 233-236, 247-249, 255-257, 265, 278-293, 304-311, 315-317, 325-326, 338-343, 367-381, 390-392, 400
+apps\dashboard\utils_pdf.py                                               373    350     6%   25-56, 61-80, 86-87, 90-91, 94-99, 102-107, 112-298, 303-464, 469-608, 613-751
+apps\dashboard\views.py                                                    71     47    34%   33-42, 47-56, 61-70, 75-84, 89-109, 118-125, 130-137, 142-149, 154-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    106    32%   167-171, 179-213, 220-230, 234-235, 239-243, 247, 251, 255, 259, 263, 267, 271, 275-280, 287-302, 335-358, 392-396, 401-402, 406-410, 414, 418, 422, 426, 430, 434, 438, 445-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     17    88%   29, 41, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      0   100%
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    167    17%   49-67, 81-107, 113-115, 129-181, 194-216, 232-250, 266-323, 342-414, 422, 430-472, 477, 482, 496-519
+apps\interessados\views_exclusao.py                                        29     20    31%   22-67, 76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     24    29%   45-51, 55-76, 98-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      0   100%
+apps\portal\views.py                                                       99     79    20%   30-39, 45-74, 79-82, 87-116, 122-163, 168-189, 196-220, 225-242, 247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   2883    31%
+Coverage HTML written to dir htmlcov
 
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.academico.tests.test_views -v 2
-Found 11 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_aluno_aprovado_gera_pdf (apps.academico.tests.test_views.TestDownloadCertificadoIndividual.test_aluno_aprovado_gera_pdf) ... ok
-test_aluno_reprovado_retorna_400 (apps.academico.tests.test_views.TestDownloadCertificadoIndividual.test_aluno_reprovado_retorna_400) ... ok
-test_avaliacao_inexistente_retorna_404 (apps.academico.tests.test_views.TestDownloadCertificadoIndividual.test_avaliacao_inexistente_retorna_404) ... ok
-test_sem_autenticacao_redireciona (apps.academico.tests.test_views.TestDownloadCertificadoIndividual.test_sem_autenticacao_redireciona) ... ok
-test_apenas_aprovados_no_zip (apps.academico.tests.test_views.TestDownloadCertificadosLote.test_apenas_aprovados_no_zip) ... ok
-test_ids_invalidos_retorna_400 (apps.academico.tests.test_views.TestDownloadCertificadosLote.test_ids_invalidos_retorna_400) ... ok
-test_sem_ids_retorna_400 (apps.academico.tests.test_views.TestDownloadCertificadosLote.test_sem_ids_retorna_400) ... ok
-test_zip_com_multiplos_certificados (apps.academico.tests.test_views.TestDownloadCertificadosLote.test_zip_com_multiplos_certificados) ... ok
-test_aluno_aprovado_inline (apps.academico.tests.test_views.TestPreviewCertificado.test_aluno_aprovado_inline) ... ok
-test_aluno_reprovado_retorna_400 (apps.academico.tests.test_views.TestPreviewCertificado.test_aluno_reprovado_retorna_400) ... ok
-test_sem_autenticacao_redireciona (apps.academico.tests.test_views.TestPreviewCertificado.test_sem_autenticacao_redireciona) ... ok
-
-----------------------------------------------------------------------
-Ran 11 tests in 9.858s
-
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+================================================================================ 11 passed in 13.41s ================================================================================
 
 
 
@@ -1772,7 +2010,7 @@ Destroying test database for alias 'default' ('test_bdmetareciclagem')...
 
 
 
-##  apps/dashboard/tests/test_services.py em 12/06/2026
+##  apps.dashboard.tests.test_services.py em 12/06/2026
 
 (.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/dashboard/tests/test_services.py -v
 ========================================================= test session starts ==========================================================
@@ -2206,201 +2444,251 @@ Destroying test database for alias 'default' ('test_bdmetareciclagem')...
 
 
 
-## apps.interessados.tests.test_models.py
+## apps.interessados.tests.test_models.py em 16/06/2026
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.interessados.tests.test_models -v 2
-Found 38 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_descricao_pode_ser_vazia (apps.interessados.tests.test_models.TestFototipoModel.test_descricao_pode_ser_vazia) ... ok
-test_factory_cria_valido (apps.interessados.tests.test_models.TestFototipoModel.test_factory_cria_valido) ... ok
-test_cpfs_diferentes_hashes_diferentes (apps.interessados.tests.test_models.TestHashCPF.test_cpfs_diferentes_hashes_diferentes) ... ok
-test_hash_tem_64_caracteres (apps.interessados.tests.test_models.TestHashCPF.test_hash_tem_64_caracteres) ... ok
-test_mesmo_cpf_mesmo_hash (apps.interessados.tests.test_models.TestHashCPF.test_mesmo_cpf_mesmo_hash) ... ok
-test_cep_muito_curto_rejeita (apps.interessados.tests.test_models.TestInteressadoModel.test_cep_muito_curto_rejeita) ... ok
-test_cep_valido (apps.interessados.tests.test_models.TestInteressadoModel.test_cep_valido) ... ok
-test_check_password_errado (apps.interessados.tests.test_models.TestInteressadoModel.test_check_password_errado) ... ok
-test_check_password_ok (apps.interessados.tests.test_models.TestInteressadoModel.test_check_password_ok) ... ok
-test_cpf_11_digitos_valido (apps.interessados.tests.test_models.TestInteressadoModel.test_cpf_11_digitos_valido) ... ok
-test_cpf_criptografado_no_banco (apps.interessados.tests.test_models.TestInteressadoModel.test_cpf_criptografado_no_banco) ... ok
-test_cpf_formatado_aceito_pelo_model (apps.interessados.tests.test_models.TestInteressadoModel.test_cpf_formatado_aceito_pelo_model)
-Model aceita CPF formatado (14 chars). A limpeza e da form. ... ok
-test_cpf_hash_busca_eficiente (apps.interessados.tests.test_models.TestInteressadoModel.test_cpf_hash_busca_eficiente) ... ok
-test_cpf_hash_unico (apps.interessados.tests.test_models.TestInteressadoModel.test_cpf_hash_unico) ... ok
-test_factory_cria_interessado_valido (apps.interessados.tests.test_models.TestInteressadoModel.test_factory_cria_interessado_valido) ... ok
-test_is_anonymous (apps.interessados.tests.test_models.TestInteressadoModel.test_is_anonymous) ... ok
-test_is_authenticated (apps.interessados.tests.test_models.TestInteressadoModel.test_is_authenticated) ... ok
-test_multiplas_deficiencias (apps.interessados.tests.test_models.TestInteressadoModel.test_multiplas_deficiencias) ... ok
-test_nis_criptografado_no_banco (apps.interessados.tests.test_models.TestInteressadoModel.test_nis_criptografado_no_banco) ... ok
-test_nis_muito_curto_rejeita (apps.interessados.tests.test_models.TestInteressadoModel.test_nis_muito_curto_rejeita) ... ok
-test_nis_valido (apps.interessados.tests.test_models.TestInteressadoModel.test_nis_valido) ... ok
-test_relacionamento_fototipo (apps.interessados.tests.test_models.TestInteressadoModel.test_relacionamento_fototipo) ... ok
-test_relacionamento_sexo (apps.interessados.tests.test_models.TestInteressadoModel.test_relacionamento_sexo) ... ok
-test_relacionamentos_simultaneos (apps.interessados.tests.test_models.TestInteressadoModel.test_relacionamentos_simultaneos) ... ok
-test_senha_nao_e_texto_puro (apps.interessados.tests.test_models.TestInteressadoModel.test_senha_nao_e_texto_puro) ... ok
-test_str_contem_nome (apps.interessados.tests.test_models.TestInteressadoModel.test_str_contem_nome) ... ok
-test_tem_deficiencia_property (apps.interessados.tests.test_models.TestInteressadoModel.test_tem_deficiencia_property) ... ok
-test_expiracao_futura (apps.interessados.tests.test_models.TestPasswordResetTokenModel.test_expiracao_futura) ... ok
-test_factory_cria_token_valido (apps.interessados.tests.test_models.TestPasswordResetTokenModel.test_factory_cria_token_valido) ... ok
-test_marca_como_usado (apps.interessados.tests.test_models.TestPasswordResetTokenModel.test_marca_como_usado) ... ok
-test_factory_cria_valido (apps.interessados.tests.test_models.TestSexoModel.test_factory_cria_valido) ... ok
-test_str_retorna_nome (apps.interessados.tests.test_models.TestSexoModel.test_str_retorna_nome) ... ok
-test_unique_constraint_violado (apps.interessados.tests.test_models.TestSexoModel.test_unique_constraint_violado) ... ok
-test_criada_com_status_pendente (apps.interessados.tests.test_models.TestSolicitacaoExclusao.test_criada_com_status_pendente) ... ok
-test_email_solicitante_opcional (apps.interessados.tests.test_models.TestSolicitacaoExclusao.test_email_solicitante_opcional) ... ok
-test_nome_solicitante_obrigatorio (apps.interessados.tests.test_models.TestSolicitacaoExclusao.test_nome_solicitante_obrigatorio) ... ok
-test_str_contem_status_e_nome (apps.interessados.tests.test_models.TestSolicitacaoExclusao.test_str_contem_status_e_nome) ... ok
-test_todos_os_status_sao_validos (apps.interessados.tests.test_models.TestSolicitacaoExclusao.test_todos_os_status_sao_validos) ... ok
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/interessados/tests/test_models.py -v
+=================================================== test session starts ===================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 38 items                                                                                                         
 
-----------------------------------------------------------------------
-Ran 38 tests in 14.695s
+apps/interessados/tests/test_models.py::TestHashCPF::test_mesmo_cpf_mesmo_hash PASSED                                [  2%]
+apps/interessados/tests/test_models.py::TestHashCPF::test_cpfs_diferentes_hashes_diferentes PASSED                   [  5%]
+apps/interessados/tests/test_models.py::TestHashCPF::test_hash_tem_64_caracteres PASSED                              [  7%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_senha_nao_e_texto_puro PASSED                     [ 10%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_check_password_ok PASSED                          [ 13%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_check_password_errado PASSED                      [ 15%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_is_authenticated PASSED                           [ 18%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_is_anonymous PASSED                               [ 21%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_str_contem_nome PASSED                            [ 23%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_cpf_criptografado_no_banco PASSED                 [ 26%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_cpf_hash_unico PASSED                             [ 28%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_cpf_hash_busca_eficiente PASSED                   [ 31%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_nis_criptografado_no_banco PASSED                 [ 34%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_factory_cria_interessado_valido PASSED            [ 36%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_cpf_11_digitos_valido PASSED                      [ 39%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_cpf_formatado_aceito_pelo_model PASSED            [ 42%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_nis_valido PASSED                                 [ 44%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_nis_muito_curto_rejeita PASSED                    [ 47%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_cep_valido PASSED                                 [ 50%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_cep_muito_curto_rejeita PASSED                    [ 52%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_relacionamento_sexo PASSED                        [ 55%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_relacionamento_fototipo PASSED                    [ 57%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_relacionamentos_simultaneos PASSED                [ 60%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_multiplas_deficiencias PASSED                     [ 63%]
+apps/interessados/tests/test_models.py::TestInteressadoModel::test_tem_deficiencia_property PASSED                   [ 65%]
+apps/interessados/tests/test_models.py::TestSolicitacaoExclusao::test_criada_com_status_pendente PASSED              [ 68%]
+apps/interessados/tests/test_models.py::TestSolicitacaoExclusao::test_todos_os_status_sao_validos PASSED             [ 71%]
+apps/interessados/tests/test_models.py::TestSolicitacaoExclusao::test_nome_solicitante_obrigatorio PASSED            [ 73%]
+apps/interessados/tests/test_models.py::TestSolicitacaoExclusao::test_email_solicitante_opcional PASSED              [ 76%]
+apps/interessados/tests/test_models.py::TestSolicitacaoExclusao::test_str_contem_status_e_nome PASSED                [ 78%]
+apps/interessados/tests/test_models.py::TestSexoModel::test_factory_cria_valido PASSED                               [ 81%]
+apps/interessados/tests/test_models.py::TestSexoModel::test_str_retorna_nome PASSED                                  [ 84%]
+apps/interessados/tests/test_models.py::TestSexoModel::test_unique_constraint_violado PASSED                         [ 86%]
+apps/interessados/tests/test_models.py::TestFototipoModel::test_factory_cria_valido PASSED                           [ 89%]
+apps/interessados/tests/test_models.py::TestFototipoModel::test_descricao_pode_ser_vazia PASSED                      [ 92%]
+apps/interessados/tests/test_models.py::TestPasswordResetTokenModel::test_factory_cria_token_valido PASSED           [ 94%]
+apps/interessados/tests/test_models.py::TestPasswordResetTokenModel::test_expiracao_futura PASSED                    [ 97%]
+apps/interessados/tests/test_models.py::TestPasswordResetTokenModel::test_marca_como_usado PASSED                    [100%]
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    136     0%   9-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   40-44, 48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    157     0%   12-400
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                    71     71     0%   13-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     10    93%   41, 138, 141, 144, 147, 158, 162, 188, 191-192
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3374    20%
+Coverage HTML written to dir htmlcov
+
+
+=================================================== 38 passed in 18.44s ===================================================
 
 
 
-## apps.interessados.tests.test_views.py
+## apps.interessados.tests.test_views.py em 16/06/2026
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.interessados.tests.test_views -v 2         
-Found 16 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_nao_autenticado_redireciona_login (apps.interessados.tests.test_views.TestDashboardAutenticacao.test_nao_autenticado_redireciona_login) ... ok
-test_usuario_inativo_redireciona_login (apps.interessados.tests.test_views.TestDashboardAutenticacao.test_usuario_inativo_redireciona_login)
-Login via POST com usuario inativo nao autentica e redireciona. ... ok
-test_cadastro_post_com_dados_completos (apps.interessados.tests.test_views.TestInteressadosViews.test_cadastro_post_com_dados_completos)
-CPF valido: 111.222.333-96. ... ok
-test_cadastro_rejeita_senha_fraca (apps.interessados.tests.test_views.TestInteressadosViews.test_cadastro_rejeita_senha_fraca) ... ok
-test_cadastro_view_get (apps.interessados.tests.test_views.TestInteressadosViews.test_cadastro_view_get) ... ok
-test_cadastro_view_post_valido (apps.interessados.tests.test_views.TestInteressadosViews.test_cadastro_view_post_valido) ... ok
-test_dashboard_com_login (apps.interessados.tests.test_views.TestInteressadosViews.test_dashboard_com_login) ... ok
-test_dashboard_requer_login (apps.interessados.tests.test_views.TestInteressadosViews.test_dashboard_requer_login) ... ok
-test_login_nao_expoe_mensagem_diferenciada (apps.interessados.tests.test_views.TestInteressadosViews.test_login_nao_expoe_mensagem_diferenciada) ... ok
-test_login_sql_injection (apps.interessados.tests.test_views.TestInteressadosViews.test_login_sql_injection) ... ok
-test_login_view_valido (apps.interessados.tests.test_views.TestInteressadosViews.test_login_view_valido) ... ok
-test_meus_dados_edicao_sem_nome_rejeita (apps.interessados.tests.test_views.TestInteressadosViews.test_meus_dados_edicao_sem_nome_rejeita) ... ok
-test_meus_dados_edicao_valida (apps.interessados.tests.test_views.TestInteressadosViews.test_meus_dados_edicao_valida)
-POST com dados minimos que o EdicaoInteressadoForm aceita. ... ok
-test_meus_dados_view_get (apps.interessados.tests.test_views.TestInteressadosViews.test_meus_dados_view_get) ... ok
-test_senha_recuperar_view (apps.interessados.tests.test_views.TestInteressadosViews.test_senha_recuperar_view) ... ok
-test_portal_index (apps.interessados.tests.test_views.TestPortalViews.test_portal_index) ... ok
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/interessados/tests/test_views.py -v
+=================================================== test session starts ===================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 16 items                                                                                                         
 
-----------------------------------------------------------------------
-Ran 16 tests in 13.566s
+apps/interessados/tests/test_views.py::TestPortalViews::test_portal_index PASSED                                     [  6%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_cadastro_view_get PASSED                          [ 12%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_cadastro_view_post_valido PASSED                  [ 18%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_cadastro_post_com_dados_completos PASSED          [ 25%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_cadastro_rejeita_senha_fraca PASSED               [ 31%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_login_view_valido PASSED                          [ 37%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_login_sql_injection PASSED                        [ 43%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_login_nao_expoe_mensagem_diferenciada PASSED      [ 50%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_dashboard_requer_login PASSED                     [ 56%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_dashboard_com_login PASSED                        [ 62%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_meus_dados_view_get PASSED                        [ 68%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_meus_dados_edicao_valida PASSED                   [ 75%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_meus_dados_edicao_sem_nome_rejeita PASSED         [ 81%]
+apps/interessados/tests/test_views.py::TestInteressadosViews::test_senha_recuperar_view PASSED                       [ 87%]
+apps/interessados/tests/test_views.py::TestDashboardAutenticacao::test_nao_autenticado_redireciona_login PASSED      [ 93%]
+apps/interessados/tests/test_views.py::TestDashboardAutenticacao::test_usuario_inativo_redireciona_login PASSED      [100%]
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    118    13%   24-37, 43-67, 72-79, 83-104, 108-116, 120-163, 167-208, 212-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      0   100%
+apps\academico\views.py                                                    63     45    29%   31-52, 61-77, 87-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     16    69%   48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20      9    55%   66-81
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      0   100%
+apps\accounts\views.py                                                     47     38    19%   26-52, 60-62, 83-114
+apps\accounts\views_exclusao.py                                            77     66    14%   19, 25-33, 43-83, 94-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    105    33%   23-26, 34-43, 47-56, 60-81, 85-93, 108-116, 131-152, 156-199, 203, 220-222, 233-236, 247-249, 255-257, 265, 278-293, 304-311, 315-317, 325-326, 338-343, 367-381, 390-392, 400
+apps\dashboard\utils_pdf.py                                               373    350     6%   25-56, 61-80, 86-87, 90-91, 94-99, 102-107, 112-298, 303-464, 469-608, 613-751
+apps\dashboard\views.py                                                    71     47    34%   33-42, 47-56, 61-70, 75-84, 89-109, 118-125, 130-137, 142-149, 154-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     46    10%   27-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     16    36%   33-52, 70-73
+apps\interessados\forms.py                                                157     15    90%   185, 189, 195, 197, 205, 222, 227, 229, 242, 279, 395-396, 409, 447, 452
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     15    89%   29, 41, 135, 138, 141, 144, 147, 151, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      0   100%
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    105    48%   60-61, 88-92, 105, 113-115, 132-134, 197-199, 209-210, 232-250, 266-323, 396-401, 409-414, 422, 430-472, 477, 482, 496-519
+apps\interessados\views_exclusao.py                                        29     20    31%   22-67, 76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     24    29%   45-51, 55-76, 98-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      0   100%
+apps\portal\views.py                                                       99     76    23%   45-74, 79-82, 87-116, 122-163, 168-189, 196-220, 225-242, 247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   2896    31%
+Coverage HTML written to dir htmlcov
+
+
+=================================================== 16 passed in 15.48s ===================================================
 
 
 
@@ -2513,83 +2801,110 @@ Destroying test database for alias 'default' ('test_bdmetareciclagem')...
 
 
 
-## apps.interessados.tests.test_authentication.py
+## apps.interessados.tests.test_authentication.py em 16/06/2026
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.interessados.tests.test_authentication -v 2
-Found 10 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_autentica_com_cpf_e_senha_validos (apps.interessados.tests.test_authentication.TestInteressadoBackendAuthenticate.test_autentica_com_cpf_e_senha_validos) ... ok
-test_autentica_com_cpf_inexistente_retorna_none (apps.interessados.tests.test_authentication.TestInteressadoBackendAuthenticate.test_autentica_com_cpf_inexistente_retorna_none) ... ok
-test_autentica_com_cpf_none_retorna_none (apps.interessados.tests.test_authentication.TestInteressadoBackendAuthenticate.test_autentica_com_cpf_none_retorna_none) ... ok
-test_autentica_com_senha_errada_retorna_none (apps.interessados.tests.test_authentication.TestInteressadoBackendAuthenticate.test_autentica_com_senha_errada_retorna_none) ... ok
-test_autentica_com_senha_none_retorna_none (apps.interessados.tests.test_authentication.TestInteressadoBackendAuthenticate.test_autentica_com_senha_none_retorna_none) ... ok
-test_autentica_interessado_inativo_retorna_none (apps.interessados.tests.test_authentication.TestInteressadoBackendAuthenticate.test_autentica_interessado_inativo_retorna_none) ... ok
-test_autentica_sem_request_mas_com_cpf_valido (apps.interessados.tests.test_authentication.TestInteressadoBackendAuthenticate.test_autentica_sem_request_mas_com_cpf_valido) ... ok
-test_get_user_com_id_inexistente_retorna_none (apps.interessados.tests.test_authentication.TestInteressadoBackendGetUser.test_get_user_com_id_inexistente_retorna_none) ... ok
-test_get_user_com_id_valido_retorna_interessado (apps.interessados.tests.test_authentication.TestInteressadoBackendGetUser.test_get_user_com_id_valido_retorna_interessado) ... ok
-test_get_user_interessado_inativo_retorna_none (apps.interessados.tests.test_authentication.TestInteressadoBackendGetUser.test_get_user_interessado_inativo_retorna_none) ... ok
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/interessados/tests/test_authentication.py -v
+=================================================== test session starts ===================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 10 items                                                                                                         
 
-----------------------------------------------------------------------
-Ran 10 tests in 3.652s
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendAuthenticate::test_autentica_com_cpf_e_senha_validos PASSED [ 10%]
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendAuthenticate::test_autentica_com_senha_errada_retorna_none PASSED [ 20%]
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendAuthenticate::test_autentica_com_cpf_inexistente_retorna_none PASSED [ 30%]
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendAuthenticate::test_autentica_com_cpf_none_retorna_none PASSED [ 40%]
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendAuthenticate::test_autentica_com_senha_none_retorna_none PASSED [ 50%]
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendAuthenticate::test_autentica_interessado_inativo_retorna_none PASSED [ 60%]
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendAuthenticate::test_autentica_sem_request_mas_com_cpf_valido PASSED [ 70%]
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendGetUser::test_get_user_com_id_valido_retorna_interessado PASSED [ 80%]
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendGetUser::test_get_user_com_id_inexistente_retorna_none PASSED [ 90%]
+apps/interessados/tests/test_authentication.py::TestInteressadoBackendGetUser::test_get_user_interessado_inativo_retorna_none PASSED [100%]
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    136     0%   9-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   40-44, 48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    157     0%   12-400
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                    71     71     0%   13-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25      0   100%
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     16    88%   29, 41, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3355    20%
+Coverage HTML written to dir htmlcov
+
+
+=================================================== 10 passed in 12.86s ===================================================
 
 
 
@@ -2950,229 +3265,282 @@ Destroying test database for alias 'default' ('test_bdmetareciclagem')...
 
 
 
-##  apps.scripts_admin.management.commands.tests.test_classificar_evento.py
+##  apps.scripts_admin.management.commands.tests.test_classificar_evento.py em 16/06/2026
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.scripts_admin.management.commands.tests.test_classificar_evento -v 2
-Found 32 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_criterio_ordenacao_nao_soma_pontos (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoCriterioOrdenacaoTest.test_criterio_ordenacao_nao_soma_pontos) ... ok
-test_desempate_idoso_prioriza_mais_velho (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoDesempatePorIdadeTest.test_desempate_idoso_prioriza_mais_velho) ... ok
-test_desempate_jovem_prioriza_mais_novo (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoDesempatePorIdadeTest.test_desempate_jovem_prioriza_mais_novo) ... ok
-test_evento_inexistente_exibe_erro (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoEventoNaoEncontradoTest.test_evento_inexistente_exibe_erro) ... ok
-test_segunda_execucao_nao_duplica_classificacao (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoIdempotenciaTest.test_segunda_execucao_nao_duplica_classificacao) ... C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Lib\site-packages\django\db\models\fields\__init__.py:1612: RuntimeWarning: DateTimeField Classificacao.processado_em received a naive datetime (2026-06-02 00:00:00) while time zone support is active.
-  warnings.warn(
-ok
-test_segunda_execucao_nao_duplica_criterios_atendidos (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoIdempotenciaTest.test_segunda_execucao_nao_duplica_criterios_atendidos) ... ok
-test_criterio_cota_racial_indigena (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_cota_racial_indigena) ... ok
-test_criterio_cota_racial_nao_atribuido_para_branca (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_cota_racial_nao_atribuido_para_branca) ... ok
-test_criterio_cota_racial_parda (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_cota_racial_parda) ... ok
-test_criterio_cota_racial_preta (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_cota_racial_preta) ... ok
-test_criterio_cota_racial_sem_fototipo (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_cota_racial_sem_fototipo) ... ok
-test_criterio_escolaridade_fundamental_incompleto (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_escolaridade_fundamental_incompleto) ... ok
-test_criterio_escolaridade_medio_completo (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_escolaridade_medio_completo) ... ok
-test_criterio_idoso_atribuido_50_anos (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_idoso_atribuido_50_anos) ... ok
-test_criterio_idoso_nao_atribuido_para_49_anos (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_idoso_nao_atribuido_para_49_anos) ... ok
-test_criterio_jovem_atribuido_16_anos (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_jovem_atribuido_16_anos) ... ok
-test_criterio_jovem_atribuido_24_anos (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_jovem_atribuido_24_anos) ... ok
-test_criterio_jovem_nao_atribuido_para_adulto (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_jovem_nao_atribuido_para_adulto) ... ok
-test_criterio_nis_atribuido (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_nis_atribuido) ... ok
-test_criterio_nis_nao_atribuido_sem_nis (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_nis_nao_atribuido_sem_nis) ... ok
-test_criterio_pcd_atribuido (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_pcd_atribuido) ... ok
-test_criterio_pcd_nao_atribuido_quando_sem_deficiencia (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_criterio_pcd_nao_atribuido_quando_sem_deficiencia) ... ok
-test_multiplos_criterios_somam_pontos (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPontuacaoTest.test_multiplos_criterios_somam_pontos) ... ok
-test_fora_das_vagas_esta_em_lista_espera (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPosicaoTest.test_fora_das_vagas_esta_em_lista_espera) ... ok
-test_posicoes_sao_unicas (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPosicaoTest.test_posicoes_sao_unicas) ... ok
-test_primeiro_colocado_esta_classificado (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPosicaoTest.test_primeiro_colocado_esta_classificado) ... ok
-test_total_de_classificacoes_igual_ao_total_de_inscricoes (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoPosicaoTest.test_total_de_classificacoes_igual_ao_total_de_inscricoes) ... ok
-test_sem_criterios_exibe_aviso (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoSemCriteriosTest.test_sem_criterios_exibe_aviso) ... ok
-test_sem_inscricoes_confirmadas_exibe_aviso (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoSemInscricoesTest.test_sem_inscricoes_confirmadas_exibe_aviso) ... ok
-test_sem_inscricoes_nao_cria_classificacao (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoSemInscricoesTest.test_sem_inscricoes_nao_cria_classificacao) ... ok
-test_inscricao_confirmada_e_processada (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoStatusInscricaoTest.test_inscricao_confirmada_e_processada) ... ok
-test_inscricao_pendente_e_ignorada (apps.scripts_admin.management.commands.tests.test_classificar_evento.ClassificarEventoStatusInscricaoTest.test_inscricao_pendente_e_ignorada) ... ok
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/scripts_admin/management/commands/tests/test_classificar_evento.py -v
+=================================================== test session starts ===================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 32 items                                                                                                         
 
-----------------------------------------------------------------------
-Ran 32 tests in 1.127s
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoEventoNaoEncontrado::test_evento_inexistente_exibe_erro PASSED [  3%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoSemInscricoes::test_sem_inscricoes_confirmadas_exibe_aviso PASSED [  6%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoSemInscricoes::test_sem_inscricoes_nao_cria_classificacao PASSED [  9%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoSemCriterios::test_sem_criterios_exibe_aviso PASSED [ 12%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_pcd_atribuido PASSED [ 15%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_pcd_nao_atribuido_quando_sem_deficiencia PASSED [ 18%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_nis_atribuido PASSED [ 21%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_nis_nao_atribuido_sem_nis PASSED [ 25%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_jovem_atribuido_16_anos PASSED [ 28%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_jovem_atribuido_24_anos PASSED [ 31%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_jovem_nao_atribuido_para_adulto PASSED [ 34%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_idoso_atribuido_50_anos PASSED [ 37%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_idoso_nao_atribuido_para_49_anos PASSED [ 40%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_cota_racial_preta PASSED [ 43%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_cota_racial_parda PASSED [ 46%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_cota_racial_indigena PASSED [ 50%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_cota_racial_nao_atribuido_para_branca PASSED [ 53%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_cota_racial_sem_fototipo PASSED [ 56%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_escolaridade_fundamental_incompleto PASSED [ 59%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_criterio_escolaridade_medio_completo PASSED [ 62%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPontuacao::test_multiplos_criterios_somam_pontos PASSED [ 65%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoCriterioOrdenacao::test_criterio_ordenacao_nao_soma_pontos PASSED [ 68%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPosicao::test_primeiro_colocado_esta_classificado PASSED [ 71%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPosicao::test_fora_das_vagas_esta_em_lista_espera PASSED [ 75%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPosicao::test_total_de_classificacoes_igual_ao_total_de_inscricoes PASSED [ 78%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoPosicao::test_posicoes_sao_unicas PASSED [ 81%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoDesempatePorIdade::test_desempate_jovem_prioriza_mais_novo PASSED [ 84%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoDesempatePorIdade::test_desempate_idoso_prioriza_mais_velho PASSED [ 87%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoIdempotencia::test_segunda_execucao_nao_duplica_classificacao PASSED [ 90%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoIdempotencia::test_segunda_execucao_nao_duplica_criterios_atendidos PASSED [ 93%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoStatusInscricao::test_inscricao_pendente_e_ignorada PASSED [ 96%]
+apps/scripts_admin/management/commands/tests/test_classificar_evento.py::TestClassificarEventoStatusInscricao::test_inscricao_confirmada_e_processada PASSED [100%]
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    136     0%   9-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   40-44, 48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    157     0%   12-400
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                    71     71     0%   13-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     18    87%   22, 29, 41, 132, 135, 138, 141, 144, 147, 151, 155, 158, 162, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134      9    93%   82, 100-101, 182-184, 188-190
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66     66     0%   8-234
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223,233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71      8    89%   38, 74, 129, 133-134, 137, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3250    23%
+Coverage HTML written to dir htmlcov
 
 
-##  apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.py
+=================================================== 32 passed in 3.63s ====================================================
 
-(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python manage.py test apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais -v 2
-Found 53 test(s).
-Creating test database for alias 'default' ('test_bdmetareciclagem')...
-Operations to perform:
-  Synchronize unmigrated apps: csp, django_extensions, messages, scripts_admin, staticfiles
-  Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
-Synchronizing apps without migrations:
-  Creating tables...
-    Running deferred SQL...
-Running migrations:
-  Applying interessados.0001_initial... OK
-  Applying eventos.0001_initial... OK
-  Applying selecao.0001_initial... OK
-  Applying interessados.0002_interessado_cep_interessado_raca_cor... OK
-  Applying interessados.0003_remove_interessado_raca_cor... OK
-  Applying interessados.0004_passwordresettoken... OK
-  Applying interessados.0005_interessado_must_change_password... OK
-  Applying academico.0001_initial... OK
-  Applying academico.0002_matricula_academico_m_inscric_af84a1_idx... OK
-  Applying contenttypes.0001_initial... OK
-  Applying contenttypes.0002_remove_content_type_name... OK
-  Applying auth.0001_initial... OK
-  Applying auth.0002_alter_permission_name_max_length... OK
-  Applying auth.0003_alter_user_email_max_length... OK
-  Applying auth.0004_alter_user_username_opts... OK
-  Applying auth.0005_alter_user_last_login_null... OK
-  Applying auth.0006_require_contenttypes_0002... OK
-  Applying auth.0007_alter_validators_add_error_messages... OK
-  Applying auth.0008_alter_user_username_max_length... OK
-  Applying auth.0009_alter_user_last_name_max_length... OK
-  Applying auth.0010_alter_group_name_max_length... OK
-  Applying auth.0011_update_proxy_permissions... OK
-  Applying auth.0012_alter_user_first_name_max_length... OK
-  Applying accounts.0001_initial... OK
-  Applying accounts.0002_usuario_must_change_password... OK
-  Applying accounts.0003_alter_usuario_email... OK
-  Applying admin.0001_initial... OK
-  Applying admin.0002_logentry_remove_auto_add... OK
-  Applying admin.0003_logentry_add_action_flag_choices... OK
-  Applying axes.0001_initial... OK
-  Applying axes.0002_auto_20151217_2044... OK
-  Applying axes.0003_auto_20160322_0929... OK
-  Applying axes.0004_auto_20181024_1538... OK
-  Applying axes.0005_remove_accessattempt_trusted... OK
-  Applying axes.0006_remove_accesslog_trusted... OK
-  Applying axes.0007_alter_accessattempt_unique_together... OK
-  Applying axes.0008_accessfailurelog... OK
-  Applying axes.0009_add_session_hash... OK
-  Applying axes.0010_accessattemptexpiration... OK
-  Applying interessados.0006_alter_interessado_email... OK
-  Applying interessados.0007_alter_interessado_cpf_alter_interessado_num_nis... OK
-  Applying interessados.0008_interessado_cpf_hash... OK
-  Applying interessados.0009_interessado_cpf_hash_unique... OK
-  Applying interessados.0010_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0011_alter_interessado_consentimento_lgpd_and_more... OK
-  Applying interessados.0012_alter_interessado_cpf_alter_sexo_nome... OK
-  Applying selecao.0002_alter_classificacao_pontuacao_total_and_more... OK
-  Applying sessions.0001_initial... OK
-System check identified no issues (0 silenced).
-test_comando_executa_sem_erro (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisComandoTest.test_comando_executa_sem_erro) ... ok
-test_comando_nao_vazio (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisComandoTest.test_comando_nao_vazio) ... ok
-test_comando_retorna_string (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisComandoTest.test_comando_retorna_string) ... ok
-test_criterio_cota_racial (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisCriteriosTest.test_criterio_cota_racial) ... ok
-test_criterio_ensino_fundamental (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisCriteriosTest.test_criterio_ensino_fundamental) ... ok
-test_criterio_idoso (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisCriteriosTest.test_criterio_idoso) ... ok
-test_criterio_jovem (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisCriteriosTest.test_criterio_jovem) ... ok
-test_criterio_pcd (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisCriteriosTest.test_criterio_pcd) ... ok
-test_criterio_programa_social (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisCriteriosTest.test_criterio_programa_social) ... ok
-test_criterio_renda_baixa (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisCriteriosTest.test_criterio_renda_baixa) ... ok
-test_fototipo_amarela (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisFototipesTest.test_fototipo_amarela) ... ok
-test_fototipo_branca (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisFototipesTest.test_fototipo_branca) ... ok
-test_fototipo_indigena (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisFototipesTest.test_fototipo_indigena) ... ok
-test_fototipo_parda (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisFototipesTest.test_fototipo_parda) ... ok
-test_fototipo_preta (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisFototipesTest.test_fototipo_preta) ... ok
-test_total_fototipos (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisFototipesTest.test_total_fototipos) ... ok
-test_execucao_dupla_nao_duplica_dados (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisIdempotenciaTest.test_execucao_dupla_nao_duplica_dados) ... ok
-test_execucao_tripla_nao_duplica_dados (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisIdempotenciaTest.test_execucao_tripla_nao_duplica_dados) ... ok
-test_contagem_total_registros (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisIntegracaoTest.test_contagem_total_registros) ... ok
-test_integridade_dados (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisIntegracaoTest.test_integridade_dados) ... ok
-test_todos_modelos_populados (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisIntegracaoTest.test_todos_modelos_populados) ... ok
-test_saida_contem_nome_comando (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisSaidaTest.test_saida_contem_nome_comando) ... ok
-test_saida_contem_sucesso (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisSaidaTest.test_saida_contem_sucesso) ... ok
-test_saida_nao_contem_ansi (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisSaidaTest.test_saida_nao_contem_ansi) ... ok
-test_sexo_feminino (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisSexoTest.test_sexo_feminino) ... ok
-test_sexo_masculino (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisSexoTest.test_sexo_masculino) ... ok
-test_sexo_nao_informar (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisSexoTest.test_sexo_nao_informar) ... ok
-test_sexo_outro (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisSexoTest.test_sexo_outro) ... ok
-test_total_sexo (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisSexoTest.test_total_sexo) ... ok
-test_status_cancelado (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusEventosTest.test_status_cancelado) ... ok
-test_status_em_andamento (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusEventosTest.test_status_em_andamento) ... ok
-test_status_em_classificacao (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusEventosTest.test_status_em_classificacao) ... ok
-test_status_finalizado (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusEventosTest.test_status_finalizado) ... ok
-test_status_inscricoes_abertas (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusEventosTest.test_status_inscricoes_abertas) ... ok
-test_status_inscricoes_encerradas (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusEventosTest.test_status_inscricoes_encerradas) ... ok
-test_status_planejamento (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusEventosTest.test_status_planejamento) ... ok
-test_status_resultado_divulgado (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusEventosTest.test_status_resultado_divulgado) ... ok
-test_total_status_eventos (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusEventosTest.test_total_status_eventos) ... ok
-test_status_cancelada (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusInscricoesTest.test_status_cancelada) ... ok
-test_status_classificado (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusInscricoesTest.test_status_classificado) ... ok
-test_status_confirmada (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusInscricoesTest.test_status_confirmada) ... ok
-test_status_desistente (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusInscricoesTest.test_status_desistente) ... ok
-test_status_expirada (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusInscricoesTest.test_status_expirada) ... ok
-test_status_lista_espera (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusInscricoesTest.test_status_lista_espera) ... ok
-test_status_nao_localizado (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusInscricoesTest.test_status_nao_localizado) ... ok
-test_status_pendente (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusInscricoesTest.test_status_pendente) ... ok
-test_total_status_inscricoes (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusInscricoesTest.test_total_status_inscricoes) ... ok
-test_status_ativa (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusMatriculasTest.test_status_ativa) ... ok
-test_status_cancelada (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusMatriculasTest.test_status_cancelada) ... ok
-test_status_concluida (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusMatriculasTest.test_status_concluida) ... ok
-test_status_pendente (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusMatriculasTest.test_status_pendente) ... ok
-test_status_trancada (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusMatriculasTest.test_status_trancada) ... ok
-test_total_status_matriculas (apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.PopularDadosIniciaisStatusMatriculasTest.test_total_status_matriculas) ... ok
 
-----------------------------------------------------------------------
-Ran 53 tests in 2.274s
 
-OK
-Destroying test database for alias 'default' ('test_bdmetareciclagem')...
+##  apps.scripts_admin.management.commands.tests.test_popular_dados_iniciais.py em 16/06/2026
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py -v
+=================================================== test session starts ===================================================
+platform win32 -- Python 3.13.2, pytest-7.4.3, pluggy-1.6.0 -- c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.4, settings: config.settings (from ini)
+rootdir: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+configfile: pytest.ini
+plugins: anyio-4.13.0, Faker-40.11.1, cov-4.1.0, django-4.7.0, mock-3.15.1
+collected 53 items                                                                                                         
+
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisComando::test_comando_executa_sem_erro PASSED [  1%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisComando::test_comando_retorna_string PASSED [  3%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisComando::test_comando_nao_vazio PASSED [  5%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusEventos::test_status_planejamento PASSED [  7%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusEventos::test_status_inscricoes_abertas PASSED [  9%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusEventos::test_status_inscricoes_encerradas PASSED [ 11%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusEventos::test_status_em_classificacao PASSED [ 13%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusEventos::test_status_resultado_divulgado PASSED [ 15%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusEventos::test_status_em_andamento PASSED [ 16%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusEventos::test_status_finalizado PASSED [ 18%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusEventos::test_status_cancelado PASSED [ 20%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusEventos::test_total_status_eventos PASSED [ 22%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusInscricoes::test_status_pendente PASSED [ 24%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusInscricoes::test_status_classificado PASSED [ 26%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusInscricoes::test_status_confirmada PASSED [ 28%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusInscricoes::test_status_lista_espera PASSED [ 30%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusInscricoes::test_status_cancelada PASSED [ 32%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusInscricoes::test_status_expirada PASSED [ 33%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusInscricoes::test_status_desistente PASSED [ 35%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusInscricoes::test_status_nao_localizado PASSED [ 37%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusInscricoes::test_total_status_inscricoes PASSED [ 39%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusMatriculas::test_status_pendente PASSED [ 41%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusMatriculas::test_status_ativa PASSED [ 43%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusMatriculas::test_status_concluida PASSED [ 45%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusMatriculas::test_status_trancada PASSED [ 47%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusMatriculas::test_status_cancelada PASSED [ 49%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisStatusMatriculas::test_total_status_matriculas PASSED [ 50%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisCriterios::test_criterio_pcd PASSED [ 52%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisCriterios::test_criterio_programa_social PASSED [ 54%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisCriterios::test_criterio_jovem PASSED [ 56%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisCriterios::test_criterio_idoso PASSED [ 58%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisCriterios::test_criterio_ensino_fundamental PASSED [ 60%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisCriterios::test_criterio_renda_baixa PASSED [ 62%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisCriterios::test_criterio_cota_racial PASSED [ 64%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisSexo::test_sexo_masculino PASSED [ 66%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisSexo::test_sexo_feminino PASSED [ 67%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisSexo::test_sexo_outro PASSED [ 69%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisSexo::test_sexo_nao_informar PASSED [ 71%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisSexo::test_total_sexo PASSED [ 73%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisFototipes::test_fototipo_branca PASSED [ 75%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisFototipes::test_fototipo_preta PASSED [ 77%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisFototipes::test_fototipo_parda PASSED [ 79%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisFototipes::test_fototipo_amarela PASSED [ 81%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisFototipes::test_fototipo_indigena PASSED [ 83%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisFototipes::test_total_fototipos PASSED [ 84%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisIntegracao::test_todos_modelos_populados PASSED [ 86%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisIntegracao::test_contagem_total_registros PASSED [ 88%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisIntegracao::test_integridade_dados PASSED [ 90%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisIdempotencia::test_execucao_dupla_nao_duplica_dados PASSED [ 92%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisIdempotencia::test_execucao_tripla_nao_duplica_dados PASSED [ 94%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisSaida::test_saida_contem_sucesso PASSED [ 96%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisSaida::test_saida_contem_nome_comando PASSED [ 98%]
+apps/scripts_admin/management/commands/tests/test_popular_dados_iniciais.py::TestPopularDadosIniciaisSaida::test_saida_nao_contem_ansi PASSED [100%]
+
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                                    Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------------------------------
+apps\__init__.py                                                            0      0   100%
+apps\academico\__init__.py                                                  0      0   100%
+apps\academico\admin.py                                                   320    248    22%   64-70, 124, 129, 200, 205, 211-216, 225-266, 270-276, 284-440, 450-613, 623-653, 663-671, 678, 681
+apps\academico\apps.py                                                      5      0   100%
+apps\academico\certificado.py                                             136    136     0%   9-254
+apps\academico\models.py                                                  110     51    54%   45, 122, 128-154, 167-176, 191-214, 282-283, 300-316, 330-342
+apps\academico\services.py                                                136    136     0%   8-402
+apps\academico\urls.py                                                      5      5     0%   8-19
+apps\academico\views.py                                                    63     63     0%   8-124
+apps\accounts\__init__.py                                                   0      0   100%
+apps\accounts\admin.py                                                     52     19    63%   40-44, 48-63, 149-169
+apps\accounts\apps.py                                                       5      0   100%
+apps\accounts\forms.py                                                      5      5     0%   8-27
+apps\accounts\middleware.py                                                20     20     0%   17-83
+apps\accounts\models.py                                                    22      4    82%   103-106
+apps\accounts\urls.py                                                       5      5     0%   9-17
+apps\accounts\views.py                                                     47     47     0%   16-114
+apps\accounts\views_exclusao.py                                            77     77     0%   9-125
+apps\dashboard\__init__.py                                                  0      0   100%
+apps\dashboard\admin.py                                                     0      0   100%
+apps\dashboard\apps.py                                                      4      0   100%
+apps\dashboard\models.py                                                    1      0   100%
+apps\dashboard\services.py                                                157    157     0%   12-400
+apps\dashboard\utils_pdf.py                                               373    373     0%   9-751
+apps\dashboard\views.py                                                    71     71     0%   13-161
+apps\eventos\__init__.py                                                    0      0   100%
+apps\eventos\admin.py                                                     212    117    45%   61-67, 95, 110-114, 118-119, 122-124, 173-181, 187-206, 218-223, 229-234, 240-245, 251-256, 269-358, 371-415, 430-519, 537
+apps\eventos\apps.py                                                        5      0   100%
+apps\eventos\context_processors.py                                         51     51     0%   8-114
+apps\eventos\management\__init__.py                                         0      0   100%
+apps\eventos\management\commands\__init__.py                                0      0   100%
+apps\eventos\models.py                                                    122     29    76%   28, 104-106, 127, 130-132, 135-137, 140-142, 145-147, 150-152, 155-160, 201, 206, 247, 280
+apps\eventos\views.py                                                       1      1     0%   1
+apps\interessados\__init__.py                                               0      0   100%
+apps\interessados\admin.py                                                218    120    45%   178-183, 188, 193-194, 201-207, 216-222, 231-243, 248-260, 265-269, 280-282, 296-316, 329-330, 337-338, 347-431, 475, 480-481, 485-500, 509, 514, 523-527, 535-538, 546-552, 564, 567, 570
+apps\interessados\apps.py                                                   5      0   100%
+apps\interessados\authentication.py                                        25     25     0%   9-73
+apps\interessados\forms.py                                                157    157     0%   20-453
+apps\interessados\management\__init__.py                                    0      0   100%
+apps\interessados\management\commands\__init__.py                           0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py                 22     22     0%   11-47
+apps\interessados\management\commands\limpar_tokens.py                     59     59     0%   13-155
+apps\interessados\management\commands\popular_cpf_hash.py                  22     22     0%   9-40
+apps\interessados\models.py                                               139     19    86%   22, 29, 41, 132, 135, 138, 141, 144, 147, 151, 155, 158, 162, 166, 172, 188, 191-192, 260
+apps\interessados\urls.py                                                   5      5     0%   11-17
+apps\interessados\utils.py                                                 14     14     0%   10-38
+apps\interessados\views.py                                                202    202     0%   24-519
+apps\interessados\views_exclusao.py                                        29     29     0%   8-76
+apps\portal\__init__.py                                                     1      0   100%
+apps\portal\admin.py                                                        1      0   100%
+apps\portal\apps.py                                                         5      0   100%
+apps\portal\forms.py                                                       34     34     0%   14-104
+apps\portal\models.py                                                       1      0   100%
+apps\portal\urls.py                                                         4      4     0%   8-13
+apps\portal\views.py                                                       99     99     0%   13-247
+apps\scripts_admin\__init__.py                                              0      0   100%
+apps\scripts_admin\management\__init__.py                                   0      0   100%
+apps\scripts_admin\management\commands\__init__.py                          0      0   100%
+apps\scripts_admin\management\commands\classificar_evento.py              134    134     0%   9-295
+apps\scripts_admin\management\commands\configurar_criterios_evento.py      57     57     0%   5-91
+apps\scripts_admin\management\commands\popular_criterios.py                21     21     0%   4-117
+apps\scripts_admin\management\commands\popular_dados_iniciais.py           66      0   100%
+apps\selecao\__init__.py                                                    0      0   100%
+apps\selecao\admin.py                                                     275    163    41%   66-72, 87, 110-115, 152, 223, 233, 240-241, 247, 254-255, 266-275, 293-456, 466-503, 507-544, 552, 558, 564, 570, 580, 586, 592, 598, 608, 612, 616, 661, 667, 673, 677
+apps\selecao\apps.py                                                        5      0   100%
+apps\selecao\management\__init__.py                                         0      0   100%
+apps\selecao\management\commands\__init__.py                                0      0   100%
+apps\selecao\models.py                                                     71     15    79%   38, 74, 124-137, 145-146, 155, 188
+apps\selecao\reports.py                                                   301    270    10%   27-31, 35-115, 126-132, 140-146, 151-163, 179-286, 302-420, 440-565, 580-711
+apps\selecao\services.py                                                  125    125     0%   29-432
+apps\selecao\validators.py                                                105    105     0%   10-225
+apps\selecao\views.py                                                       1      1     0%   1
+-----------------------------------------------------------------------------------------------------
+TOTAL                                                                    4208   3317    21%
+Coverage HTML written to dir htmlcov
+
+
+=================================================== 53 passed in 5.53s ====================================================
 
 
 
@@ -3347,7 +3715,7 @@ TOTAL                                                                    4265   
 
 
 
-##  apps/eventos/tests/test_admin.py em 09/06/2026
+##  apps.eventos.tests.test_admin.py em 09/06/2026
 
 (.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_admin.py -v
 ========================================================== test session starts ===========================================================
@@ -3473,7 +3841,7 @@ Coverage HTML written to dir htmlcov
 
 
 
-##  apps/eventos/tests/test_models_evento_expanded.py
+##  apps.eventos.tests.test_models_evento_expanded.py
 
 (.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_evento_expanded.py -v
 =========================================================================== test session starts ===========================================================================
@@ -3584,7 +3952,7 @@ Coverage HTML written to dir htmlcov
 
 
 
-##  pytest apps/eventos/tests/test_models_evento.py em 09/06/2026
+##  pytest apps.eventos.tests.test_models_evento.py em 09/06/2026
 
 (.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_evento.py -v
 ========================================================== test session starts ===========================================================
@@ -3715,7 +4083,7 @@ Coverage HTML written to dir htmlcov
 
 
 
-##  apps/eventos/tests/test_models_turma.py
+##  apps.eventos.tests.test_models_turma.py
 
 (.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_turma.py -v
 ========================================================== test session starts ===========================================================
@@ -3760,7 +4128,7 @@ apps/eventos/tests/test_models_turma.py::TestTurmaModel::test_queryset_count PAS
 
 
 
-##  apps/eventos/tests/test_models_horario.py
+##  apps.eventos.tests.test_models_horario.py
 
 (.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_horario.py -v
 ========================================================== test session starts ===========================================================
@@ -3798,7 +4166,7 @@ apps/eventos/tests/test_models_horario.py::TestHorarioModel::test_queryset_count
 
 
 
-##  apps/eventos/tests/test_models_criterio.py
+##  apps.eventos.tests.test_models_criterio.py
 
 (.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> pytest apps/eventos/tests/test_models_criterio.py -v
 ========================================================== test session starts ===========================================================

@@ -1,17 +1,21 @@
 """
 Arquivo: classificar_evento.py
-Caminho: apps/selecao/management/commands/classificar_evento.py
-Alteração: Corrigido fototipo.upper() para fototipo.nome e tipo_deficiencia
-Data: 10/12/2025
+Caminho: apps/scripts_admin/management/commands/classificar_evento.py
+Atualizações: 
+ - 10/12/2025 - v1.1 - Correção de fototipo para fototipo.nome e tipo_deficiencia
+ - 16/06/2026 - Corrigido processado_em de date.today() para timezone.now() para eliminar RuntimeWarning de timezone
 """
 
 """
 Comando para classificar inscrições de um evento
 Modelo Simplificado com Pontuação Fixa
 """
+from datetime import date
+
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from datetime import date
+from django.utils import timezone
+
 from apps.eventos.models import Evento, EventoCriterio
 from apps.selecao.models import Inscricao, Classificacao, InscricaoCriterioAtendido
 
@@ -34,12 +38,12 @@ class Command(BaseCommand):
             evento = Evento.objects.get(pk=evento_id)
         except Evento.DoesNotExist:
             self.stdout.write(
-                self.style.ERROR(f'❌ Evento com ID {evento_id} não encontrado!')
+                self.style.ERROR(f'Evento com ID {evento_id} não encontrado!')
             )
             return
         
         self.stdout.write('='*70)
-        self.stdout.write(self.style.SUCCESS(f'🎯 CLASSIFICANDO EVENTO: {evento.nome}'))
+        self.stdout.write(f'CLASSIFICANDO EVENTO: {evento.nome}')
         self.stdout.write('='*70)
         
         # Buscar inscrições confirmadas
@@ -52,11 +56,11 @@ class Command(BaseCommand):
         
         if total == 0:
             self.stdout.write(
-                self.style.WARNING('⚠️  Nenhuma inscrição CONFIRMADA encontrada!')
+                self.style.WARNING('Nenhuma inscrição CONFIRMADA encontrada!')
             )
             return
         
-        self.stdout.write(f'\n📊 Total de inscrições a classificar: {total}\n')
+        self.stdout.write(f'\nTotal de inscrições a classificar: {total}\n')
         
         # Buscar critérios ativos
         criterios_ativos = EventoCriterio.objects.filter(
@@ -66,16 +70,16 @@ class Command(BaseCommand):
         
         if not criterios_ativos.exists():
             self.stdout.write(
-                self.style.WARNING('⚠️  Nenhum critério ativo para este evento!')
+                self.style.WARNING('Nenhum critério ativo para este evento!')
             )
             return
         
-        self.stdout.write('📋 Critérios ativos:')
+        self.stdout.write('Critérios ativos:')
         for ec in criterios_ativos:
             if ec.criterio.pontos is not None:
-                self.stdout.write(f'   • {ec.criterio.nome} ({ec.criterio.pontos} pts)')
+                self.stdout.write(f'   - {ec.criterio.nome} ({ec.criterio.pontos} pts)')
             else:
-                self.stdout.write(f'   • {ec.criterio.nome} (Ordenação)')
+                self.stdout.write(f'   - {ec.criterio.nome} (Ordenação)')
         
         self.stdout.write('\n' + '-'*70)
         
@@ -90,22 +94,22 @@ class Command(BaseCommand):
                     classificados += 1
                     
                     self.stdout.write(
-                        f'✅ {inscricao.interessado.nome}: {resultado["pontuacao"]} pontos'
+                        f'{inscricao.interessado.nome}: {resultado["pontuacao"]} pontos'
                     )
             
             except Exception as e:
                 self.stdout.write(
-                    self.style.ERROR(f'❌ Erro ao classificar {inscricao.interessado.nome}: {str(e)}')
+                    self.style.ERROR(f'Erro ao classificar {inscricao.interessado.nome}: {str(e)}')
                 )
         
         self.stdout.write('-'*70)
         
         # Atualizar posições
-        self.stdout.write('\n🔢 Atualizando posições de classificação...')
+        self.stdout.write('\nAtualizando posições de classificação...')
         self.atualizar_posicoes(evento, criterios_ativos)
         
         self.stdout.write('\n' + '='*70)
-        self.stdout.write(self.style.SUCCESS('✅ CLASSIFICAÇÃO CONCLUÍDA!'))
+        self.stdout.write('CLASSIFICAÇÃO CONCLUÍDA!')
         self.stdout.write(f'   Inscrições classificadas: {classificados}/{total}')
         self.stdout.write('='*70)
     
@@ -216,7 +220,7 @@ class Command(BaseCommand):
             inscricao=inscricao,
             defaults={
                 'pontuacao_total': resultado['pontuacao'],
-                'processado_em': date.today()
+                'processado_em': timezone.now()  # corrigido: agora com timezone
             }
         )
         
@@ -289,3 +293,7 @@ class Command(BaseCommand):
             classificacao.classificado = (posicao <= total_vagas)
             classificacao.lista_espera = (posicao > total_vagas)
             classificacao.save(update_fields=['posicao', 'classificado', 'lista_espera'])
+
+
+
+

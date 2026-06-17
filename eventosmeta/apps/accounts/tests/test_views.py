@@ -1,3 +1,12 @@
+"""
+Arquivo: test_views.py
+Caminho: apps/accounts/tests/test_views.py
+Testes para as views do app Accounts.
+Atualizações:
+ - 28/05/2026 - Criacao inicial dos testes 
+ - 16/06/2026 - Refatorado para pytest puro
+"""
+
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse

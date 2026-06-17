@@ -1,140 +1,162 @@
-from django.test import TestCase
+"""
+Arquivo: test_models.py
+Caminho: apps/accounts/tests/test_models.py
+Testes dos models: User e UserManager do app Accounts.
+Atualizações:
+ - 10/02/2026 - Criacao inicial dos testes
+ - 16/06/2026 - Refatorado para pytest puro
+"""
+
+import pytest
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
-from django.contrib.auth import get_user_model
 
 
-class TestUsuarioModel(TestCase):
-    """Testes para o modelo customizado de usuário (Usuario)."""
+@pytest.fixture
+def user_model():
+    return get_user_model()
 
-    def setUp(self):
-        self.User = get_user_model()
 
-    def test_criar_usuario_com_cpf_valido(self):
-        """Verifica se um usuário pode ser criado com um CPF válido de 11 dígitos."""
-        cpf_valido = '12345678901'
-        usuario = self.User.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='password123',
-            cpf=cpf_valido
+@pytest.mark.django_db
+def test_criar_usuario_com_cpf_valido(user_model):
+    cpf_valido = "12345678901"
+
+    usuario = user_model.objects.create_user(
+        username="testuser",
+        email="test@example.com",
+        password="password123",
+        cpf=cpf_valido,
+    )
+
+    assert usuario is not None
+    assert usuario.username == "testuser"
+    assert usuario.email == "test@example.com"
+    assert usuario.cpf == cpf_valido
+    assert usuario.check_password("password123")
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "cpf",
+    [
+        "1234567890",      # 10 dígitos
+        "123456789012",    # 12 dígitos
+    ],
+)
+def test_criar_usuario_com_cpf_invalido(user_model, cpf):
+    usuario = user_model(
+        username="usuario_teste",
+        email="teste@example.com",
+        cpf=cpf,
+    )
+
+    with pytest.raises(ValidationError):
+        usuario.full_clean()
+
+
+@pytest.mark.django_db
+def test_cpf_unico(user_model):
+    cpf_duplicado = "98765432109"
+
+    user_model.objects.create_user(
+        username="firstuser",
+        email="first@example.com",
+        password="password123",
+        cpf=cpf_duplicado,
+    )
+
+    with pytest.raises(IntegrityError):
+        user_model.objects.create_user(
+            username="seconduser",
+            email="second@example.com",
+            password="password456",
+            cpf=cpf_duplicado,
         )
-        self.assertIsNotNone(usuario)
-        self.assertEqual(usuario.username, 'testuser')
-        self.assertEqual(usuario.email, 'test@example.com')
-        self.assertEqual(usuario.cpf, cpf_valido)
-        self.assertTrue(usuario.check_password('password123'))
 
-    def test_criar_usuario_com_cpf_invalido(self):
-        """Verifica se a criação falha com CPF que não tem 11 dígitos."""
-        cpf_curto = '1234567890'
-        cpf_longo = '123456789012'
 
-        with self.assertRaises(ValidationError):
-            usuario = self.User(
-                username='usercurto',
-                email='curto@example.com',
-                cpf=cpf_curto
-            )
-            usuario.full_clean()
-            usuario.save()
+@pytest.mark.django_db
+def test_usuario_staff_pode_login(user_model):
+    usuario = user_model.objects.create_user(
+        username="staffuser",
+        email="staff@example.com",
+        password="staffpassword",
+        cpf="11122233344",
+        is_staff=True,
+    )
 
-        with self.assertRaises(ValidationError):
-            usuario = self.User(
-                username='userlongo',
-                email='longo@example.com',
-                cpf=cpf_longo
-            )
-            usuario.full_clean()
-            usuario.save()
+    assert usuario.is_staff is True
 
-    def test_cpf_unico(self):
-        """Verifica se CPF duplicado falha."""
-        cpf_duplicado = '98765432109'
-        self.User.objects.create_user(
-            username='firstuser',
-            email='first@example.com',
-            password='password123',
-            cpf=cpf_duplicado
+
+@pytest.mark.django_db
+def test_usuario_nao_staff_nao_pode_login_staff(user_model):
+    usuario = user_model.objects.create_user(
+        username="normaluser",
+        email="normal@example.com",
+        password="normalpassword",
+        cpf="55566677788",
+        is_staff=False,
+    )
+
+    assert usuario.is_staff is False
+
+
+@pytest.mark.django_db
+def test_criar_usuario_sem_username_falha(user_model):
+    with pytest.raises(ValueError):
+        user_model.objects.create_user(
+            username=None,
+            email="semusername@example.com",
+            password="password123",
+            cpf="11122233344",
         )
 
-        with self.assertRaises(IntegrityError):
-            self.User.objects.create_user(
-                username='seconduser',
-                email='second@example.com',
-                password='password456',
-                cpf=cpf_duplicado
-            )
 
-    def test_usuario_staff_pode_login(self):
-        """Verifica se um usuário staff é criado com is_staff=True."""
-        staff_cpf = '11122233344'
-        staff_user = self.User.objects.create_user(
-            username='staffuser',
-            email='staff@example.com',
-            password='staffpassword',
-            cpf=staff_cpf,
-            is_staff=True
-        )
-        self.assertTrue(staff_user.is_staff)
+@pytest.mark.django_db
+def test_criar_usuario_sem_password_falha(user_model):
+    usuario = user_model.objects.create_user(
+        username="sempassword",
+        email="sempassword@example.com",
+        password=None,
+        cpf="22233344455",
+    )
 
-    def test_usuario_nao_staff_nao_pode_login_staff(self):
-        """Verifica se um usuário não staff é criado com is_staff=False."""
-        normal_cpf = '55566677788'
-        normal_user = self.User.objects.create_user(
-            username='normaluser',
-            email='normal@example.com',
-            password='normalpassword',
-            cpf=normal_cpf,
-            is_staff=False
-        )
-        self.assertFalse(normal_user.is_staff)
-
-    def test_criar_usuario_sem_username_falha(self):
-        with self.assertRaises((ValueError)):
-            self.User.objects.create_user(
-                username=None,
-                email='semusername@example.com',
-                password='password123',
-                cpf='11122233344'
-            )
-
-    def test_criar_usuario_sem_password_falha(self):
-        usuario = self.User.objects.create_user(
-            username='sempassword',
-            email='sempassword@example.com',
-            password=None,
-            cpf='22233344455'
-        )
-        self.assertFalse(usuario.check_password('qualquercoisa'))
-
-    def test_criar_superuser_is_staff(self):
-        usuario = self.User.objects.create_superuser(
-            username='admin',
-            email='admin@ex.com',
-            password='admin123',
-            cpf='99988877766'
-        )
-        self.assertTrue(usuario.is_staff)
-
-    def test_criar_superuser_is_superuser(self):
-        usuario = self.User.objects.create_superuser(
-            username='admin2',
-            email='admin2@ex.com',
-            password='admin123',
-            cpf='88877766655'
-        )
-        self.assertTrue(usuario.is_superuser)
-
-    def test_usuario_str_retorna_username(self):
-        usuario = self.User.objects.create_user(
-            username='joaosilva',
-            email='joao@example.com',
-            password='password123',
-            cpf='33344455566'
-        )
-        self.assertEqual(str(usuario), 'joaosilva - CPF: 33344455566')
+    assert not usuario.check_password("qualquercoisa")
 
 
+@pytest.mark.django_db
+def test_criar_superuser_is_staff(user_model):
+    usuario = user_model.objects.create_superuser(
+        username="admin",
+        email="admin@ex.com",
+        password="admin123",
+        cpf="99988877766",
+    )
 
-        
+    assert usuario.is_staff is True
+
+
+@pytest.mark.django_db
+def test_criar_superuser_is_superuser(user_model):
+    usuario = user_model.objects.create_superuser(
+        username="admin2",
+        email="admin2@ex.com",
+        password="admin123",
+        cpf="88877766655",
+    )
+
+    assert usuario.is_superuser is True
+
+
+@pytest.mark.django_db
+def test_usuario_str_retorna_username(user_model):
+    usuario = user_model.objects.create_user(
+        username="joaosilva",
+        email="joao@example.com",
+        password="password123",
+        cpf="33344455566",
+    )
+
+    assert str(usuario) == "joaosilva - CPF: 33344455566"
+
+

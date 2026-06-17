@@ -1,200 +1,173 @@
 """
 Arquivo: test_views.py
 Caminho: apps/academico/tests/test_views.py
-Atualizações
-28/05/2026 - Criação do arquivo 
+Atualizacoes:
+ - 28/05/2006 - Criacao do arquivo
+ - 17/06/2026 - Refatorado de unittest.TestCase para pytest
 """
 
-from django.test import TestCase, Client
-from django.contrib.auth import get_user_model
-from django.urls import reverse
-from unittest.mock import patch
 import io
 import zipfile
 
-from .factories import MatriculaFactory, InteressadoFactory
+import pytest
+from django.test import Client
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+from unittest.mock import patch
 
+from .factories import MatriculaFactory
 
-class BaseCertificadoTest(TestCase):
-    """Base class for certificate view tests."""
+pytestmark = pytest.mark.django_db
 
-    def setUp(self):
-        super().setUp()
-        self.client = Client()
-        self.User = get_user_model()
+@pytest.fixture
+def client():
+    return Client()
 
-        self.staff_user = self.User.objects.create_user(
-            username="staffuser",
-            email="staff@example.com",
-            password="password123",
-            cpf="11111111111",
-            is_staff=True,
-        )
+@pytest.fixture
+def staff_user(db):
+    User = get_user_model()
+    return User.objects.create_user(
+        username="staffuser",
+        email="staff@example.com",
+        password="password123",
+        cpf="11111111111",
+        is_staff=True,
+    )
 
-        # Mock GeradorCertificado
-        self.patcher = patch("apps.academico.views.GeradorCertificado")
-        self.MockGeradorCertificado = self.patcher.start()
-        self.mock_instance = self.MockGeradorCertificado.return_value
-        self.mock_instance.gerar_pdf.side_effect = (
+@pytest.fixture
+def mock_gerador():
+    with patch("apps.academico.views.GeradorCertificado") as MockGerador:
+        mock_instance = MockGerador.return_value
+        mock_instance.gerar_pdf.side_effect = (
             lambda buffer: buffer.write(b"Mock PDF Content")
         )
+        yield MockGerador, mock_instance
 
-    def tearDown(self):
-        self.patcher.stop()
-        super().tearDown()
+def criar_avaliacao(aprovado=False):
+    matricula = MatriculaFactory()
+    avaliacao = matricula.avaliacao
+    if aprovado:
+        avaliacao.aprovado = True
+        avaliacao.save()
+    return avaliacao
 
-    def _criar_avaliacao(self, aprovado=False):
-        """Helper: cria matricula + avaliacao com o status de aprovacao desejado"""
-        matricula = MatriculaFactory()
-        avaliacao = matricula.avaliacao
-        if aprovado:
-            avaliacao.aprovado = True
-            avaliacao.save()
-        return avaliacao
+AVALIACAO_INEXISTENTE = 9999
 
-    def _login(self):
-        self.client.force_login(self.staff_user)
-
-    def _avaliacao_inexistente(self):
-        return 9999
-
-
-class TestDownloadCertificadoIndividual(BaseCertificadoTest):
-    """Tests for download_certificado_individual view."""
-
-    def test_sem_autenticacao_redireciona(self):
-        avaliacao = self._criar_avaliacao()
-        response = self.client.get(
+class TestDownloadCertificadoIndividual:
+    def test_sem_autenticacao_redireciona(self, client):
+        avaliacao = criar_avaliacao()
+        response = client.get(
             reverse("academico:download_certificado", args=[avaliacao.pk])
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("/admin/login/", response.url)
+        assert response.status_code == 302
+        assert "/admin/login/" in response.url
 
-    def test_aluno_aprovado_gera_pdf(self):
-        avaliacao = self._criar_avaliacao(aprovado=True)
-        self._login()
-
-        response = self.client.get(
+    def test_aluno_aprovado_gera_pdf(self, client, staff_user, mock_gerador):
+        MockGerador, mock_instance = mock_gerador
+        avaliacao = criar_avaliacao(aprovado=True)
+        client.force_login(staff_user)
+        response = client.get(
             reverse("academico:download_certificado", args=[avaliacao.pk])
         )
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/pdf"
+        assert "attachment" in response["Content-Disposition"]
+        MockGerador.assert_called_once_with(avaliacao)
+        mock_instance.gerar_pdf.assert_called_once()
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/pdf")
-        self.assertIn("attachment", response["Content-Disposition"])
-        self.MockGeradorCertificado.assert_called_once_with(avaliacao)
-        self.mock_instance.gerar_pdf.assert_called_once()
-
-    def test_aluno_reprovado_retorna_400(self):
-        avaliacao = self._criar_avaliacao(aprovado=False)
-        self._login()
-
-        response = self.client.get(
+    def test_aluno_reprovado_retorna_400(self, client, staff_user, mock_gerador):
+        MockGerador, mock_instance = mock_gerador
+        avaliacao = criar_avaliacao(aprovado=False)
+        client.force_login(staff_user)
+        response = client.get(
             reverse("academico:download_certificado", args=[avaliacao.pk])
         )
+        assert response.status_code == 400
+        assert b"Certificado" in response.content
+        MockGerador.assert_not_called()
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(b"Certificado", response.content)
-        self.MockGeradorCertificado.assert_not_called()
-
-    def test_avaliacao_inexistente_retorna_404(self):
-        self._login()
-        response = self.client.get(
-            reverse("academico:download_certificado", args=[self._avaliacao_inexistente()])
+    def test_avaliacao_inexistente_retorna_404(self, client, staff_user):
+        client.force_login(staff_user)
+        response = client.get(
+            reverse("academico:download_certificado", args=[AVALIACAO_INEXISTENTE])
         )
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
-
-class TestPreviewCertificado(BaseCertificadoTest):
-    """Tests for preview_certificado view."""
-
-    def test_sem_autenticacao_redireciona(self):
-        avaliacao = self._criar_avaliacao()
-        response = self.client.get(
+class TestPreviewCertificado:
+    def test_sem_autenticacao_redireciona(self, client):
+        avaliacao = criar_avaliacao()
+        response = client.get(
             reverse("academico:preview_certificado", args=[avaliacao.pk])
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertIn("/admin/login/", response.url)
+        assert response.status_code == 302
+        assert "/admin/login/" in response.url
 
-    def test_aluno_aprovado_inline(self):
-        avaliacao = self._criar_avaliacao(aprovado=True)
-        self._login()
-
-        response = self.client.get(
+    def test_aluno_aprovado_inline(self, client, staff_user, mock_gerador):
+        MockGerador, mock_instance = mock_gerador
+        avaliacao = criar_avaliacao(aprovado=True)
+        client.force_login(staff_user)
+        response = client.get(
             reverse("academico:preview_certificado", args=[avaliacao.pk])
         )
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/pdf"
+        assert "inline" in response["Content-Disposition"]
+        MockGerador.assert_called_once_with(avaliacao)
+        mock_instance.gerar_pdf.assert_called_once()
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/pdf")
-        self.assertIn("inline", response["Content-Disposition"])
-        self.MockGeradorCertificado.assert_called_once_with(avaliacao)
-        self.mock_instance.gerar_pdf.assert_called_once()
-
-    def test_aluno_reprovado_retorna_400(self):
-        avaliacao = self._criar_avaliacao(aprovado=False)
-        self._login()
-
-        response = self.client.get(
+    def test_aluno_reprovado_retorna_400(self, client, staff_user, mock_gerador):
+        MockGerador, mock_instance = mock_gerador
+        avaliacao = criar_avaliacao(aprovado=False)
+        client.force_login(staff_user)
+        response = client.get(
             reverse("academico:preview_certificado", args=[avaliacao.pk])
         )
+        assert response.status_code == 400
+        assert b"Certificado" in response.content
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(b"Certificado", response.content)
+class TestDownloadCertificadosLote:
+    def test_sem_ids_retorna_400(self, client, staff_user):
+        client.force_login(staff_user)
+        response = client.get(reverse("academico:download_certificados_lote"))
+        assert response.status_code == 400
+        assert b"Nenhuma avalia" in response.content
 
-
-class TestDownloadCertificadosLote(BaseCertificadoTest):
-    """Tests for download_certificados_lote view."""
-
-    def test_sem_ids_retorna_400(self):
-        self._login()
-        response = self.client.get(
-            reverse("academico:download_certificados_lote")
-        )
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(b"Nenhuma avalia", response.content)
-
-    def test_ids_invalidos_retorna_400(self):
-        self._login()
-        response = self.client.get(
+    def test_ids_invalidos_retorna_400(self, client, staff_user):
+        client.force_login(staff_user)
+        response = client.get(
             reverse("academico:download_certificados_lote") + "?ids=abc,123"
         )
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(b"Nenhum aluno aprovado", response.content)
+        assert response.status_code == 400
+        assert b"Nenhum aluno aprovado" in response.content
 
-    def test_apenas_aprovados_no_zip(self):
-        avaliacao_aprovada = self._criar_avaliacao(aprovado=True)
-        avaliacao_reprovada = self._criar_avaliacao(aprovado=False)
-
-        self._login()
-        response = self.client.get(
+    def test_apenas_aprovados_no_zip(self, client, staff_user):
+        avaliacao_aprovada = criar_avaliacao(aprovado=True)
+        avaliacao_reprovada = criar_avaliacao(aprovado=False)
+        client.force_login(staff_user)
+        response = client.get(
             reverse("academico:download_certificados_lote")
             + f"?ids={avaliacao_aprovada.pk},{avaliacao_reprovada.pk}"
         )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/zip")
-        self.assertIn("attachment", response["Content-Disposition"])
-
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/zip"
+        assert "attachment" in response["Content-Disposition"]
         zip_buffer = io.BytesIO(response.content)
         with zipfile.ZipFile(zip_buffer, "r") as zf:
-            self.assertEqual(len(zf.namelist()), 1)
+            assert len(zf.namelist()) == 1
 
-    def test_zip_com_multiplos_certificados(self):
-        avaliacao1 = self._criar_avaliacao(aprovado=True)
-        avaliacao2 = self._criar_avaliacao(aprovado=True)
-
-        self._login()
-        response = self.client.get(
+    def test_zip_com_multiplos_certificados(self, client, staff_user):
+        avaliacao1 = criar_avaliacao(aprovado=True)
+        avaliacao2 = criar_avaliacao(aprovado=True)
+        client.force_login(staff_user)
+        response = client.get(
             reverse("academico:download_certificados_lote")
             + f"?ids={avaliacao1.pk},{avaliacao2.pk}"
         )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/zip")
-        self.assertIn("attachment", response["Content-Disposition"])
-
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/zip"
+        assert "attachment" in response["Content-Disposition"]
         zip_buffer = io.BytesIO(response.content)
         with zipfile.ZipFile(zip_buffer, "r") as zf:
-            self.assertEqual(len(zf.namelist()), 2)
+            assert len(zf.namelist()) == 2
 
-
-
+            

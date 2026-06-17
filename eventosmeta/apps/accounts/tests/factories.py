@@ -1,3 +1,12 @@
+"""
+Arquivo: factories.py
+Caminho: apps/accounts/tests/factories.py
+Fábricas para criação de dados de teste.
+Atualizações:
+ - 31/03/2026 - Criacao inicial dos testes
+"""
+
+
 import factory
 from django.contrib.auth import get_user_model
 from faker import Faker
