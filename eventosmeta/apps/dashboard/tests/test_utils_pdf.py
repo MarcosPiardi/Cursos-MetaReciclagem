@@ -1,13 +1,13 @@
 """
 Arquivo: test_utils_pdf.py
 Caminho: apps/dashboard/tests/test_utils_pdf.py
-Atualizações
-29/05/2026 - Criação do arquivo 
+Atualizacoes:
+ - 29/05/2026 - Criacao do arquivo
+ - 18/06/2026 - Refatorado de unittest.SimpleTestCase para pytest
 """
 
 from io import BytesIO
 from unittest.mock import patch, MagicMock
-from django.test import SimpleTestCase
 from apps.dashboard.utils_pdf import (
     criar_grafico_pizza,
     criar_grafico_barras,
@@ -17,44 +17,41 @@ from apps.dashboard.utils_pdf import (
     gerar_pdf_processo_seletivo,
 )
 
-
-class TestCriarGraficoPizza(SimpleTestCase):
+class TestCriarGraficoPizza:
     def test_dados_validos_retorna_buffer(self):
         labels = ["Masculino", "Feminino"]
         values = [30, 70]
         resultado = criar_grafico_pizza(labels, values, "Teste")
-        self.assertIsNotNone(resultado)
+        assert resultado is not None
         conteudo = resultado.getvalue()
-        self.assertGreater(len(conteudo), 100)
+        assert len(conteudo) > 100
 
     def test_todos_valores_zero_retorna_none(self):
         labels = ["Masculino", "Feminino"]
         values = [0, 0]
         resultado = criar_grafico_pizza(labels, values, "Teste")
-        self.assertIsNone(resultado)
+        assert resultado is None
 
     def test_lista_vazia_retorna_none(self):
         resultado = criar_grafico_pizza([], [], "Teste")
-        self.assertIsNone(resultado)
+        assert resultado is None
 
     def test_um_item_valido_retorna_buffer(self):
         labels = ["Unico"]
         values = [100]
         resultado = criar_grafico_pizza(labels, values, "Teste")
-        self.assertIsNotNone(resultado)
+        assert resultado is not None
 
-
-class TestCriarGraficoBarras(SimpleTestCase):
+class TestCriarGraficoBarras:
     def test_dados_validos_retorna_buffer(self):
         labels = ["Faixa 1", "Faixa 2", "Faixa 3"]
         values = [10, 25, 15]
         resultado = criar_grafico_barras(labels, values, "Teste")
-        self.assertIsNotNone(resultado)
+        assert resultado is not None
         conteudo = resultado.getvalue()
-        self.assertGreater(len(conteudo), 100)
+        assert len(conteudo) > 100
 
-
-class TestGerarPdfInteressados(SimpleTestCase):
+class TestGerarPdfInteressados:
     def test_context_minimo_retorna_buffer(self):
         context = {
             "total_interessados": 100,
@@ -69,12 +66,11 @@ class TestGerarPdfInteressados(SimpleTestCase):
             "faixas_etarias": [],
         }
         buffer = gerar_pdf_interessados(context)
-        self.assertIsNotNone(buffer)
+        assert buffer is not None
         conteudo = buffer.getvalue()
-        self.assertTrue(conteudo.startswith(b"%PDF"), "Deve comecar com %PDF")
+        assert conteudo.startswith(b"%PDF"), "Deve comecar com %PDF"
 
-
-class TestGerarPdfEventos(SimpleTestCase):
+class TestGerarPdfEventos:
     def test_context_minimo_retorna_buffer(self):
         context = {
             "total_eventos": 10,
@@ -87,12 +83,11 @@ class TestGerarPdfEventos(SimpleTestCase):
             "top_eventos_inscricoes": [],
         }
         buffer = gerar_pdf_eventos(context)
-        self.assertIsNotNone(buffer)
+        assert buffer is not None
         conteudo = buffer.getvalue()
-        self.assertTrue(conteudo.startswith(b"%PDF"))
+        assert conteudo.startswith(b"%PDF")
 
-
-class TestGerarPdfAcademico(SimpleTestCase):
+class TestGerarPdfAcademico:
     def test_context_minimo_retorna_buffer(self):
         context = {
             "total_avaliacoes": 50,
@@ -105,12 +100,11 @@ class TestGerarPdfAcademico(SimpleTestCase):
             "top_cursos_aprovados": [],
         }
         buffer = gerar_pdf_academico(context)
-        self.assertIsNotNone(buffer)
+        assert buffer is not None
         conteudo = buffer.getvalue()
-        self.assertTrue(conteudo.startswith(b"%PDF"))
+        assert conteudo.startswith(b"%PDF")
 
-
-class TestGerarPdfProcessoSeletivo(SimpleTestCase):
+class TestGerarPdfProcessoSeletivo:
     def test_context_minimo_retorna_buffer(self):
         context = {
             "total_inscricoes": 200,
@@ -122,9 +116,9 @@ class TestGerarPdfProcessoSeletivo(SimpleTestCase):
             "top_eventos_inscricoes": [],
         }
         buffer = gerar_pdf_processo_seletivo(context)
-        self.assertIsNotNone(buffer)
+        assert buffer is not None
         conteudo = buffer.getvalue()
-        self.assertTrue(conteudo.startswith(b"%PDF"))
+        assert conteudo.startswith(b"%PDF")
 
 
-
+        

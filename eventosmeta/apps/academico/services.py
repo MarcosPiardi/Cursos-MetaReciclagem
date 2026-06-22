@@ -206,10 +206,12 @@ class MatriculaService:
                 # Criar matrícula
                 matricula = Matricula.objects.create(
                     interessado=inscricao.interessado,
+                    inscricao=inscricao,           # <-- ADICIONADO 22/06/2026
                     turma=turma,
                     status=status_matricula_ativa,
                     data_matricula=timezone.now()
                 )
+
                 
                 # Atualizar status da inscrição
                 inscricao.status = status_inscricao_confirmado

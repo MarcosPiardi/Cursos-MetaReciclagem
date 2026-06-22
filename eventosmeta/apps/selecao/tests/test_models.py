@@ -146,7 +146,8 @@ class TestClassificacaoModel:
         classificacao = ClassificacaoFactory(
             inscricao=self.inscricao,
             pontuacao_total=60,
-            posicao=None
+            posicao=None,
+            lista_espera=False
         )
         assert classificacao.posicao is None
         assert classificacao.classificado is False

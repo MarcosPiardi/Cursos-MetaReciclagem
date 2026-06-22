@@ -73,8 +73,8 @@ class TestClassificadorServicePontuacao:
 
     def test_calcular_pontuacao_multiplos_criterios(self, status_pendente):
         evento = EventoFactory(total_vagas=5)
-        criterio1 = CriterioFactory(nome='Criterio1', tipo_criterio='PONTUACAO', pontos=10)
-        criterio2 = CriterioFactory(nome='Criterio2', tipo_criterio='PONTUACAO', pontos=20)
+        criterio1 = CriterioFactory(nome='Criterio1', tipo_criterio='PONTUACAO', pontos=10, categoria='OUTRO')
+        criterio2 = CriterioFactory(nome='Criterio2', tipo_criterio='PONTUACAO', pontos=20, categoria='OUTRO')
         EventoCriterioFactory(evento=evento, criterio=criterio1)
         EventoCriterioFactory(evento=evento, criterio=criterio2)
         interessado = InteressadoFactory()

@@ -170,7 +170,7 @@ class EventoAdmin(admin.ModelAdmin):
 
     def status_colorido(self, obj):
         """Exibe o status com a cor definida no modelo Status"""
-        if obj.status:
+        if obj.status_id is not None:
             return format_html(
                 '<span style="display: inline-block; padding: 5px 10px; '
                 'background-color: {}; color: #050505; border-radius: 4px; '

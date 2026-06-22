@@ -12,8 +12,9 @@ import pytest
 from django.core.exceptions import ValidationError
 
 from apps.academico.services import MatriculaService
-from apps.academico.models import Avaliacao
+from apps.academico.models import Avaliacao, StatusMatricula
 from .factories import MatriculaFactory, TurmaFactory, StatusMatriculaFactory
+
 
 @pytest.mark.django_db
 class TestVerificacaoDisponibilidade:
@@ -191,5 +192,319 @@ class TestRelatorioTurma:
         
         assert rel['media_nota'] == 5.0
         assert rel['taxa_aprovacao'] == 50.0
+
+
+# ============================================================
+# TESTES DE MATRÍCULA
+# 22/06/2026 - Adicionados testes para matricular_classificado,
+#              matricular_lote, matricular_alunos e alterar_status_inscricao
+# ============================================================
+
+@pytest.mark.django_db
+class TestMatricularClassificado:
+    """Testes para matricular_classificado()"""
+
+    def setup_method(self):
+        from apps.eventos.tests.factories import EventoFactory, StatusFactory
+        from apps.selecao.tests.factories import InscricaoFactory, ClassificacaoFactory, StatusInscricaoFactory
+
+        self.status_ativa = StatusMatriculaFactory(nome='Ativa')
+        self.status_evento = StatusFactory()
+        self.status_inscricao = StatusInscricaoFactory(nome='Confirmada')
+        self.turma = TurmaFactory(capacidade=5)
+        self.inscricao = InscricaoFactory(
+            evento=self.turma.evento,
+            status=self.status_inscricao,
+        )
+        self.classificacao = ClassificacaoFactory(
+            inscricao=self.inscricao,
+            classificado=True,
+            posicao=1,
+            pontuacao_total=100.0,
+        )
+
+    def test_matricular_classificado_com_sucesso(self):
+        """Deve criar matrícula para classificado com turma disponível"""
+        matricula = MatriculaService.matricular_classificado(self.classificacao, self.turma)
+
+        assert matricula.interessado == self.classificacao.inscricao.interessado
+        assert matricula.turma == self.turma
+        assert matricula.status.nome == 'Ativa'
+        assert matricula.inscricao == self.classificacao.inscricao
+        assert 'Matriculado automaticamente' in matricula.observacoes
+
+    def test_matricular_classificado_nao_classificado(self):
+        """Deve lançar ValidationError se candidato não está classificado"""
+        self.classificacao.classificado = False
+        self.classificacao.save()
+
+        with pytest.raises(ValidationError, match='não está classificado'):
+            MatriculaService.matricular_classificado(self.classificacao, self.turma)
+
+    def test_matricular_classificado_turma_lotada(self):
+        """Deve lançar ValidationError se turma não tem vagas"""
+        turma_cheia = TurmaFactory(capacidade=1)
+        MatriculaFactory(turma=turma_cheia, status=self.status_ativa)
+
+        with pytest.raises(ValidationError, match='não possui vagas'):
+            MatriculaService.matricular_classificado(self.classificacao, turma_cheia)
+
+    def test_matricular_classificado_ja_matriculado(self):
+        """Deve lançar ValidationError se candidato já está matriculado"""
+        MatriculaService.matricular_classificado(self.classificacao, self.turma)
+
+        with pytest.raises(ValidationError, match='já está matriculado'):
+            MatriculaService.matricular_classificado(self.classificacao, self.turma)
+
+    def test_matricular_classificado_sem_status_ativa(self):
+        """Deve lançar exception se StatusMatricula 'Ativa' não existe"""
+        self.status_ativa.delete()
+
+        with pytest.raises(StatusMatricula.DoesNotExist):
+            MatriculaService.matricular_classificado(self.classificacao, self.turma)
+
+@pytest.mark.django_db
+class TestMatricularLote:
+    """Testes para matricular_lote()"""
+
+    def setup_method(self):
+        from apps.eventos.tests.factories import StatusFactory
+        from apps.selecao.tests.factories import InscricaoFactory, ClassificacaoFactory, StatusInscricaoFactory
+
+        self.status_ativa = StatusMatriculaFactory(nome='Ativa')
+        self.status_inscricao = StatusInscricaoFactory(nome='Confirmada')
+        self.turma = TurmaFactory(capacidade=10)
+
+        # Criar 3 classificações
+        self.classificacoes = []
+        for i in range(3):
+            inscricao = InscricaoFactory(
+                evento=self.turma.evento,
+                status=self.status_inscricao,
+            )
+            classificacao = ClassificacaoFactory(
+                inscricao=inscricao,
+                classificado=True,
+                posicao=i + 1,
+                pontuacao_total=float(100 - i * 10),
+            )
+            self.classificacoes.append(classificacao)
+
+    def test_matricular_lote_todos_sucesso(self):
+        """Deve matricular todos os 3 classificados"""
+        from apps.selecao.models import Classificacao
+        qs = Classificacao.objects.filter(id__in=[c.id for c in self.classificacoes])
+
+        resultado = MatriculaService.matricular_lote(qs, self.turma)
+
+        assert len(resultado['sucesso']) == 3
+        assert len(resultado['erros']) == 0
+
+    def test_matricular_lote_um_erro(self):
+        """Deve matricular 2 e reportar 1 erro"""
+        from apps.selecao.models import Classificacao
+
+        # Tornar um não classificado
+        self.classificacoes[1].classificado = False
+        self.classificacoes[1].save()
+
+        qs = Classificacao.objects.filter(id__in=[c.id for c in self.classificacoes])
+
+        resultado = MatriculaService.matricular_lote(qs, self.turma)
+
+        assert len(resultado['sucesso']) == 2
+        assert len(resultado['erros']) == 1
+        assert 'não está classificado' in resultado['erros'][0]['erro']
+
+    def test_matricular_lote_todos_erro(self):
+        """Deve reportar erro para todos se turma está lotada"""
+        from apps.selecao.models import Classificacao
+
+        turma_cheia = TurmaFactory(capacidade=1)
+        MatriculaFactory(turma=turma_cheia, status=self.status_ativa)
+
+        qs = Classificacao.objects.filter(id__in=[c.id for c in self.classificacoes])
+
+        resultado = MatriculaService.matricular_lote(qs, turma_cheia)
+
+        assert len(resultado['sucesso']) == 0
+        assert len(resultado['erros']) == 3
+
+@pytest.mark.django_db
+class TestMatricularAlunos:
+    """Testes para matricular_alunos()"""
+
+    def setup_method(self):
+        from apps.eventos.tests.factories import EventoFactory, StatusFactory
+        from apps.selecao.tests.factories import InscricaoFactory, StatusInscricaoFactory
+
+        self.status_matricula_ativa = StatusMatriculaFactory(nome='Ativa')
+        self.status_inscricao_confirmado = StatusInscricaoFactory(nome='Confirmado')
+        self.status_inscricao_pendente = StatusInscricaoFactory(nome='Pendente')
+        self.evento = EventoFactory()
+
+    def test_matricular_alunos_com_sucesso(self):
+        """Deve matricular aluno e criar matrícula"""
+        from apps.selecao.tests.factories import InscricaoFactory
+
+        TurmaFactory(evento=self.evento, capacidade=30)
+        inscricao = InscricaoFactory(
+            evento=self.evento,
+            status=self.status_inscricao_pendente,
+        )
+
+        resultado = MatriculaService.matricular_alunos(
+            inscricoes_ids=[inscricao.id]
+        )
+
+        assert resultado['sucesso'] is True
+        assert resultado['total_sucesso'] == 1
+        assert resultado['total_ja_matriculados'] == 0
+        assert len(resultado['erros']) == 0
+
+        # Verificar que matrícula foi criada
+        from apps.academico.models import Matricula
+        assert Matricula.objects.filter(interessado=inscricao.interessado).exists()
+
+        # Verificar que status foi atualizado
+        inscricao.refresh_from_db()
+        assert inscricao.status.nome == 'Confirmado'
+
+    def test_matricular_alunos_sem_turma(self):
+        """Deve reportar erro se evento não tem turmas"""
+        from apps.selecao.tests.factories import InscricaoFactory
+
+        inscricao = InscricaoFactory(
+            evento=self.evento,
+            status=self.status_inscricao_pendente,
+        )
+
+        resultado = MatriculaService.matricular_alunos(
+            inscricoes_ids=[inscricao.id]
+        )
+
+        assert resultado['total_sucesso'] == 0
+        assert len(resultado['erros']) > 0
+        assert 'não possui turmas' in resultado['erros'][0]
+
+    def test_matricular_alunos_ja_matriculado(self):
+        """Deve pular aluno já matriculado"""
+        from apps.selecao.tests.factories import InscricaoFactory
+        from apps.academico.models import Matricula
+
+        turma = TurmaFactory(evento=self.evento, capacidade=30)
+        inscricao = InscricaoFactory(
+            evento=self.evento,
+            status=self.status_inscricao_pendente,
+        )
+
+        # Criar matrícula manualmente (MatriculaFactory geraria inscricao divergente)
+        Matricula.objects.create(
+            turma=turma,
+            interessado=inscricao.interessado,
+            inscricao=inscricao,
+            status=self.status_matricula_ativa,
+        )
+
+        resultado = MatriculaService.matricular_alunos(
+            inscricoes_ids=[inscricao.id]
+        )
+
+        assert resultado['total_sucesso'] == 0
+        assert resultado['total_ja_matriculados'] == 1
+
+    def test_matricular_alunos_sem_status_ativa(self):
+        """Deve lançar ValueError se StatusMatricula 'Ativa' não existe"""
+        from apps.selecao.tests.factories import InscricaoFactory
+
+        self.status_matricula_ativa.delete()
+        inscricao = InscricaoFactory(
+            evento=self.evento,
+            status=self.status_inscricao_pendente,
+        )
+
+        with pytest.raises(ValueError, match="Status 'Ativa' não encontrado"):
+            MatriculaService.matricular_alunos(
+                inscricoes_ids=[inscricao.id]
+            )
+
+    def test_matricular_alunos_multiplos(self):
+        """Deve matricular múltiplos alunos"""
+        from apps.selecao.tests.factories import InscricaoFactory
+
+        TurmaFactory(evento=self.evento, capacidade=50)
+
+        inscricoes = []
+        for i in range(3):
+            inscricao = InscricaoFactory(
+                evento=self.evento,
+                status=self.status_inscricao_pendente,
+            )
+            inscricoes.append(inscricao)
+
+        ids = [insc.id for insc in inscricoes]
+
+        resultado = MatriculaService.matricular_alunos(
+            inscricoes_ids=ids
+        )
+
+        assert resultado['total_sucesso'] == 3
+        assert resultado['total_ja_matriculados'] == 0
+
+@pytest.mark.django_db
+class TestAlterarStatusInscricao:
+    """Testes para alterar_status_inscricao()"""
+
+    def setup_method(self):
+        from apps.selecao.tests.factories import InscricaoFactory, StatusInscricaoFactory
+
+        self.status_pendente = StatusInscricaoFactory(nome='Pendente')
+        self.status_confirmado = StatusInscricaoFactory(nome='Confirmado')
+        self.status_cancelado = StatusInscricaoFactory(nome='Cancelado')
+
+        self.inscricoes = []
+        for i in range(3):
+            inscricao = InscricaoFactory(status=self.status_pendente)
+            self.inscricoes.append(inscricao)
+
+    def test_alterar_status_todas(self):
+        """Deve alterar status de todas as inscrições"""
+        ids = [insc.id for insc in self.inscricoes]
+
+        resultado = MatriculaService.alterar_status_inscricao(
+            inscricoes_ids=ids,
+            novo_status_nome='Confirmado'
+        )
+
+        assert resultado['sucesso'] is True
+        assert resultado['total_atualizadas'] == 3
+        assert len(resultado['erros']) == 0
+
+        # Verificar no banco
+        from apps.selecao.models import Inscricao
+        for insc in self.inscricoes:
+            insc.refresh_from_db()
+            assert insc.status.nome == 'Confirmado'
+
+    def test_alterar_status_uma(self):
+        """Deve alterar status de uma inscrição específica"""
+        resultado = MatriculaService.alterar_status_inscricao(
+            inscricoes_ids=[self.inscricoes[0].id],
+            novo_status_nome='Cancelado'
+        )
+
+        assert resultado['total_atualizadas'] == 1
+
+        self.inscricoes[0].refresh_from_db()
+        assert self.inscricoes[0].status.nome == 'Cancelado'
+
+    def test_alterar_status_inexistente(self):
+        """Deve lançar ValueError se status não existe"""
+        with pytest.raises(ValueError, match="Status 'Inexistente' não encontrado"):
+            MatriculaService.alterar_status_inscricao(
+                inscricoes_ids=[1],
+                novo_status_nome='Inexistente'
+            )
+
 
 

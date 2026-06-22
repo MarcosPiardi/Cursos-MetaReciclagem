@@ -74,8 +74,7 @@ class InteressadoFactory(factory.django.DjangoModelFactory):
     # Contato
     telefone = factory.LazyAttribute(lambda obj: fake.numerify('##########'))  # 10 dígitos
     celular = factory.LazyAttribute(lambda obj: fake.numerify('###########'))  # 11 dígitos
-    email = factory.LazyAttribute(lambda obj: f'{fake.user_name()}@teste.com')
-
+    email = factory.Sequence(lambda n: f'interessado{n}@teste.com')
     # Programa social
     programa_social = False
     num_nis = factory.LazyAttribute(lambda obj: fake.numerify('###.#####.##-#'))

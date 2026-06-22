@@ -1,14 +1,15 @@
 """
 Arquivo: factories.py
 caminho: apps/selecao/tests/factories.py
-Finalidade: Definir factories para testes do app seleção.
+Finalidade: Definir factories para testes do app selecao.
 
-Atualizações:
- - 15/05/2026 - Criação do arquivo - Implementação inicial das factories para o app seleção
- - 15/05/2026 - Inclusão de cabeçalho 
- - 10/06/2026 - Adição de factory para StatusInscricao, Inscricao, Classificacao e InscricaoCriterioAtendido
+Atualizacoes:
+ - 15/05/2026 - Criacao do arquivo
+ - 15/05/2026 - Inclusao de cabecalho
+ - 10/06/2026 - Adicao de factory para StatusInscricao, Inscricao, Classificacao e InscricaoCriterioAtendido
+ - 18/06/2026 - Corrigido ClassificacaoFactory: classificado e lista_espera
+                padrao False para nao violar validacao mutuamente exclusiva
 """
-
 
 import factory
 from decimal import Decimal
@@ -34,7 +35,6 @@ class InscricaoFactory(DjangoModelFactory):
     interessado = factory.SubFactory(InteressadoFactory)
     evento = factory.SubFactory(EventoFactory)
     status = factory.SubFactory(StatusInscricaoFactory, nome='Pendente')
-    # data_inscricao = factory.LazyFunction(timezone.now)   para evitar warning de naive datetime em testes
     observacoes = factory.Faker('text', max_nb_chars=200)
 
 class ClassificacaoFactory(DjangoModelFactory):
@@ -43,9 +43,9 @@ class ClassificacaoFactory(DjangoModelFactory):
 
     inscricao = factory.SubFactory(InscricaoFactory)
     posicao = factory.Faker('random_int', min=1, max=100)
-    pontuacao_total = factory.Faker('pydecimal', left_digits=2, right_digits=2, positive=True, min_value=0, max_value=100)
-    classificado = factory.Faker('boolean')
-    lista_espera = factory.Faker('boolean')
+    pontuacao_total = factory.Faker('pydecimal', left_digits=2, right_digits=2, min_value=0, max_value=100)
+    classificado = False
+    lista_espera = False
     processado_em = factory.LazyFunction(timezone.now)
     atualizado_em = factory.LazyFunction(timezone.now)
 
@@ -58,5 +58,6 @@ class InscricaoCriterioAtendidoFactory(DjangoModelFactory):
     pontos_atribuidos = factory.Faker('random_int', min=1, max=20)
     validado = factory.Faker('boolean')
     observacao_validacao = factory.Faker('sentence')
+
 
     

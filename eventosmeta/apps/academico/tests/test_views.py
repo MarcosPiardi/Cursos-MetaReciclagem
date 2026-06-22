@@ -132,10 +132,20 @@ class TestDownloadCertificadosLote:
         assert response.status_code == 400
         assert b"Nenhuma avalia" in response.content
 
-    def test_ids_invalidos_retorna_400(self, client, staff_user):
+    def test_ids_todos_invalidos_retorna_400(self, client, staff_user):
+        """?ids=abc,def → todos filtrados → nenhuma avaliacao selecionada"""
         client.force_login(staff_user)
         response = client.get(
-            reverse("academico:download_certificados_lote") + "?ids=abc,123"
+            reverse("academico:download_certificados_lote") + "?ids=abc,def"
+        )
+        assert response.status_code == 400
+        assert b"Nenhuma avalia" in response.content
+
+    def test_sem_aprovados_entre_ids_validos_retorna_400(self, client, staff_user):
+        """?ids=999,888 → ids validos mas sem aprovados"""
+        client.force_login(staff_user)
+        response = client.get(
+            reverse("academico:download_certificados_lote") + "?ids=999,888"
         )
         assert response.status_code == 400
         assert b"Nenhum aluno aprovado" in response.content
@@ -169,5 +179,42 @@ class TestDownloadCertificadosLote:
         zip_buffer = io.BytesIO(response.content)
         with zipfile.ZipFile(zip_buffer, "r") as zf:
             assert len(zf.namelist()) == 2
+
+    def test_zip_filename_contem_contagem(self, client, staff_user):
+        avaliacao = criar_avaliacao(aprovado=True)
+        client.force_login(staff_user)
+        response = client.get(
+            reverse("academico:download_certificados_lote")
+            + f"?ids={avaliacao.pk}"
+        )
+        assert "Certificados_1_alunos.zip" in response["Content-Disposition"]           
+
+
+class TestMetodosHttpNaoPermitidos:
+    def test_download_certificado_post_retorna_405(self, client, staff_user):
+        avaliacao = criar_avaliacao(aprovado=True)
+        client.force_login(staff_user)
+        response = client.post(
+            reverse("academico:download_certificado", args=[avaliacao.pk])
+        )
+        assert response.status_code == 405
+
+    def test_preview_certificado_put_retorna_405(self, client, staff_user):
+        avaliacao = criar_avaliacao(aprovado=True)
+        client.force_login(staff_user)
+        response = client.put(
+            reverse("academico:preview_certificado", args=[avaliacao.pk])
+        )
+        assert response.status_code == 405
+
+    def test_lote_post_retorna_405(self, client, staff_user):
+        client.force_login(staff_user)
+        response = client.post(
+            reverse("academico:download_certificados_lote")
+        )
+        assert response.status_code == 405
+
+
+
 
             

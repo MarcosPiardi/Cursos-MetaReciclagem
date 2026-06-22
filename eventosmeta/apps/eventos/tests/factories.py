@@ -116,10 +116,12 @@ class EventoFactory(factory.django.DjangoModelFactory):
 
     data_inicio_evento = factory.LazyAttribute(
         lambda o: o.data_fim_inscricao + timedelta(days=1)
+        if o.data_fim_inscricao else None
     )
 
     data_fim_evento = factory.LazyAttribute(
         lambda o: o.data_inicio_evento + timedelta(days=2)
+        if o.data_inicio_evento else None
     )
 
 

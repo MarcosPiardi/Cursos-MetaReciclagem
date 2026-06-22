@@ -2,17 +2,18 @@
 Arquivo: test_forms.py
 Caminho: apps/interessados/tests/test_forms.py
 Testes de formularios: CadastroInteressadoForm, LoginInteressadoForm, EdicaoInteressadoForm
-Data: 07/04/2026
-Refatorado: 29/05/2026
-  - Removido TestLoginFormComFactory (redundante)
-  - Unificado TestCadastroFormCPFValidacao em TestCadastroInteressadoForm
-  - Removido import nao utilizado (timezone)
-  - Factory imports movidos para nivel da classe
-  - Adicionados testes basicos de validacao EdicaoInteressadoForm
+Atualizações:
+ - 07/04/2026 - Criacao dos testes iniciais para os formularios de cadastro, login e edicao.
+ - 29/05/2026 - Adicionados testes de validacao de CPF (formato, digitos iguais, digito verificador).
+              - Removido TestLoginFormComFactory (redundante)
+              - Unificado TestCadastroFormCPFValidacao em TestCadastroInteressadoForm   
+              - Removido import nao utilizado (timezone)
+              - Factory imports movidos para nivel da classe
+              - Adicionados testes basicos de validacao EdicaoInteressadoForm
+ - 18/06/2026 - Refatorado de unittest.TestCase para pytest
 """
 
-from django.test import TestCase
-
+import pytest
 from ..forms import (
     CadastroInteressadoForm,
     LoginInteressadoForm,
@@ -25,15 +26,14 @@ from .factories import (
     FototipoFactory,
 )
 
+pytestmark = pytest.mark.django_db
 
 # ============================================================
 # TESTES: CADASTRO INTERESSADO FORM
 # ============================================================
 
-class TestCadastroInteressadoForm(TestCase):
+class TestCadastroInteressadoForm:
     """Testes de validacao do formulario de cadastro (incluindo CPF)."""
-
-    # --- Dados minimos ---
 
     def test_cadastro_valido_dados_minimos(self):
         """Formulario valido com dados minimos obrigatorios."""
@@ -46,11 +46,9 @@ class TestCadastroInteressadoForm(TestCase):
             'consentimento_lgpd': True,
         }
         form = CadastroInteressadoForm(data=form_data)
-        self.assertTrue(form.is_valid(), f"Erros: {form.errors}")
+        assert form.is_valid(), f"Erros: {form.errors}"
 
-    # --- Unicidade ---
-
-    def test_cadastro_cpf_duplicado(self):
+    def test_cadastro_cpf_duplicado(self, db):
         """Rejeita se CPF ja existe no banco."""
         cpf = '52998224725'
         InteressadoFactory.create(cpf=cpf)
@@ -63,10 +61,10 @@ class TestCadastroInteressadoForm(TestCase):
             'consentimento_lgpd': True,
         }
         form = CadastroInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('cpf', form.errors)
+        assert not form.is_valid()
+        assert 'cpf' in form.errors
 
-    def test_cadastro_email_duplicado(self):
+    def test_cadastro_email_duplicado(self, db):
         """Rejeita se email ja existe no banco."""
         email = 'existente@example.com'
         InteressadoFactory.create(email=email)
@@ -79,10 +77,8 @@ class TestCadastroInteressadoForm(TestCase):
             'consentimento_lgpd': True,
         }
         form = CadastroInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('email', form.errors)
-
-    # --- Senha ---
+        assert not form.is_valid()
+        assert 'email' in form.errors
 
     def test_cadastro_senhas_nao_conferem(self):
         """Rejeita se senhas sao diferentes."""
@@ -95,10 +91,8 @@ class TestCadastroInteressadoForm(TestCase):
             'consentimento_lgpd': True,
         }
         form = CadastroInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('confirmar_senha', form.errors)
-
-    # --- CPF ---
+        assert not form.is_valid()
+        assert 'confirmar_senha' in form.errors
 
     def test_cadastro_cpf_invalido_todos_iguais(self):
         """Rejeita CPF com todos digitos iguais."""
@@ -111,8 +105,8 @@ class TestCadastroInteressadoForm(TestCase):
             'consentimento_lgpd': True,
         }
         form = CadastroInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('cpf', form.errors)
+        assert not form.is_valid()
+        assert 'cpf' in form.errors
 
     def test_cpf_valido_com_pontuacao(self):
         """Aceita CPF formatado (123.456.789-00)."""
@@ -125,7 +119,7 @@ class TestCadastroInteressadoForm(TestCase):
             'consentimento_lgpd': True,
         }
         form = CadastroInteressadoForm(data=form_data)
-        self.assertTrue(form.is_valid())
+        assert form.is_valid()
 
     def test_cpf_invalido_digito_verificador(self):
         """Rejeita CPF com digito verificador invalido."""
@@ -138,7 +132,7 @@ class TestCadastroInteressadoForm(TestCase):
             'consentimento_lgpd': True,
         }
         form = CadastroInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
+        assert not form.is_valid()
 
     def test_cpf_muito_curto(self):
         """Rejeita CPF com menos de 11 digitos."""
@@ -151,9 +145,7 @@ class TestCadastroInteressadoForm(TestCase):
             'consentimento_lgpd': True,
         }
         form = CadastroInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
-
-    # --- LGPD ---
+        assert not form.is_valid()
 
     def test_cadastro_sem_consentimento_lgpd(self):
         """Rejeita sem aceitar consentimento LGPD."""
@@ -166,18 +158,18 @@ class TestCadastroInteressadoForm(TestCase):
             'consentimento_lgpd': False,
         }
         form = CadastroInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('consentimento_lgpd', form.errors)
-
+        assert not form.is_valid()
+        assert 'consentimento_lgpd' in form.errors
 
 # ============================================================
 # TESTES: LOGIN INTERESSADO FORM
 # ============================================================
 
-class TestLoginInteressadoForm(TestCase):
+class TestLoginInteressadoForm:
     """Testes de validacao do formulario de login."""
 
-    def setUp(self):
+    @pytest.fixture(autouse=True)
+    def setup(self, db):
         self.cpf = '52998224725'
         self.senha = 'senha123'
         self.interessado = InteressadoFactory.create(
@@ -192,8 +184,8 @@ class TestLoginInteressadoForm(TestCase):
             'senha': self.senha,
         }
         form = LoginInteressadoForm(data=form_data)
-        self.assertTrue(form.is_valid(), f"Erros: {form.errors}")
-        self.assertEqual(form.interessado, self.interessado)
+        assert form.is_valid(), f"Erros: {form.errors}"
+        assert form.interessado == self.interessado
 
     def test_login_cpf_nao_cadastrado(self):
         """Login com CPF nao existente."""
@@ -202,8 +194,8 @@ class TestLoginInteressadoForm(TestCase):
             'senha': self.senha,
         }
         form = LoginInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('__all__', form.errors)
+        assert not form.is_valid()
+        assert '__all__' in form.errors
 
     def test_login_senha_incorreta(self):
         """Login com senha errada."""
@@ -212,8 +204,8 @@ class TestLoginInteressadoForm(TestCase):
             'senha': 'SenhaErrada123',
         }
         form = LoginInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('__all__', form.errors)
+        assert not form.is_valid()
+        assert '__all__' in form.errors
 
     def test_login_interessado_inativo(self):
         """Login falha se conta esta inativa."""
@@ -224,8 +216,8 @@ class TestLoginInteressadoForm(TestCase):
             'senha': self.senha,
         }
         form = LoginInteressadoForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('__all__', form.errors)
+        assert not form.is_valid()
+        assert '__all__' in form.errors
 
     def test_login_cpf_formatado_com_pontuacao(self):
         """Login funciona com CPF contendo pontos e tracos."""
@@ -238,24 +230,23 @@ class TestLoginInteressadoForm(TestCase):
             'senha': 'senha123',
         }
         form = LoginInteressadoForm(data=form_data)
-        self.assertTrue(form.is_valid(), f"Erros: {form.errors}")
-        self.assertEqual(form.interessado, interessado)
-
+        assert form.is_valid(), f"Erros: {form.errors}"
+        assert form.interessado == interessado
 
 # ============================================================
 # TESTES: EDICAO INTERESSADO FORM
 # ============================================================
 
-class TestEdicaoInteressadoForm(TestCase):
+class TestEdicaoInteressadoForm:
     """Testes de validacao do formulario de edicao."""
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.sexo = SexoFactory()
-        cls.fototipo = FototipoFactory()
-        cls.interessado = InteressadoFactory.create(
-            sexo=cls.sexo,
-            fototipo=cls.fototipo,
+    @pytest.fixture(autouse=True)
+    def setup(self, db):
+        self.sexo = SexoFactory()
+        self.fototipo = FototipoFactory()
+        self.interessado = InteressadoFactory.create(
+            sexo=self.sexo,
+            fototipo=self.fototipo,
         )
 
     def _dados_minimos(self, **kwargs):
@@ -288,12 +279,12 @@ class TestEdicaoInteressadoForm(TestCase):
             data=self._dados_minimos(),
             instance=self.interessado,
         )
-        self.assertTrue(form.is_valid(), f"Erros: {form.errors}")
+        assert form.is_valid(), f"Erros: {form.errors}"
 
     def test_cpf_nao_aparece_na_edicao(self):
         """CPF nao esta nos fields do formulario de edicao."""
         form = EdicaoInteressadoForm(instance=self.interessado)
-        self.assertNotIn('cpf', form.fields)
+        assert 'cpf' not in form.fields
 
     def test_tentativa_alterar_cpf_ignorada(self):
         """Passar CPF no POST nao altera o cpf_hash do interessado."""
@@ -304,9 +295,9 @@ class TestEdicaoInteressadoForm(TestCase):
             data=dados,
             instance=self.interessado,
         )
-        self.assertTrue(form.is_valid(), f"Erros: {form.errors}")
+        assert form.is_valid(), f"Erros: {form.errors}"
         saved = form.save()
-        self.assertEqual(saved.cpf_hash, cpf_hash_original)
+        assert saved.cpf_hash == cpf_hash_original
 
     def test_edicao_sem_nome_rejeita(self):
         """Rejeita edicao sem nome."""
@@ -315,8 +306,8 @@ class TestEdicaoInteressadoForm(TestCase):
             data=dados,
             instance=self.interessado,
         )
-        self.assertFalse(form.is_valid())
-        self.assertIn('nome', form.errors)
+        assert not form.is_valid()
+        assert 'nome' in form.errors
 
     def test_edicao_email_invalido_rejeita(self):
         """Rejeita edicao com email mal formatado."""
@@ -325,7 +316,7 @@ class TestEdicaoInteressadoForm(TestCase):
             data=dados,
             instance=self.interessado,
         )
-        self.assertFalse(form.is_valid())
-        self.assertIn('email', form.errors)
+        assert not form.is_valid()
+        assert 'email' in form.errors
 
-        
+

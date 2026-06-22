@@ -37,6 +37,8 @@ urlpatterns = [
     # Adicionar no urlpatterns
     path('exclusao/solicitar/', views_exclusao.solicitar_exclusao_view, name='solicitar_exclusao'),
     path('exclusao/solicitada/', views_exclusao.exclusao_solicitada_view, name='exclusao_solicitada'),
+    path('senha/trocar-obrigatorio/', views.trocar_senha_obrigatorio_view, name='trocar_senha_obrigatorio'),
+    
 
 
 ]
