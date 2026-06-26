@@ -27,413 +27,283 @@ Funcionalidades:
 
 # Linha 28
 from decimal import Decimal
-from django.db import transaction
-from django.utils import timezone
 from datetime import date
 
-from apps.selecao.models import Inscricao, Classificacao, StatusInscricao, InscricaoCriterioAtendido
+from django.db import transaction
+from django.utils import timezone
+
+from apps.selecao.models import (
+    Inscricao,
+    Classificacao,
+    StatusInscricao,
+    InscricaoCriterioAtendido,
+)
 from apps.eventos.models import Evento
 
 
 class ClassificadorService:
     """
     Serviço para classificação de inscrições em eventos.
-    
-    ARQUITETURA:
-    - _atende_criterio(): valida se inscrição atende critério específico
-    - _calcular_pontos(): lógica pura, soma apenas pontos de critérios atendidos
-    - calcular_pontuacao_inscricao(): retorna pontos sem salvar
-    - processar_inscricao(): calcula e cria Classificacao
-    - classificar_evento(): orquestra classificação completa com desempate e quotas
-    
-    Alteração: 19/05/2026 - Adicionada validação automática de critérios
     """
 
     @staticmethod
     def _atende_criterio(inscricao, criterio):
-        """
-        MÉTODO PRIVADO: Valida se uma inscrição atende a um critério específico.
-        
-        Cada categoria de critério mapeia para um atributo ou regra do Interessado.
-        Retorna True se a inscrição deve somar os pontos deste critério.
-        
-        Alteração: 19/05/2026 - Implementação de validação automática
-        
-        Args:
-            inscricao: Objeto Inscricao com interessado relacionado
-            criterio: Objeto Criterio com categoria definida
-            
-        Returns:
-            bool: True se inscrição atende critério, False caso contrário
-        """
         interessado = inscricao.interessado
         categoria = criterio.categoria
-        
-        # PCD: Pessoa com Deficiência
-        if categoria == 'PCD':
-            return interessado.necessidades_especiais
-        
-        # NIS: Programa Social (Cadastro Único)
-        if categoria == 'NIS':
-            return interessado.programa_social
-        
-        # JOVEM: Faixa etária 16-24 anos
-        if categoria == 'JOVEM':
+
+        hoje = timezone.localdate()
+
+        if categoria == "PCD":
+            return bool(interessado.necessidades_especiais)
+
+        if categoria == "NIS":
+            return bool(interessado.programa_social)
+
+        if categoria == "JOVEM":
             if interessado.data_nascimento:
-                idade = (date.today() - interessado.data_nascimento).days // 365
+                idade = (hoje - interessado.data_nascimento).days // 365
                 return 16 <= idade <= 24
             return False
-        
-        # IDOSO: Faixa etária 50+ anos
-        if categoria == 'IDOSO':
+
+        if categoria == "IDOSO":
             if interessado.data_nascimento:
-                idade = (date.today() - interessado.data_nascimento).days // 365
+                idade = (hoje - interessado.data_nascimento).days // 365
                 return idade >= 50
             return False
-        
-        # COTA_RACIAL: Preto, Pardo, Indígena
-        if categoria == 'COTA_RACIAL':
+
+        if categoria == "COTA_RACIAL":
             if interessado.fototipo:
                 return interessado.fototipo.id in [2, 3, 5]
             return False
-        
-        # ESC_FUND_INC: Ensino Fundamental Incompleto
-        if categoria == 'ESC_FUND_INC':
-            return interessado.escolaridade == 'FUNDAMENTAL_INCOMPLETO'
-        
-        # ESC_FUND_COMP: Ensino Fundamental Completo
-        if categoria == 'ESC_FUND_COMP':
-            return interessado.escolaridade == 'FUNDAMENTAL_COMPLETO'
-        
-        # ESC_MEDIO_INC: Ensino Médio Incompleto
-        if categoria == 'ESC_MEDIO_INC':
-            return interessado.escolaridade == 'MEDIO_INCOMPLETO'
-        
-        # ESC_MEDIO_COMP: Ensino Médio Completo
-        if categoria == 'ESC_MEDIO_COMP':
-            return interessado.escolaridade == 'MEDIO_COMPLETO'
-        
-        # Se categoria não reconhecida, assume que atende (padrão permissivo)
+
+        if categoria == "ESC_FUND_INC":
+            return interessado.escolaridade == "FUNDAMENTAL_INCOMPLETO"
+
+        if categoria == "ESC_FUND_COMP":
+            return interessado.escolaridade == "FUNDAMENTAL_COMPLETO"
+
+        if categoria == "ESC_MEDIO_INC":
+            return interessado.escolaridade == "MEDIO_INCOMPLETO"
+
+        if categoria == "ESC_MEDIO_COMP":
+            return interessado.escolaridade == "MEDIO_COMPLETO"
+
+        # Categoria desconhecida: mantém permissivo
         return True
 
     @staticmethod
     def _calcular_pontos(inscricao):
-        """
-        MÉTODO PRIVADO: Lógica pura de cálculo de pontuação.
-        
-        Percorre os critérios do evento com tipo PONTUACAO e soma os pontos
-        APENAS dos critérios que a inscrição ATENDE (validação automática).
-        SEM efeitos colaterais no BD (não salva).
-        
-        Fluxo:
-        1. Obtém EventoCriterio com ativo=True ordenados por prioridade
-        2. Para cada critério com tipo PONTUACAO:
-           - Valida se inscrição atende (via _atende_criterio)
-           - Se atende, soma os pontos
-        3. Retorna Decimal('0.00') se sem critérios ou nenhum atendido
-        
-        Alteração: 19/05/2026 - Adicionada validação automática de atendimento
-        
-        Args:
-            inscricao: Objeto Inscricao com evento relacionado
-            
-        Returns:
-            Decimal: Pontuação total calculada (0.00 se sem critérios)
-        """
-        pontuacao_total = Decimal('0.00')
-        
-        evento_criterios = inscricao.evento.evento_criterios.filter(
-            ativo=True
-        ).order_by('prioridade')
-        
+        pontuacao_total = Decimal("0.00")
+
+        evento_criterios = (
+            inscricao.evento.evento_criterios.filter(ativo=True).order_by("prioridade")
+        )
+
         for evento_criterio in evento_criterios:
             criterio = evento_criterio.criterio
-            
-            if (criterio.tipo_criterio == 'PONTUACAO' and 
-                criterio.pontos is not None and
-                ClassificadorService._atende_criterio(inscricao, criterio)):
-                
-                pontuacao_total += Decimal(str(criterio.pontos))
-        
+
+            if criterio.tipo_criterio == "PONTUACAO" and criterio.pontos is not None:
+                if ClassificadorService._atende_criterio(inscricao, criterio):
+                    pontuacao_total += Decimal(str(criterio.pontos))
+
         return pontuacao_total
 
     @staticmethod
     def calcular_pontuacao_inscricao(inscricao):
-        """
-        Calcula a pontuação de uma inscrição SEM salvar no BD.
-        
-        Método público que reutiliza _calcular_pontos().
-        Útil para validações, testes e consultas sem persistência.
-        
-        Alteração: 19/05/2026 - Implementação como wrapper de _calcular_pontos()
-        
-        Args:
-            inscricao: Objeto Inscricao com evento relacionado
-            
-        Returns:
-            Decimal: Pontuação total calculada
-        """
         return ClassificadorService._calcular_pontos(inscricao)
 
     @staticmethod
+    @transaction.atomic
     def processar_inscricao(inscricao):
-        """
-        Processa uma inscrição: calcula pontuação e cria/atualiza Classificacao.
-        
-        Também popula InscricaoCriterioAtendido com critérios atendidos (auditoria).
-        
-        Alteração: 19/05/2026 - Adicionada persistência em InscricaoCriterioAtendido
-        
-        Args:
-            inscricao: Objeto Inscricao com evento relacionado
-            
-        Returns:
-            Decimal: Pontuação total calculada e salva
-        """
-        # from apps.selecao.models import InscricaoCriterioAtendido  - 
-        
-        pontuacao_total = Decimal('0.00')
-        
-        # Limpar critérios anteriores (reclassificação)
+        pontuacao_total = Decimal("0.00")
+
         InscricaoCriterioAtendido.objects.filter(inscricao=inscricao).delete()
-        
-        # Percorrer critérios e criar registros de atendimento
-        evento_criterios = inscricao.evento.evento_criterios.filter(
-            ativo=True
-        ).order_by('prioridade')
-        
+
+        evento_criterios = (
+            inscricao.evento.evento_criterios.filter(ativo=True).order_by("prioridade")
+        )
+
         for evento_criterio in evento_criterios:
             criterio = evento_criterio.criterio
-            
-            # Verificar se inscrição ATENDE este critério
-            if ClassificadorService._atende_criterio(inscricao, criterio):
-                # Se é critério de PONTUACAO, somar pontos
-                if criterio.tipo_criterio == 'PONTUACAO' and criterio.pontos is not None:
-                    pontuacao_total += Decimal(str(criterio.pontos))
-                    
-                    # Criar registro em InscricaoCriterioAtendido
-                    InscricaoCriterioAtendido.objects.create(
-                        inscricao=inscricao,
-                        criterio=criterio,
-                        pontos_atribuidos=criterio.pontos,
-                        validado=False  # Aguardando validação manual se necessário
-                    )
-        
-        # Atualizar ou criar Classificacao com pontuação total
+
+            if criterio.tipo_criterio != "PONTUACAO":
+                continue
+
+            atende = ClassificadorService._atende_criterio(inscricao, criterio)
+
+            pontos = Decimal(str(criterio.pontos)) if criterio.pontos is not None else Decimal("0.00")
+
+            if atende and criterio.pontos is not None:
+                pontuacao_total += pontos
+
+            # Auditoria sempre registra quando é PONTUACAO (atendido ou não)
+            InscricaoCriterioAtendido.objects.create(
+                inscricao=inscricao,
+                criterio=criterio,
+                pontos_atribuidos=pontos if atende else Decimal("0.00"),
+                validado=bool(atende),
+            )
+
         classificacao, criada = Classificacao.objects.get_or_create(
             inscricao=inscricao,
-            defaults={'pontuacao_total': pontuacao_total}
+            defaults={"pontuacao_total": pontuacao_total},
         )
-        
+
         if not criada:
             classificacao.pontuacao_total = pontuacao_total
-            classificacao.save()
-        
+            classificacao.save(update_fields=["pontuacao_total"])
+
         return pontuacao_total
 
     @staticmethod
     @transaction.atomic
     def classificar_evento(evento):
-        """
-        Classifica TODAS as inscrições do evento:
-        - Processa cada inscrição para calcular pontuação
-        - Aplica desempate inteligente (idade ou timestamp)
-        - Aplica quotas se critérios existirem (30% PCD, 40% social)
-        - Atribui posições ordinais
-        - Marca classificado/lista_espera
-        - Atualiza status Inscricao para "Classificado"
-        
-        Desempate Inteligente:
-        - Verifica se existe critério de IDADE ou FAIXA_ETARIA
-        - SE SIM: ordena por idade
-        - SE NÃO: ordena por data_inscricao (timestamp) - FIFO
-        
-        Alteração: 19/05/2026 - Implementação com validação automática
-        Alteração: 19/05/2026 - Refatoração de retorno com campos expandidos
-        
-        Args:
-            evento: Objeto Evento a ser classificado
-            
-        Returns:
-            dict: {
-                'sucesso': True/False,
-                'mensagem': str,
-                'total_processadas': int,
-                'total_classificadas': int,
-                'total_lista_espera': int
-            }
-        """
         try:
-            # Obter todas as inscrições do evento
             inscricoes = Inscricao.objects.filter(evento=evento)
-            
+
             if not inscricoes.exists():
                 return {
-                    'sucesso': False,
-                    'mensagem': f'Nenhuma inscrição encontrada para o evento {evento.nome}',
-                    'total_processadas': 0,
-                    'total_classificadas': 0,
-                    'total_lista_espera': 0
+                    "sucesso": False,
+                    "mensagem": f"Nenhuma inscrição encontrada para o evento {evento.nome}",
+                    "total_processadas": 0,
+                    "total_classificadas": 0,
+                    "total_lista_espera": 0,
                 }
-            
-            # Etapa 1: Processar pontuações para todas as inscrições
+
             for inscricao in inscricoes:
                 ClassificadorService.processar_inscricao(inscricao)
-            
-            # Etapa 2: Obter Classificacoes e aplicar desempate
-            classificacoes = Classificacao.objects.filter(
-                inscricao__evento=evento
-            ).select_related('inscricao__interessado')
-            
-            # Desempate Inteligente
+
+            classificacoes_qs = (
+                Classificacao.objects.filter(inscricao__evento=evento)
+                .select_related("inscricao__interessado")
+                .all()
+            )
+
+            # Definir desempate
             tem_criterio_idade = evento.evento_criterios.filter(
-                criterio__categoria__in=['IDADE', 'FAIXA_ETARIA', 'JOVEM', 'IDOSO'],
-                ativo=True
+                criterio__categoria__in=["IDADE", "FAIXA_ETARIA", "JOVEM", "IDOSO"],
+                ativo=True,
             ).exists()
-            
+
             if tem_criterio_idade:
-                # Desempate por idade
                 classificacoes = sorted(
-                    classificacoes,
+                    classificacoes_qs,
                     key=lambda x: (
-                        -float(x.pontuacao_total),  # Pontuação DESC
-                        x.inscricao.interessado.data_nascimento or date.today()
-                    )
+                        -(x.pontuacao_total or Decimal("0.00")),
+                        x.inscricao.interessado.data_nascimento or date.today(),
+                        x.inscricao.id,
+                    ),
                 )
             else:
-                # Desempate por timestamp (FIFO)
                 classificacoes = sorted(
-                    classificacoes,
+                    classificacoes_qs,
                     key=lambda x: (
-                        -float(x.pontuacao_total),  # Pontuação DESC
-                        x.inscricao.data_inscricao  # Data ASC (chegou primeiro = melhor)
-                    )
+                        -(x.pontuacao_total or Decimal("0.00")),
+                        x.inscricao.data_inscricao,
+                        x.inscricao.id,
+                    ),
                 )
-            
-            # Etapa 3: Aplicar quotas
+
+            # Quotas
             tem_criterio_pcd = evento.evento_criterios.filter(
-                criterio__categoria='PCD',
-                ativo=True
+                criterio__categoria="PCD", ativo=True
             ).exists()
-            
             tem_criterio_social = evento.evento_criterios.filter(
-                criterio__categoria='NIS',
-                ativo=True
+                criterio__categoria="NIS", ativo=True
             ).exists()
-            
-            # Cálculo de vagas por quota
+
             total_vagas = evento.total_vagas
             vagas_pcd = int(total_vagas * 0.30) if tem_criterio_pcd else 0
             vagas_social = int(total_vagas * 0.40) if tem_criterio_social else 0
-            vagas_aberta = total_vagas - vagas_pcd - vagas_social
+            vagas_aberta = total_vagas - vagas_pcd - vagas_social  # mantido
 
-            # RESET: Limpar classificações anteriores antes de reclassificar
+            # Reset
             Classificacao.objects.filter(inscricao__evento=evento).update(
-                classificado=False,
-                lista_espera=False,
-                posicao=None
+                classificado=False, lista_espera=False, posicao=None
             )
 
-            # RESET: Limpar status de inscricoes antes de reclassificar
-            status_lista_espera = StatusInscricao.objects.get(nome='Lista de Espera')
-            Inscricao.objects.filter(evento=evento).update(status=status_lista_espera)
+            status_lista_espera_obj = StatusInscricao.objects.get(nome="Lista de Espera")
+            Inscricao.objects.filter(evento=evento).update(status=status_lista_espera_obj)
 
-           
-            # Etapa 4: Atribuir posições e flags
+            status_classificado_obj = StatusInscricao.objects.get(nome="Classificado")
+
             posicao = 1
-            status_classificado = StatusInscricao.objects.get(nome='Classificado')
-            status_lista_espera = StatusInscricao.objects.get(nome='Lista de Espera')
-            
             for classificacao in classificacoes:
-                classificacao.refresh_from_db()
                 classificacao.posicao = posicao
-                
+
                 if posicao <= total_vagas:
                     classificacao.classificado = True
                     classificacao.lista_espera = False
-                    classificacao.inscricao.status = status_classificado
+                    classificacao.inscricao.status = status_classificado_obj
                 else:
                     classificacao.classificado = False
                     classificacao.lista_espera = True
-                    classificacao.inscricao.status = status_lista_espera
-                
+                    classificacao.inscricao.status = status_lista_espera_obj
+
                 classificacao.save()
-                classificacao.inscricao.save()
+                classificacao.inscricao.save(update_fields=["status"])
+
                 posicao += 1
-            
-            # Etapa 5: Calcular totais para retorno
+
             total_classificadas = Classificacao.objects.filter(
-                inscricao__evento=evento,
-                classificado=True
+                inscricao__evento=evento, classificado=True
             ).count()
-            
+
             total_lista_espera = Classificacao.objects.filter(
-                inscricao__evento=evento,
-                lista_espera=True
+                inscricao__evento=evento, lista_espera=True
             ).count()
-            
+
             return {
-                'sucesso': True,
-                'mensagem': f'Evento {evento.nome} classificado com sucesso. {total_vagas} vagas preenchidas.',
-                'total_processadas': len(classificacoes),
-                'total_classificadas': total_classificadas,
-                'total_lista_espera': total_lista_espera
+                "sucesso": True,
+                "mensagem": f"Evento {evento.nome} classificado com sucesso. {total_vagas} vagas preenchidas.",
+                "total_processadas": len(classificacoes),
+                "total_classificadas": total_classificadas,
+                "total_lista_espera": total_lista_espera,
             }
-        
+
         except StatusInscricao.DoesNotExist:
             return {
-                'sucesso': False,
-                'mensagem': 'Status "Classificado" não encontrado. Verifique StatusInscricao no admin.',
-                'total_processadas': 0,
-                'total_classificadas': 0,
-                'total_lista_espera': 0
+                "sucesso": False,
+                "mensagem": 'Status "Classificado" não encontrado. Verifique StatusInscricao no admin.',
+                "total_processadas": 0,
+                "total_classificadas": 0,
+                "total_lista_espera": 0,
             }
         except Exception as erro:
             return {
-                'sucesso': False,
-                'mensagem': f'Erro ao classificar evento: {str(erro)}',
-                'total_processadas': 0,
-                'total_classificadas': 0,
-                'total_lista_espera': 0
+                "sucesso": False,
+                "mensagem": f"Erro ao classificar evento: {str(erro)}",
+                "total_processadas": 0,
+                "total_classificadas": 0,
+                "total_lista_espera": 0,
             }
-        
 
     @staticmethod
     @transaction.atomic
     def desfazer_classificacao_evento(evento):
-        """
-        Desfaz a classificação de um evento, deletando as classificações
-        e resetando o status das inscrições para 'Pendente'.
-        
-        Args:
-            evento: Objeto Evento cuja classificação será desfeita
-        
-        Returns:
-            dict: { 'sucesso': True/False, 'mensagem': str, 'total_desfeitas': int }
-        """
         try:
             total_desfeitas = Classificacao.objects.filter(inscricao__evento=evento).count()
             Classificacao.objects.filter(inscricao__evento=evento).delete()
-            status_pendente = StatusInscricao.objects.get(nome='Pendente')
+
+            status_pendente = StatusInscricao.objects.get(nome="Pendente")
             Inscricao.objects.filter(evento=evento).update(status=status_pendente)
-            
+
             return {
-                'sucesso': True,
-                'mensagem': f'Classificação do evento {evento.nome} desfeita com sucesso.',
-                'total_desfeitas': total_desfeitas
+                "sucesso": True,
+                "mensagem": f"Classificação do evento {evento.nome} desfeita com sucesso.",
+                "total_desfeitas": total_desfeitas,
             }
         except StatusInscricao.DoesNotExist:
             return {
-                'sucesso': False,
-                'mensagem': 'Status "Pendente" não encontrado em StatusInscricao.',
-                'total_desfeitas': 0
+                "sucesso": False,
+                "mensagem": 'Status "Pendente" não encontrado em StatusInscricao.',
+                "total_desfeitas": 0,
             }
         except Exception as erro:
             return {
-                'sucesso': False,
-                'mensagem': f'Erro ao desfazer classificação: {str(erro)}',
-                'total_desfeitas': 0
+                "sucesso": False,
+                "mensagem": f"Erro ao desfazer classificação: {str(erro)}",
+                "total_desfeitas": 0,
             }
         
-
         

@@ -58,7 +58,8 @@ class Inscricao(models.Model):
     )
     
     # Datas
-    data_inscricao = models.DateTimeField(auto_now_add=True)
+    # data_inscricao = models.DateTimeField(auto_now_add=True)   mudança por recomendação do Claude para evitar problemas de timezone em 23/06/2026
+    data_inscricao = models.DateTimeField(default=timezone.now, editable=False)
     data_atualizacao = models.DateTimeField(auto_now=True)
     
     # Observações

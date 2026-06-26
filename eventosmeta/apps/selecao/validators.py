@@ -137,46 +137,40 @@ class ClassificacaoValidator:
     
     @staticmethod
     def validar_criterio(criterio):
-        """
-        Valida se o critério está configurado corretamente
-        
-        Args:
-            criterio: Instância do modelo Criterio
-            
-        Returns:
-            dict: {'valido': bool, 'erros': list, 'avisos': list}
-        """
         erros = []
         avisos = []
-        
-        # 1. Nome obrigatório
+
         if not criterio.nome:
-            erros.append(f'Critério ID {criterio.id}: nome não informado')
-        
-        # 2. Tipo de critério obrigatório
+            erros.append(f"Critério ID {criterio.id}: nome não informado")
+
         if not criterio.tipo_criterio:
-            erros.append(f'Critério {criterio.nome}: tipo_criterio não informado')
-        
-        # 3. Se for PONTUACAO, pontos é obrigatório
-        if criterio.tipo_criterio == 'PONTUACAO':
-            if criterio.pontos is None or criterio.pontos == 0:
-                erros.append(f'Critério {criterio.nome}: tipo PONTUACAO requer pontos > 0 (atual: {criterio.pontos})')
+            erros.append(f"Critério {criterio.nome}: tipo_criterio não informado")
+
+        if criterio.tipo_criterio == "PONTUACAO":
+            if criterio.pontos is None:
+                erros.append(
+                    f"Critério {criterio.nome}: tipo PONTUACAO requer pontos definidos"
+                )
             elif criterio.pontos < 0:
-                erros.append(f'Critério {criterio.nome}: pontos não pode ser negativo ({criterio.pontos})')
-        
-        # 4. Categoria recomendada
+                erros.append(
+                    f"Critério {criterio.nome}: pontos não pode ser negativo ({criterio.pontos})"
+                )
+            elif criterio.pontos == 0:
+                erros.append(
+                    f"Critério {criterio.nome}: tipo PONTUACAO requer pontos > 0 (atual: {criterio.pontos})"
+                )
+
         if not criterio.categoria:
-            avisos.append(f'Critério {criterio.nome}: categoria não informada (dificulta organização)')
-        
-        # 5. Código recomendado
+            avisos.append(
+                f"Critério {criterio.nome}: categoria não informada (dificulta organização)"
+            )
+
         if not criterio.codigo:
-            avisos.append(f'Critério {criterio.nome}: código não informado (recomendado para referência)')
-        
-        return {
-            'valido': len(erros) == 0,
-            'erros': erros,
-            'avisos': avisos
-        }
+            avisos.append(
+                f"Critério {criterio.nome}: código não informado (recomendado para referência)"
+            )
+
+        return {"valido": len(erros) == 0, "erros": erros, "avisos": avisos}
     
     @staticmethod
     def validar_inscricao(inscricao):

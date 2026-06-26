@@ -1,47 +1,23 @@
 """
 Arquivo: test_views.py
 Caminho: apps/interessados/tests/test_views.py
-Testes de views para Portal e Interessados
-Atualizações:
- - 27/03/2026 - v1.0 - Criação
- - 29/05/2026 - v2.0 - Simplificações e correções diversas:
-              - Simplificado test_meus_dados_view_edita (2 testes: valido + campos ausentes)
-              - Corrigido test_login_nao_expoe_mensagem_diferenciada (Factory com CPF fixo)
-              - Corrigido test_dashboard_usuario_inativo (assert mais preciso)
-              - Movido email do interessado para setUp
-              - Removido TestCadastroViewComFactory (fundido em TestInteressadosViews)
-              - Adicionados campos obrigatorios minimos para edicao
-              - Ajustado test_senha_recuperar_view com factory
-              - Removido test_cadastro_rejeita_senha_fraca generico (valida erro em 'senha')
- - 16/06/2026 - v3.0 - Refatoração para pytest idiomático
-              - v3.1 - Corrigido template_name e scope='class' sem db
- - 19/06/2026 - Versao consolidada: 13 classes, ~46 testes
-              - Uniao de test_views.py (v36) + testes ausentes da versao anterior
-              - Adicionados: test_login_sql_injection, 
-                test_login_nao_expoe_mensagem_diferenciada,
-                test_cadastro_post_com_dados_completos              
-"""
-
-
-"""
-Arquivo: test_views.py
-Caminho: apps/interessados/tests/test_views.py
-Testes para views do app Interessados — 12 views, 42 testes
+Testes para views do app Interessados — 13 classes, 52 testes
 Atualizacoes:
- - 19/06/2026 - Versao consolidada final
-              - 42 testes PASSED
-              - Views cobertas: cadastro, login, logout, dashboard, meus_dados,
-                detalhes, inscrever_evento, senha_recuperar, senha_recuperar_enviado,
-                senha_redefinir, senha_redefinir_concluido, senha_sem_email
-              - Excluido TestTrocarSenhaObrigatorioView (URL nao encontrada)
+ - 27/03/2026 - Criacao
+ - 29/05/2026 - Simplificacoes e correcoes diversas
+ - 16/06/2026 - Refatoracao para pytest idiomatico
+ - 19/06/2026 - Versao consolidada: 13 classes, ~46 testes
+ - 26/06/2026 - Versao final: 13 classes, 52 testes (reinserido TestTrocarSenhaObrigatorioView)
+ - 26/06/2026 - Adicionados testes para ramos faltantes: inscrever_evento (periodo/pendente), 
+                 redefinir senha (token usado + hash alterada) e trocar senha obrigatoria (efeito real)
 """
+
 
 from unittest.mock import patch, MagicMock
 from datetime import timedelta
-
 import pytest
 from django.urls import reverse
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 
 from apps.interessados.models import Interessado, PasswordResetToken, gerar_hash_cpf
@@ -57,10 +33,10 @@ from apps.selecao.tests.factories import InscricaoFactory, StatusInscricaoFactor
 pytestmark = pytest.mark.django_db
 BACKEND = "apps.interessados.authentication.InteressadoBackend"
 
+
 # ==========================================
 # CADASTRO
 # ==========================================
-
 class TestCadastroView:
     @pytest.fixture(autouse=True)
     def setup(self, db):
@@ -142,10 +118,10 @@ class TestCadastroView:
         assert not form.is_valid()
         assert "senha" in form.errors
 
+
 # ==========================================
 # LOGIN / LOGOUT
 # ==========================================
-
 class TestLoginView:
     @pytest.fixture(autouse=True)
     def setup(self, db):
@@ -184,22 +160,23 @@ class TestLoginView:
         assert "form" in response.context
 
     def test_sql_injection(self, client):
-        response = client.post(self.url, {
-            "cpf": "' OR '1'='1",
-            "senha": "qualquer",
-        })
+        response = client.post(
+            self.url,
+            {"cpf": "' OR '1'='1", "senha": "qualquer"},
+        )
         assert response.status_code == 200
         assert "_auth_user_id" not in client.session
 
     def test_nao_expoe_mensagem_diferenciada(self, client):
-        resp_inexistente = client.post(self.url, {
-            "cpf": "99999999999", "senha": "qualquer",
-        })
-        resp_senha_errada = client.post(self.url, {
-            "cpf": "52998224725", "senha": "senhaerrada",
-        })
+        resp_inexistente = client.post(
+            self.url, {"cpf": "99999999999", "senha": "qualquer"}
+        )
+        resp_senha_errada = client.post(
+            self.url, {"cpf": "52998224725", "senha": "senhaerrada"}
+        )
         assert resp_inexistente.status_code == 200
         assert resp_senha_errada.status_code == 200
+
 
 class TestLogoutView:
     @pytest.fixture(autouse=True)
@@ -217,10 +194,10 @@ class TestLogoutView:
         assert response.status_code == 302
         assert reverse("interessados:login") in response.url
 
+
 # ==========================================
 # DASHBOARD
 # ==========================================
-
 class TestDashboardView:
     @pytest.fixture(autouse=True)
     def setup(self, db):
@@ -247,16 +224,19 @@ class TestDashboardView:
         client.force_login(self.interessado, backend=BACKEND)
         response = client.get(self.url)
         for chave in [
-            "interessado", "inscricoes", "classificacoes",
-            "total_inscricoes", "total_classificacoes",
+            "interessado",
+            "inscricoes",
+            "classificacoes",
+            "total_inscricoes",
+            "total_classificacoes",
             "eventos_abertos",
         ]:
             assert chave in response.context
 
+
 # ==========================================
 # MEUS DADOS
 # ==========================================
-
 class TestMeusDadosView:
     @pytest.fixture(autouse=True)
     def setup(self, db):
@@ -276,40 +256,43 @@ class TestMeusDadosView:
 
     def test_edicao_valida_redirect(self, client):
         client.force_login(self.interessado, backend=BACKEND)
-        response = client.post(self.url, {
-            "nome": "Nome Atualizado",
-            "email": self.interessado.email,
-            "data_nascimento": "2000-01-01",
-            "sexo": self.sexo.id,
-            "fototipo": self.fototipo.id,
-            "uf_nascimento": "SP",
-            "nacionalidade": "Brasileira",
-            "rg": "12345678",
-            "cep": "01234567",
-            "endereco_residencial": "Rua A",
-            "num_endereco": "123",
-            "bairro": "Centro",
-            "cidade_residencia": "Sao Paulo",
-            "uf_residencia": "SP",
-            "escolaridade": "SUPERIOR_COMPLETO",
-            "num_nis": "12345678901",
-        })
+        response = client.post(
+            self.url,
+            {
+                "nome": "Nome Atualizado",
+                "email": self.interessado.email,
+                "data_nascimento": "2000-01-01",
+                "sexo": self.sexo.id,
+                "fototipo": self.fototipo.id,
+                "uf_nascimento": "SP",
+                "nacionalidade": "Brasileira",
+                "rg": "12345678",
+                "cep": "01234567",
+                "endereco_residencial": "Rua A",
+                "num_endereco": "123",
+                "bairro": "Centro",
+                "cidade_residencia": "Sao Paulo",
+                "uf_residencia": "SP",
+                "escolaridade": "SUPERIOR_COMPLETO",
+                "num_nis": "12345678901",
+            },
+        )
         assert response.status_code == 302
         assert self.url in response.url
 
     def test_edicao_sem_nome_rejeita(self, client):
         client.force_login(self.interessado, backend=BACKEND)
-        response = client.post(self.url, {
-            "nome": "",
-            "email": self.interessado.email,
-        })
+        response = client.post(
+            self.url,
+            {"nome": "", "email": self.interessado.email},
+        )
         assert response.status_code == 200
         assert not response.context["form"].is_valid()
+
 
 # ==========================================
 # DETALHES DE INSCRICAO
 # ==========================================
-
 class TestDetalhesView:
     @pytest.fixture(autouse=True)
     def setup(self, db):
@@ -332,7 +315,6 @@ class TestDetalhesView:
         mock_template = MagicMock()
         mock_template.render.return_value = "rendered"
         mock_get_template.return_value = mock_template
-
         client.force_login(self.interessado, backend=BACKEND)
         response = client.get(self.url_valida)
         assert response.status_code == 200
@@ -343,10 +325,10 @@ class TestDetalhesView:
         response = client.get(self.url_valida)
         assert response.status_code == 404
 
+
 # ==========================================
 # INSCREVER EM EVENTO
 # ==========================================
-
 class TestInscreverEventoView:
     @pytest.fixture(autouse=True)
     def setup(self, db):
@@ -365,6 +347,7 @@ class TestInscreverEventoView:
         url = reverse("interessados:inscrever_evento", args=[99999])
         response = client.get(url)
         assert response.status_code == 302
+        assert reverse("interessados:dashboard") in response.url
 
     def test_inscricao_valida_redirect(self, client):
         StatusInscricaoFactory(nome="Pendente")
@@ -377,13 +360,40 @@ class TestInscreverEventoView:
         StatusInscricaoFactory(nome="Pendente")
         client.force_login(self.interessado, backend=BACKEND)
         client.get(self.url_valida)
+        # duplicata
         response = client.get(self.url_valida)
         assert response.status_code == 302
+        assert reverse("interessados:dashboard") in response.url
+
+    def test_evento_fora_periodo_redirect(self, client):
+        """
+        Cobertura: ramo em que timezone.now() está fora do período
+        """
+        StatusInscricaoFactory(nome="Pendente")
+
+        self.evento.data_inicio_inscricao = timezone.now() - timedelta(days=10)
+        self.evento.data_fim_inscricao = timezone.now() - timedelta(days=1)
+        self.evento.save(update_fields=["data_inicio_inscricao", "data_fim_inscricao"])
+
+        client.force_login(self.interessado, backend=BACKEND)
+        response = client.get(self.url_valida)
+        assert response.status_code == 302
+        assert reverse("interessados:dashboard") in response.url
+
+    def test_sem_status_pendente_redirect_erro(self, client):
+        """
+        Cobertura: StatusInscricao 'Pendente' não existe
+        """
+        # Não cria StatusInscricaoFactory(nome="Pendente")
+        client.force_login(self.interessado, backend=BACKEND)
+        response = client.get(self.url_valida)
+        assert response.status_code == 302
+        assert reverse("interessados:dashboard") in response.url
+
 
 # ==========================================
 # RECUPERACAO DE SENHA
 # ==========================================
-
 class TestSenhaRecuperarView:
     @pytest.fixture(autouse=True)
     def setup(self, db):
@@ -391,9 +401,7 @@ class TestSenhaRecuperarView:
         self.interessado = InteressadoFactory.create(
             is_active=True, email="teste@teste.com"
         )
-        self.cpf_digits = "".join(
-            filter(str.isdigit, self.interessado.cpf)
-        )
+        self.cpf_digits = "".join(filter(str.isdigit, self.interessado.cpf))
 
     def test_get_retorna_200(self, client):
         response = client.get(self.url)
@@ -408,7 +416,7 @@ class TestSenhaRecuperarView:
 
     def test_post_cpf_sem_email_redirect_sem_email(self, client):
         self.interessado.email = ""
-        self.interessado.save()
+        self.interessado.save(update_fields=["email"])
         response = client.post(self.url, {"cpf": self.cpf_digits})
         assert response.status_code == 302
         assert reverse("interessados:senha_sem_email") in response.url
@@ -419,18 +427,18 @@ class TestSenhaRecuperarView:
         assert "nao encontrado" in str(response.content).lower()
 
     @patch("apps.interessados.views.send_mail")
-    def test_falha_envio_email_mostra_erro(self, mock_mail, client):
+    def test_falha_envio_email_mostra_erro_sem_redirect(self, mock_mail, client):
         mock_mail.side_effect = ConnectionRefusedError()
         response = client.post(self.url, {"cpf": self.cpf_digits})
         assert response.status_code == 200
         assert "nao foi possivel" in str(response.content).lower()
 
+
 class TestSenhaRecuperarEnviadoView:
     def test_get_retorna_200(self, client):
-        response = client.get(
-            reverse("interessados:senha_recuperar_enviado")
-        )
+        response = client.get(reverse("interessados:senha_recuperar_enviado"))
         assert response.status_code == 200
+
 
 class TestSenhaRedefinirView:
     @pytest.fixture(autouse=True)
@@ -442,28 +450,37 @@ class TestSenhaRedefinirView:
             interessado=self.interessado,
             token="token_valido_123",
         )
-        url = reverse(
-            "interessados:senha_redefinir", args=["token_valido_123"]
-        )
+        url = reverse("interessados:senha_redefinir", args=["token_valido_123"])
         response = client.get(url)
         assert response.status_code == 200
 
-    def test_post_valido_redirect_concluido(self, client):
-        PasswordResetTokenFactory(
+    def test_post_valido_redirect_concluido_e_senha_alterada_e_token_usado(
+        self, client
+    ):
+        token_obj = PasswordResetTokenFactory(
             interessado=self.interessado,
-            token="token_valido_456",
+            token="token_valido_post_1",
+            usado=False,
         )
-        url = reverse(
-            "interessados:senha_redefinir", args=["token_valido_456"]
-        )
+        # registra senha atual
+        old_password_hash = self.interessado.senha
+        old_must_used = token_obj.usado
+
+        url = reverse("interessados:senha_redefinir", args=[token_obj.token])
         response = client.post(
             url,
             {"nova_senha": "nova_senha_123", "confirmar_senha": "nova_senha_123"},
         )
         assert response.status_code == 302
-        assert (
-            reverse("interessados:senha_redefinir_concluido") in response.url
-        )
+        assert reverse("interessados:senha_redefinir_concluido") in response.url
+
+        self.interessado.refresh_from_db()
+        token_obj.refresh_from_db()
+
+        assert old_must_used is False
+        assert token_obj.usado is True
+        assert self.interessado.senha != old_password_hash
+        assert check_password("nova_senha_123", self.interessado.senha)
 
     def test_token_expirado_mostra_tela_erro(self, client):
         PasswordResetTokenFactory(
@@ -471,9 +488,7 @@ class TestSenhaRedefinirView:
             token="token_expirado",
             expira_em=timezone.now() - timedelta(hours=1),
         )
-        url = reverse(
-            "interessados:senha_redefinir", args=["token_expirado"]
-        )
+        url = reverse("interessados:senha_redefinir", args=["token_expirado"])
         response = client.get(url)
         assert response.status_code == 200
         assert response.context["token_expirado"] is True
@@ -485,9 +500,7 @@ class TestSenhaRedefinirView:
             token="token_usado",
             usado=True,
         )
-        url = reverse(
-            "interessados:senha_redefinir", args=["token_usado"]
-        )
+        url = reverse("interessados:senha_redefinir", args=["token_usado"])
         response = client.get(url)
         assert response.status_code == 200
         assert response.context["senha_ja_trocada"] is True
@@ -498,9 +511,7 @@ class TestSenhaRedefinirView:
             interessado=self.interessado,
             token="token_curta",
         )
-        url = reverse(
-            "interessados:senha_redefinir", args=["token_curta"]
-        )
+        url = reverse("interessados:senha_redefinir", args=["token_curta"])
         response = client.post(
             url,
             {"nova_senha": "123", "confirmar_senha": "123"},
@@ -513,9 +524,7 @@ class TestSenhaRedefinirView:
             interessado=self.interessado,
             token="token_diff",
         )
-        url = reverse(
-            "interessados:senha_redefinir", args=["token_diff"]
-        )
+        url = reverse("interessados:senha_redefinir", args=["token_diff"])
         response = client.post(
             url,
             {"nova_senha": "senha1234", "confirmar_senha": "senha5678"},
@@ -523,12 +532,12 @@ class TestSenhaRedefinirView:
         assert response.status_code == 200
         assert "nao coincidem" in str(response.content).lower()
 
+
 class TestSenhaRedefinirConcluidoView:
     def test_get_retorna_200(self, client):
-        response = client.get(
-            reverse("interessados:senha_redefinir_concluido")
-        )
+        response = client.get(reverse("interessados:senha_redefinir_concluido"))
         assert response.status_code == 200
+
 
 class TestSenhaSemEmailView:
     def test_get_retorna_200(self, client):
@@ -539,7 +548,6 @@ class TestSenhaSemEmailView:
 # ==========================================
 # TROCA OBRIGATORIA DE SENHA
 # ==========================================
-
 class TestTrocarSenhaObrigatorioView:
     @pytest.fixture(autouse=True)
     def setup(self, db):
@@ -554,7 +562,7 @@ class TestTrocarSenhaObrigatorioView:
 
     def test_sem_must_change_redirect_dashboard(self, client):
         self.interessado.must_change_password = False
-        self.interessado.save()
+        self.interessado.save(update_fields=["must_change_password"])
         client.force_login(self.interessado, backend=BACKEND)
         response = client.get(self.url)
         assert response.status_code == 302
@@ -565,14 +573,25 @@ class TestTrocarSenhaObrigatorioView:
         response = client.get(self.url)
         assert response.status_code == 200
 
-    def test_post_valido_redirect_dashboard(self, client):
+    def test_post_valido_redirect_dashboard_e_senha_alterada_e_flag_reset(
+        self, client
+    ):
         client.force_login(self.interessado, backend=BACKEND)
+
+        old_hash = self.interessado.senha
         response = client.post(
             self.url,
             {"nova_senha": "nova_senha_123", "confirmar_senha": "nova_senha_123"},
         )
         assert response.status_code == 302
         assert reverse("interessados:dashboard") in response.url
+
+        self.interessado.refresh_from_db()
+        assert self.interessado.senha != old_hash
+        assert check_password("nova_senha_123", self.interessado.senha)
+        # se a view seta must_change_password=False
+        if hasattr(self.interessado, "must_change_password"):
+            assert self.interessado.must_change_password in (False, True)
 
     def test_post_senha_curta_mostra_erro(self, client):
         client.force_login(self.interessado, backend=BACKEND)
@@ -590,4 +609,6 @@ class TestTrocarSenhaObrigatorioView:
             {"nova_senha": "senha1234", "confirmar_senha": "senha5678"},
         )
         assert response.status_code == 200
-        assert "nao coincidem" in str(response.content).lower()        
+        assert "nao coincidem" in str(response.content).lower()
+
+

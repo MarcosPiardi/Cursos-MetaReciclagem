@@ -25,6 +25,7 @@ from apps.selecao.tests.factories import (
     ClassificacaoFactory
 )
 from apps.interessados.tests.factories import InteressadoFactory
+from apps.interessados.models import Fototipo
 from apps.eventos.tests.factories import (
     EventoFactory,
     EventoCriterioFactory,
@@ -174,11 +175,26 @@ class TestClassificadorServiceClassificacao:
         assert classificacoes[2].lista_espera is True
 
 class TestClassificadorServiceDesempate:
+    # def setup_method(self):
+    #         """Executado antes de CADA teste desta classe."""
+    #         # Garante que nenhum lixo de testes anteriores interfira neste cenário sensível de ordenação
+    #         Classificacao.objects.all().delete()
+    #         Inscricao.objects.all().delete()    
+
+    @pytest.fixture(autouse=True)
+    def limpar_inscricoes(self):
+        """Executado antes de cada teste: limpa registros que podem interferir na ordenação."""
+        Classificacao.objects.all().delete()
+        Inscricao.objects.all().delete()
+        yield  # teste executa aqui
+        # rollback automático pelo pytest-django, não precisa limpar depois
+            
     def test_desempate_por_data_inscricao_igual_pontuacao(self, status_pendente, status_classificado, status_lista_espera, criterio):
         evento = EventoFactory(total_vagas=5)
         EventoCriterioFactory(evento=evento, criterio=criterio)
-        inscricao_primeira = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=2))
-        inscricao_segunda = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=timezone.now() - timedelta(minutes=1))
+        agora = timezone.now()
+        inscricao_primeira = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=agora - timedelta(minutes=5))
+        inscricao_segunda = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=agora)
         ClassificadorService.classificar_evento(evento)
         classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
         assert classificacoes[0].inscricao == inscricao_primeira
@@ -238,3 +254,192 @@ class TestClassificadorServiceProcessamento:
         assert classificacao.pontuacao_total == Decimal('10.00')
 
 
+
+class TestClassificadorServiceAtendeCriterio:
+    """Testes para o metodo privado _atende_criterio."""
+
+    def test_pcd_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='PCD')
+        interessado = InteressadoFactory(necessidades_especiais=True)
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+    def test_pcd_nao_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='PCD')
+        interessado = InteressadoFactory(necessidades_especiais=False)
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is False
+
+    def test_nis_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='NIS')
+        interessado = InteressadoFactory(programa_social=True)
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+    def test_nis_nao_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='NIS')
+        interessado = InteressadoFactory(programa_social=False)
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is False
+
+    def test_jovem_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='JOVEM')
+        interessado = InteressadoFactory(
+            data_nascimento=timezone.localdate() - timedelta(days=365 * 20)
+        )
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+    def test_jovem_fora_faixa(self, status_pendente):
+        criterio = CriterioFactory(categoria='JOVEM')
+        interessado = InteressadoFactory(
+            data_nascimento=timezone.localdate() - timedelta(days=365 * 30)
+        )
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is False
+
+    def test_jovem_sem_data(self, status_pendente):
+        criterio = CriterioFactory(categoria='JOVEM')
+        interessado = InteressadoFactory(data_nascimento=None)
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is False
+
+    def test_idoso_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='IDOSO')
+        interessado = InteressadoFactory(
+            data_nascimento=timezone.localdate() - timedelta(days=365 * 60)
+        )
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+    def test_idoso_abaixo(self, status_pendente):
+        criterio = CriterioFactory(categoria='IDOSO')
+        interessado = InteressadoFactory(
+            data_nascimento=timezone.localdate() - timedelta(days=365 * 30)
+        )
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is False
+
+    def test_idoso_sem_data(self, status_pendente):
+        criterio = CriterioFactory(categoria='IDOSO')
+        interessado = InteressadoFactory(data_nascimento=None)
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is False
+
+    def test_cota_racial_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='COTA_RACIAL')
+        # O codigo verifica fototipo.id in [2, 3, 5]
+        fototipo = Fototipo.objects.create(id=2, nome='Preta', descricao='Teste')
+        interessado = InteressadoFactory(fototipo=fototipo)
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+    def test_cota_racial_nao_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='COTA_RACIAL')
+        # id=1 nao esta na lista [2, 3, 5]
+        fototipo = Fototipo.objects.create(id=1, nome='Branca', descricao='Teste')
+        interessado = InteressadoFactory(fototipo=fototipo)
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is False
+
+    def test_cota_racial_sem_fototipo(self, status_pendente):
+        criterio = CriterioFactory(categoria='COTA_RACIAL')
+        interessado = InteressadoFactory(fototipo=None)
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is False
+
+    def test_escolaridade_fund_inc_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='ESC_FUND_INC')
+        interessado = InteressadoFactory(escolaridade='FUNDAMENTAL_INCOMPLETO')
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+    def test_escolaridade_fund_inc_nao_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='ESC_FUND_INC')
+        interessado = InteressadoFactory(escolaridade='MEDIO_COMPLETO')
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is False
+
+    def test_escolaridade_fund_comp_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='ESC_FUND_COMP')
+        interessado = InteressadoFactory(escolaridade='FUNDAMENTAL_COMPLETO')
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+    def test_escolaridade_medio_inc_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='ESC_MEDIO_INC')
+        interessado = InteressadoFactory(escolaridade='MEDIO_INCOMPLETO')
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+    def test_escolaridade_medio_comp_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='ESC_MEDIO_COMP')
+        interessado = InteressadoFactory(escolaridade='MEDIO_COMPLETO')
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+    def test_categoria_desconhecida_atende(self, status_pendente):
+        criterio = CriterioFactory(categoria='CATEGORIA_INEXISTENTE')
+        interessado = InteressadoFactory()
+        inscricao = InscricaoFactory(interessado=interessado, status=status_pendente)
+        assert ClassificadorService._atende_criterio(inscricao, criterio) is True
+
+class TestClassificadorServiceProcessamento:
+    """Testes para o metodo processar_inscricao."""
+
+    def test_processar_inscricao_cria_classificacao(self, evento):
+        inscricao = InscricaoFactory(evento=evento)
+        ClassificadorService.processar_inscricao(inscricao)
+        classificacao = Classificacao.objects.get(inscricao=inscricao)
+        assert classificacao.pontuacao_total == Decimal('10.00')
+
+    def test_processar_inscricao_atualiza_existente(self, evento):
+        inscricao = InscricaoFactory(evento=evento)
+        ClassificadorService.processar_inscricao(inscricao)
+        # Segunda chamada deve atualizar, nao criar duplicata
+        ClassificadorService.processar_inscricao(inscricao)
+        count = Classificacao.objects.filter(inscricao=inscricao).count()
+        assert count == 1
+
+    def test_processar_inscricao_cria_criterio_atendido(self, evento):
+        inscricao = InscricaoFactory(evento=evento)
+        ClassificadorService.processar_inscricao(inscricao)
+        atendidos = InscricaoCriterioAtendido.objects.filter(inscricao=inscricao)
+        assert atendidos.count() >= 1
+
+    def test_processar_inscricao_sem_criterios(self, status_pendente):
+        evento = EventoFactory(total_vagas=5)
+        inscricao = InscricaoFactory(evento=evento, status=status_pendente)
+        ClassificadorService.processar_inscricao(inscricao)
+        classificacao = Classificacao.objects.get(inscricao=inscricao)
+        assert classificacao.pontuacao_total == Decimal('0.00')
+
+class TestClassificadorServiceDesfazer:
+    """Testes para o metodo desfazer_classificacao_evento."""
+
+    def test_desfazer_classificacao_com_dados(self, evento, status_pendente, status_classificado, status_lista_espera):
+        InscricaoFactory(evento=evento, status=status_pendente)
+        InscricaoFactory(evento=evento, status=status_pendente)
+        ClassificadorService.classificar_evento(evento)
+        resultado = ClassificadorService.desfazer_classificacao_evento(evento)
+        assert resultado['sucesso'] is True
+        assert resultado['total_desfeitas'] == 2
+        assert Classificacao.objects.filter(inscricao__evento=evento).count() == 0
+
+    def test_desfazer_classificacao_sem_dados(self, status_pendente):
+        evento = EventoFactory(total_vagas=5)
+        resultado = ClassificadorService.desfazer_classificacao_evento(evento)
+        assert resultado['sucesso'] is True
+        assert resultado['total_desfeitas'] == 0
+
+    def test_desfazer_classificacao_reseta_status(self, evento, status_pendente, status_classificado, status_lista_espera):
+        inscricao = InscricaoFactory(evento=evento, status=status_pendente)
+        ClassificadorService.classificar_evento(evento)
+        inscricao.refresh_from_db()
+        assert inscricao.status.nome == 'Classificado'
+        ClassificadorService.desfazer_classificacao_evento(evento)
+        inscricao.refresh_from_db()
+        assert inscricao.status.nome == 'Pendente'
+
+
+        
