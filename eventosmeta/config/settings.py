@@ -136,7 +136,7 @@ LOGOUT_REDIRECT_URL = config('LOGOUT_REDIRECT_URL', default='/')
 # Alteração: 23/02/2026
 # Backend customizado para servidor interno da prefeitura (10.28.10.54:587)
 # 
-EMAIL_BACKEND   = 'apps.interessados.utils.CustomEmailBackend'
+EMAIL_BACKEND   = config('EMAIL_BACKEND', default='apps.interessados.utils.CustomEmailBackend')
 EMAIL_HOST      = config('EMAIL_HOST')
 EMAIL_PORT      = config('EMAIL_PORT',    cast=int)
 EMAIL_USE_TLS   = config('EMAIL_USE_TLS', cast=bool)
@@ -187,7 +187,7 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER     = True
     X_FRAME_OPTIONS                = 'DENY'
     SECURE_CONTENT_TYPE_NOSNIFF    = True
-    SECURE_SSL_REDIRECT            = True
+    SECURE_SSL_REDIRECT            = False  # Desativado para desenvolvimento local, ativar em produção
     SESSION_COOKIE_SECURE          = True
     CSRF_COOKIE_SECURE             = True
     SECURE_HSTS_SECONDS            = 31536000
