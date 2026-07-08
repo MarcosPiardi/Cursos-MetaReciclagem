@@ -1,0 +1,2422 @@
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+web_eventosmeta  |     self.fetch_command(subcommand).run_from_argv(self.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 408, in run_from_argv
+web_eventosmeta  |     parser = self.create_parser(argv[0], argv[1])
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 371, in create_parser
+web_eventosmeta  |     self.add_arguments(parser)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/migrate.py", line 45, in add_arguments
+web_eventosmeta  |     choices=tuple(connections),
+web_eventosmeta  |             ~~~~~^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 73, in __iter__
+web_eventosmeta  |     return iter(self.settings)
+web_eventosmeta  |                 ^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+web_eventosmeta  |     res = instance.__dict__[self.name] = self.func(instance)
+web_eventosmeta  |                                          ~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 45, in settings
+web_eventosmeta  |     self._settings = self.configure_settings(self._settings)
+web_eventosmeta  |                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/db/utils.py", line 148, in configure_settings
+web_eventosmeta  |     databases = super().configure_settings(databases)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/utils/connection.py", line 50, in configure_settings
+web_eventosmeta  |     settings = getattr(django_settings, self.settings_name)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1310, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+web_eventosmeta  | ModuleNotFoundError: No module named 'eventosmeta'
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...

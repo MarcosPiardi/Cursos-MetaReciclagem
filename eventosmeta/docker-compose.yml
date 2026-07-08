@@ -1,76 +1,98 @@
+# =============================================================================
 # Arquivo: docker-compose.yml
 # Caminho: eventosmeta/docker-compose.yml
-# Finalidade: Orquestracao Django + PostgreSQL + Nginx
+# Finalidade: Orquestracao Django + PostgreSQL + Nginx (Desenvolvimento)
+# Ambiente otimizado para DESENVOLVIMENTO.
 # Atualizacoes:
 #  - 29/06/2026 - Versao inicial
+#  - 03/07/2026 - Refatoracao e padronizacao
+#  - 03/07/2026 - Criação inicial do docker-compose.
+#  - 06/07/2026 - Adição do serviço nginx_eventosmeta.
+#  - 06/07/2026 - Padronização de nomes prefixados (db/web/nginx_eventosmeta).
+#  - 07/07/2026 - Otimização para desenvolvimento:
+#                      * healthcheck no web_eventosmeta
+#                      * rede nomeada metareciclagem_net
+#                      * variáveis de porta via .env (POSTGRES_PORT,
+#                        NGINX_PORT, DJANGO_PORT)
+#                      * removido backup.sql hardcoded
+# =============================================================================
 
-services:
+# version: "3.8"
 
-  db:
-    image: postgres:16-alpine
-    container_name: eventosmeta-db
-    restart: unless-stopped
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-      - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql
-    environment:
-      - POSTGRES_DB=${DATABASE_NAME}
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 40s
-
-  web:
-    build: .
-    container_name: eventosmeta-web
-    restart: unless-stopped
-    volumes:
-      - static_volume:/app/staticfiles_collected
-      - media_volume:/app/media
-    environment:
-      - DATABASE_ENGINE=django.db.backends.postgresql
-      - DATABASE_NAME=bdmetareciclagem
-      - DATABASE_USER=metareciclagem_user
-      - DATABASE_PASSWORD=meta2025@forte
-      - DATABASE_HOST=db
-      - DATABASE_PORT=5432
-      - SECRET_KEY=${SECRET_KEY}
-      - DEBUG=False
-      - ALLOWED_HOSTS=10.30.166.21,localhost,127.0.0.1
-      - FERNET_KEY=${FERNET_KEY}
-      - DJANGO_SETTINGS_MODULE=config.settings
-      - EMAIL_HOST=${EMAIL_HOST}
-      - EMAIL_PORT=${EMAIL_PORT}
-      - EMAIL_USE_TLS=${EMAIL_USE_TLS}
-      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
-      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
-      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
-    depends_on:
-      db:
-        condition: service_healthy
-    expose:
-      - 8000
-
-  nginx:
-    image: nginx:1.27-alpine
-    container_name: eventosmeta-nginx
-    restart: unless-stopped
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - static_volume:/app/staticfiles_collected:ro
-      - media_volume:/app/media:ro
-    ports:
-      - "80:80"
-    depends_on:
-      - web
+networks:
+  metareciclagem_net:
+    name: metareciclagem_net
+    driver: bridge
 
 volumes:
-  postgres_data:
-  static_volume:
-  media_volume:
+  pgdata_eventosmeta:
+    name: pgdata_eventosmeta
+    
+
+services:
+  db_eventosmeta:
+    image: postgres:15-alpine
+    container_name: db_eventosmeta
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bdmetareciclagem
+      POSTGRES_USER: metareciclagem_user
+      POSTGRES_PASSWORD: meta2025@forte
+    ports:
+      - "${POSTGRES_PORT:-15459}:5432"
+    volumes:
+      - pgdata_eventosmeta:/var/lib/postgresql/data
+    networks:
+      - metareciclagem_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-metareciclagem_user} -d ${POSTGRES_DB:-bdmetareciclagem}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  web_eventosmeta:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: web_eventosmeta
+    restart: unless-stopped
+    depends_on:
+      db_eventosmeta:
+        condition: service_healthy
+    environment:
+      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
+      DATABASE_URL: postgres://${POSTGRES_USER:-eventosmeta}:${POSTGRES_PASSWORD:-eventosmeta}@db_eventosmeta:5432/${POSTGRES_DB:-eventosmeta}
+    ports:
+      - "${DJANGO_PORT:-1362}:8000"
+    volumes:
+      - .:/app
+    command: python manage.py runserver 0.0.0.0:8000
+    networks:
+      - metareciclagem_net
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/', timeout=5)\" || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  nginx_eventosmeta:
+    image: nginx:alpine
+    container_name: nginx_eventosmeta
+    restart: unless-stopped
+    depends_on:
+      web_eventosmeta:
+        condition: service_healthy
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+    - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    - ./:/app:ro
+    # - web_eventosmeta:/app:ro
+    networks:
+      - metareciclagem_net
+      
+  

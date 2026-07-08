@@ -1,53 +1,166 @@
-# version: '3.9'
+# Arquivo: docker-compose-prod.yml
+# Caminho: eventosmeta/docker-compose-prod.yml
+# Finalidade: Orquestracao Django + PostgreSQL + Nginx (Producao)
+# Atualizacoes:
+#  - 29/06/2026 - Versao inicial
+#  - 03/07/2026 - Refatoracao e padronizacao
+
+
+
+# =============================================================================
+# docker-compose-prod.yml
+# -----------------------------------------------------------------------------
+# Projeto: EventosMeta / MetaReciclagem
+# Ambiente: Produção
+# Host alvo: 10.30.166.21
+# Orquestração: Docker Compose (Compose Specification)
+#
+# Histórico:
+#  - 29/06/2026 - Versão inicial de produção.
+#  - 03/07/2026 - Refatoracao e padronizacao  
+#  - 06/07/2026 - Adicionados healthchecks em db_eventosmeta e web_eventosmeta.
+#  - 07/07/2026 - Rede nomeada metareciclagem_net_prod e volumes nomeados.
+#               - Portas NGINX via .env.prod (NGINX_HTTP_PORT, NGINX_HTTPS_PORT).
+#               - Logging json-file limitado (10m, 5 arquivos).
+#               - Gunicorn workers/threads via ENV (GUNICORN_WORKERS, GUNICORN_THREADS).
+#               - Revisão final e padronização de nomes prefixados *_eventosmeta_prod.
+#
+# Uso:
+#   docker compose --env-file .env.prod -f docker-compose-prod.yml up -d
+#
+# Variáveis esperadas no arquivo .env.prod:
+#   NGINX_HTTP_PORT=80
+#   NGINX_HTTPS_PORT=443
+#   GUNICORN_WORKERS=3
+#   GUNICORN_THREADS=4
+#   POSTGRES_DB=eventosmeta
+#   POSTGRES_USER=eventosmeta
+#   POSTGRES_PASSWORD=<senha_segura>
+#   DATABASE_URL=postgresql://eventosmeta:<senha_segura>@db_eventosmeta_prod:5432/eventosmeta
+#   DJANGO_SECRET_KEY=<chave_segura>
+#   DJANGO_ALLOWED_HOSTS=10.30.166.21,eventosmeta.metareciclagem.org
+# =============================================================================
+
+name: eventosmeta_prod
 
 services:
-
-  db:
+  db_eventosmeta_prod:
     image: postgres:16-alpine
-    container_name: eventosmeta-db-prod
+    container_name: db_eventosmeta_prod
     restart: always
+    env_file:
+      - .env.prod
     environment:
-      POSTGRES_DB: ${DATABASE_NAME}
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-eventosmeta}
+      POSTGRES_USER: ${POSTGRES_USER:-eventosmeta}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-eventosmeta}
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - postgres_data_prod:/var/lib/postgresql/data
+      - db_data_eventosmeta_prod:/var/lib/postgresql/data
+    networks:
+      - metareciclagem_net_prod
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-eventosmeta} -d ${POSTGRES_DB:-eventosmeta}"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-  web:
-    build: .
-    container_name: eventosmeta-web-prod
+  web_eventosmeta_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: eventosmeta_web:prod
+    container_name: web_eventosmeta_prod
     restart: always
+    env_file:
+      - .env.prod
     environment:
-      DJANGO_SETTINGS_MODULE: config.settings
-      DATABASE_ENGINE: django.db.backends.postgresql
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USER: ${DATABASE_USER}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      DATABASE_HOST: db
-      SECRET_KEY: ${SECRET_KEY}
-      DEBUG: "False"
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://eventosmeta:eventosmeta@db_eventosmeta_prod:5432/eventosmeta}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-changeme}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+      GUNICORN_THREADS: ${GUNICORN_THREADS:-4}
+    command: >-
+      sh -c "gunicorn --bind 0.0.0.0:8000 \
+      --workers ${GUNICORN_WORKERS:-3} \
+      --threads ${GUNICORN_THREADS:-4} \
+      --timeout 120 \
+      --graceful-timeout 30 \
+      --access-logfile - \
+      --error-logfile - \
+      config.wsgi:application"
     volumes:
-      - static_volume_prod:/app/staticfiles_collected
-      - media_volume_prod:/app/media
+      - static_eventosmeta_prod:/app/staticfiles
+      - media_eventosmeta_prod:/app/media
+    networks:
+      - metareciclagem_net_prod
     depends_on:
-      - db
+      db_eventosmeta_prod:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python -c \"import socket; s=socket.socket(); s.settimeout(2); s.connect(('127.0.0.1', 8000)); s.close()\""
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
-  nginx:
+  nginx_eventosmeta_prod:
     image: nginx:1.27-alpine
-    container_name: eventosmeta-nginx-prod
+    container_name: nginx_eventosmeta_prod
     restart: always
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - static_volume_prod:/app/staticfiles_collected:ro
-      - media_volume_prod:/app/media:ro
+    environment:
+      NGINX_HTTP_PORT: ${NGINX_HTTP_PORT:-80}
+      NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT:-443}
     ports:
-      - "80:80"
-      - "443:443"
+      - "${NGINX_HTTP_PORT:-80}:${NGINX_HTTP_PORT:-80}"
+      - "${NGINX_HTTPS_PORT:-443}:${NGINX_HTTPS_PORT:-443}"
+    volumes:
+      - ./nginx/prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - static_eventosmeta_prod:/usr/share/nginx/static:ro
+      - media_eventosmeta_prod:/usr/share/nginx/media:ro
+    networks:
+      - metareciclagem_net_prod
     depends_on:
-      - web
+      web_eventosmeta_prod:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:${NGINX_HTTP_PORT:-80}/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+networks:
+  metareciclagem_net_prod:
+    name: metareciclagem_net_prod
+    driver: bridge
 
 volumes:
-  postgres_data_prod:
-  static_volume_prod:
-  media_volume_prod:
+  db_data_eventosmeta_prod:
+    name: db_data_eventosmeta_prod
+  static_eventosmeta_prod:
+    name: static_eventosmeta_prod
+  media_eventosmeta_prod:
+    name: media_eventosmeta_prod
+

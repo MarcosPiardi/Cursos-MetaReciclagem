@@ -21,10 +21,10 @@ from django.contrib.auth.decorators import login_required
 
 
 def login_staff(request):
-    """Login para usuários staff - redireciona para admin"""
+    """Login para usuários staff - redireciona para admin customizado"""
 
     if request.user.is_authenticated and request.user.is_staff:
-        return redirect('/admin/')
+        return redirect('custom_admin:index')
 
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -32,13 +32,13 @@ def login_staff(request):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user     = authenticate(request=request, username=username, password=password)
+            user = authenticate(request=request, username=username, password=password)
 
             if user is not None and user.is_staff:
                 login(request, user)
                 messages.success(request, f'Bem-vindo, {user.username}!')
                 # Middleware intercepta e redireciona se must_change_password = True
-                return redirect('/admin/')
+                return redirect('custom_admin:index')
             else:
                 messages.error(
                     request,

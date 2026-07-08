@@ -1,4 +1,12 @@
 #!/bin/sh
+# ============================================================
+# Arquivo: entrypoint.sh
+# Caminho: eventosmeta/entrypoint.sh
+# Finalidade: Script de inicialização do container Django
+#             Executa migrações, coleta estáticos e inicia Gunicorn
+# Atualizações:
+#  - 07/07/2026 - Versão inicial com healthcheck do PostgreSQL
+# ============================================================
 set -e
 
 echo "Aguardando PostgreSQL ficar pronto..."

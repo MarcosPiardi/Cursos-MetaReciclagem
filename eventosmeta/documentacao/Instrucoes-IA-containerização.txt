@@ -1,0 +1,101 @@
+Finalidade desta interação:
+Continuidade no desenvolvimento de sistema em Django/Python/HTML/CSS/JS
+
+Contexto:
+Me ajude a fazer um alinhamento e dar continuidade.
+
+
+Abaixo algumas informações de como devemos interagir
+
+
+SEÇÃO 1: PERFIL DO DESENVOLVEDOR
+Esta seção define o perfil técnico e as preferências de comunicação do responsável pelo projeto, visando alinhar a interação com modelos de inteligência artificial às necessidades reais de desenvolvimento e arquitetura.
+Nome: Marcos Piardi
+Cargo: Analista de Sistemas
+Nível: Desenvolvedor Iniciante para desenvolvimento em Django/Python/HTML/CSS/JS que desenvolvia em clipper e delphi. 
+Possui 17 anos de experiência em outras áreas, encontrando-se em fase de reaprendizado de programação. 
+
+Ambiente de Trabalho: Sistema operacional Windows, utilizando VS Code configurado em Português Brasil. Tecnologias base: Python e Django.
+Preferências de Comunicação: As interações devem ser realizadas em Português Brasil (PT-BR). O tom deve ser conciso, técnico e objetivo, sem a utilização de preâmbulos desnecessários. Respostas diretas são priorizadas.
+Tecnologias Principais: Framework Django (MVT), banco de dados PostgreSQL e Python 3.13.2.
+Padrões Adotados: Utilização de PascalCase para Models, snake_case para variáveis e funções, e SCREAMING_SNAKE_CASE para constantes.
+Ênfase Técnica: Foco em Service Layer para isolamento de lógica complexa, uso de UUIDs como chaves primárias (PKs), implementação rigorosa de testes automatizados com pytest e manutenção de toda a documentação técnica em português.
+
+SEÇÃO 2: CONTEXTO DO SISTEMA PARA IA
+O sistema MetaReciclagem é uma plataforma municipal voltada à gestão integral de inscrições, classificação automática de candidatos e acompanhamento acadêmico.
+2.1. Stack Tecnológica e Arquitetura
+O projeto utiliza Django 5.2.4, Python 3.13.2 e PostgreSQL 15+. A segurança é reforçada por django-axes 6.1.1, django-csp 4.0+ e django-encrypted-model-fields.
+
+O sistema é composto por 8 aplicações (Apps) principais:
+accounts: Gestão de autenticação para o corpo técnico (staff).
+interessados: Cadastro e perfil do candidato.
+eventos: Gestão de cursos, editais e oferta de vagas.
+selecao: Núcleo de inteligência contendo o ClassificadorService.
+academico: Gestão pós-seleção (matrícula e notas).
+portal: Interface pública de navegação e interação.
+dashboard: Módulo de análise de dados e indicadores.
+scripts_admin: Ferramentas utilitárias de administração.
+
+2.2. Fluxo Operacional e Regras Críticas
+O fluxo de negócio é dividido em 6 fases:
+Cadastro → Inscrição → Classificação → Matrícula → Avaliação → Certificação.
+
+As 10 ADRs (Architectural Decision Records) consolidadas são:
+CPF identificador: Chave única de identificação do cidadão.
+Fernet encryption: Criptografia simétrica para dados sensíveis.
+Service Layer: Lógica de negócio fora de models e views.
+JSONB: Armazenamento de dados semiestruturados no PostgreSQL.
+Rate-limiting: Proteção contra ataques de força bruta.
+CSP: Content Security Policy para mitigação de XSS.
+Django Admin ERP: Uso do admin como interface de gestão interna.
+pytest: Framework padrão para testes automatizados.
+LGPD anonymization: Processos de anonimização para conformidade legal.
+Email DataCenter: Integração com servidor SMTP interno.
+Regras de Negócio: CPF único por evento; NIS obrigatório para cotas sociais; Score decrescente para classificação com desempate por data_inscricao em milissegundos; Aprovação exige nota ≥ 7.0 e frequência ≥ 75%.
+
+SEÇÃO 3: INSTRUÇÕES PARA NOVAS CONVERSAS COM IA
+O objetivo desta seção é padronizar as solicitações para otimizar o tempo de resposta e a precisão das análises geradas pela IA.
+Crie um índice navegável das interações desta conversa;
+A cada interação, quero que numere e date (dd/mm/yyyy) suas respostas;
+Respostas em Português Brasil;
+Nunca inventar dados ou informações;
+Fazer perguntas específicas claramente quando houver dúvidas (não presumir);
+Questionar decisões ambíguas em vez de assumir
+Separação de PY, HTML, CSS e JavaScript em arquivos distintos
+Gerar código apenas quando solicitado ou consentido (artefatos completos com cabeçalho padronizado)
+Arquivo com código completo pronto para copy-paste (não trechos)
+Modelo de cabeçalho:
+"""
+Arquivo: [nome_arquivo]
+Caminho: [caminho_completo]
+Finalidade: [finalidade do programa]
+Atualizações:
+ - [dd/mm/aaaa] - [descrição da mudança/alteração no código]
+"""
+Sempre copiar o cabeçalho existente e acrescentar as atualizações feitas
+Quando necessário ou solicitado, colocar comentários no corpo do código indicando alterações e data
+Código testável e funcional
+Indicação clara de qual arquivo substituir e caminho
+Fluxo Esperado:
+1ª mensagem (Contexto + Código) → 2ª mensagem (Dúvidas da IA) → 3ª mensagem (Respostas do Desenvolvedor) → 4ª mensagem (Entrega da análise/documentação).
+
+SEÇÃO 4: PADRÕES E CONVENÇÕES DE IMPLEMENTAÇÃO
+4.1. Nomenclatura e Estrutura de Código
+● Models: PascalCase (ex: Candidato, EventoVaga). Devem conter docstrings e validações no método clean().
+● Variáveis/Funções: snake_case.
+● Constantes: SCREAMING_SNAKE_CASE.
+● PKs: Uso obrigatório de UUIDs.
+4.2. Camadas de Lógica
+● Views: Preferência por Function-Based Views (FBV). Devem ser otimizadas com select_related() e prefetch_related().
+● Service Layer: Toda lógica complexa (classificação, certificados) deve residir em classes de serviço com métodos verbais (ex: processar_lote).
+4.3. Segurança e Performance
+● Segurança: Rate-limiting (5 tentativas = 30min de bloqueio) via django-axes. CSP ativo. Criptografia Fernet para CPF e NIS. Primeiro acesso exige troca de senha.
+● Performance: Índices obrigatórios em campos de busca (CPF, Email, Data). Evitar queries N+1. Cache em relatórios de alta densidade.
+4.4. Testes e Qualidade
+● Framework:pytest com factory-boy.
+● Cobertura: Mínimo de 80% nos apps críticos (selecao, interessados, academico).
+● Documentação: Todo o código e comentários devem estar em Português Brasil.
+
+
+
+

@@ -10,6 +10,9 @@ Atualização:
  - 17/06/2026 - Corrigido naive datetime warning no dashboard_view
               - Substituído date.today() por timezone.now().date()
               - Adicionado lookup __date__gte para evitar warning
+ - 08/07/2026 - REMOVIDO CustomAdminSite (causava erro 500)
+              - Usando admin.site padrão do Django
+              - Dashboard movido para app separado (apps.dashboard)
 """
 
 import secrets
@@ -18,54 +21,45 @@ import string
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin
 from django.contrib.auth.models import Group
-from django.urls import path, reverse
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.utils.html import format_html
-from django.utils import timezone                       # ← adicionado 17/06/2026
 
 from .models import Usuario
-from apps.eventos.models import Evento
-from apps.interessados.models import Interessado
-from apps.selecao.models import Inscricao
 
 # ==========================================
-# ADMIN SITE CUSTOMIZADO COM DASHBOARD
+# REMOVIDO: CustomAdminSite (linhas 27-54 do arquivo original)
 # ==========================================
-
-class CustomAdminSite(admin.AdminSite):
-    site_header = 'MetaReciclagem - Administração'
-    site_title  = 'MetaReciclagem Admin'
-    index_title = 'Painel de Controle'
-
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path('dashboard/', self.admin_view(self.dashboard_view), name='dashboard'),
-        ]
-        return custom_urls + urls
-
-    def dashboard_view(self, request):
-        """View personalizada de dashboard"""
-        total_eventos       = Evento.objects.count()
-        total_interessados  = Interessado.objects.count()
-        total_inscricoes    = Inscricao.objects.count()
-        eventos_abertos     = Evento.objects.filter(
-            data_fim_inscricao__date__gte=timezone.now().date()     # ← corrigido 17/06/2026
-        ).count()
-
-        context = {
-            **self.each_context(request),
-            'title'              : 'Dashboard',
-            'total_eventos'      : total_eventos,
-            'total_interessados' : total_interessados,
-            'total_inscricoes'   : total_inscricoes,
-            'eventos_abertos'    : eventos_abertos,
-        }
-        return render(request, 'admin/dashboard.html', context)
-
-# Instância do admin customizado
-admin_site = CustomAdminSite(name='custom_admin')
+# class CustomAdminSite(admin.AdminSite):
+#     site_header = 'MetaReciclagem - Administração'
+#     site_title  = 'MetaReciclagem Admin'
+#     index_title = 'Painel de Controle'
+#
+#     def get_urls(self):
+#         urls = super().get_urls()
+#         custom_urls = [
+#             path('dashboard/', self.admin_view(self.dashboard_view), name='dashboard'),
+#         ]
+#         return custom_urls + urls
+#
+#     def dashboard_view(self, request):
+#         """View personalizada de dashboard"""
+#         total_eventos       = Evento.objects.count()
+#         total_interessados  = Interessado.objects.count()
+#         total_inscricoes    = Inscricao.objects.count()
+#         eventos_abertos     = Evento.objects.filter(
+#             data_fim_inscricao__date__gte=timezone.now().date()
+#         ).count()
+#
+#         context = {
+#             **self.each_context(request),
+#             'title'              : 'Dashboard',
+#             'total_eventos'      : total_eventos,
+#             'total_interessados' : total_interessados,
+#             'total_inscricoes'   : total_inscricoes,
+#             'eventos_abertos'    : eventos_abertos,
+#         }
+#         return render(request, 'admin/dashboard.html', context)
+#
+# # Instância do admin customizado
+# admin_site = CustomAdminSite(name='custom_admin')
 
 # ==========================================
 # CONFIGURAÇÃO DO USUARIO ADMIN
@@ -167,8 +161,8 @@ class UsuarioAdmin(BaseUserAdmin):
             level=messages.SUCCESS,
         )
 
-admin_site.register(Usuario, UsuarioAdmin)
-admin_site.register(Group, GroupAdmin)
-
-
+# REMOVIDO: admin_site.register(Usuario, UsuarioAdmin)
+# NOVO: usar admin.site padrão do Django
+admin.site.register(Usuario, UsuarioAdmin)
+admin.site.register(Group, GroupAdmin)
 

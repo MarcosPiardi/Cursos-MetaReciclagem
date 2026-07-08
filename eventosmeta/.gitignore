@@ -4,6 +4,11 @@
 .env
 .env.*
 !.env.example
+.env.prod
+.env.local
+.env.docker
+*.key
+*.pem
 
 # ============================================================
 # BANCO DE DADOS
@@ -15,6 +20,7 @@ db.sqlite3
 # PYTHON E DEPENDÊNCIAS
 # ============================================================
 __pycache__/
+*.pyc
 *.py[cod]
 *.so
 .Python

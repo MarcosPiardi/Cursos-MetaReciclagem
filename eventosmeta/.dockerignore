@@ -17,6 +17,8 @@
 # PYTHON E CACHE
 # ============================================================
 __pycache__/
+__pycache__
+*.pyc
 *.py[cod]
 *.so
 .Python
@@ -31,6 +33,7 @@ build/
 # TESTES E COBERTURA (NÃO PRECISA NA IMAGEM)
 # ============================================================
 .pytest_cache/
+.pytest_cache
 .cache/
 .coverage
 coverage.xml

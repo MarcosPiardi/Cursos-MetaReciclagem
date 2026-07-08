@@ -1,0 +1,1086 @@
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Operations to perform:
+web_eventosmeta  |   Apply all migrations: academico, accounts, admin, auth, axes, contenttypes, eventos, interessados, selecao, sessions
+web_eventosmeta  | Running migrations:
+web_eventosmeta  |   No migrations to apply.
+web_eventosmeta  |   Your models in app(s): 'eventos' have changes that are not yet reflected in a migration, and so won't be applied.
+web_eventosmeta  |   Run 'manage.py makemigrations' to make new migrations, and then re-run 'manage.py migrate' to apply them.
+web_eventosmeta  | Coletando arquivos est├íticos...
+web_eventosmeta  | Deleting 'admin/css/autocomplete.css'
+web_eventosmeta  | Deleting 'admin/css/base.css'
+web_eventosmeta  | Deleting 'admin/css/changelists.css'
+web_eventosmeta  | Deleting 'admin/css/dark_mode.css'
+web_eventosmeta  | Deleting 'admin/css/dashboard.css'
+web_eventosmeta  | Deleting 'admin/css/forms.css'
+web_eventosmeta  | Deleting 'admin/css/login.css'
+web_eventosmeta  | Deleting 'admin/css/nav_sidebar.css'
+web_eventosmeta  | Deleting 'admin/css/responsive.css'
+web_eventosmeta  | Deleting 'admin/css/responsive_rtl.css'
+web_eventosmeta  | Deleting 'admin/css/rtl.css'
+web_eventosmeta  | Deleting 'admin/css/unusable_password_field.css'
+web_eventosmeta  | Deleting 'admin/css/widgets.css'
+web_eventosmeta  | Deleting 'admin/css/vendor/select2/LICENSE-SELECT2.md'
+web_eventosmeta  | Deleting 'admin/css/vendor/select2/select2.css'
+web_eventosmeta  | Deleting 'admin/css/vendor/select2/select2.min.css'
+web_eventosmeta  | Deleting 'admin/img/calendar-icons.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-addlink.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-alert.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-calendar.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-changelink.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-clock.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-deletelink.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-hidelink.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-no.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-unknown-alt.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-unknown.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-viewlink.svg'
+web_eventosmeta  | Deleting 'admin/img/icon-yes.svg'
+web_eventosmeta  | Deleting 'admin/img/inline-delete.svg'
+web_eventosmeta  | Deleting 'admin/img/LICENSE'
+web_eventosmeta  | Deleting 'admin/img/README.txt'
+web_eventosmeta  | Deleting 'admin/img/search.svg'
+web_eventosmeta  | Deleting 'admin/img/selector-icons.svg'
+web_eventosmeta  | Deleting 'admin/img/sorting-icons.svg'
+web_eventosmeta  | Deleting 'admin/img/tooltag-add.svg'
+web_eventosmeta  | Deleting 'admin/img/tooltag-arrowright.svg'
+web_eventosmeta  | Deleting 'admin/img/gis/move_vertex_off.svg'
+web_eventosmeta  | Deleting 'admin/img/gis/move_vertex_on.svg'
+web_eventosmeta  | Deleting 'admin/js/actions.js'
+web_eventosmeta  | Deleting 'admin/js/autocomplete.js'
+web_eventosmeta  | Deleting 'admin/js/calendar.js'
+web_eventosmeta  | Deleting 'admin/js/cancel.js'
+web_eventosmeta  | Deleting 'admin/js/change_form.js'
+web_eventosmeta  | Deleting 'admin/js/core.js'
+web_eventosmeta  | Deleting 'admin/js/filters.js'
+web_eventosmeta  | Deleting 'admin/js/inlines.js'
+web_eventosmeta  | Deleting 'admin/js/jquery.init.js'
+web_eventosmeta  | Deleting 'admin/js/nav_sidebar.js'
+web_eventosmeta  | Deleting 'admin/js/popup_response.js'
+web_eventosmeta  | Deleting 'admin/js/prepopulate.js'
+web_eventosmeta  | Deleting 'admin/js/prepopulate_init.js'
+web_eventosmeta  | Deleting 'admin/js/SelectBox.js'
+web_eventosmeta  | Deleting 'admin/js/SelectFilter2.js'
+web_eventosmeta  | Deleting 'admin/js/theme.js'
+web_eventosmeta  | Deleting 'admin/js/unusable_password_field.js'
+web_eventosmeta  | Deleting 'admin/js/urlify.js'
+web_eventosmeta  | Deleting 'admin/js/admin/DateTimeShortcuts.js'
+web_eventosmeta  | Deleting 'admin/js/admin/RelatedObjectLookups.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/jquery/jquery.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/jquery/jquery.min.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/jquery/LICENSE.txt'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/LICENSE.md'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/select2.full.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/select2.full.min.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/af.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ar.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/az.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/bg.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/bn.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/bs.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ca.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/cs.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/da.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/de.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/dsb.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/el.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/en.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/es.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/et.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/eu.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/fa.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/fi.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/fr.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/gl.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/he.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/hi.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/hr.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/hsb.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/hu.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/hy.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/id.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/is.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/it.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ja.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ka.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/km.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ko.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/lt.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/lv.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/mk.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ms.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/nb.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ne.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/nl.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/pl.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ps.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/pt-BR.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/pt.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ro.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/ru.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/sk.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/sl.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/sq.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/sr-Cyrl.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/sr.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/sv.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/th.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/tk.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/tr.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/uk.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/vi.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/zh-CN.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/select2/i18n/zh-TW.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/xregexp/LICENSE.txt'
+web_eventosmeta  | Deleting 'admin/js/vendor/xregexp/xregexp.js'
+web_eventosmeta  | Deleting 'admin/js/vendor/xregexp/xregexp.min.js'
+web_eventosmeta  | Deleting 'css/style.css'
+web_eventosmeta  | Deleting 'django_extensions/css/jquery.autocomplete.css'
+web_eventosmeta  | Deleting 'django_extensions/img/indicator.gif'
+web_eventosmeta  | Deleting 'django_extensions/js/jquery.ajaxQueue.js'
+web_eventosmeta  | Deleting 'django_extensions/js/jquery.autocomplete.js'
+web_eventosmeta  | Deleting 'django_extensions/js/jquery.bgiframe.js'
+web_eventosmeta  | Deleting 'images/brasao-1024x937.png'
+web_eventosmeta  | Deleting 'images/brasao.gif'
+web_eventosmeta  | Deleting 'images/bras├úo 2.jpg'
+web_eventosmeta  | Deleting 'images/bras├úo-2.png'
+web_eventosmeta  | Deleting 'images/Bras├úo-PMS.png'
+web_eventosmeta  | Deleting 'images/favicon.png'
+web_eventosmeta  | Deleting 'images/logo-pms-header.png'
+web_eventosmeta  | Deleting 'images/logo-pms-horizontal-colorido.png'
+web_eventosmeta  | Deleting 'images/logo-pms-horizontal-colorido.svg'
+web_eventosmeta  | Deleting 'images/metareciclagem.ico'
+web_eventosmeta  | Deleting 'images/metareciclagem.jpg'
+web_eventosmeta  | Deleting 'images/metareciclagem.png'
+web_eventosmeta  | Deleting 'images/metareciclagem.svg'
+web_eventosmeta  | Deleting 'interessados/formStyles.css'
+web_eventosmeta  | Deleting 'js/cpf-formatter.js'
+web_eventosmeta  | Deleting 'js/script.js'
+web_eventosmeta  | 
+web_eventosmeta  | 149 static files copied to '/app/staticfiles_collected'.
+web_eventosmeta  | Iniciando Gunicorn...
+web_eventosmeta  | Performing system checks...
+web_eventosmeta  | 
+web_eventosmeta  | System check identified no issues (0 silenced).
+web_eventosmeta  | July 08, 2026 - 11:44:09
+web_eventosmeta  | Django version 5.2.4, using settings 'config.settings'
+web_eventosmeta  | Starting development server at http://0.0.0.0:8000/
+web_eventosmeta  | Quit the server with CONTROL-C.
+web_eventosmeta  | 
+web_eventosmeta  | WARNING: This is a development server. Do not use it in a production setting. Use a production WSGI or ASGI server instead.
+web_eventosmeta  | For more information on production servers see: https://docs.djangoproject.com/en/5.2/howto/deployment/
+web_eventosmeta  | [08/Jul/2026 11:44:12] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:44:28] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:44:43] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:44:48] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:44:58] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:45:14] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:45:24] "GET /eventosmeta/staff/login/ HTTP/1.1" 302 0
+web_eventosmeta  | [08/Jul/2026 11:45:24] "GET /eventosmeta/admin/ HTTP/1.1" 500 145
+web_eventosmeta  | [08/Jul/2026 11:45:27] "GET /eventosmeta/admin/ HTTP/1.1" 500 145
+web_eventosmeta  | [08/Jul/2026 11:45:29] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:45:35] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:45:39] "GET /eventosmeta/inscricao/login/ HTTP/1.1" 200 10848
+web_eventosmeta  | [08/Jul/2026 11:45:42] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:45:44] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:45:44] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:45:45] "GET /eventosmeta/staff/login/ HTTP/1.1" 302 0
+web_eventosmeta  | [08/Jul/2026 11:45:45] "GET /eventosmeta/admin/ HTTP/1.1" 500 145
+web_eventosmeta  | [08/Jul/2026 11:46:00] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:46:15] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:46:30] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:46:42] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:46:46] "GET /eventosmeta/inscricao/login/ HTTP/1.1" 200 10848
+web_eventosmeta  | [08/Jul/2026 11:46:46] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:46:51] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:46:52] "GET /eventosmeta/staff/login/ HTTP/1.1" 302 0
+web_eventosmeta  | [08/Jul/2026 11:46:52] "GET /eventosmeta/admin/ HTTP/1.1" 500 145
+web_eventosmeta  | [08/Jul/2026 11:47:01] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:47:16] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:47:32] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:47:47] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:48:02] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:48:18] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:48:33] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:48:48] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:49:04] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:49:19] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:49:34] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:49:50] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:50:05] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:50:20] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:50:36] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:50:51] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:51:06] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:51:22] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:51:37] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:51:52] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:52:08] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:52:23] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:52:38] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:52:53] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:53:07] "GET /eventosmeta/admin/ HTTP/1.1" 500 145
+web_eventosmeta  | [08/Jul/2026 11:53:09] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:53:24] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:53:40] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:53:55] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:54:10] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:54:26] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:54:41] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:54:56] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:55:12] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:55:27] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:55:42] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:55:47] "GET /eventosmeta/admin/ HTTP/1.1" 500 145
+web_eventosmeta  | [08/Jul/2026 11:55:57] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:55:58] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:56:01] "GET /eventosmeta/staff/login/ HTTP/1.1" 302 0
+web_eventosmeta  | [08/Jul/2026 11:56:01] "GET /eventosmeta/admin/ HTTP/1.1" 500 145
+web_eventosmeta  | [08/Jul/2026 11:56:13] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:56:28] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:56:44] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:56:59] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:57:14] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:57:29] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:57:45] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:58:00] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:58:15] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:58:31] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:58:46] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:59:01] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:59:17] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:59:32] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 11:59:48] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:00:03] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:00:18] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:00:34] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:00:49] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:01:04] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:01:20] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:01:35] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:01:50] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:02:06] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:02:21] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:02:36] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:02:52] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:03:07] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:03:22] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:03:38] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:03:53] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:04:08] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:04:24] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:04:39] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:04:54] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:05:10] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:05:25] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:05:40] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:05:56] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:06:11] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:06:26] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:06:42] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:06:57] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:07:12] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:07:28] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:07:43] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:07:58] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:08:14] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:08:29] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:08:44] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:09:00] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:09:15] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:09:30] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:09:46] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:10:01] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:10:16] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:10:32] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:10:47] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:11:02] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:11:18] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:11:33] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:11:48] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:12:04] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:12:19] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:12:34] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:12:50] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:13:05] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:13:20] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:13:36] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:13:51] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:14:06] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:14:22] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:14:37] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:14:52] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:15:08] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:15:23] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:15:38] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:15:54] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:16:09] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:16:24] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:16:40] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:16:55] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:17:10] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:17:26] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:17:41] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:17:56] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:18:12] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:18:27] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:18:42] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:18:58] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:19:13] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:19:28] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:19:44] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:19:59] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:20:14] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:20:30] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:20:45] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:21:00] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:21:15] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:21:31] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:21:46] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:22:01] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:22:17] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:22:32] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:22:47] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:23:03] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:23:18] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:23:33] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:23:49] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:24:04] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:24:19] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:24:35] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:24:50] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:25:05] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:25:21] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:25:36] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:25:51] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:26:07] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:26:22] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:26:37] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:26:53] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:27:08] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:27:23] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:27:39] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:27:54] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:28:09] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:28:25] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:28:40] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:28:56] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:29:11] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:29:26] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:29:42] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:29:57] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:30:12] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:30:28] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:30:43] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:30:58] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:31:14] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:31:29] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:31:44] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:32:00] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:32:15] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:32:30] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:32:46] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:33:01] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:33:16] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:33:32] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:33:47] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:34:02] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:34:18] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:34:33] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:34:48] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:35:04] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:35:19] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:35:35] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:35:50] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:36:05] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:36:21] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:36:36] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:36:51] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:37:07] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:37:22] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:37:37] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:37:53] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:38:08] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:38:24] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:38:39] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:38:55] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:39:10] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:39:25] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:39:41] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:39:56] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:40:11] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:40:26] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:40:42] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:40:57] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:41:13] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:41:24] "GET /eventosmeta/admin/ HTTP/1.1" 500 145
+web_eventosmeta  | [08/Jul/2026 12:41:28] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:41:43] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:41:59] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:42:14] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:42:29] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:42:41] "GET /eventosmeta/admin/ HTTP/1.1" 500 145
+web_eventosmeta  | [08/Jul/2026 12:42:45] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:43:00] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:43:15] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:43:31] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:43:46] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:44:01] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:44:17] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:44:32] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:44:48] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:45:03] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:45:18] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:45:34] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:45:49] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:46:04] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:46:20] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | [08/Jul/2026 12:46:35] "GET / HTTP/1.1" 200 32264
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Executando migrations...
+web_eventosmeta  | Traceback (most recent call last):
+web_eventosmeta  |   File "/app/manage.py", line 22, in <module>
+web_eventosmeta  |     main()
+web_eventosmeta  |     ~~~~^^
+web_eventosmeta  |   File "/app/manage.py", line 18, in main
+web_eventosmeta  |     execute_from_command_line(sys.argv)
+web_eventosmeta  |     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+web_eventosmeta  |     utility.execute()
+web_eventosmeta  |     ~~~~~~~~~~~~~~~^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 382, in execute
+web_eventosmeta  |     settings.INSTALLED_APPS
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 81, in __getattr__
+web_eventosmeta  |     self._setup(name)
+web_eventosmeta  |     ~~~~~~~~~~~^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 68, in _setup
+web_eventosmeta  |     self._wrapped = Settings(settings_module)
+web_eventosmeta  |                     ~~~~~~~~^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "/usr/local/lib/python3.13/site-packages/django/conf/__init__.py", line 166, in __init__
+web_eventosmeta  |     mod = importlib.import_module(self.SETTINGS_MODULE)
+web_eventosmeta  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+web_eventosmeta  |     return _bootstrap._gcd_import(name[level:], package, level)
+web_eventosmeta  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+web_eventosmeta  |   File "<frozen importlib._bootstrap_external>", line 1023, in exec_module
+web_eventosmeta  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+web_eventosmeta  |   File "/app/config/settings.py", line 282, in <module>
+web_eventosmeta  |     EOF
+web_eventosmeta  | NameError: name 'EOF' is not defined
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
+web_eventosmeta  | Aguardando PostgreSQL ficar pronto...
