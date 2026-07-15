@@ -8,9 +8,12 @@ Atualizações:
               - Views customizadas para dashboards com geração de PDF
  - 10/02/2026 - Correções de imports
  - 10/06/2026 - Refatoração para usar services
+ - 13/07/2026 - CORRIGIDO: Removido import de admin_site customizado
+              - Usando admin.site padrão do Django
 """
 
 from django.shortcuts import render
+from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 from datetime import datetime
@@ -30,13 +33,11 @@ from .utils_pdf import (
 @staff_member_required
 def dashboard_academico(request):
     """Dashboard de Informações Acadêmicas"""
-    from apps.accounts.admin import admin_site
-    
     context = DashboardAcademicoService.obter_contexto_completo()
     context.update({
         'title': 'Dashboard - Informações Acadêmicas',
-        'site_title': admin_site.site_title,
-        'site_header': admin_site.site_header,
+        'site_title': admin.site.site_title,
+        'site_header': admin.site.site_header,
     })
     
     return render(request, 'admin/dashboard/academico.html', context)
@@ -44,13 +45,11 @@ def dashboard_academico(request):
 @staff_member_required
 def dashboard_eventos(request):
     """Dashboard de Eventos e Cursos"""
-    from apps.accounts.admin import admin_site
-    
     context = DashboardEventosService.obter_contexto_completo()
     context.update({
         'title': 'Dashboard - Eventos e Cursos',
-        'site_title': admin_site.site_title,
-        'site_header': admin_site.site_header,
+        'site_title': admin.site.site_title,
+        'site_header': admin.site.site_header,
     })
     
     return render(request, 'admin/dashboard/eventos.html', context)
@@ -58,13 +57,11 @@ def dashboard_eventos(request):
 @staff_member_required
 def dashboard_interessados(request):
     """Dashboard de Interessados com dados demográficos detalhados"""
-    from apps.accounts.admin import admin_site
-    
     context = DashboardInteressadosService.obter_contexto_completo()
     context.update({
         'title': 'Dashboard - Interessados',
-        'site_title': admin_site.site_title,
-        'site_header': admin_site.site_header,
+        'site_title': admin.site.site_title,
+        'site_header': admin.site.site_header,
     })
     
     return render(request, 'admin/dashboard/interessados.html', context)
@@ -72,13 +69,11 @@ def dashboard_interessados(request):
 @staff_member_required
 def dashboard_processo_seletivo(request):
     """Dashboard de Processo Seletivo (Inscrições e Classificações)"""
-    from apps.accounts.admin import admin_site
-    
     context = DashboardProcessoSeletivoService.obter_contexto_completo()
     context.update({
         'title': 'Dashboard - Processo Seletivo',
-        'site_title': admin_site.site_title,
-        'site_header': admin_site.site_header,
+        'site_title': admin.site.site_title,
+        'site_header': admin.site.site_header,
     })
     
     return render(request, 'admin/dashboard/processo_seletivo.html', context)
@@ -87,7 +82,6 @@ def dashboard_processo_seletivo(request):
 def dashboard_lgpd(request):
     """Dashboard de Solicitações de Exclusão — LGPD"""
     from apps.interessados.models import SolicitacaoExclusao
-    from apps.accounts.admin import admin_site
 
     pendentes = SolicitacaoExclusao.objects.filter(status='PENDENTE').order_by('-solicitado_em')
     aprovadas = SolicitacaoExclusao.objects.filter(status='APROVADA').order_by('-analisado_em')
@@ -95,8 +89,8 @@ def dashboard_lgpd(request):
 
     context = {
         'title': 'Dashboard - LGPD / Exclusões',
-        'site_title': admin_site.site_title,
-        'site_header': admin_site.site_header,
+        'site_title': admin.site.site_title,
+        'site_header': admin.site.site_header,
         'pendentes': pendentes,
         'aprovadas': aprovadas,
         'recusadas': recusadas,
@@ -159,3 +153,4 @@ def dashboard_processo_seletivo_pdf(request):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
     return response
+

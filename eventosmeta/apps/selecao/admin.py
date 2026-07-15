@@ -28,7 +28,6 @@ from django.db import transaction
 from django.shortcuts import render, redirect
 from django.utils.html import format_html
 
-from apps.accounts.admin import admin_site
 from apps.eventos.models import Turma, Evento
 from apps.academico.models import Matricula, StatusMatricula
 from .models import StatusInscricao, Inscricao, Classificacao, InscricaoCriterioAtendido
@@ -90,7 +89,7 @@ class InscricaoCriterioAtendidoInline(admin.TabularInline):
 # ADMIN: STATUS INSCRIÇÃO
 # 
 
-@admin.register(StatusInscricao, site=admin_site)
+@admin.register(StatusInscricao)
 class StatusInscricaoAdmin(admin.ModelAdmin):
     """Admin para gerenciar Status de Inscrição com seletor visual de cor"""
     form = StatusInscricaoForm
@@ -121,7 +120,7 @@ class StatusInscricaoAdmin(admin.ModelAdmin):
 # ADMIN: INSCRIÇÃO
 # 
 
-@admin.register(Inscricao, site=admin_site)
+@admin.register(Inscricao)
 class InscricaoAdmin(admin.ModelAdmin):
     """Admin para gerenciar Inscrições de interessados em eventos"""
     list_display = ['get_interessado', 'evento', 'status', 'data_inscricao']
@@ -158,7 +157,7 @@ class InscricaoAdmin(admin.ModelAdmin):
 # ADMIN: CLASSIFICAÇÃO
 # 
 
-@admin.register(Classificacao, site=admin_site)
+@admin.register(Classificacao)
 class ClassificacaoAdmin(admin.ModelAdmin):
     """Admin para gerenciar Classificações com matrícula em lote + relatórios"""
 
@@ -619,7 +618,7 @@ class ClassificacaoAdmin(admin.ModelAdmin):
 # ADMIN: CRITÉRIOS ATENDIDOS
 # 
 
-@admin.register(InscricaoCriterioAtendido, site=admin_site)
+@admin.register(InscricaoCriterioAtendido)
 class InscricaoCriterioAtendidoAdmin(admin.ModelAdmin):
     """Admin para gerenciar Critérios Atendidos por Inscrições (Somente leitura)"""
 

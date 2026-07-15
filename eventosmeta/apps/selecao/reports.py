@@ -45,9 +45,9 @@ class ReportTemplate(BaseDocTemplate):
         canvas.setFillColor(colors.HexColor('#e0e0e0'))
         canvas.rect(0, height - 2.5*cm, width, 2.5*cm, fill=True, stroke=False)
         
-        # Brasão PMS (esquerda) - ATUALIZADO PARA brasão-PMS.png
+        # Brasão PMS (esquerda) - ATUALIZADO PARA brasao-horizontal.png
         try:
-            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-PMS.png')
+            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasao-horizontal.png')
             if os.path.exists(brasao_path):
                 brasao = Image(brasao_path, width=3*cm, height=1.8*cm)
                 brasao.drawOn(canvas, 0.5*cm, height - 2.3*cm)
@@ -56,7 +56,7 @@ class ReportTemplate(BaseDocTemplate):
         
         # Logo Metareciclagem (direita)
         try:
-            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'favicon-metareciclagem.png')
             if os.path.exists(logo_path):
                 logo = Image(logo_path, width=3*cm, height=1.8*cm)
                 logo.drawOn(canvas, width - 3.5*cm, height - 2.3*cm)

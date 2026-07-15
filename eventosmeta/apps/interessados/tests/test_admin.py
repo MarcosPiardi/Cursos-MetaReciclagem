@@ -5,6 +5,10 @@ Testes para admin do app Interessados
 SexoAdmin, FototipoAdmin, InteressadoAdmin, PasswordResetTokenAdmin
 Data: 29/05/2026
 Refatorado: 18/06/2006 - unittest.TestCase para pytest
+Atualização: 13/07/2026 - CORRIGIDO: import de admin_site customizado
+             (removido de apps.accounts.admin). Substituído por
+             django.contrib.admin.site, alinhado com a remoção do
+             CustomAdminSite (ver config/urls.py, 08/07/2026)
 """
 
 import uuid
@@ -15,7 +19,7 @@ from django.http import HttpRequest
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.utils import timezone
 
-from apps.accounts.admin import admin_site
+from django.contrib.admin import site as admin_site
 from apps.interessados.admin import (
     SexoAdmin,
     FototipoAdmin,
@@ -328,6 +332,5 @@ class TestPasswordResetTokenAdmin:
     def test_has_delete_permission_normal_user_false(self):
         req = _make_request(is_superuser=False)
         assert not self.ma.has_delete_permission(req)
-
 
         

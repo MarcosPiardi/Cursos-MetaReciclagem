@@ -26,7 +26,6 @@ from django.utils import timezone
 from django.http import HttpResponse
 import csv
 
-from apps.accounts.admin import admin_site
 from .models import Interessado, Sexo, Fototipo, PasswordResetToken
 
 
@@ -570,13 +569,5 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
         return request.user.is_superuser
 
 
-# 
-# REGISTRAR NO ADMIN CUSTOMIZADO
-# 
-
-admin_site.register(Sexo,               SexoAdmin)
-admin_site.register(Fototipo,           FototipoAdmin)
-admin_site.register(Interessado,        InteressadoAdmin)
-admin_site.register(PasswordResetToken, PasswordResetTokenAdmin)
 
 

@@ -24,7 +24,7 @@ def login_staff(request):
     """Login para usuários staff - redireciona para admin customizado"""
 
     if request.user.is_authenticated and request.user.is_staff:
-        return redirect('custom_admin:index')
+        return redirect('admin:index')
 
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -38,7 +38,7 @@ def login_staff(request):
                 login(request, user)
                 messages.success(request, f'Bem-vindo, {user.username}!')
                 # Middleware intercepta e redireciona se must_change_password = True
-                return redirect('custom_admin:index')
+                return redirect('admin:index')
             else:
                 messages.error(
                     request,

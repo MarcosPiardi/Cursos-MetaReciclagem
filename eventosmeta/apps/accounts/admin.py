@@ -21,8 +21,13 @@ import string
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin
 from django.contrib.auth.models import Group
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.utils.html import format_html
+from django.utils import timezone
 
 from .models import Usuario
+
 
 # ==========================================
 # REMOVIDO: CustomAdminSite (linhas 27-54 do arquivo original)
@@ -164,5 +169,5 @@ class UsuarioAdmin(BaseUserAdmin):
 # REMOVIDO: admin_site.register(Usuario, UsuarioAdmin)
 # NOVO: usar admin.site padrão do Django
 admin.site.register(Usuario, UsuarioAdmin)
-admin.site.register(Group, GroupAdmin)
+# REMOVIDO: admin.site.register(Group, GroupAdmin)
 

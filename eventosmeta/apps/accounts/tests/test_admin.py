@@ -5,6 +5,8 @@ Finalidade: Testes para as admin.py do app accounts
 Atualizações:
  - 28/05/2026 - Criação do arquivo
  - 17/06/2026 - Refatorado de unittest.TestCase para pytest
+ - 13/07/2026 - REMOVIDO: Testes de CustomAdminSite (descontinuado)
+              - Mantidos: Testes de UsuarioAdmin
 """
 
 import pytest
@@ -15,40 +17,6 @@ from django.contrib.messages import get_messages
 from apps.accounts.models import Usuario
 
 pytestmark = pytest.mark.django_db
-
-class TestCustomAdminSite:
-    def setup_method(self):
-        self.client = Client()
-        self.staff_user = Usuario.objects.create_user(
-            username='staff',
-            email='staff@example.com',
-            password='staffpass',
-            cpf='11111111111',
-            is_staff=True,
-            is_superuser=True,
-        )
-
-    def test_admin_index_status_200(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse('admin:index'))
-        assert response.status_code == 200
-
-    def test_admin_index_sem_login_redirect(self):
-        response = self.client.get(reverse('admin:index'))
-        assert response.status_code == 302
-
-    def test_dashboard_status_200(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse('admin:dashboard'))
-        assert response.status_code == 200
-        assert 'total_eventos' in response.context
-        assert 'total_interessados' in response.context
-        assert 'total_inscricoes' in response.context
-        assert 'eventos_abertos' in response.context
-
-    def test_dashboard_sem_login_redirect(self):
-        response = self.client.get(reverse('admin:dashboard'))
-        assert response.status_code == 302
 
 class TestUsuarioAdminList:
     def setup_method(self):
@@ -178,3 +146,4 @@ class TestUsuarioAdminActionGerarSenhaProvisoria:
 
 
 
+        

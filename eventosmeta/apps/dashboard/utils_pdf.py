@@ -141,12 +141,12 @@ def gerar_pdf_interessados(context):
             # CABEÇALHO COMPACTO
             # ==========================================
             # Brasão à esquerda
-            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-2.png')
+            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasao-2.png')
             if os.path.exists(brasao_path):
                 self.drawImage(brasao_path, 1*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
             
             # Logo à direita
-            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'favicon-metareciclagem.png')
             if os.path.exists(logo_path):
                 self.drawImage(logo_path, page_width - 2.5*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
             
@@ -332,12 +332,12 @@ def gerar_pdf_eventos(context):
             # CABEÇALHO COMPACTO
             # ==========================================
             # Brasão à esquerda
-            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-2.png')
+            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasao-2.png')
             if os.path.exists(brasao_path):
                 self.drawImage(brasao_path, 1*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
             
             # Logo à direita
-            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'favicon-metareciclagem.png')
             if os.path.exists(logo_path):
                 self.drawImage(logo_path, page_width - 2.5*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
             
@@ -498,12 +498,12 @@ def gerar_pdf_academico(context):
             # CABEÇALHO COMPACTO
             # ==========================================
             # Brasão à esquerda
-            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-2.png')
+            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasao-2.png')
             if os.path.exists(brasao_path):
                 self.drawImage(brasao_path, 1*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
             
             # Logo à direita
-            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'favicon-metareciclagem.png')
             if os.path.exists(logo_path):
                 self.drawImage(logo_path, page_width - 2.5*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
             
@@ -642,12 +642,12 @@ def gerar_pdf_processo_seletivo(context):
             # CABEÇALHO COMPACTO
             # ==========================================
             # Brasão à esquerda
-            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasão-2.png')
+            brasao_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'brasao-2.png')
             if os.path.exists(brasao_path):
                 self.drawImage(brasao_path, 1*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
             
             # Logo à direita
-            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'metareciclagem.png')
+            logo_path = os.path.join(settings.BASE_DIR, 'static', 'images', 'favicon-metareciclagem.png')
             if os.path.exists(logo_path):
                 self.drawImage(logo_path, page_width - 2.5*cm, page_height - 2*cm, width=1.5*cm, height=1.5*cm, preserveAspectRatio=True)
             

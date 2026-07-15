@@ -33,8 +33,8 @@ class GeradorCertificado:
         
         # Caminhos das imagens
         self.static_path = os.path.join(settings.BASE_DIR, 'static', 'images')
-        self.logo_meta = os.path.join(self.static_path, 'metareciclagem.png')
-        self.brasao = os.path.join(self.static_path, 'brasão-2.png')
+        self.logo_meta = os.path.join(self.static_path, 'favicon-metareciclagem.png')
+        self.brasao = os.path.join(self.static_path, 'brasao-2.png')
     
     def gerar_pdf(self, buffer):
         """Gera o PDF do certificado"""

@@ -11,18 +11,19 @@ Histórico de Alterações:
               - Corrigido acento em test_gerar_certificados_ja_emitido
               - Adicionados testes de cobertura para gerar_relatorio_excel, gerar_relatorio_pdf e changelist_view com IDs inexistentes
               - Consolidação de arquivos, aplicação de DRY com factories/helpers, e expansão de testes de cobertura (múltiplas turmas e simulação de erros).
+ - 13/07/2026 - REMOVIDO: import de admin_site customizado
+              - Usando admin.site padrão do Django
 """
 
 import pytest
 from django.test import Client
 from django.urls import reverse
+from django.contrib import admin
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.utils import timezone
 from datetime import timedelta, date
 from unittest.mock import Mock, patch
-
-from apps.accounts.admin import admin_site
 from apps.academico.admin import StatusMatriculaAdmin, MatriculaAdmin, AvaliacaoAdmin
 from apps.academico.models import StatusMatricula, Matricula, Avaliacao
 from apps.eventos.models import Evento, Turma, Status
@@ -30,17 +31,14 @@ from apps.selecao.models import Inscricao, Classificacao, StatusInscricao
 from apps.accounts.models import Usuario
 from apps.interessados.tests.factories import InteressadoFactory
 
-
 # =============================================================================
 # FIXTURES / HELPERS COMPARTILHADOS
 # =============================================================================
-
 def _criar_estrutura_base():
     """Cria a árvore base de entidades: Status, Evento, Turma e StatusMatricula."""
     agora = timezone.now()
     status_evento = Status.objects.create(nome='Ativo')
     status_inscricao = StatusInscricao.objects.create(nome='Confirmada')
-    
     evento = Evento.objects.create(
         nome='Evento Teste',
         status=status_evento,
@@ -50,7 +48,6 @@ def _criar_estrutura_base():
         data_inicio_evento=agora.date() + timedelta(days=60),
         data_fim_evento=agora.date() + timedelta(days=61),
     )
-    
     turma = Turma.objects.create(
         nome='Turma Teste',
         evento=evento,
@@ -58,11 +55,9 @@ def _criar_estrutura_base():
         data_inicio=agora.date() + timedelta(days=60),
         data_fim=agora.date() + timedelta(days=61),
     )
-    
     status_matricula = StatusMatricula.objects.create(
         nome='Ativa', cor='#00ff00', ordem=1
     )
-    
     return {
         'evento': evento,
         'turma': turma,
@@ -71,19 +66,16 @@ def _criar_estrutura_base():
         'status_matricula': status_matricula,
     }
 
-
 def _criar_matricula_e_avaliacao(base, interessado=None, numero='100',
                                  nota=8.5, frequencia=90, aprovado=True):
     """Cria de forma encadeada uma inscrição, matrícula e avaliação."""
     if interessado is None:
         interessado = InteressadoFactory()
-        
     inscricao = Inscricao.objects.create(
         interessado=interessado,
         evento=base['evento'],
         status=base['status_inscricao'],
     )
-    
     matricula = Matricula.objects.create(
         numero_matricula=numero,
         interessado=interessado,
@@ -91,7 +83,6 @@ def _criar_matricula_e_avaliacao(base, interessado=None, numero='100',
         status=base['status_matricula'],
         inscricao=inscricao,
     )
-    
     avaliacao, _ = Avaliacao.objects.update_or_create(
         matricula=matricula,
         defaults={
@@ -102,17 +93,14 @@ def _criar_matricula_e_avaliacao(base, interessado=None, numero='100',
     )
     return inscricao, matricula, avaliacao
 
-
 # =============================================================================
 # TESTES: STATUS MATRICULA ADMIN
 # =============================================================================
-
 @pytest.mark.django_db
 class TestStatusMatriculaAdmin:
     """Testes para StatusMatriculaAdmin"""
-
     def setup_method(self):
-        self.admin = StatusMatriculaAdmin(StatusMatricula, admin_site)
+        self.admin = StatusMatriculaAdmin(StatusMatricula, admin.site)
 
     def test_cor_display_com_cor(self):
         """Deve exibir quadrado colorido quando cor esta preenchida"""
@@ -125,19 +113,16 @@ class TestStatusMatriculaAdmin:
         """Deve exibir travessao quando cor esta vazia"""
         obj = StatusMatricula(cor='')
         result = self.admin.cor_display(obj)
-        assert result == '\u2014'
-
+        assert result == '—'
 
 # =============================================================================
 # TESTES: MATRICULA ADMIN
 # =============================================================================
-
 @pytest.mark.django_db
 class TestMatriculaAdmin:
     """Testes para MatriculaAdmin"""
-
     def setup_method(self):
-        self.admin = MatriculaAdmin(Matricula, admin_site)
+        self.admin = MatriculaAdmin(Matricula, admin.site)
         self.base = _criar_estrutura_base()
         self.interessado = InteressadoFactory()
         self.inscricao, self.matricula, _ = _criar_matricula_e_avaliacao(
@@ -154,11 +139,9 @@ class TestMatriculaAdmin:
         result = self.admin.get_evento(self.matricula)
         assert result == 'Evento Teste'
 
-
 # =============================================================================
 # TESTES: AVALIACAO ADMIN
 # =============================================================================
-
 @pytest.mark.django_db
 class TestAvaliacaoAdmin:
     """Testes para AvaliacaoAdmin"""
@@ -176,22 +159,19 @@ class TestAvaliacaoAdmin:
         )
         self.client = Client()
         self.client.force_login(self.superuser)
-
         # Dados estruturais base
         self.base = _criar_estrutura_base()
         self.interessado = InteressadoFactory()
         self.inscricao, self.matricula, self.avaliacao = _criar_matricula_e_avaliacao(
             self.base, self.interessado, numero='456', nota=8.5, frequencia=90, aprovado=True
         )
-
         Classificacao.objects.create(
             inscricao=self.inscricao,
             classificado=True,
             pontuacao_total=100,
             posicao=1,
         )
-
-        self.admin = AvaliacaoAdmin(Avaliacao, admin_site)
+        self.admin = AvaliacaoAdmin(Avaliacao, admin.site)
 
     def _criar_matricula_extra(self, aprovado=False, numero='789'):
         """Helper para criar matricula/avaliacao extra (nao aprovada por padrao)"""
@@ -233,7 +213,6 @@ class TestAvaliacaoAdmin:
         return request
 
     # --- Ações de Certificado (Renderização de coluna) ---
-
     def test_acoes_certificado_aprovado(self):
         """Deve exibir botao para certificado aprovado"""
         result = self.admin.acoes_certificado(self.avaliacao)
@@ -247,7 +226,6 @@ class TestAvaliacaoAdmin:
         assert result == '<span style="color: #999;">-</span>'
 
     # --- Changelist View & Filtros Contextuais ---
-
     def test_changelist_view_contexto(self):
         """Deve incluir eventos_disponiveis no contexto"""
         response = self.client.get(reverse('admin:academico_avaliacao_changelist'))
@@ -298,7 +276,6 @@ class TestAvaliacaoAdmin:
         assert response.context.get('turma_nome') is None
 
     # --- Action: Gerar Certificados ---
-
     def test_gerar_certificados_marca_emitidos(self):
         """Deve marcar certificado como emitido com a data atual"""
         assert not self.avaliacao.certificado_emitido
@@ -361,7 +338,6 @@ class TestAvaliacaoAdmin:
         assert any('Erro simulado' in str(m) for m in msg_list)
 
     # --- Action: Download em Lote ---
-
     def test_download_certificados_lote_action_redirect(self):
         """Deve redirecionar para a URL de download em lote com sucesso"""
         response = self.client.post(
@@ -391,7 +367,6 @@ class TestAvaliacaoAdmin:
         assert any('Nenhum aluno aprovado' in str(m) for m in msg_list)
 
     # --- Action & Método: Relatório Excel ---
-
     def test_gerar_relatorio_excel_via_interface(self):
         """Garante compatibilidade de ponta-a-ponta da action Excel via Client POST"""
         hoje = date.today().strftime('%Y%m%d')
@@ -411,7 +386,6 @@ class TestAvaliacaoAdmin:
         """Testa o método isolado com um QuerySet preenchido"""
         qs = Avaliacao.objects.filter(pk=self.avaliacao.pk)
         request = self._configurar_mock_request()
-
         response = self.admin.gerar_relatorio_excel(request, qs)
         assert response is not None
         assert 'spreadsheetml' in response['Content-Type']
@@ -421,7 +395,6 @@ class TestAvaliacaoAdmin:
         """Deve retornar None (ou exibir erro) quando o QuerySet for vazio"""
         qs = Avaliacao.objects.none()
         request = self._configurar_mock_request()
-
         response = self.admin.gerar_relatorio_excel(request, qs)
         assert response is None
 
@@ -440,7 +413,6 @@ class TestAvaliacaoAdmin:
         assert any('Nenhuma avaliação encontrada' in str(m) for m in msg_list)
 
     # --- Action & Método: Relatório PDF ---
-
     def test_gerar_relatorio_pdf_via_interface(self):
         """Garante compatibilidade de ponta-a-ponta da action PDF via Client POST"""
         response = self.client.post(
@@ -458,7 +430,6 @@ class TestAvaliacaoAdmin:
         """Testa o método isolado com um QuerySet preenchido"""
         qs = Avaliacao.objects.filter(pk=self.avaliacao.pk)
         request = self._configurar_mock_request()
-
         response = self.admin.gerar_relatorio_pdf(request, qs)
         assert response is not None
         assert response['Content-Type'] == 'application/pdf'
@@ -468,7 +439,6 @@ class TestAvaliacaoAdmin:
         """Deve retornar None quando o QuerySet for vazio no PDF"""
         qs = Avaliacao.objects.none()
         request = self._configurar_mock_request()
-
         response = self.admin.gerar_relatorio_pdf(request, qs)
         assert response is None
 
@@ -487,7 +457,6 @@ class TestAvaliacaoAdmin:
         assert any('Nenhuma avaliação encontrada' in str(m) for m in msg_list)
 
     # --- Métodos Auxiliares e Propriedades ---
-
     def test_get_numero_matricula(self):
         """Deve retornar numero da matricula através do método customizado do admin"""
         result = self.admin.get_numero_matricula(self.avaliacao)
@@ -540,7 +509,6 @@ class TestAvaliacaoAdmin:
             matricula=matricula2,
             defaults={'nota_final': 7.0, 'frequencia': 80, 'aprovado': True},
         )
-
         qs = Avaliacao.objects.all()
         resultado = self.admin._agrupar_por_turma(qs)
         assert len(resultado) == 2
@@ -548,7 +516,6 @@ class TestAvaliacaoAdmin:
         assert turma2 in resultado
 
     # --- Actions Administrativas Genéricas ---
-
     def test_aprovar_eventos(self):
         """Deve aprovar eventos selecionados via método direto"""
         request = Mock(_messages=[])
@@ -565,3 +532,4 @@ class TestAvaliacaoAdmin:
         self.admin.reprovar_eventos(request, qs)
         qs.update.assert_called_once_with(status='reprovado')
 
+        

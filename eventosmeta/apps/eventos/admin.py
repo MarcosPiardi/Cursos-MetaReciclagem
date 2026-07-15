@@ -4,7 +4,7 @@ Caminho: apps/eventos/admin.py
 Alteração: Melhorada apresentação da grade de eventos (status colorido, datas formatadas, vagas/inscritos)
 Data: 12/01/2026
 
-Alteração: Registrados todos os models no admin_site customizado (melhor prática)
+Alteração: Registrados todos os models no admin.site customizado (melhor prática)
 Data: 20/01/2026
 
 Alteração: Adicionadas colunas de datas de inscrição no grid do admin
@@ -24,7 +24,6 @@ import csv
 # IMPORT DO ADMIN CUSTOMIZADO
 # Adicionado em 20/01/2026
 # ==========================================
-from apps.accounts.admin import admin_site
 
 from .models import Status, Criterio, Evento, EventoCriterio, Turma, Horario
 
@@ -537,14 +536,4 @@ class HorarioAdmin(admin.ModelAdmin):
         return obj.get_dia_semana_display()
     dia_semana_display.short_description = 'Dia da Semana'
 
-
-# ==========================================
-# REGISTRAR NO ADMIN CUSTOMIZADO
-# Adicionado em 20/01/2026
-# ==========================================
-admin_site.register(Status, StatusAdmin)
-admin_site.register(Criterio, CriterioAdmin)
-admin_site.register(Evento, EventoAdmin)
-admin_site.register(Turma, TurmaAdmin)
-admin_site.register(Horario, HorarioAdmin)
 

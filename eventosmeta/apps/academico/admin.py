@@ -5,7 +5,7 @@ Arquivo: apps/academico/admin.py
 Alteração: Adicionado seletor de cor visual e removido código hex da listagem
 Data: 11/12/2025
 
-Alteração: Registrados todos os models no admin_site customizado (melhor prática)
+Alteração: Registrados todos os models no admin.site customizado (melhor prática)
 Data: 20/01/2026
 
 Alteração: Adicionado filtro por evento e action para certificados
@@ -25,7 +25,6 @@ from django.urls import reverse
 from datetime import date
 from collections import defaultdict
 
-from apps.accounts.admin import admin_site
 from .models import StatusMatricula, Matricula, Avaliacao
 
 
@@ -46,7 +45,7 @@ class StatusMatriculaForm(forms.ModelForm):
         }
 
 
-@admin.register(StatusMatricula, site=admin_site)
+@admin.register(StatusMatricula)
 class StatusMatriculaAdmin(admin.ModelAdmin):
     form = StatusMatriculaForm
     list_display = ['nome', 'cor_display', 'ordem']
@@ -76,7 +75,7 @@ class StatusMatriculaAdmin(admin.ModelAdmin):
 # MATRÍCULA
 # ==========================================
 
-@admin.register(Matricula, site=admin_site)
+@admin.register(Matricula)
 class MatriculaAdmin(admin.ModelAdmin):
     list_display = [
         'numero_matricula',
@@ -135,7 +134,7 @@ class MatriculaAdmin(admin.ModelAdmin):
 # AVALIAÇÃO
 # ==========================================
 
-@admin.register(Avaliacao, site=admin_site)
+@admin.register(Avaliacao)
 class AvaliacaoAdmin(admin.ModelAdmin):
     change_list_template = 'admin/academico/avaliacao/change_list.html'
     
@@ -297,8 +296,8 @@ class AvaliacaoAdmin(admin.ModelAdmin):
         wb.remove(wb.active)
         
         static_path = os.path.join(settings.BASE_DIR, 'static', 'images')
-        brasao_path = os.path.join(static_path, 'brasão-2.png')
-        logo_meta_path = os.path.join(static_path, 'metareciclagem.png')
+        brasao_path = os.path.join(static_path, 'brasao-2.png')
+        logo_meta_path = os.path.join(static_path, 'favicon-metareciclagem.png')
         
         borda_fina = Border(
             left=Side(style='thin'),
@@ -490,7 +489,7 @@ class AvaliacaoAdmin(admin.ModelAdmin):
             header_images = []
             
             try:
-                brasao_path = os.path.join(static_path, 'brasão-2.png')
+                brasao_path = os.path.join(static_path, 'brasao-2.png')
                 if os.path.exists(brasao_path):
                     header_images.append(Image(brasao_path, width=2.2*cm, height=2.2*cm))
                 else:
@@ -509,7 +508,7 @@ class AvaliacaoAdmin(admin.ModelAdmin):
             header_images.append(Paragraph("METARECICLAGEM<br/><br/><b>ALUNOS MATRICULADOS</b>", style_meta))
             
             try:
-                logo_meta_path = os.path.join(static_path, 'metareciclagem.png')
+                logo_meta_path = os.path.join(static_path, 'favicon-metareciclagem.png')
                 if os.path.exists(logo_meta_path):
                     header_images.append(Image(logo_meta_path, width=2.2*cm, height=2.2*cm))
                 else:
