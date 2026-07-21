@@ -1,0 +1,94 @@
+Além dos outros arquivos anexados tenho a informar/reforçar:
+
+Estrutura de Apps Django: Organização modular com apps academico, accounts, dashboard, eventos, interessados, portal, seleção
+
+O app Portal é onde está a tela inicial do sistema (index.html) e não requer autenticação para as consultas públicas e nela temos dois botões com links para acesso do sistema de Autenticação Dupla.
+Staff e Interessados possuem logins separados sendo as URLs de acesso claramente divididas para cada tipo de usuário, direcionando-os para seus respectivos fluxos de login e dashboards.
+
+STAFF/ADMIN
+Este sistema é dedicado aos usuários internos da administração, utilizando a estrutura de autenticação padrão do Django com algumas customizações.
+• Esse admin tem alguns cards customizados com links que nos leva para alguns dashboards
+• URL de acesso: /staff/login/ (via apps.accounts.urls) e /admin/ (para o painel administrativo) (não tenho segurança nessa informação. tem que verificar)
+• Validações: Utiliza AuthenticationForm do Django. Verifica is_staff para acesso à área administrativa.
+• Fluxo de login: A view apps.accounts.views.login_staff processa o login. Após autenticação bem-sucedida, o usuário é redirecionado para /admin/. O middleware TrocarSenhaObrigatorioMiddleware pode interceptar e forçar a troca de senha se must_change_password for True.
+• O login de Staff/Admin está operacional e protegido pelo AxesMiddleware e TrocarSenhaObrigatorioMiddleware.
+
+
+INTERESSADOS
+Este sistema é uma interface pública que também permite login de interessados, mas com uma abordagem de autenticação diferente, baseada em gerenciamento manual de sessão.
+• URL de acesso: /login/ (via apps.portal.urls). (não tenho segurança nessa informação. tem que verificar. pode ser apps.interessados )
+• Método de autenticação: A view apps.portal.views.login_interessado autentica o interessado usando LoginInteressadoForm e, em vez de usar o sistema de autenticação do Django (
+django.contrib.auth.login), armazena manualmente o interessado_id, interessado_nome e interessado_cpf na request.session.
+• Validações: Verifica is_active do interessado.
+
+
+Models de Usuário
+Dois modelos principais de usuário são utilizados, cada um com suas características e finalidades
+específicas:
+• apps.accounts.models.Usuario: Herda de AbstractUser do Django, sendo o modelo padrão para 
+usuários da equipe (Staff/Admin). Inclui campos adicionais como CPF, telefones, setor e local de 
+trabalho. Possui o campo must_change_password para forçar a troca de senha.
+• apps.interessados.models.Interessado: Um modelo de usuário customizado que gerencia o 
+acesso dos interessados. Utiliza CPF como identificador principal e possui um campo senha 
+customizado (hashed). Também inclui o campo must_change_password e campos para dados 
+pessoais sensíveis como NIS (ambos criptografados com EncryptedCharField).
+
+
+Backends de Autenticação
+Os backends de autenticação são responsáveis por verificar as credenciais dos usuários. O
+sistema utiliza uma combinação de backends padrão do Django e um customizado:
+• django.contrib.auth.backends.ModelBackend: Backend padrão do Django, utilizado para 
+autenticar o modelo Usuario (Staff/Admin) com username e senha.
+• apps.interessados.authentication.InteressadoBackend: Backend customizado para autenticar o 
+modelo Interessado usando CPF e senha. Este backend é crucial para o sistema de Interessados 
+Autenticados.
+
+Middlewares Envolvidos
+Dois middlewares desempenham papéis importantes na segurança e no fluxo de autenticação:
+• axes.middleware.AxesMiddleware: Implementa o rate limiting para proteger contra ataques de 
+força bruta em tentativas de login. Configurado para bloquear após 5 tentativas falhas por 30 
+minutos.
+• apps.accounts.middleware.TrocarSenhaObrigatorioMiddleware: Intercepta requisições de 
+usuários (Staff ou Interessados) que possuem o atributo must_change_password como True, 
+redirecionando-os para uma tela de troca de senha obrigatória antes de permitir acesso a outras 
+partes do sistema.
+
+Faça a leitura total dos dois arquivos anexados e:
+
+Primeiro: compare com o texto acima e pontue as diferenças;
+
+Segundo: extraia o necessário para gerar um relatório com a seguintes informações:
+
+1. Um mapa completo da arquitetura
+
+2. Um diagnóstico dos problemas
+
+3. Uma proposta de reorganização dos diretórios
+
+4. Uma proposta de padronização dos nomes
+
+5. A lista de arquivos que podem ser eliminados
+
+6. A lista de arquivos que precisam ser movidos
+
+7. As rotas quebradas
+
+8. Os templates órfãos
+
+9. A ordem correta para fazer a refatoração sem quebrar o sistema
+
+Requisitos para a consolidação:
+
+- Identifique e preserve a estrutura lógica dos arquivos anexados
+
+- Organize o conteúdo por seções e sub-seções, quando necessário
+
+- Registre caminhos, nomes de arquivos, dependências e relações entre componentes
+
+- Destaque inconsistências, duplicidades, padrões de nomenclatura e possíveis problemas estruturais
+
+- Inclua informações suficientes para suportar análise futura sem necessidade de consultar os anexos originais
+
+- Não omita dados relevantes para arquitetura, rotas, templates, diretórios e possíveis refatorações
+
+- Se houver ambiguidades ou ausência de contexto, sinalize explicitamente no arquivo consolidado

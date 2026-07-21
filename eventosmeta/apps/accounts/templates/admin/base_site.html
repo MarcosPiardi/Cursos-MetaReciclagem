@@ -9,6 +9,7 @@
 {% block nav-global %}
 <div style="background: #417690; padding: 10px 20px;">
     <a href="{% url 'admin:dashboard' %}" style="color: white; text-decoration: none; margin-right: 20px;">📊 Dashboard</a>
+    {% comment %} <a href="{% url 'dashboard:academico' %}" style="color: white; text-decoration: none; margin-right: 20px;">📊 Dashboard</a> {% endcomment %}
     <a href="{% url 'admin:index' %}" style="color: white; text-decoration: none; margin-right: 20px;">🏠 Início</a>
     <a href="{% url 'accounts:listar_solicitacoes_exclusao' %}" style="color: #ffcccc; text-decoration: none;">🗑️ Exclusões LGPD</a>
 </div>

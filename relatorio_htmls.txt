@@ -1,0 +1,1648 @@
+====================================================================================================
+RELATÓRIO COMPLETO DE ARQUIVOS HTML - METARECICLAGEM
+====================================================================================================
+
+Total de arquivos HTML: 46
+
+====================================================================================================
+LISTA DETALHADA
+====================================================================================================
+
+
+====================================================================================================
+ARQUIVO 1/46
+====================================================================================================
+Diretório:    eventosmeta\apps\academico\templates\academico
+Nome:         gestao_matricula.html
+Caminho:      eventosmeta\apps\academico\templates\academico\gestao_matricula.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\academico\templates\academico\gestao_matricula.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: gestao_matricula.html
+Caminho: apps/academico/templates/academico/gestao_matricula.html
+Descrição: Template para interface de gestão de matrícula
+Data: 12/01/2026
+-->
+
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Gestão de Matrícula - {{ block.super }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .container-matricula {
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+
+... (mais 462 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 2/46
+====================================================================================================
+Diretório:    eventosmeta\apps\academico\templates\admin\academico\avaliacao
+Nome:         change_list.html
+Caminho:      eventosmeta\apps\academico\templates\admin\academico\avaliacao\change_list.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\academico\templates\admin\academico\avaliacao\change_list.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block content_title %}
+    <h1>📊 Lançamento de Notas e Frequências</h1>
+{% endblock %}
+
+{% block search %}
+    {# ============================================ #}
+    {# ÁREA DE FILTROS PRIMÁRIOS (Topo da página)  #}
+    {# ============================================ #}
+    
+    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <form method="get" action="" id="filtros-primarios-form">
+            <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 15px;">
+                
+                {# Dropdown Evento/Curso #}
+                <div style="flex: 2; min-width: 300px;">
+                    <label for="evento_filter" style="display: block; font-weight: 600; margin-bottom: 5px; color: #333; font-size: 14px;">
+                        📚 Evento/Curso:
+
+... (mais 318 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 3/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts
+Nome:         base_auth.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\base_auth.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\base_auth.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: base_auth.html
+Caminho: template/base_auth.html
+Alteração: Base simplificado para páginas de autenticação (sem navbar/footer)
+Data: 29/01/2026
+
+Alteração: Mensagens do Django centralizadas com animações + auto-dismiss
+Data: 30/01/2026
+-->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Portal MetaReciclagem{% endblock %}</title>
+
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}">
+
+... (mais 104 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 4/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts\exclusao
+Nome:         detalhe.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\exclusao\detalhe.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\exclusao\detalhe.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: detalhe.html
+Caminho: apps/accounts/templates/accounts/exclusao/detalhe.html
+Alteração: Criado — Detalhe e análise de solicitação de exclusão (LGPD) — 18/03/2026
+-->
+
+{% extends 'base.html' %}
+
+{% block title %}Analisar Solicitação — MetaReciclagem{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-trash3 text-danger"></i> Analisar Solicitação</h2>
+            <a href="{% url 'accounts:listar_solicitacoes_exclusao' %}" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+... (mais 122 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 5/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts\exclusao
+Nome:         listar.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\exclusao\listar.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\exclusao\listar.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: listar.html
+Caminho: apps/accounts/templates/accounts/exclusao/listar.html
+Alteração: Criado — Lista de solicitações de exclusão (LGPD) — 18/03/2026
+-->
+
+{% extends 'base.html' %}
+
+{% block title %}Solicitações de Exclusão — MetaReciclagem{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2><i class="bi bi-trash3 text-danger"></i> Solicitações de Exclusão de Dados</h2>
+            <a href="/eventosmeta/admin/" class="btn btn-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Voltar ao Admin
+            </a>
+        </div>
+        <p class="text-muted">Gerencie as solicitações de exclusão conforme a LGPD.</p>
+
+... (mais 132 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 6/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts
+Nome:         login_staff.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\login_staff.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\login_staff.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: login_staff.html
+Caminho: apps/accounts/templates/accounts/login_staff.html
+Alteração: Template refatorado para estender base_auth.html e exibir favicon
+Data: 29/01/2026
+Alteração: Adicionado link "Esqueceu a senha?"
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Login Staff - Eventos MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+
+... (mais 124 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 7/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts\senha
+Nome:         adm_email_recuperar.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\senha\adm_email_recuperar.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\senha\adm_email_recuperar.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: adm_email_recuperar.html
+Caminho: apps/accounts/templates/accounts/senha/adm_email_recuperar.html
+Alteração: Corrigido compatibilidade com Outlook, Hotmail e Gmail
+           Substituído linear-gradient por cor sólida + VML para Outlook
+           Botão implementado com tabela aninhada (padrão email marketing)
+Data: 25/02/2026
+-->
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:v="urn:schemas-microsoft-com:vml"
+      xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+
+... (mais 177 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 8/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts\senha
+Nome:         adm_recuperar.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\senha\adm_recuperar.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\senha\adm_recuperar.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: adm_recuperar.html
+Caminho: apps/accounts/templates/accounts/senha/adm_recuperar.html
+Descrição: Passo 1 — Staff informa o e-mail para receber link de redefinição
+Criado: 24/02/2026
+-->
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Recuperar Senha — Staff | MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+... (mais 109 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 9/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts\senha
+Nome:         adm_recuperar_enviado.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\senha\adm_recuperar_enviado.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\senha\adm_recuperar_enviado.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: adm_recuperar_enviado.html
+Caminho: apps/accounts/templates/accounts/senha/adm_recuperar_enviado.html
+Descrição: Passo 2 — Confirmação de envio do e-mail de recuperação
+Criado: 24/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}E-mail Enviado — Staff | MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+... (mais 87 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 10/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts\senha
+Nome:         adm_redefinir.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\senha\adm_redefinir.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\senha\adm_redefinir.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: adm_redefinir.html
+Caminho: apps/accounts/templates/accounts/senha/adm_redefinir.html
+Descrição: Passo 3 — Formulário de nova senha (acessado pelo link do e-mail)
+Criado: 24/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Nova Senha — Staff | MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+... (mais 160 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 11/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts\senha
+Nome:         adm_redefinir_concluido.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\senha\adm_redefinir_concluido.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\senha\adm_redefinir_concluido.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: adm_redefinir_concluido.html
+Caminho: apps/accounts/templates/accounts/senha/adm_redefinir_concluido.html
+Descrição: Passo 4 — Senha redefinida com sucesso
+Criado: 24/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Senha Redefinida — Staff | MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+... (mais 56 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 12/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts\senha
+Nome:         adm_trocar_obrigatorio.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\senha\adm_trocar_obrigatorio.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\senha\adm_trocar_obrigatorio.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: adm_trocar_obrigatorio.html
+Caminho: apps/accounts/templates/accounts/senha/adm_trocar_obrigatorio.html
+Alteração: Template de troca obrigatória de senha para usuários Staff (Fluxo B)
+           Exibido pelo middleware quando must_change_password = True
+Data: 25/02/2026
+-->
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Troca de Senha Obrigatória — Staff{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1a237e 0%, #1976d2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+
+... (mais 193 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 13/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\accounts\senha
+Nome:         confirmar.html
+Caminho:      eventosmeta\apps\accounts\templates\accounts\senha\confirmar.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\accounts\senha\confirmar.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: confirmar.html
+Caminho: apps/accounts/templates/accounts/senha/confirmar.html
+Alteração: Renomeado de redefinir.html → confirmar.html
+           URL corrigida: 'staff_senha_recuperar' → 'accounts:senha_recuperar'
+Data: 20/02/2026
+Data: 24/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Nova Senha — Staff{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh; display: flex;
+        justify-content: center; align-items: center;
+    }
+
+... (mais 78 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 14/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\admin\accounts
+Nome:         cards-admin.html
+Caminho:      eventosmeta\apps\accounts\templates\admin\accounts\cards-admin.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\admin\accounts\cards-admin.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% comment %}
+Arquivo: cards-admin.html    antigo index.html
+Caminho: apps/accounts/templates/admin/accounts/cards-admin.html
+Finalidade: Customização da página inicial do admin com cards de acesso aos dashboards
+Atualizações:
+ - 13/07/2026 - Corrigidos links de dashboard para usar namespace 'dashboard:'
+                (dashboard_eventos, dashboard_interessados, dashboard_processo_seletivo,
+                dashboard_lgpd), resolvendo erro NoReverseMatch após refatoração
+                que moveu rotas do dashboard para app próprio com app_name='dashboard'
+{% endcomment %}
+
+{% block content %}
+<div style="margin: 20px 0;">
+    <h2 style="border-bottom: 2px solid #417690; padding-bottom: 10px;">📊 Dashboards</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0;">
+        <a href="{% url 'dashboard:academico' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
+
+... (mais 32 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 15/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\admin
+Nome:         base_site.html
+Caminho:      eventosmeta\apps\accounts\templates\admin\base_site.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\admin\base_site.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/base.html" %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">MetaReciclagem - Administração</a></h1>
+{% endblock %}
+
+{% block nav-global %}
+<div style="background: #417690; padding: 10px 20px;">
+    <a href="{% url 'admin:dashboard' %}" style="color: white; text-decoration: none; margin-right: 20px;">📊 Dashboard</a>
+    {% comment %} <a href="{% url 'dashboard:academico' %}" style="color: white; text-decoration: none; margin-right: 20px;">📊 Dashboard</a> {% endcomment %}
+    <a href="{% url 'admin:index' %}" style="color: white; text-decoration: none; margin-right: 20px;">🏠 Início</a>
+    <a href="{% url 'accounts:listar_solicitacoes_exclusao' %}" style="color: #ffcccc; text-decoration: none;">🗑️ Exclusões LGPD</a>
+</div>
+{% endblock %}
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 16/46
+====================================================================================================
+Diretório:    eventosmeta\apps\accounts\templates\admin
+Nome:         dashboard.html
+Caminho:      eventosmeta\apps\accounts\templates\admin\dashboard.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\templates\admin\dashboard.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Dashboard - {{ site_title }}{% endblock %}
+
+{% block content %}
+<h1>📊 Dashboard Administrativo</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">
+    
+    <!-- Card: Total de Eventos -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="font-size: 48px; font-weight: bold; margin-bottom: 10px;">{{ total_eventos }}</div>
+        <div style="font-size: 18px; opacity: 0.9;">Total de Eventos</div>
+    </div>
+    
+    <!-- Card: Eventos Abertos -->
+    <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <div style="font-size: 48px; font-weight: bold; margin-bottom: 10px;">{{ eventos_abertos }}</div>
+        <div style="font-size: 18px; opacity: 0.9;">Eventos Abertos</div>
+
+... (mais 26 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 17/46
+====================================================================================================
+Diretório:    eventosmeta\apps\dashboard\templates\admin\dashboard
+Nome:         academico.html
+Caminho:      eventosmeta\apps\dashboard\templates\admin\dashboard\academico.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\dashboard\templates\admin\dashboard\academico.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{% static 'favicon-metareciclagem.png' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h1 style="margin: 0;">📚 Dashboard - Informações Acadêmicas</h1>
+        
+        <!-- Botões à direita -->
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'admin:index' %}" class="btn-voltar">
+                ⬅️ Voltar ao Admin
+            </a>
+
+... (mais 288 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 18/46
+====================================================================================================
+Diretório:    eventosmeta\apps\dashboard\templates\admin\dashboard
+Nome:         base_dashboard.html
+Caminho:      eventosmeta\apps\dashboard\templates\admin\dashboard\base_dashboard.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\dashboard\templates\admin\dashboard\base_dashboard.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrahead %}
+<!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="{% static 'admin/img/favicon.ico' %}">
+{% comment %} <link rel="icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}"> {% endcomment %}
+
+<!-- Chart.js (se necessário) -->
+{% block extra_charts %}{% endblock %}
+
+{% block extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 style="margin: 0;">{% block dashboard_title %}Dashboard{% endblock %}</h1>
+        {% block dashboard_actions %}{% endblock %}
+    </div>
+
+... (mais 35 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 19/46
+====================================================================================================
+Diretório:    eventosmeta\apps\dashboard\templates\admin\dashboard
+Nome:         eventos.html
+Caminho:      eventosmeta\apps\dashboard\templates\admin\dashboard\eventos.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\dashboard\templates\admin\dashboard\eventos.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h1 style="margin: 0;">🎓 Dashboard - Eventos e Cursos</h1>
+        
+        <!-- Botões à direita -->
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'admin:index' %}" class="btn-voltar">
+                ⬅️ Voltar ao Admin
+            </a>
+
+... (mais 375 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 20/46
+====================================================================================================
+Diretório:    eventosmeta\apps\dashboard\templates\admin\dashboard
+Nome:         interessados.html
+Caminho:      eventosmeta\apps\dashboard\templates\admin\dashboard\interessados.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\dashboard\templates\admin\dashboard\interessados.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h1 style="margin: 0;">👥 Dashboard - Interessados</h1>
+        
+        <!-- Botões à direita -->
+        <div style="display: flex; gap: 10px;">
+
+... (mais 576 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 21/46
+====================================================================================================
+Diretório:    eventosmeta\apps\dashboard\templates\admin\dashboard
+Nome:         lgpd.html
+Caminho:      eventosmeta\apps\dashboard\templates\admin\dashboard\lgpd.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\dashboard\templates\admin\dashboard\lgpd.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: lgpd.html
+Caminho: apps/dashboard/templates/admin/dashboard/lgpd.html
+Alteração: Criado — Dashboard de Solicitações de Exclusão (LGPD) — 20/03/2026
+-->
+
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+<link rel="icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h1 style="margin: 0;">🗑️ Dashboard — LGPD / Exclusões de Dados</h1>
+
+... (mais 234 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 22/46
+====================================================================================================
+Diretório:    eventosmeta\apps\dashboard\templates\admin\dashboard
+Nome:         processo_seletivo.html
+Caminho:      eventosmeta\apps\dashboard\templates\admin\dashboard\processo_seletivo.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\dashboard\templates\admin\dashboard\processo_seletivo.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extrahead %}
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h1 style="margin: 0;">📝 Dashboard - Processo Seletivo</h1>
+        
+        <!-- Botões à direita -->
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'admin:index' %}" class="btn-voltar">
+                ⬅️ Voltar ao Admin
+            </a>
+
+... (mais 337 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 23/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados
+Nome:         cadastro.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\cadastro.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\cadastro.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: cadastro.html
+Caminho: apps/interessados/templates/interessados/cadastro.html
+Alteração: Template refatorado para estender base.html — 29/01/2026
+Alteração: Toggle de senha + Valores padrão — 28/01/2026
+Alteração: REMOVIDO raca_cor + Máscaras + Senha criptografada — 26/01/2026
+Alteração: Consentimento LGPD — 17/03/2026
+Alteração: Campos PCD ocultos até marcar "necessidades especiais"
+           Campo NIS oculto até marcar "programa social" — 17/03/2026
+-->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cadastro Completo - Eventos MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+... (mais 695 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 24/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados
+Nome:         dashboard.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\dashboard.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\dashboard.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: dashboard.html
+Caminho: apps/interessados/templates/interessados/dashboard.html
+Alteração: Cards visuais padronizados entre os 3 blocos
+           Status do evento com cor dinâmica do banco (Status.cor)
+           Header colorido: azul (inscrições), verde (abertos), lilás (classificações)
+           Status posicionado logo acima dos botões em todos os cards
+Data: 23/02/2026
+Alteração: Minhas Inscrições — borda reforçada nos cards
+           Mesma ordem de informações que Eventos Abertos
+           "Inscrito em:" na última linha em negrito
+           Status de matrícula adicionado (quando houver)
+           Minhas Classificações — status de matrícula adicionado
+Data: 24/02/2026
+Alteração: Status da inscrição usa cor do banco (inscricao.status.cor)
+           Rótulos adicionados em cada badge de status
+Data: 24/02/2026
+-->
+{% extends 'base.html' %}
+{% load static %}
+
+... (mais 508 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 25/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\exclusao
+Nome:         solicitada.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\exclusao\solicitada.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\exclusao\solicitada.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: solicitada.html
+Caminho: apps/interessados/templates/interessados/exclusao/solicitada.html
+Alteração: Criado — Confirmação de solicitação registrada — 18/03/2026
+-->
+
+{% extends 'base.html' %}
+
+{% block title %}Solicitação Registrada — MetaReciclagem{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm text-center py-5">
+            <div class="card-body">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 56px;"></i>
+                <h2 class="mt-3">Solicitação Registrada</h2>
+                <p class="text-muted mt-2">
+                    Sua solicitação de exclusão de dados foi recebida com sucesso.<br>
+                    A equipe irá analisá-la e você será notificado pelo e-mail cadastrado.
+
+... (mais 18 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 26/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\exclusao
+Nome:         solicitar.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\exclusao\solicitar.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\exclusao\solicitar.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: solicitar.html
+Caminho: apps/interessados/templates/interessados/exclusao/solicitar.html
+Alteração: Criado — Solicitação de exclusão de dados (LGPD) — 18/03/2026
+-->
+
+{% extends 'base.html' %}
+
+{% block title %}Solicitar Exclusão de Dados — MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+
+    .exclusao-container {
+        background: white;
+
+... (mais 83 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 27/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados
+Nome:         login.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\login.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\login.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: login.html
+Caminho: apps/interessados/templates/interessados/login.html
+Correção: 06 de abril de 2026 - Formatação de CPF, limite de 11 dígitos, toggle de senha
+-->
+
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Login Interessado - Eventos MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+... (mais 290 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 28/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados
+Nome:         meus_dados.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\meus_dados.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\meus_dados.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: meus_dados.html
+Caminho: apps/interessados/templates/interessados/meus_dados.html
+Alteração: Template refatorado para estender base.html — 29/01/2026
+Alteração: Template de EDIÇÃO de dados do interessado logado — 26/01/2026
+Alteração: Campos PCD ocultos até marcar "necessidades especiais"
+           Campo NIS oculto até marcar "programa social" — 17/03/2026
+-->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Meus Dados - Eventos MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px 0;
+
+... (mais 549 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 29/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\senha
+Nome:         email_recuperar.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\senha\email_recuperar.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\senha\email_recuperar.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: email_recuperar.html
+Caminho: apps/interessados/templates/interessados/senha/email_recuperar.html
+Alteração: Corrigido compatibilidade com Outlook, Hotmail e Gmail
+           Substituído linear-gradient por cor sólida + VML para Outlook
+           Botão implementado com tabela aninhada (padrão email marketing)
+Data: 25/02/2026
+-->
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:v="urn:schemas-microsoft-com:vml"
+      xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--[if mso]>
+    <noscript>
+        <xml>
+            <o:OfficeDocumentSettings>
+                <o:PixelsPerInch>96</o:PixelsPerInch>
+
+... (mais 164 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 30/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\senha
+Nome:         int_trocar_obrigatorio.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\senha\int_trocar_obrigatorio.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\senha\int_trocar_obrigatorio.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: int_trocar_obrigatorio.html
+Caminho: apps/interessados/templates/interessados/senha/int_trocar_obrigatorio.html
+Alteração: Template de troca obrigatória de senha para Interessados (Fluxo B)
+           Exibido pelo middleware quando must_change_password = True
+Data: 25/02/2026
+-->
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Troca de Senha Obrigatória — Interessado{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+
+... (mais 193 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 31/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\senha
+Nome:         recuperar.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\senha\recuperar.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\senha\recuperar.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: recuperar.html
+Caminho: apps/interessados/templates/interessados/senha/recuperar.html
+Alteração: Formulário de recuperação de senha para Interessados (via CPF)
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Recuperar Senha — Interessado{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh; display: flex;
+        justify-content: center; align-items: center;
+    }
+    .container {
+
+... (mais 81 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 32/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\senha
+Nome:         recuperar_enviado.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\senha\recuperar_enviado.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\senha\recuperar_enviado.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: recuperar_enviado.html
+Caminho: apps/interessados/templates/interessados/senha/recuperar_enviado.html
+Alteração: Confirmação de envio de e-mail para Interessado
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}E-mail Enviado — Interessado{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh; display: flex;
+        justify-content: center; align-items: center;
+    }
+    .container {
+        background: white; padding: 40px; border-radius: 10px;
+
+... (mais 36 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 33/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\senha
+Nome:         redefinir.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\senha\redefinir.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\senha\redefinir.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: redefinir.html
+Caminho: apps/interessados/templates/interessados/senha/redefinir.html
+Alteração: Formulário para nova senha — Interessado
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Nova Senha — Interessado{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh; display: flex;
+        justify-content: center; align-items: center;
+    }
+    .container {
+        background: white; padding: 40px; border-radius: 10px;
+
+... (mais 94 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 34/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\senha
+Nome:         redefinir_concluido.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\senha\redefinir_concluido.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\senha\redefinir_concluido.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: redefinir_concluido.html
+Caminho: apps/interessados/templates/interessados/senha/redefinir_concluido.html
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Senha Redefinida — Interessado{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh; display: flex;
+        justify-content: center; align-items: center;
+    }
+    .container {
+        background: white; padding: 40px; border-radius: 10px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+
+... (mais 23 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 35/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\senha
+Nome:         sem_email.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\senha\sem_email.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\senha\sem_email.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: sem_email.html
+Caminho: apps/interessados/templates/interessados/senha/sem_email.html
+Alteração: Exibido quando interessado não tem e-mail cadastrado
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}Sem E-mail Cadastrado{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh; display: flex;
+        justify-content: center; align-items: center;
+    }
+    .container {
+        background: white; padding: 40px; border-radius: 10px;
+
+... (mais 39 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 36/46
+====================================================================================================
+Diretório:    eventosmeta\apps\interessados\templates\interessados\senha
+Nome:         token_invalido.html
+Caminho:      eventosmeta\apps\interessados\templates\interessados\senha\token_invalido.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\interessados\templates\interessados\senha\token_invalido.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: token_invalido.html
+Caminho: apps/interessados/templates/interessados/senha/token_invalido.html
+Alteração: Diferencia link inválido de senha já trocada com sucesso
+Data: 20/02/2026
+-->
+{% extends 'base_auth.html' %}
+
+{% block title %}
+    {% if senha_ja_trocada %}Senha Já Redefinida{% else %}Link Inválido{% endif %}
+    — MetaReciclagem
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        min-height: 100vh;
+        display: flex;
+
+... (mais 101 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 37/46
+====================================================================================================
+Diretório:    eventosmeta\apps\portal\templates\portal
+Nome:         base.html
+Caminho:      eventosmeta\apps\portal\templates\portal\base.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal\base.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: base.html
+Caminho: apps/portal/templates/portal/base.html
+Alteração: Template base corrigido e otimizado
+Data: 20/01/2026
+-->
+
+
+{# apps/portal/templates/portal/base.html #}
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Portal MetaReciclagem{% endblock %}</title>
+
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}">
+
+... (mais 200 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 38/46
+====================================================================================================
+Diretório:    eventosmeta\apps\portal\templates\portal
+Nome:         consulta_publica.html
+Caminho:      eventosmeta\apps\portal\templates\portal\consulta_publica.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal\consulta_publica.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: consulta_publica.html
+Caminho: apps/portal/templates/portal/consulta_publica.html
+Alteração: Layout moderno + Máscara CPF + Remoção de duplicação
+Data: 30/01/2026
+
+Atualização: 10/02/2026 - Ocultar formulário quando houver resultados + Nome no resultado + Botão Nova Consulta alinhado
+-->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Consulta Pública - Portal MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+
+... (mais 314 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 39/46
+====================================================================================================
+Diretório:    eventosmeta\apps\portal\templates\portal
+Nome:         contato.html
+Caminho:      eventosmeta\apps\portal\templates\portal\contato.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal\contato.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: contato.html
+Caminho: apps/portal/templates/portal/contato.html
+Alteração: Página de contatos da MetaReciclagem
+Data: 30/01/2026
+-->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Fale Conosco - Portal MetaReciclagem{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-contato {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+
+... (mais 258 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 40/46
+====================================================================================================
+Diretório:    eventosmeta\apps\portal\templates\portal
+Nome:         detalhes_evento.html
+Caminho:      eventosmeta\apps\portal\templates\portal\detalhes_evento.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal\detalhes_evento.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: detalhes_evento.html
+Caminho: apps/portal/templates/portal/detalhes_evento.html
+Alteração: Template para exibir detalhes completos do evento/curso
+Data: 29/01/2026
+Alteração: Status do evento buscado direto da tabela eventos_status (ForeignKey)
+Data: 20/02/2026
+Alteração: Header do card usa cor dinâmica do status (evento.status.cor)
+           Removido bloco "Status do Evento:" redundante
+           Datas de inscrição e evento exibidas em linha (início | fim)
+Data: 23/02/2026
+Alteração: Header fixo #7fb8ec — texto #1a1a1a
+           Total de vagas inline após título com hífen
+           Botão "Ver Classificação" alterado para btn-outline-success
+Data: 24/02/2026
+-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ evento.nome }} - Eventos MetaReciclagem{% endblock %}
+
+... (mais 263 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 41/46
+====================================================================================================
+Diretório:    eventosmeta\apps\portal\templates\portal
+Nome:         index.html
+Caminho:      eventosmeta\apps\portal\templates\portal\index.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal\index.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: index.html
+Caminho: apps/portal/templates/portal/index.html
+Alteração: Exibir todos os eventos exceto FINALIZADOS e CANCELADOS
+Data: 29/01/2026
+-->
+
+<!-- Arquivo: index.html -->
+<!-- Caminho: apps/portal/templates/portal/index.html -->
+<!-- Alteração: Cards de ações rápidas movidos para logo abaixo da hero-section -->
+<!-- Data: 19/01/2026 -->
+
+{% extends 'base.html' %}
+
+{% block title %}Início - Portal MetaReciclagem{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row mb-4">
+    <div class="col-12">
+
+... (mais 159 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 42/46
+====================================================================================================
+Diretório:    eventosmeta\apps\portal\templates\portal
+Nome:         politica_privacidade.html
+Caminho:      eventosmeta\apps\portal\templates\portal\politica_privacidade.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal\politica_privacidade.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!--
+Arquivo: politica_privacidade.html
+Caminho: apps/portal/templates/portal/politica_privacidade.html
+Alteração: Criado — Política de Privacidade conforme LGPD
+Data: 17/03/2026
+-->
+
+{% extends 'base.html' %}
+
+{% block title %}Política de Privacidade — Portal MetaReciclagem{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0 fs-4">Política de Privacidade</h2>
+                <small>Última atualização: março de 2026</small>
+            </div>
+
+... (mais 123 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 43/46
+====================================================================================================
+Diretório:    eventosmeta\apps\portal\templates\portal
+Nome:         resultado_evento.html
+Caminho:      eventosmeta\apps\portal\templates\portal\resultado_evento.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal\resultado_evento.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends 'base.html' %}
+
+{% block title %}Resultado: {{ evento.nome }} - Portal MetaReciclagem{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho do Evento -->
+<div class="row mb-4">
+    <div class="col-12">
+        <!-- 
+            ALTERAÇÃO 05/12/2025: 
+            1. Corrigido gradiente (mesmo problema do consulta_publica.html)
+            2. Reduzido padding de py-5 para py-3 (diminui altura do banner)
+            3. Reduzido tamanho do título de h2 para h4
+        -->
+        <div class="card text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; background-color: transparent !important;">
+            <div class="card-body py-3">
+                <!-- 
+                    ALTERAÇÃO: h2 → h4 (título menor)
+                    mb-3 → mb-2 (menos espaço abaixo)
+                -->
+
+... (mais 161 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 44/46
+====================================================================================================
+Diretório:    eventosmeta\apps\selecao\templates\admin\selecao
+Nome:         matricular_alunos.html
+Caminho:      eventosmeta\apps\selecao\templates\admin\selecao\matricular_alunos.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao\templates\admin\selecao\matricular_alunos.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Matricular Alunos{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .matricula-container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 20px;
+    }
+    
+    .evento-info {
+        background: #e3f2fd;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        border-left: 4px solid #2196f3;
+
+... (mais 169 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 45/46
+====================================================================================================
+Diretório:    eventosmeta\apps\selecao\templates\selecao
+Nome:         relatorio_aprovados_mural.html
+Caminho:      eventosmeta\apps\selecao\templates\selecao\relatorio_aprovados_mural.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao\templates\selecao\relatorio_aprovados_mural.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Classificados - {{ evento.nome }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.6;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+
+... (mais 161 linhas)
+----------------------------------------------------------------------------------------------------
+
+====================================================================================================
+ARQUIVO 46/46
+====================================================================================================
+Diretório:    eventosmeta\apps\selecao\templates\selecao
+Nome:         relatorio_aprovados_staff.html
+Caminho:      eventosmeta\apps\selecao\templates\selecao\relatorio_aprovados_staff.html
+Caminho Full: C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\selecao\templates\selecao\relatorio_aprovados_staff.html
+
+PREVIEW:
+----------------------------------------------------------------------------------------------------
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Aprovados - {{ evento.nome }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+
+... (mais 183 linhas)
+----------------------------------------------------------------------------------------------------
+
+
+====================================================================================================
+RESUMO POR DIRETÓRIO
+====================================================================================================
+
+eventosmeta\apps\academico\templates\academico/
+   └── gestao_matricula.html
+
+eventosmeta\apps\academico\templates\admin\academico\avaliacao/
+   └── change_list.html
+
+eventosmeta\apps\accounts\templates\accounts/
+   └── base_auth.html
+   └── login_staff.html
+
+eventosmeta\apps\accounts\templates\accounts\exclusao/
+   └── detalhe.html
+   └── listar.html
+
+eventosmeta\apps\accounts\templates\accounts\senha/
+   └── adm_email_recuperar.html
+   └── adm_recuperar.html
+   └── adm_recuperar_enviado.html
+   └── adm_redefinir.html
+   └── adm_redefinir_concluido.html
+   └── adm_trocar_obrigatorio.html
+   └── confirmar.html
+
+eventosmeta\apps\accounts\templates\admin/
+   └── base_site.html
+   └── dashboard.html
+
+eventosmeta\apps\accounts\templates\admin\accounts/
+   └── cards-admin.html
+
+eventosmeta\apps\dashboard\templates\admin\dashboard/
+   └── academico.html
+   └── base_dashboard.html
+   └── eventos.html
+   └── interessados.html
+   └── lgpd.html
+   └── processo_seletivo.html
+
+eventosmeta\apps\interessados\templates\interessados/
+   └── cadastro.html
+   └── dashboard.html
+   └── login.html
+   └── meus_dados.html
+
+eventosmeta\apps\interessados\templates\interessados\exclusao/
+   └── solicitada.html
+   └── solicitar.html
+
+eventosmeta\apps\interessados\templates\interessados\senha/
+   └── email_recuperar.html
+   └── int_trocar_obrigatorio.html
+   └── recuperar.html
+   └── recuperar_enviado.html
+   └── redefinir.html
+   └── redefinir_concluido.html
+   └── sem_email.html
+   └── token_invalido.html
+
+eventosmeta\apps\portal\templates\portal/
+   └── base.html
+   └── consulta_publica.html
+   └── contato.html
+   └── detalhes_evento.html
+   └── index.html
+   └── politica_privacidade.html
+   └── resultado_evento.html
+
+eventosmeta\apps\selecao\templates\admin\selecao/
+   └── matricular_alunos.html
+
+eventosmeta\apps\selecao\templates\selecao/
+   └── relatorio_aprovados_mural.html
+   └── relatorio_aprovados_staff.html
+

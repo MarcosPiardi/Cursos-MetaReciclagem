@@ -33,8 +33,6 @@ sistema_urlpatterns = [
     # ADMIN CUSTOMIZADO
     # ==========================================
     path('admin/dashboard/', include('apps.dashboard.urls')),
-    # MUDADO: path('admin/', admin_site.urls),
-    # NOVO: usar admin.site padrão do Django
     path('admin/', admin.site.urls),
 
     # ==========================================

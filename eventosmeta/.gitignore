@@ -43,6 +43,8 @@ media/uploads/
 !/media/.gitkeep
 *.log
 logs/
+temp/
+temp/*
 
 # ============================================================
 # TESTES E COBERTURA
