@@ -7,7 +7,8 @@ Atualizações:
  - 15/06/2026 - Correção de testes para refletir a nova estrutura de URLs (ex: /staff/senha/trocar-obrigatorio/) 
  - 17/06/2026 - Adição de testes para URLs estáticas e de mídia, além de URLs de login/logout do admin
               - Refatoração para pytest, utilizando fixtures para criar usuários e interessados de teste, e um helper para aplicar o middleware nos requests.
-
+ - 22/07/2026 - Corrigidos paths do RequestFactory para incluir prefixo /eventosmeta/
+                e expected URLs nos redirects, alinhando com o middleware refatorado.
 """
 
 import pytest
@@ -67,37 +68,39 @@ def _aplicar_middleware(request, user=None):
 # ── Testes ────────────────────────────────────────────────────────────
 
 def test_usuario_nao_autenticado_passa(rf):
-    request = rf.get('/admin/')
+    request = rf.get('/eventosmeta/admin/')
     response = _aplicar_middleware(request)
     assert response is None
 
 def test_usuario_sem_must_change_password_passa(rf, usuario_comum):
-    request = rf.get('/admin/')
+    request = rf.get('/eventosmeta/admin/')
     response = _aplicar_middleware(request, user=usuario_comum)
     assert response is None
 
 def test_usuario_com_must_change_password_url_liberada_staff(rf, usuario_staff):
     usuario_staff.must_change_password = True
     usuario_staff.save()
-    request = rf.get('/staff/logout/')
+    request = rf.get('/eventosmeta/staff/logout/')
     response = _aplicar_middleware(request, user=usuario_staff)
     assert response is None
 
 def test_usuario_com_must_change_password_url_restrita_staff(rf, usuario_staff):
     usuario_staff.must_change_password = True
     usuario_staff.save()
-    request = rf.get('/admin/')
+    request = rf.get('/eventosmeta/admin/')
     response = _aplicar_middleware(request, user=usuario_staff)
     assert response.status_code == 302
-    assert response.url == '/staff/senha/trocar-obrigatorio/'
+    # 22/07/2026 - Corrigido: prefixo /eventosmeta/ incluido
+    assert response.url == '/eventosmeta/staff/senha/trocar-obrigatorio/'
 
 def test_interessado_com_must_change_password_url_restrita(rf, interessado):
     interessado.must_change_password = True
     interessado.save()
-    request = rf.get('/inscricao/')
+    request = rf.get('/eventosmeta/inscricao/')
     response = _aplicar_middleware(request, user=interessado)
     assert response.status_code == 302
-    assert response.url == '/inscricao/senha/trocar-obrigatorio/'
+    # 22/07/2026 - Corrigido: prefixo /eventosmeta/ incluido
+    assert response.url == '/eventosmeta/inscricao/senha/trocar-obrigatorio/'
 
 def test_static_url_liberada_mesmo_com_must_change_password(rf, usuario_staff):
     usuario_staff.must_change_password = True
@@ -116,14 +119,16 @@ def test_media_url_liberada_mesmo_com_must_change_password(rf, usuario_staff):
 def test_url_admin_login_liberada(rf, usuario_staff):
     usuario_staff.must_change_password = True
     usuario_staff.save()
-    request = rf.get('/admin/login/')
+    # 22/07/2026 - Corrigido: path com prefixo para resolve() encontrar a URL
+    request = rf.get('/eventosmeta/admin/login/')
     response = _aplicar_middleware(request, user=usuario_staff)
     assert response is None
 
 def test_url_admin_logout_liberada(rf, usuario_staff):
     usuario_staff.must_change_password = True
     usuario_staff.save()
-    request = rf.get('/admin/logout/')
+    request = rf.get('/eventosmeta/admin/logout/')
     response = _aplicar_middleware(request, user=usuario_staff)
     assert response is None
 
+    

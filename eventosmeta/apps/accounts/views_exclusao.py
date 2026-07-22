@@ -3,7 +3,11 @@ Arquivo: views_exclusao.py
 Caminho: apps/accounts/views_exclusao.py
 Finalidade: Views do staff para listar, aprovar e recusar
             solicitações de exclusão de dados (LGPD)
-Data: 18/03/2026
+Atualizações:
+ - 18/03/2026 - Criacao do arquivo
+ - 14/07/2026 - Padronizado parâmetro para solicitacao_id em todas as rotas de exclusão
+ - 22/07/2026 - Removida listar_solicitacoes_view (substituida por dashboard:lgpd)
+ - 22/07/2026 - Redirect de detalhe_solicitacao_view alterado para dashboard:lgpd
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -13,29 +17,9 @@ from django.utils import timezone
 
 from apps.interessados.models import SolicitacaoExclusao, Interessado
 
-
 def _apenas_staff(request):
     """Retorna True se o usuário é staff autenticado."""
     return request.user.is_authenticated and request.user.is_staff
-
-
-@login_required(login_url='/staff/login/')
-def listar_solicitacoes_view(request):
-    """Lista todas as solicitações de exclusão, agrupadas por status."""
-    if not _apenas_staff(request):
-        messages.error(request, 'Acesso restrito à equipe.')
-        return redirect('/staff/login/')
-
-    pendentes  = SolicitacaoExclusao.objects.filter(status='PENDENTE').order_by('-solicitado_em')
-    aprovadas  = SolicitacaoExclusao.objects.filter(status='APROVADA').order_by('-analisado_em')
-    recusadas  = SolicitacaoExclusao.objects.filter(status='RECUSADA').order_by('-analisado_em')
-
-    return render(request, 'accounts/exclusao/listar.html', {
-        'pendentes': pendentes,
-        'aprovadas': aprovadas,
-        'recusadas': recusadas,
-    })
-
 
 @login_required(login_url='/staff/login/')
 def detalhe_solicitacao_view(request, solicitacao_id):
@@ -78,12 +62,12 @@ def detalhe_solicitacao_view(request, solicitacao_id):
             solicitacao.save()
             messages.info(request, f'Solicitação de {solicitacao.nome_solicitante} recusada.')
 
-        return redirect('accounts:listar_solicitacoes_exclusao')
+        # 22/07/2026 - Alterado de accounts:listar_solicitacoes_exclusao para dashboard:lgpd
+        return redirect('dashboard:lgpd')
 
     return render(request, 'accounts/exclusao/detalhe.html', {
         'solicitacao': solicitacao,
     })
-
 
 def _anonimizar_interessado(interessado):
     """
@@ -123,6 +107,4 @@ def _anonimizar_interessado(interessado):
     interessado.is_active            = False
 
     interessado.save()
-
-
 

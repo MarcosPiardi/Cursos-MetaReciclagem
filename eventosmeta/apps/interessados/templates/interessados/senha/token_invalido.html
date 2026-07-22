@@ -4,7 +4,7 @@ Caminho: apps/interessados/templates/interessados/senha/token_invalido.html
 Alteração: Diferencia link inválido de senha já trocada com sucesso
 Data: 20/02/2026
 -->
-{% extends 'base_auth.html' %}
+{% extends 'accounts/base_auth.html' %}
 
 {% block title %}
     {% if senha_ja_trocada %}Senha Já Redefinida{% else %}Link Inválido{% endif %}

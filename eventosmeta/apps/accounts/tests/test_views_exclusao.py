@@ -5,6 +5,7 @@ Finalidade: Testes para as views de exclusao de dados (LGPD)
 Atualizacoes:
  - 28/05/2026 - Criacao do arquivo
  - 17/06/2026 - Refatorado de unittest.TestCase para pytest
+ - 22/07/2026 - Removida classe TestListarSolicitacoesView (view removida, substituida por dashboard:lgpd)
 """
 
 import pytest
@@ -17,80 +18,6 @@ from apps.accounts.views_exclusao import _anonimizar_interessado
 from apps.interessados.tests.factories import InteressadoFactory
 
 pytestmark = pytest.mark.django_db
-
-class TestListarSolicitacoesView:
-    """Testes para listar_solicitacoes_view."""
-
-    def setup_method(self):
-        self.client = Client()
-        User = get_user_model()
-
-        self.staff_user = User.objects.create_user(
-            username='staff',
-            email='staff@ex.com',
-            password='abc123',
-            cpf='11111111111',
-            is_staff=True,
-            is_active=True,
-        )
-
-        self.normal_user = User.objects.create_user(
-            username='normal',
-            email='normal@ex.com',
-            password='abc123',
-            cpf='22222222222',
-            is_staff=False,
-            is_active=True,
-        )
-
-        interessado1 = InteressadoFactory()
-        interessado2 = InteressadoFactory()
-        interessado3 = InteressadoFactory()
-
-        SolicitacaoExclusao.objects.create(
-            interessado=interessado1,
-            nome_solicitante='Joao',
-            status='PENDENTE',
-        )
-        SolicitacaoExclusao.objects.create(
-            interessado=interessado2,
-            nome_solicitante='Maria',
-            status='APROVADA',
-        )
-        SolicitacaoExclusao.objects.create(
-            interessado=interessado3,
-            nome_solicitante='Jose',
-            status='RECUSADA',
-        )
-
-    def test_listar_solicitacoes_status_200(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse('accounts:listar_solicitacoes_exclusao'))
-        assert response.status_code == 200
-
-    def test_listar_solicitacoes_sem_login_redirect(self):
-        response = self.client.get(reverse('accounts:listar_solicitacoes_exclusao'))
-        assert response.status_code == 302
-
-    def test_listar_solicitacoes_nao_staff_redirect(self):
-        self.client.force_login(self.normal_user)
-        response = self.client.get(reverse('accounts:listar_solicitacoes_exclusao'))
-        assert response.status_code == 302
-
-    def test_listar_solicitacoes_contexto_tem_pendentes(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse('accounts:listar_solicitacoes_exclusao'))
-        assert 'pendentes' in response.context
-
-    def test_listar_solicitacoes_contexto_tem_aprovadas(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse('accounts:listar_solicitacoes_exclusao'))
-        assert 'aprovadas' in response.context
-
-    def test_listar_solicitacoes_contexto_tem_recusadas(self):
-        self.client.force_login(self.staff_user)
-        response = self.client.get(reverse('accounts:listar_solicitacoes_exclusao'))
-        assert 'recusadas' in response.context
 
 class TestDetalheSolicitacaoView:
     """Testes para detalhe_solicitacao_view."""
@@ -258,4 +185,4 @@ class TestAnonimizarInteressado:
         _anonimizar_interessado(self.interessado)
         assert Interessado.objects.filter(pk=pk).exists()
 
-
+        

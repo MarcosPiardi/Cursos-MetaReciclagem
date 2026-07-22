@@ -5,6 +5,7 @@ Testes de resolucao de URLs do app Interessados
 Atualizações:
  - 29/05/2026 - Criacao do arquivo
  - 18/06/2026 - unittest.SimpleTestCase para pytest
+ - 22/07/2026 - Corrigido PREFIXO para incluir /eventosmeta/
 """
 
 from django.urls import reverse, resolve
@@ -12,7 +13,8 @@ from django.urls import reverse, resolve
 from apps.interessados import views
 from apps.interessados import views_exclusao
 
-PREFIXO = "/inscricao/"
+# 22/07/2026 - Corrigido: incluido prefixo /eventosmeta/ do config/urls.py
+PREFIXO = "/eventosmeta/inscricao/"
 
 class TestUrlsResolvem:
     def test_cadastro_url(self):
@@ -141,4 +143,4 @@ class TestUrlsPath:
             == PREFIXO + "exclusao/solicitada/"
         )
 
-
+        

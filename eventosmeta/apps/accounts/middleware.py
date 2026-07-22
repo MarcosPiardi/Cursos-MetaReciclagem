@@ -1,42 +1,32 @@
 """
 Arquivo: middleware.py
 Caminho: apps/accounts/middleware.py
-Alteração: Criado middleware de troca obrigatória de senha
-           Intercepta qualquer requisição autenticada e redireciona
-           para tela de troca de senha se must_change_password = True
-           Libera URLs de logout, troca de senha e arquivos estáticos
-Data: 25/02/2026
-Alteração: Removido '/admin/' dos prefixos liberados — Staff com
-           must_change_password = True não pode acessar o admin
-           sem trocar a senha primeiro.
-           Adicionadas URLs mínimas do admin necessárias para
-           que o redirect funcione sem loop.
-Data: 26/02/2026
+Atualização:
+ - 25/02/2026 - Criado middleware de troca obrigatória de senha
+                Intercepta qualquer requisição autenticada e redireciona
+                para tela de troca de senha se must_change_password = True
+                Libera URLs de logout, troca de senha e arquivos estáticos
+ - 26/02/2026 - Alteração: Removido '/admin/' dos prefixos liberados — Staff com
+                must_change_password = True não pode acessar o admin
+                sem trocar a senha primeiro.
+                Adicionadas URLs mínimas do admin necessárias para
+                que o redirect funcione sem loop.
+ - 22/07/2026 - Refatorado: substituído paths hardcoded por resolve() e
+                nomes de URL. Elimina dependência do prefixo /eventosmeta/
+                que causava redirect loop e 404 nos testes.
+              - Adicionada verificação por path para /trocar-obrigatorio/
+                e /logout/, eliminando dependência de nomes de URL com
+                ou sem namespace (interessados: vs interessados_).
 """
 
 from django.shortcuts import redirect
-
-
-# URLs liberadas mesmo com must_change_password = True
-URLS_LIBERADAS = [
-    # Staff
-    '/staff/senha/trocar-obrigatorio/',
-    '/staff/logout/',
-    # Interessado
-    '/inscricao/senha/trocar-obrigatorio/',
-    '/inscricao/logout/',
-    # Admin mínimo — necessário para não causar loop no redirect
-    '/admin/login/',
-    '/admin/logout/',
-    '/admin/jsi18n/',
-]
+from django.urls import resolve
 
 # Prefixos sempre liberados (estáticos e mídia apenas)
 PREFIXOS_LIBERADOS = [
     '/static/',
     '/media/',
 ]
-
 
 class TrocarSenhaObrigatorioMiddleware:
     """
@@ -67,19 +57,33 @@ class TrocarSenhaObrigatorioMiddleware:
                 if path.startswith(prefixo):
                     return self.get_response(request)
 
-            # Libera URLs específicas
-            if path in URLS_LIBERADAS:
+            # 22/07/2026 - Libera URLs de logout (independente de prefixo)
+            if path.endswith('/logout/'):
                 return self.get_response(request)
 
+            # 22/07/2026 - Libera URLs de troca obrigatória de senha
+            # (independente de namespace: interessados: vs interessados_)
+            if '/trocar-obrigatorio/' in path:
+                return self.get_response(request)
+
+            # Verifica por nome de URL para liberar URLs mínimas do admin
+            try:
+                match = resolve(path)
+                if match.view_name in (
+                    'admin:login',
+                    'admin:logout',
+                    'admin:jsi18n',
+                ):
+                    return self.get_response(request)
+            except Exception:
+                pass
+
             # Determina para qual tela redirecionar
-            # Staff → Usuario do Django (tem atributo username nativo)
             from apps.accounts.models import Usuario
             if isinstance(usuario, Usuario):
-                return redirect('/staff/senha/trocar-obrigatorio/')
+                return redirect('staff_trocar_senha_obrigatorio')
 
             # Interessado → redireciona para tela própria
-            return redirect('/inscricao/senha/trocar-obrigatorio/')
+            return redirect('interessados_trocar_senha_obrigatorio')
 
         return self.get_response(request)
-    
-    

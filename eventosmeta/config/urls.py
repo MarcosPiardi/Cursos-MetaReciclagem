@@ -28,6 +28,8 @@ from apps.accounts import views as accounts_views
 # REMOVIDO: from apps.accounts.admin import admin_site
 from apps.interessados import views as interessados_views
 
+admin.site.index_template = 'admin/accounts/cards-admin.html'
+
 sistema_urlpatterns = [
     # ==========================================
     # ADMIN CUSTOMIZADO

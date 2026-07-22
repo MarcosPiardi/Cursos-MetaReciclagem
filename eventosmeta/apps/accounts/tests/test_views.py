@@ -8,8 +8,8 @@ Atualizacoes:
  - 25/06/2026 - Adicionados testes para trocar_senha_obrigatorio_view
                 e testes extras para login_staff
  - 25/06/2026 - Corrigido: URL correta e '/staff/senha/trocar-obrigatorio/'
+ - 22/07/2026 - Corrigido URLs e redirects para incluir prefixo /eventosmeta/
 """
-
 import pytest
 from django.test import Client
 from django.contrib.auth import get_user_model
@@ -18,11 +18,9 @@ from django.urls import reverse
 # =============================================================================
 # Testes para login_staff
 # =============================================================================
-
 @pytest.mark.django_db
 class TestLoginStaffView:
     """Testes para a view login_staff."""
-
     def test_login_staff_get(self):
         """Pagina de login deve ser acessivel via GET."""
         response = Client().get(reverse('accounts:login_staff'))
@@ -129,7 +127,8 @@ class TestLoginStaffView:
         client.force_login(usuario)
         response = client.get(reverse('accounts:login_staff'))
         assert response.status_code == 302
-        assert response.url == '/admin/'
+        # 22/07/2026 - Corrigido: prefixo /eventosmeta/ incluido
+        assert response.url == '/eventosmeta/admin/'
 
     def test_usuario_ja_logado_nao_staff_nao_redireciona(self):
         """Nao-staff ja logado nao deve ser redirecionado (mostra form)."""
@@ -151,11 +150,9 @@ class TestLoginStaffView:
 # =============================================================================
 # Testes para logout_staff
 # =============================================================================
-
 @pytest.mark.django_db
 class TestLogoutStaffView:
     """Testes para a view logout_staff."""
-
     def test_logout_staff_post(self):
         """POST no logout deve deslogar e redirecionar."""
         User = get_user_model()
@@ -187,13 +184,12 @@ class TestLogoutStaffView:
 # =============================================================================
 # Testes para trocar_senha_obrigatorio_view
 # =============================================================================
-
-TROCAR_SENHA_URL = '/staff/senha/trocar-obrigatorio/'
+# 22/07/2026 - Corrigido: adicionado prefixo /eventosmeta/
+TROCAR_SENHA_URL = '/eventosmeta/staff/senha/trocar-obrigatorio/'
 
 @pytest.mark.django_db
 class TestTrocarSenhaObrigatorioView:
     """Testes para a view trocar_senha_obrigatorio_view."""
-
     def test_get_sem_login_redireciona(self):
         """Usuario nao logado deve ser redirecionado para login."""
         response = Client().get(TROCAR_SENHA_URL)
@@ -211,7 +207,8 @@ class TestTrocarSenhaObrigatorioView:
         client.force_login(usuario)
         response = client.get(TROCAR_SENHA_URL)
         assert response.status_code == 302
-        assert response.url == '/admin/'
+        # 22/07/2026 - Corrigido: prefixo /eventosmeta/ incluido
+        assert response.url == '/eventosmeta/admin/'
 
     def test_get_com_must_change_password_renderiza(self):
         """Staff com must_change_password=True deve ver o template."""
@@ -279,7 +276,7 @@ class TestTrocarSenhaObrigatorioView:
         assert usuario.must_change_password is False
         assert usuario.check_password('nova_senha_123') is True
         assert response.status_code == 302
-        assert response.url == '/admin/'
-
+        # 22/07/2026 - Corrigido: prefixo /eventosmeta/ incluido
+        assert response.url == '/eventosmeta/admin/'
 
         

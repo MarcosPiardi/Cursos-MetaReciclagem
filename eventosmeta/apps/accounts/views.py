@@ -11,6 +11,9 @@ Alteração: Adicionada view trocar_senha_obrigatorio_view (Fluxo B)
            Intercepta login de Staff com must_change_password = True
            e força troca de senha antes de qualquer outra ação
 Data: 25/02/2026
+Atualização:
+ - 22/07/2026 - Redirects hardcoded /admin/ trocados por reverse('admin:index')
+                para incluir automaticamente o prefixo /eventosmeta/
 """
 
 from django.shortcuts import render, redirect
@@ -18,7 +21,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
-
 
 def login_staff(request):
     """Login para usuários staff - redireciona para admin customizado"""
@@ -54,13 +56,11 @@ def login_staff(request):
         'url_recuperar_senha': 'staff_senha_recuperar',
     })
 
-
 def logout_staff(request):
     """Logout do staff"""
     logout(request)
     messages.success(request, 'Você saiu do sistema.')
     return redirect('accounts:login_staff')
-
 
 # ==============================================================================
 # FLUXO B — TROCA OBRIGATÓRIA DE SENHA — STAFF
@@ -84,7 +84,8 @@ def trocar_senha_obrigatorio_view(request):
 
     # Segurança extra: se chegou aqui sem must_change_password, redireciona
     if not usuario.must_change_password:
-        return redirect('/admin/')
+        # 22/07/2026 - Alterado de '/admin/' para reverse('admin:index')
+        return redirect('admin:index')
 
     erro = None
 
@@ -109,10 +110,12 @@ def trocar_senha_obrigatorio_view(request):
                 request,
                 '✅ Senha alterada com sucesso! Bem-vindo ao sistema.'
             )
-            return redirect('/admin/')
+            # 22/07/2026 - Alterado de '/admin/' para reverse('admin:index')
+            return redirect('admin:index')
 
     return render(request, 'accounts/senha/adm_trocar_obrigatorio.html', {
         'erro'   : erro,
         'usuario': usuario,
     })
+
 

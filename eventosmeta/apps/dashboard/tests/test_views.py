@@ -1,13 +1,14 @@
 """
 Arquivo: test_views.py
 Caminho: apps/dashboard/tests/test_views.py
-Atualizações
-29/05/2026 - Criação do arquivo 
+Atualizações:
+ - 29/05/2026 - Criação do arquivo
+ - 22/07/2026 - Corrigidos nomes de URL para incluir namespace dashboard:
+                dashboard_academico → dashboard:academico, etc.
 """
 
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
-
 
 class TestDashboardViews(TestCase):
     """Smoke tests para as views de dashboard HTML"""
@@ -47,77 +48,76 @@ class TestDashboardViews(TestCase):
     # --- Dashboard Academico ---
 
     def test_dashboard_academico_sem_auth_redireciona(self):
-        response = self.client.get(self._url("dashboard_academico"))
+        response = self.client.get(self._url("dashboard:academico"))
         self.assertEqual(response.status_code, 302)
         self.assertIn("/admin/login/", response.url)
 
     def test_dashboard_academico_non_staff_redireciona(self):
         self._login_user()
-        response = self.client.get(self._url("dashboard_academico"))
+        response = self.client.get(self._url("dashboard:academico"))
         self.assertEqual(response.status_code, 302)
         self.assertIn("/admin/login/", response.url)
 
     def test_dashboard_academico_staff_200(self):
         self._login_staff()
-        response = self.client.get(self._url("dashboard_academico"))
+        response = self.client.get(self._url("dashboard:academico"))
         self.assertEqual(response.status_code, 200)
 
     def test_dashboard_academico_sem_dados_nao_quebra(self):
         """Banco vazio nao causa erro 500"""
         self._login_staff()
-        response = self.client.get(self._url("dashboard_academico"))
+        response = self.client.get(self._url("dashboard:academico"))
         self.assertEqual(response.status_code, 200)
 
     # --- Dashboard Eventos ---
 
     def test_dashboard_eventos_sem_auth_redireciona(self):
-        response = self.client.get(self._url("dashboard_eventos"))
+        response = self.client.get(self._url("dashboard:eventos"))
         self.assertEqual(response.status_code, 302)
 
     def test_dashboard_eventos_staff_200(self):
         self._login_staff()
-        response = self.client.get(self._url("dashboard_eventos"))
+        response = self.client.get(self._url("dashboard:eventos"))
         self.assertEqual(response.status_code, 200)
 
     # --- Dashboard Interessados ---
 
     def test_dashboard_interessados_sem_auth_redireciona(self):
-        response = self.client.get(self._url("dashboard_interessados"))
+        response = self.client.get(self._url("dashboard:interessados"))
         self.assertEqual(response.status_code, 302)
 
     def test_dashboard_interessados_staff_200(self):
         self._login_staff()
-        response = self.client.get(self._url("dashboard_interessados"))
+        response = self.client.get(self._url("dashboard:interessados"))
         self.assertEqual(response.status_code, 200)
 
     def test_dashboard_interessados_total_zero_nao_quebra(self):
         """Divisao por zero nos percentuais com banco vazio"""
         self._login_staff()
-        response = self.client.get(self._url("dashboard_interessados"))
+        response = self.client.get(self._url("dashboard:interessados"))
         self.assertEqual(response.status_code, 200)
 
     # --- Dashboard Processo Seletivo ---
 
     def test_dashboard_processo_seletivo_sem_auth_redireciona(self):
-        response = self.client.get(self._url("dashboard_processo_seletivo"))
+        response = self.client.get(self._url("dashboard:processo_seletivo"))
         self.assertEqual(response.status_code, 302)
 
     def test_dashboard_processo_seletivo_staff_200(self):
         self._login_staff()
-        response = self.client.get(self._url("dashboard_processo_seletivo"))
+        response = self.client.get(self._url("dashboard:processo_seletivo"))
         self.assertEqual(response.status_code, 200)
 
     # --- Dashboard LGPD ---
 
     def test_dashboard_lgpd_sem_auth_redireciona(self):
-        response = self.client.get(self._url("dashboard_lgpd"))
+        response = self.client.get(self._url("dashboard:lgpd"))
         self.assertEqual(response.status_code, 302)
 
     def test_dashboard_lgpd_staff_200(self):
         self._login_staff()
-        response = self.client.get(self._url("dashboard_lgpd"))
+        response = self.client.get(self._url("dashboard:lgpd"))
         self.assertEqual(response.status_code, 200)
-
 
 class TestDashboardPdfViews(TestCase):
     """Smoke tests para as views de PDF"""
@@ -147,57 +147,54 @@ class TestDashboardPdfViews(TestCase):
     # --- PDF Interessados ---
 
     def test_pdf_interessados_sem_auth_redireciona(self):
-        response = self.client.get(self._url("dashboard_interessados_pdf"))
+        response = self.client.get(self._url("dashboard:interessados_pdf"))
         self.assertEqual(response.status_code, 302)
 
     def test_pdf_interessados_staff_200(self):
         self._login()
-        response = self.client.get(self._url("dashboard_interessados_pdf"))
+        response = self.client.get(self._url("dashboard:interessados_pdf"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
 
     def test_pdf_interessados_sem_dados_nao_quebra(self):
         self._login()
-        response = self.client.get(self._url("dashboard_interessados_pdf"))
+        response = self.client.get(self._url("dashboard:interessados_pdf"))
         self.assertEqual(response.status_code, 200)
 
     # --- PDF Eventos ---
 
     def test_pdf_eventos_sem_auth_redireciona(self):
-        response = self.client.get(self._url("dashboard_eventos_pdf"))
+        response = self.client.get(self._url("dashboard:eventos_pdf"))
         self.assertEqual(response.status_code, 302)
 
     def test_pdf_eventos_staff_200(self):
         self._login()
-        response = self.client.get(self._url("dashboard_eventos_pdf"))
+        response = self.client.get(self._url("dashboard:eventos_pdf"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
 
     # --- PDF Academico ---
 
     def test_pdf_academico_sem_auth_redireciona(self):
-        response = self.client.get(self._url("dashboard_academico_pdf"))
+        response = self.client.get(self._url("dashboard:academico_pdf"))
         self.assertEqual(response.status_code, 302)
 
     def test_pdf_academico_staff_200(self):
         self._login()
-        response = self.client.get(self._url("dashboard_academico_pdf"))
+        response = self.client.get(self._url("dashboard:academico_pdf"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
 
     # --- PDF Processo Seletivo ---
 
     def test_pdf_processo_seletivo_sem_auth_redireciona(self):
-        response = self.client.get(self._url("dashboard_processo_seletivo_pdf"))
+        response = self.client.get(self._url("dashboard:processo_seletivo_pdf"))
         self.assertEqual(response.status_code, 302)
 
     def test_pdf_processo_seletivo_staff_200(self):
         self._login()
-        response = self.client.get(self._url("dashboard_processo_seletivo_pdf"))
+        response = self.client.get(self._url("dashboard:processo_seletivo_pdf"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/pdf")
 
         
-
-
-

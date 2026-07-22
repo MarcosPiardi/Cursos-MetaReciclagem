@@ -7085,3 +7085,89 @@ Coverage HTML written to dir htmlcov
 
 
 ================================================================== 856 passed in 511.90s (0:08:31) =====================================================
+
+
+##  coverage em 22/07/2026
+
+(.venv) PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> python -m pytest --cov -v
+.
+.
+.
+.
+.
+apps/selecao/tests/test_validators.py::TestValidarInscricao::test_inscricao_evento_sem_criterios_gera_aviso PASSED  [100%]
+
+---------- coverage: platform win32, python 3.13.2-final-0 -----------
+Name                                                         Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------------
+apps\__init__.py                                                 0      0   100%
+apps\academico\__init__.py                                       0      0   100%
+apps\academico\admin.py                                        319      9    97%   335-336, 485, 496-498, 515-517
+apps\academico\apps.py                                           5      0   100%
+apps\academico\certificado.py                                  136      3    98%   103-104, 193
+apps\academico\models.py                                       110     22    80%   45, 122, 133, 142, 168, 204-206, 300-316, 339-342
+apps\academico\services.py                                     136      8    94%   172-173, 230-232, 281-283
+apps\academico\urls.py                                           5      0   100%
+apps\academico\views.py                                         63      0   100%
+apps\accounts\__init__.py                                        0      0   100%
+apps\accounts\admin.py                                          31      0   100%
+apps\accounts\apps.py                                            5      0   100%
+apps\accounts\forms.py                                           5      0   100%
+apps\accounts\middleware.py                                     28      0   100%
+apps\accounts\models.py                                         22      1    95%   105
+apps\accounts\urls.py                                            5      0   100%
+apps\accounts\views.py                                          47      0   100%
+apps\accounts\views_exclusao.py                                 68      2    97%   28-29
+apps\dashboard\__init__.py                                       0      0   100%
+apps\dashboard\admin.py                                          0      0   100%
+apps\dashboard\apps.py                                           4      0   100%
+apps\dashboard\models.py                                         1      0   100%
+apps\dashboard\services.py                                     157      0   100%
+apps\dashboard\urls.py                                           4      0   100%
+apps\dashboard\utils_pdf.py                                    373     90    76%   86-87, 90-91, 94-99, 102-107, 227-231, 235-239, 243-247, 250-252, 259-263, 267-271, 275-279, 282-284, 288-293, 416-435, 439-459, 583-603, 726-746
+apps\dashboard\views.py                                         67      0   100%
+apps\eventos\__init__.py                                         0      0   100%
+apps\eventos\admin.py                                          206     78    62%   66, 113, 195, 268-357, 370-414, 429-518
+apps\eventos\apps.py                                             5      0   100%
+apps\eventos\context_processors.py                              51      3    94%   39, 111-112
+apps\eventos\management\__init__.py                              0      0   100%
+apps\eventos\management\commands\__init__.py                     0      0   100%
+apps\eventos\models.py                                         122      7    94%   106, 137, 142, 147, 152, 201, 206
+apps\eventos\views.py                                            1      1     0%   1
+apps\interessados\__init__.py                                    0      0   100%
+apps\interessados\admin.py                                     213     20    91%   234-237, 250, 254, 366, 379, 412-420, 479-480, 508, 513
+apps\interessados\apps.py                                        5      0   100%
+apps\interessados\authentication.py                             25      1    96%   52
+apps\interessados\forms.py                                     157      8    95%   203, 227, 242, 395-396, 409, 447, 452
+apps\interessados\management\__init__.py                         0      0   100%
+apps\interessados\management\commands\__init__.py                0      0   100%
+apps\interessados\management\commands\criptografar_cpfs.py      22      3    86%   41-45
+apps\interessados\management\commands\limpar_tokens.py          59      1    98%   122
+apps\interessados\models.py                                    139      9    94%   41, 138, 141, 144, 147, 162, 188, 191-192
+apps\interessados\urls.py                                        5      0   100%
+apps\interessados\utils.py                                      14      0   100%
+apps\interessados\views.py                                     202     20    90%   60-61, 88-92, 132-134, 197-199, 209-210, 233-235, 247-248, 269-271
+apps\interessados\views_exclusao.py                             29      3    90%   25-27
+apps\portal\__init__.py                                          1      0   100%
+apps\portal\admin.py                                             1      0   100%
+apps\portal\apps.py                                              5      0   100%
+apps\portal\forms.py                                            34      0   100%
+apps\portal\models.py                                            1      0   100%
+apps\portal\urls.py                                              4      0   100%
+apps\portal\views.py                                            99     11    89%   72-74, 174-189, 202-220
+apps\selecao\__init__.py                                         0      0   100%
+apps\selecao\admin.py                                          274     88    68%   70-71, 86, 109-114, 151, 222, 232, 239-240, 246, 253-254, 265-274, 305-306, 337-342, 444, 465-502, 506-543, 551, 557, 563, 569, 579, 585, 591, 597, 660, 666
+apps\selecao\apps.py                                             5      0   100%
+apps\selecao\management\__init__.py                              0      0   100%
+apps\selecao\management\commands\__init__.py                     0      0   100%
+apps\selecao\models.py                                          71      1    99%   189
+apps\selecao\reports.py                                        301     13    96%   54-55, 63-64, 95, 146, 163, 223, 346, 475, 513, 615, 653
+apps\selecao\services.py                                       129      9    93%   130, 264-273, 296-303
+apps\selecao\validators.py                                     107      9    92%   47, 151, 187-188, 198, 208-209, 216-217
+apps\selecao\views.py                                            0      0   100%
+------------------------------------------------------------------------------------------
+TOTAL                                                         3878    420    89%
+Coverage HTML written to dir htmlcov
+
+
+============================================ 846 passed in 497.46s (0:08:17) ===========================================
