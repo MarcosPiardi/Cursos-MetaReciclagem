@@ -27,6 +27,8 @@ urlpatterns = [
     path('processo-seletivo/pdf/', views.dashboard_processo_seletivo_pdf, name='processo_seletivo_pdf'),
 
     path('lgpd/', views.dashboard_lgpd, name='lgpd'),
+
+    path('geral/', views.dashboard_geral, name='geral'),
 ]
 
 

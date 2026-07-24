@@ -2,18 +2,20 @@
 """
 Admin do app ACADÊMICO
 Arquivo: apps/academico/admin.py
-Alteração: Adicionado seletor de cor visual e removido código hex da listagem
-Data: 11/12/2025
-
-Alteração: Registrados todos os models no admin.site customizado (melhor prática)
-Data: 20/01/2026
-
-Alteração: Adicionado filtro por evento e action para certificados
-Alteração: Sistema completo de certificados com 2 opções
-Alteração: Solução híbrida com filtros superiores + edição em massa
-Alteração: Adicionadas actions para relatório Excel e PDF
-Alteração: Título junto com logo, checkbox corrigido, labels removidos
-Data: 03/02/2026
+Finalidade: Configuração do admin para models de acadêmico
+Atualizações:
+    - 11/12/2025 - Adicionado seletor de cor visual e removido código hex da listagem
+    - 20/01/2026 - Registrados todos os models no admin.site customizado (melhor prática)
+    - 03/02/2026 - Adicionado filtro por evento e action para certificados
+                - Sistema completo de certificados com 2 opções
+                - Solução híbrida com filtros superiores + edição em massa
+                - Adicionadas actions para relatório Excel e PDF
+                - Título junto com logo, checkbox corrigido, labels removidos
+    - 10/06/2026 - Refatoração para usar services
+    - 13/07/2026 - CORRIGIDO: Removido import de admin_site customizado
+                - Usando admin.site padrão do Django
+                - Adicionado comentário explicativo
+                - Corrigido erro de importação                
 """
 
 from django import forms

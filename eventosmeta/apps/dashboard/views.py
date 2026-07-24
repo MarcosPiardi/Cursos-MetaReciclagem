@@ -47,7 +47,7 @@ def dashboard_eventos(request):
     """Dashboard de Eventos e Cursos"""
     context = DashboardEventosService.obter_contexto_completo()
     context.update({
-        'title': 'Dashboard - Eventos e Cursos',
+        'title': 'Dashboard - Eventos/Cursos e Turmas',
         'site_title': admin.site.site_title,
         'site_header': admin.site.site_header,
     })
@@ -101,6 +101,40 @@ def dashboard_lgpd(request):
     }
 
     return render(request, 'admin/dashboard/lgpd.html', context)
+
+@staff_member_required
+def dashboard_geral(request):
+    """Renderiza o dashboard administrativo com dados agregados de todos os services."""
+    contexto_interessados = DashboardInteressadosService.calcular_metricas_gerais()
+    contexto_eventos = DashboardEventosService.calcular_metricas_gerais()
+    contexto_academico = DashboardAcademicoService.obter_contexto_completo()
+    contexto_seletivo = DashboardProcessoSeletivoService.calcular_metricas_inscricoes()
+
+    # Junta todos os contextos e ajusta o nome da variavel para o template
+    contexto = {
+        **contexto_interessados,
+        **contexto_eventos,
+        **contexto_academico,
+        **contexto_seletivo,
+        # O template HTML usa 'eventos_abertos', mas o service retorna 'eventos_inscricoes_abertas'
+        'eventos_abertos': contexto_eventos.get('eventos_inscricoes_abertas', 0),
+    }
+
+    return render(request, 'admin/dashgeral.html', contexto)
+
+
+# @staff_member_required
+# def dashboard_geral(request):
+#     """Dashboard geral com informações resumidas"""
+#     context = DashboardGeralService.obter_contexto_completo()
+#     context.update({
+#         'title': 'Dashboard - Geral',
+#         'site_title': admin.site.site_title,
+#         'site_header': admin.site.site_header,
+#     })
+    
+#     return render(request, 'admin/dashboard/interessados.html', context)
+
 
 # ==========================================
 # VIEWS PDF

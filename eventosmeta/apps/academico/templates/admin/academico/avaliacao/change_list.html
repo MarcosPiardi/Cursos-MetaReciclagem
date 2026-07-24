@@ -1,6 +1,16 @@
 {% extends "admin/change_list.html" %}
 {% load static %}
 
+{% comment %}
+Arquivo: change_list.html    antigo index.html
+Caminho: apps/academico/templates/admin/academico/avaliacao/change_list.html
+Finalidade: customização da página de listagem de avaliações no admin, incluindo filtros híbridos e 
+            destaque visual para lançamento de notas e frequências
+Atualizações:
+  - 13/07/2026 - Adicionado cabeçalho com título e ícone, filtros híbridos (primários e secundários), destaque visual para linhas aprovadas/reprovadas, e botão de salvar destacado 
+  - 24/07/2026 - Ajustes de responsividade e melhorias na experiência do usuário com feedback visual nos dropdowns
+{% endcomment %}
+
 {% block content_title %}
     <h1>📊 Lançamento de Notas e Frequências</h1>
 {% endblock %}
@@ -10,7 +20,7 @@
     {# ÁREA DE FILTROS PRIMÁRIOS (Topo da página)  #}
     {# ============================================ #}
     
-    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    <div style="background: #faf8f8; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         <form method="get" action="" id="filtros-primarios-form">
             <div style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 15px;">
                 

@@ -9,25 +9,25 @@
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">
     
     <!-- Card: Total de Eventos -->
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #2196f3 0%, #2196f3 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <div style="font-size: 48px; font-weight: bold; margin-bottom: 10px;">{{ total_eventos }}</div>
         <div style="font-size: 18px; opacity: 0.9;">Total de Eventos</div>
     </div>
     
     <!-- Card: Eventos Abertos -->
-    <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #2196f3 0%, #2196f3 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <div style="font-size: 48px; font-weight: bold; margin-bottom: 10px;">{{ eventos_abertos }}</div>
         <div style="font-size: 18px; opacity: 0.9;">Eventos Abertos</div>
     </div>
     
     <!-- Card: Total de Interessados -->
-    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #2196f3 0%, #2196f3 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <div style="font-size: 48px; font-weight: bold; margin-bottom: 10px;">{{ total_interessados }}</div>
         <div style="font-size: 18px; opacity: 0.9;">Total de Interessados</div>
     </div>
     
     <!-- Card: Total de Inscrições -->
-    <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <div style="background: linear-gradient(135deg, #2196f3 0%, #2196f3 100%); color: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         <div style="font-size: 48px; font-weight: bold; margin-bottom: 10px;">{{ total_inscricoes }}</div>
         <div style="font-size: 18px; opacity: 0.9;">Total de Inscrições</div>
     </div>
@@ -40,7 +40,19 @@
         <li><a href="{% url 'admin:eventos_evento_changelist' %}">Gerenciar Eventos</a></li>
         <li><a href="{% url 'admin:interessados_interessado_changelist' %}">Gerenciar Interessados</a></li>
         <li><a href="{% url 'admin:selecao_inscricao_changelist' %}">Gerenciar Inscrições</a></li>
+        <li><a href="{% url 'admin:academico_matricula_changelist' %}">Gerenciar Acadêmico</a></li>
+        <li><a href="{% url 'admin:academico_avaliacao_changelist' %}">Gerenciar Avaliações</a></li>
+        <li><a href="{% url 'academico:gestao_matricula' %}">Gestão de Matrículas</a></li>
     </ul>
 </div>
 
+
 {% endblock %}
+
+
+
+{% comment %} 
+        <a href="{% url 'academico:gestao_matricula' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #205067 0%, #2d7a9b 100%); color: white; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
+            <h3 style="margin: 0 0 10px 0; font-size: 18px;">🎓 Gestão de Matrículas</h3>
+            <p style="margin: 0; opacity: 0.9; font-size: 14px;">Matricular, cancelar e alterar status de inscrições</p>
+        </a> {% endcomment %}
