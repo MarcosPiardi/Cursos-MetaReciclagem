@@ -27,6 +27,7 @@ from django.http import HttpResponse
 import csv
 
 from .models import Interessado, Sexo, Fototipo, PasswordResetToken
+from apps.admin_mixins import CustomTitleMixin
 
 
 # 
@@ -34,13 +35,15 @@ from .models import Interessado, Sexo, Fototipo, PasswordResetToken
 # 
 
 @admin.register(Sexo)
-class SexoAdmin(admin.ModelAdmin):
+class SexoAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = 'adm Sexos'
     list_display  = ['nome']
     search_fields = ['nome']
 
 
 @admin.register(Fototipo)
-class FototipoAdmin(admin.ModelAdmin):
+class FototipoAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = 'adm Fototipos'
     list_display  = ['nome', 'descricao']
     search_fields = ['nome', 'descricao']
 
@@ -50,7 +53,8 @@ class FototipoAdmin(admin.ModelAdmin):
 # 
 
 @admin.register(Interessado)
-class InteressadoAdmin(admin.ModelAdmin):
+class InteressadoAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = 'adm Interessados'
     """Administração de Interessados"""
 
     list_display = [
@@ -439,11 +443,12 @@ class InteressadoAdmin(admin.ModelAdmin):
 # 
 
 @admin.register(PasswordResetToken)
-class PasswordResetTokenAdmin(admin.ModelAdmin):
+class PasswordResetTokenAdmin(CustomTitleMixin, admin.ModelAdmin):
     """
     Administração dos tokens de recuperação de senha.
     Permite visualizar e limpar tokens expirados ou usados.
     """
+    custom_title = 'adm Tokens de Reset de Senha'
 
     list_display = [
         'get_interessado',

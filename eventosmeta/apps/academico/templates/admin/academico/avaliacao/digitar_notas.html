@@ -1,0 +1,206 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+<!--
+Arquivo: digitar_notas.html   antigo change_list.html    antigo index.html
+Caminho: apps/academico/templates/admin/academico/avaliacao/digitar_notas   .html
+Finalidade: customização da página de listagem de avaliações no admin, incluindo filtros híbridos e 
+            destaque visual para lançamento de notas, frequências e status de aprovação, além de botões de ação para salvar alterações
+Atualizações:
+  - 13/07/2026 - Adicionado cabeçalho com título e ícone, filtros híbridos (primários e secundários), destaque visual para linhas aprovadas/reprovadas, e botão de salvar destacado 
+  - 24/07/2026 - Ajustes de responsividade e melhorias na experiência do usuário com feedback visual nos dropdowns
+  - 27/07/2026 - Substituidos dropdowns por lista de links (evento + turma)
+-->
+
+{% block content_title %}
+    <h1>Lancamento de Notas e Frequencias</h1>
+{% endblock %}
+
+{% block search %}
+    <div style="background: #faf8f8; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+
+            {# ============================================ #}
+            {# LISTA DE LINKS (Evento + Turma)             #}
+            {# ============================================ #}
+            <div style="flex: 2; min-width: 300px;">
+                <div style="font-weight: 600; margin-bottom: 8px; color: #333; font-size: 14px;">
+                    Selecionar Turma:
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow-y: auto; padding-right: 8px;">
+                    {% for turma in turmas_com_avaliacao %}
+                        <a href="?matricula__turma__evento__id__exact={{ turma.evento.id }}&matricula__turma__id__exact={{ turma.id }}"
+                           style="display: block; padding: 8px 14px; border-radius: 5px; text-decoration: none; font-size: 14px; transition: all 0.2s;
+                           {% if turma.id|stringformat:"s" == turma_selecionada %}
+                                background: #2196f3; color: white; font-weight: 600;
+                           {% else %}
+                                background: white; color: #333; border: 1px solid #e0e0e0;
+                           {% endif %}"
+                           onmouseover="if(this.style.background !== 'rgb(33, 150, 243)'){this.style.background='#e3f2fd'; this.style.borderColor='#90caf9';}"
+                           onmouseout="if(this.style.background !== 'rgb(33, 150, 243)'){this.style.background='white'; this.style.borderColor='#e0e0e0';}">
+                            {{ turma.evento.nome }} - {{ turma.nome }}
+                        </a>
+                    {% empty %}
+                        <span style="color: #999; font-size: 13px; padding: 8px;">Nenhuma turma com avaliacao encontrada.</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# ============================================ #}
+            {# LATERAL: Limpar + Filtros Rapidos           #}
+            {# ============================================ #}
+            <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 15px;">
+
+                {# Botao Limpar Filtros #}
+                {% if evento_selecionado or turma_selecionada or cl.query %}
+                <div>
+                    <a href="?" class="button" style="display: inline-block; padding: 10px 18px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; transition: background-color 0.3s;">
+                        Limpar Filtros
+                    </a>
+                </div>
+                {% endif %}
+
+                {# Painel de Contexto #}
+                {% if evento_nome or turma_nome %}
+                <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 12px 16px; border-radius: 6px; border-left: 4px solid #2196f3;">
+                    {% if evento_nome %}
+                    <div style="margin-bottom: 4px;">
+                        <strong style="color: #1565c0; font-size: 13px;">Evento:</strong>
+                        <span style="font-size: 14px; color: #0d47a1; font-weight: 600;">{{ evento_nome }}</span>
+                    </div>
+                    {% endif %}
+                    {% if turma_nome %}
+                    <div>
+                        <strong style="color: #1565c0; font-size: 13px;">Turma:</strong>
+                        <span style="font-size: 14px; color: #0d47a1; font-weight: 600;">{{ turma_nome }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {# Filtros Rapidos #}
+                <div style="background: white; padding: 12px 16px; border-radius: 6px; border: 1px solid #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <form method="get" action="" id="filtros-secundarios-form" style="display: flex; flex-direction: column; gap: 10px;">
+                        {# Preservar filtros primarios #}
+                        {% if evento_selecionado %}
+                            <input type="hidden" name="matricula__turma__evento__id__exact" value="{{ evento_selecionado }}">
+                        {% endif %}
+                        {% if turma_selecionada %}
+                            <input type="hidden" name="matricula__turma__id__exact" value="{{ turma_selecionada }}">
+                        {% endif %}
+                        {% if cl.query %}
+                            <input type="hidden" name="q" value="{{ cl.query }}">
+                        {% endif %}
+                        <div style="font-weight: 600; color: #555; font-size: 13px;">
+                            Filtros Rapidos:
+                        </div>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                            <input type="checkbox" name="aprovado__exact" value="1"
+                                   {% if aprovado_selecionado == "1" %}checked{% endif %}
+                                   onchange="this.form.submit()"
+                                   style="width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #333;">Apenas Aprovados</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                            <input type="checkbox" name="certificado_emitido__exact" value="1"
+                                   {% if certificado_selecionado == "1" %}checked{% endif %}
+                                   onchange="this.form.submit()"
+                                   style="width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-size: 14px; color: #333;">Certificado Emitido</span>
+                        </label>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ block.super }}
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <style>
+        #changelist-filter {
+            display: none !important;
+        }
+        #changelist {
+            margin-right: 0 !important;
+        }
+        .field-nota_final input,
+        .field-frequencia input {
+            width: 80px !important;
+            padding: 6px 8px !important;
+            text-align: center !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            border: 2px solid #ddd !important;
+            border-radius: 4px !important;
+            transition: border-color 0.3s !important;
+        }
+        .field-nota_final input:focus,
+        .field-frequencia input:focus {
+            border-color: #2196f3 !important;
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1) !important;
+        }
+        .field-aprovado input[type="checkbox"] {
+            width: 22px !important;
+            height: 22px !important;
+            cursor: pointer !important;
+            accent-color: #4caf50 !important;
+        }
+        .column-get_numero_matricula { width: 110px; font-weight: 600; color: #1976d2; }
+        .column-get_aluno { min-width: 200px; font-weight: 500; }
+        .column-nota_final { width: 100px; text-align: center; background: #f5f5f5; }
+        .column-frequencia { width: 100px; text-align: center; background: #f5f5f5; }
+        .column-aprovado { width: 90px; text-align: center; }
+        .column-certificado_emitido { width: 120px; text-align: center; }
+        .column-acoes_certificado { width: 130px; text-align: center; }
+        #result_list tbody tr:has(.field-aprovado input:checked) {
+            background: linear-gradient(90deg, #e8f5e9 0%, #f1f8f4 100%) !important;
+        }
+        #result_list tbody tr:has(.field-aprovado input:checked):hover {
+            background: linear-gradient(90deg, #c8e6c9 0%, #dcedc8 100%) !important;
+        }
+        #result_list tbody tr:has(.field-aprovado input:not(:checked)) {
+            background: linear-gradient(90deg, #ffebee 0%, #fce4ec 100%) !important;
+        }
+        #result_list tbody tr:has(.field-aprovado input:not(:checked)):hover {
+            background: linear-gradient(90deg, #ffcdd2 0%, #f8bbd0 100%) !important;
+        }
+        .submit-row {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 18px 20px;
+            border-top: 3px solid #28a745;
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+        }
+        input[type="submit"][name="_save"] {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            color: white !important;
+            padding: 12px 32px !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            border: none !important;
+            border-radius: 6px !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3) !important;
+            transition: all 0.3s !important;
+        }
+        input[type="submit"][name="_save"]:hover {
+            background: linear-gradient(135deg, #218838 0%, #1e9e6e 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4) !important;
+        }
+        input[type="submit"][name="_save"]:active {
+            transform: translateY(0);
+        }
+        @media (max-width: 768px) {
+            #filtros-primarios-form > div {
+                flex-direction: column;
+            }
+        }
+    </style>
+{% endblock %}
+

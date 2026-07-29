@@ -28,6 +28,10 @@ from apps.accounts import views as accounts_views
 # REMOVIDO: from apps.accounts.admin import admin_site
 from apps.interessados import views as interessados_views
 
+admin.site.site_title = 'MetaReciclagem Admin'
+admin.site.site_header = 'MetaReciclagem - Administracao'
+admin.site.index_title = 'Painel de Controle'
+
 admin.site.index_template = 'admin/accounts/cards-admin.html'
 
 sistema_urlpatterns = [

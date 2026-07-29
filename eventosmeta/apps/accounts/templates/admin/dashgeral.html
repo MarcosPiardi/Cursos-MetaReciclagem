@@ -1,7 +1,30 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 
-{% block title %}Dashboard - {{ site_title }}{% endblock %}
+<!--
+Arquivo: dashgeral.html
+Caminho: apps/accounts/templates/admin/dashgeral.html
+Finalidade: Página de dashboard administrativo com visão geral das estatísticas e acesso rápido aos módulos
+Atualizações:
+  - 13/07/2026 - Adicionado cabeçalho com título e ícone, cards com estatísticas principais e links de acesso rápido
+  - 24/07/2026 - Ajustes de responsividade e melhorias na experiência do usuário com feedback visual nos dropdowns
+-->
+
+{% block title %}Dash Geral{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Início</a>
+    &rsaquo;
+    <span style="color: white; font-size: 13px; display: inline-flex; align-items: center; gap: 5px;">
+        <svg xmlns="http://www.w3.org/2001/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Dashboard com Links Rápidos
+    </span>
+</div>
+{% endblock %}
+
 
 {% block content %}
 <h1>📊 Dashboard Administrativo</h1>
@@ -36,23 +59,24 @@
 
 <div style="margin-top: 30px;">
     <h2>Acesso Rápido</h2>
-    <ul>
-        <li><a href="{% url 'admin:eventos_evento_changelist' %}">Gerenciar Eventos</a></li>
-        <li><a href="{% url 'admin:interessados_interessado_changelist' %}">Gerenciar Interessados</a></li>
-        <li><a href="{% url 'admin:selecao_inscricao_changelist' %}">Gerenciar Inscrições</a></li>
-        <li><a href="{% url 'admin:academico_matricula_changelist' %}">Gerenciar Acadêmico</a></li>
-        <li><a href="{% url 'admin:academico_avaliacao_changelist' %}">Gerenciar Avaliações</a></li>
-        <li><a href="{% url 'academico:gestao_matricula' %}">Gestão de Matrículas</a></li>
+    <ul style="list-style: none; padding: 0;">
+        <li style="margin-bottom: 10px;"><a href="{% url 'admin:eventos_evento_changelist' %}" style="font-size: 16px; text-decoration: underline;">Gerenciar Eventos</a></li>
+        <li style="margin-bottom: 10px;"><a href="{% url 'admin:interessados_interessado_changelist' %}" style="font-size: 16px; text-decoration: underline;">Gerenciar Interessados</a></li>
+        <li style="margin-bottom: 10px;"><a href="{% url 'admin:selecao_inscricao_changelist' %}" style="font-size: 16px; text-decoration: underline;">Gerenciar Inscrições</a></li>
+        <li style="margin-bottom: 10px;"><a href="{% url 'academico:gestao_matricula' %}" style="font-size: 16px; text-decoration: underline;">Gestão de Matrículas</a></li>
+        <li style="margin-bottom: 10px;"><a href="{% url 'admin:academico_matricula_changelist' %}" style="font-size: 16px; text-decoration: underline;">Gerenciar Acadêmico</a></li>
+        <li style="margin-bottom: 10px;"><a href="{% url 'admin:academico_avaliacao_changelist' %}" style="font-size: 16px; text-decoration: underline;">Gerenciar Avaliações</a></li>    
     </ul>
 </div>
+
+        {% comment %} <a href="{% url 'academico:gestao_matricula' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #205067 0%, #2d7a9b 100%); color: white; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
+            <h3 style="margin: 0 0 10px 0; font-size: 18px;">🎓 Gestão de Matrículas</h3>
+            <p style="margin: 0; opacity: 0.9; font-size: 14px;">Matricular, cancelar e alterar status de inscrições</p>
+        </a>  {% endcomment %}
 
 
 {% endblock %}
 
 
 
-{% comment %} 
-        <a href="{% url 'academico:gestao_matricula' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #205067 0%, #2d7a9b 100%); color: white; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
-            <h3 style="margin: 0 0 10px 0; font-size: 18px;">🎓 Gestão de Matrículas</h3>
-            <p style="margin: 0; opacity: 0.9; font-size: 14px;">Matricular, cancelar e alterar status de inscrições</p>
-        </a> {% endcomment %}
+

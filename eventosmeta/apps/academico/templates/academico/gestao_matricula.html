@@ -2,470 +2,430 @@
 Arquivo: gestao_matricula.html
 Caminho: apps/academico/templates/academico/gestao_matricula.html
 Descrição: Template para interface de gestão de matrícula
-Data: 12/01/2026
+Atualizações:
+ - 12/01/2026 - Criação do template com estrutura básica, cabeçalho e lista de turmas
+ - 27/07/2026 - Substituído dropdown por lista de links (evento + turma) e adicionada coluna Evento/Turma na grid
+ - 28/07/2026 - Listbox 2 colunas com scroll, tabela sempre visível sem filtro, toolbar sticky, botão Remover Matrículas, Limpar Filtros na barra de ações
 -->
-
 {% extends "admin/base_site.html" %}
-{% load static %}
-
-{% block title %}Gestão de Matrícula - {{ block.super }}{% endblock %}
-
+{% comment %} {% load static %} {% endcomment %}
+{% block title %}Gestão de Classificados/Matrículas{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Início</a>
+    &rsaquo;
+    <span style="color: white; font-size: 13px; display: inline-flex; align-items: center; gap: 5px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Gestão de Classificados/Matrículas
+    </span>
+</div>
+{% endblock %}
 {% block extrastyle %}
 <style>
     .container-matricula {
-        padding: 20px;
+        padding: 5px;
         max-width: 1400px;
         margin: 0 auto;
     }
-    
     .header-section {
         background: linear-gradient(135deg, #205067 0%, #2d7a9b 100%);
         color: white;
-        padding: 25px;
+        padding: 10px;
         border-radius: 8px;
-        margin-bottom: 30px;
+        margin-bottom: 10px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-    
     .header-section h1 {
-        margin: 0 0 10px 0;
-        font-size: 28px;
+        margin: 0 0 5px 0;
+        font-size: 24px;
     }
-    
     .header-section p {
         margin: 0;
         opacity: 0.9;
-        font-size: 14px;
+        font-size: 13px;
     }
-    
-    .selecao-evento {
+
+    /* Listbox 2 colunas com scroll */
+    .selecao-eventos {
         background: white;
-        padding: 20px;
+        padding: 15px 20px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 25px;
+        margin-bottom: 15px;
     }
-    
-    .selecao-evento label {
+    .selecao-eventos-label {
         display: block;
         font-weight: bold;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
+        color: #205067;
+        font-size: 15px;
+    }
+    .listbox-eventos {
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        max-height: 160px;
+        overflow-y: auto;
+        background: white;
+    }
+    .listbox-eventos-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0;
+    }
+    .listbox-eventos-grid a {
+        display: block;
+        padding: 8px 14px;
+        text-decoration: none;
+        font-size: 14px;
+        color: #333;
+        border-bottom: 1px solid #f0f0f0;
+        border-right: 1px solid #f0f0f0;
+        transition: all 0.15s;
+    }
+    .listbox-eventos-grid a:nth-child(2n) {
+        border-right: none;
+    }
+    .listbox-eventos-grid a:hover {
+        background: #e3f2fd;
+        color: #333;
+    }
+    .listbox-eventos-grid a.ativo {
+        background: #205067;
+        color: white;
+        font-weight: 600;
+    }
+    .listbox-eventos-grid .vazio {
+        color: #999;
+        font-size: 13px;
+        padding: 12px;
+        grid-column: 1 / -1;
+    }
+
+    /* Toolbar sticky */
+    .acoes-toolbar {
+        background: #f8f9fa;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #dee2e6;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .acoes-toolbar h3 {
+        margin: 0 0 12px 0;
         color: #205067;
         font-size: 16px;
     }
-    
-    .selecao-evento select {
-        width: 100%;
-        padding: 12px;
-        border: 2px solid #ddd;
-        border-radius: 6px;
-        font-size: 15px;
-        transition: border-color 0.3s;
-    }
-    
-    .selecao-evento select:focus {
-        border-color: #205067;
-        outline: none;
-    }
-    
-    .acoes-toolbar {
-        background: #f8f9fa;
-        padding: 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        border: 1px solid #dee2e6;
-    }
-    
-    .acoes-toolbar h3 {
-        margin: 0 0 15px 0;
-        color: #205067;
-        font-size: 18px;
-    }
-    
     .botoes-acao {
         display: flex;
-        gap: 10px;
+        gap: 8px;
         flex-wrap: wrap;
+        align-items: center;
     }
-    
     .btn-acao {
-        padding: 10px 20px;
+        padding: 8px 16px;
         border: none;
         border-radius: 6px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 500;
         transition: all 0.3s;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
+        text-decoration: none;
+        white-space: nowrap;
     }
-    
-    .btn-matricular {
-        background: #28a745;
-        color: white;
+    .btn-matricular { background: #28a745; color: white; }
+    .btn-matricular:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); }
+    .btn-cancelar { background: #dc3545; color: white; }
+    .btn-cancelar:hover { background: #c82333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3); }
+    .btn-expirar { background: #6c757d; color: white; }
+    .btn-expirar:hover { background: #5a6268; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3); }
+    .btn-desistente { background: #ffc107; color: #212529; }
+    .btn-desistente:hover { background: #e0a800; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3); }
+    .btn-nao-localizado { background: #17a2b8; color: white; }
+    .btn-nao-localizado:hover { background: #138496; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3); }
+    .btn-remover-matricula { background: #6f42c1; color: white; }
+    .btn-remover-matricula:hover { background: #5a32a3; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3); }
+    .btn-limpar { background: #6c757d; color: white !important; }
+    .btn-limpar:hover { background: #5a6268; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3); }
+    .separador-botoes {
+        width: 1px;
+        height: 28px;
+        background: #dee2e6;
+        margin: 0 4px;
     }
-    
-    .btn-matricular:hover {
-        background: #218838;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-    }
-    
-    .btn-cancelar {
-        background: #dc3545;
-        color: white;
-    }
-    
-    .btn-cancelar:hover {
-        background: #c82333;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
-    }
-    
-    .btn-expirar {
-        background: #6c757d;
-        color: white;
-    }
-    
-    .btn-expirar:hover {
-        background: #5a6268;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
-    }
-    
-    .btn-desistente {
-        background: #ffc107;
-        color: #212529;
-    }
-    
-    .btn-desistente:hover {
-        background: #e0a800;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
-    }
-    
-    .btn-nao-localizado {
-        background: #17a2b8;
-        color: white;
-    }
-    
-    .btn-nao-localizado:hover {
-        background: #138496;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
-    }
-    
+
+    /* Tabela */
     .tabela-classificacao {
         background: white;
         border-radius: 8px;
         overflow: hidden;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    
     .tabela-classificacao table {
         width: 100%;
         border-collapse: collapse;
     }
-    
     .tabela-classificacao thead {
         background: #205067;
         color: white;
     }
-    
     .tabela-classificacao th {
-        padding: 15px 10px;
+        padding: 12px 10px;
         text-align: left;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
     }
-    
     .tabela-classificacao th:first-child {
         width: 50px;
         text-align: center;
     }
-    
     .tabela-classificacao td {
-        padding: 12px 10px;
+        padding: 10px 10px;
         border-bottom: 1px solid #dee2e6;
-        font-size: 14px;
+        font-size: 13px;
     }
-    
     .tabela-classificacao tbody tr:hover {
         background: #f8f9fa;
     }
-    
     .tabela-classificacao tbody tr:nth-child(even) {
         background: #fafafa;
     }
-    
     .badge-status {
-        padding: 5px 12px;
+        padding: 4px 10px;
         border-radius: 20px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 600;
         display: inline-block;
     }
-    
-    .badge-aprovado {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .badge-espera {
-        background: #fff3cd;
-        color: #856404;
-    }
-    
-    .badge-confirmado {
-        background: #cce5ff;
-        color: #004085;
-    }
-    
+    .badge-aprovado { background: #d4edda; color: #155724; }
+    .badge-espera { background: #fff3cd; color: #856404; }
+    .badge-confirmado { background: #cce5ff; color: #004085; }
     .posicao-badge {
         display: inline-block;
         background: #205067;
         color: white;
-        padding: 5px 10px;
+        padding: 4px 8px;
         border-radius: 50%;
         font-weight: bold;
-        min-width: 35px;
+        min-width: 30px;
         text-align: center;
+        font-size: 12px;
     }
-    
     .info-vazia {
         text-align: center;
-        padding: 60px 20px;
+        padding: 40px 20px;
         color: #6c757d;
     }
-    
-    .info-vazia svg {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 20px;
-        opacity: 0.5;
-    }
-    
     .contador-selecao {
         background: #fff3cd;
         border: 1px solid #ffc107;
-        padding: 10px 15px;
+        padding: 8px 12px;
         border-radius: 6px;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         display: none;
     }
-    
-    .contador-selecao.ativo {
-        display: block;
-    }
-    
-    .contador-selecao strong {
-        color: #856404;
-    }
+    .contador-selecao.ativo { display: block; }
+    .contador-selecao strong { color: #856404; }
 </style>
 {% endblock %}
-
 {% block content %}
 <div class="container-matricula">
-    <!-- Cabeçalho -->
     <div class="header-section">
-        <h1>🎓 Gestão de Matrícula</h1>
-        <p>Selecione um evento e gerencie as matrículas dos alunos classificados</p>
+        <h1>Gestão de Classificados/Matrículas</h1>
+        <p>Selecione um evento ou visualize todas as classificações abaixo</p>
     </div>
-    
-    <!-- Seleção de Evento -->
-    <div class="selecao-evento">
-        <form method="GET" action="{% url 'academico:gestao_matricula' %}">
-            <label for="evento_id">📅 Selecione o Evento:</label>
-            <select name="evento_id" id="evento_id" onchange="this.form.submit()" required>
-                <option value="">-- Escolha um evento --</option>
+
+    <!-- Listbox 3 colunas 
+    Como o evento_id viaja do template para a view
+    No template (gestao_matricula.html)
+    O evento_id é passado pela URL em dois pontos:
+    1. Listbox de eventos -- cada link carrega o ID na query string:
+       <a href="{% url 'academico:gestao_matricula' %}?evento_id={{ evento.id }}">
+       Isso gera uma URL como: /academico/gestao-matricula/?evento_id=15
+    2. Botao "Limpar Filtros" -- link sem evento_id, volta para a URL limpa:
+        <a href="{% url 'academico:gestao_matricula' %}">
+        Gera: /academico/gestao-matricula/ (sem parametro)
+    Nao ha AJAX, nao ha form GET. É puramente navegacao por URL.
+    -->
+    <div class="selecao-eventos">
+        <label class="selecao-eventos-label">Filtrar por Evento:</label>
+        <div class="listbox-eventos">
+            <div class="listbox-eventos-grid">
                 {% for evento in eventos_disponiveis %}
-                    <option value="{{ evento.id }}" {% if evento_selecionado and evento.id == evento_selecionado.id %}selected{% endif %}>
-                        {{ evento.nome }} - {{ evento.data_inicio_evento|date:"d/m/Y" }}
-                    </option>
+                    <a href="{% url 'academico:gestao_matricula' %}?evento_id={{ evento.id }}"
+                       {% if evento_selecionado and evento.id == evento_selecionado.id %}class="ativo"{% endif %}>
+                        {{ evento.nome }}
+                    </a>
+                {% empty %}
+                    <span class="vazio">Nenhum evento disponível.</span>
                 {% endfor %}
-            </select>
-        </form>
+            </div>
+        </div>
     </div>
-    
-    {% if evento_selecionado %}
-        <!-- Ações -->
-        <div class="acoes-toolbar">
-            <h3>⚡ Ações Disponíveis</h3>
-            
-            <div id="contador-selecao" class="contador-selecao">
-                <strong id="total-selecionados">0</strong> inscrito(s) selecionado(s)
-            </div>
-            
-            <div class="botoes-acao">
-                <!-- Matricular -->
-                <button type="button" class="btn-acao btn-matricular" onclick="confirmarAcao('matricular')">
-                    ✅ Matricular Selecionados
-                </button>
-                
-                <!-- Cancelar -->
-                <button type="button" class="btn-acao btn-cancelar" onclick="confirmarAcao('Cancelado')">
-                    ❌ Marcar como Cancelado
-                </button>
-                
-                <!-- Expirado -->
-                <button type="button" class="btn-acao btn-expirar" onclick="confirmarAcao('Expirado')">
-                    ⏰ Marcar como Expirado
-                </button>
-                
-                <!-- Desistente -->
-                <button type="button" class="btn-acao btn-desistente" onclick="confirmarAcao('Desistente')">
-                    🚫 Marcar como Desistente
-                </button>
-                
-                <!-- Não Localizado -->
-                <button type="button" class="btn-acao btn-nao-localizado" onclick="confirmarAcao('Não Localizado')">
-                    🔍 Marcar como Não Localizado
-                </button>
-            </div>
+
+    <!-- Ações (sempre visíveis quando há classificações) -->
+    <!-- Acoes (sticky) + Botao Limpar Filtros movido para ca -->
+    {% if classificacoes %}
+    <div class="acoes-toolbar">
+        <h3>Ações Disponíveis</h3>
+        <div id="contador-selecao" class="contador-selecao">
+            <strong id="total-selecionados">0</strong> inscrito(s) selecionado(s)
         </div>
-        
-        <!-- Tabela de Classificação -->
-        {% if classificacoes %}
-        <div class="tabela-classificacao">
-            <table>
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="selecionar-todos" onchange="selecionarTodos(this)"></th>
-                        <th>Posição</th>
-                        <th>Nome</th>
-                        <th>CPF</th>
-                        <th>Situação</th>
-                        <th>Status Inscrição</th>
-                        <th>Pontuação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for c in classificacoes %}
-                    <tr>
-                        <td style="text-align: center;">
-                            <input type="checkbox" class="checkbox-inscricao" name="inscricao" value="{{ c.inscricao.id }}">
-                        </td>
-                        <td style="text-align: center;">
-                            <span class="posicao-badge">{{ c.posicao }}</span>
-                        </td>
-                        <td>{{ c.inscricao.interessado.nome }}</td>
-                        <td>{{ c.inscricao.interessado.cpf }}</td>
-                        <td>
-                            {% if c.classificado %}
-                                <span class="badge-status badge-aprovado">✅ Aprovado</span>
-                            {% elif c.lista_espera %}
-                                <span class="badge-status badge-espera">⏳ Lista de Espera</span>
-                            {% else %}
-                                <span class="badge-status">—</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <span class="badge-status badge-confirmado">{{ c.inscricao.status.nome }}</span>
-                        </td>
-                        <td style="text-align: center; font-weight: bold;">{{ c.pontuacao_total }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="botoes-acao">
+            <button type="button" class="btn-acao btn-matricular" onclick="confirmarAcao('matricular')">
+                Matricular Selecionados
+            </button>
+            <button type="button" class="btn-acao btn-cancelar" onclick="confirmarAcao('Cancelado')">
+                Marcar como Cancelado
+            </button>
+            <button type="button" class="btn-acao btn-expirar" onclick="confirmarAcao('Expirado')">
+                Marcar como Expirado
+            </button>
+            <button type="button" class="btn-acao btn-desistente" onclick="confirmarAcao('Desistente')">
+                Marcar como Desistente
+            </button>
+            <button type="button" class="btn-acao btn-nao-localizado" onclick="confirmarAcao('Nao Localizado')">
+                Marcar como Nao Localizado
+            </button>
+            <button type="button" class="btn-acao btn-remover-matricula" onclick="confirmarAcao('remover_matricula')">
+                Remover Matrículas
+            </button>
+
+            <!-- ALTERACAO 2: Limpar Filtros movido para a barra de acoes -->
+            {% if evento_selecionado %}
+            <div class="separador-botoes"></div>
+            <a href="{% url 'academico:gestao_matricula' %}" class="btn-acao btn-limpar">
+                Limpar Filtros
+            </a>
+            {% endif %}
         </div>
-        {% else %}
-        <div class="info-vazia">
-            <p><strong>Nenhuma classificação encontrada para este evento</strong></p>
-            <p>Execute a classificação primeiro para exibir os alunos.</p>
-        </div>
+    </div>
+
+
+    <!-- Tabela -->
+    <div class="tabela-classificacao">
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selecionar-todos" onchange="selecionarTodos(this)"></th>
+                    <th>Posição</th>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Evento</th>
+                    <th>Situação</th>
+                    <th>Status Inscrição</th>
+                    <th>Pontuação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in classificacoes %}
+                <tr>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="checkbox-inscricao" name="inscricao" value="{{ c.inscricao.id }}">
+                    </td>
+                    <td style="text-align: center;">
+                        <span class="posicao-badge">{{ c.posicao }}</span>
+                    </td>
+                    <td>{{ c.inscricao.interessado.nome }}</td>
+                    <td>{{ c.inscricao.interessado.cpf }}</td>
+                    <td>{{ c.inscricao.evento.nome }}</td>
+                    <td>
+                        {% if c.classificado %}
+                            <span class="badge-status badge-aprovado">Aprovado</span>
+                        {% elif c.lista_espera %}
+                            <span class="badge-status badge-espera">Lista de Espera</span>
+                        {% else %}
+                            <span class="badge-status">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge-status badge-confirmado">{{ c.inscricao.status.nome }}</span>
+                    </td>
+                    <td style="text-align: center; font-weight: bold;">{{ c.pontuacao_total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Formulários ocultos -->
+    <form id="form-matricula" method="POST" action="{% url 'academico:processar_matricula' %}" style="display: none;">
+        {% csrf_token %}
+        {% if evento_selecionado %}
+        <input type="hidden" name="evento_id" value="{{ evento_selecionado.id }}">
         {% endif %}
-        
-        <!-- Formulário oculto para enviar ações -->
-        <form id="form-matricula" method="POST" action="{% url 'academico:processar_matricula' %}" style="display: none;">
-            {% csrf_token %}
-            <input type="hidden" name="evento_id" value="{{ evento_selecionado.id }}">
-            <div id="inscricoes-container"></div>
-        </form>
-        
-        <form id="form-status" method="POST" action="{% url 'academico:alterar_status_inscricao' %}" style="display: none;">
-            {% csrf_token %}
-            <input type="hidden" name="evento_id" value="{{ evento_selecionado.id }}">
-            <input type="hidden" name="novo_status" id="novo-status-input">
-            <div id="inscricoes-status-container"></div>
-        </form>
+        <div id="inscricoes-container"></div>
+    </form>
+    <form id="form-status" method="POST" action="{% url 'academico:alterar_status_inscricao' %}" style="display: none;">
+        {% csrf_token %}
+        {% if evento_selecionado %}
+        <input type="hidden" name="evento_id" value="{{ evento_selecionado.id }}">
+        {% endif %}
+        <input type="hidden" name="novo_status" id="novo-status-input">
+        <div id="inscricoes-status-container"></div>
+    </form>
     {% else %}
-        <div class="info-vazia">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <p><strong>Selecione um evento para começar</strong></p>
-            <p>Escolha um evento na lista acima para visualizar os alunos classificados.</p>
-        </div>
+    <div class="info-vazia">
+        <p><strong>Nenhuma classificação encontrada</strong></p>
+        <p>Execute a classificação primeiro para exibir os alunos.</p>
+    </div>
     {% endif %}
 </div>
-
 <script>
-    // Contador de seleção
     function atualizarContador() {
         const checkboxes = document.querySelectorAll('.checkbox-inscricao:checked');
         const total = checkboxes.length;
         const contador = document.getElementById('contador-selecao');
         const totalSpan = document.getElementById('total-selecionados');
-        
         totalSpan.textContent = total;
-        
         if (total > 0) {
             contador.classList.add('ativo');
         } else {
             contador.classList.remove('ativo');
         }
     }
-    
-    // Selecionar todos
     function selecionarTodos(checkbox) {
         const checkboxes = document.querySelectorAll('.checkbox-inscricao');
-        checkboxes.forEach(cb => {
-            cb.checked = checkbox.checked;
-        });
+        checkboxes.forEach(cb => { cb.checked = checkbox.checked; });
         atualizarContador();
     }
-    
-    // Atualizar contador ao clicar em checkbox
     document.addEventListener('DOMContentLoaded', function() {
         const checkboxes = document.querySelectorAll('.checkbox-inscricao');
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', atualizarContador);
-        });
+        checkboxes.forEach(cb => { cb.addEventListener('change', atualizarContador); });
     });
-    
-    // Confirmar ação
     function confirmarAcao(tipo) {
         const checkboxes = document.querySelectorAll('.checkbox-inscricao:checked');
-        
         if (checkboxes.length === 0) {
-            alert('⚠️ Selecione pelo menos uma inscrição!');
+            alert('Selecione pelo menos uma inscrição!');
             return;
         }
-        
         let mensagem = '';
         let form = null;
         let container = null;
-        
         if (tipo === 'matricular') {
             mensagem = `Confirma a matrícula de ${checkboxes.length} aluno(s)?`;
             form = document.getElementById('form-matricula');
             container = document.getElementById('inscricoes-container');
+        } else if (tipo === 'remover_matricula') {
+            mensagem = `Confirma a REMOÇÃO de matrícula de ${checkboxes.length} aluno(s)? Esta ação não pode ser desfeita.`;
+            form = document.getElementById('form-status');
+            container = document.getElementById('inscricoes-status-container');
+            document.getElementById('novo-status-input').value = tipo;
         } else {
             mensagem = `Confirma alterar status de ${checkboxes.length} inscrição(ões) para "${tipo}"?`;
             form = document.getElementById('form-status');
             container = document.getElementById('inscricoes-status-container');
             document.getElementById('novo-status-input').value = tipo;
         }
-        
-        if (!confirm(mensagem)) {
-            return;
-        }
-        
-        // Limpar container
+        if (!confirm(mensagem)) { return; }
         container.innerHTML = '';
-        
-        // Adicionar inputs hidden
         checkboxes.forEach(cb => {
             const input = document.createElement('input');
             input.type = 'hidden';
@@ -473,8 +433,6 @@ Data: 12/01/2026
             input.value = cb.value;
             container.appendChild(input);
         });
-        
-        // Enviar formulário
         form.submit();
     }
 </script>

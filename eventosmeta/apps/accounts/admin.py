@@ -27,6 +27,7 @@ from django.utils.html import format_html
 from django.utils import timezone
 
 from .models import Usuario
+from apps.admin_mixins import CustomTitleMixin
 
 
 # ==========================================
@@ -166,8 +167,5 @@ class UsuarioAdmin(BaseUserAdmin):
             level=messages.SUCCESS,
         )
 
-# REMOVIDO: admin_site.register(Usuario, UsuarioAdmin)
-# NOVO: usar admin.site padrão do Django
 admin.site.register(Usuario, UsuarioAdmin)
-# REMOVIDO: admin.site.register(Group, GroupAdmin)
 

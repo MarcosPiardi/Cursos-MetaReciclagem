@@ -32,6 +32,7 @@ from apps.eventos.models import Turma, Evento
 from apps.academico.models import Matricula, StatusMatricula
 from .models import StatusInscricao, Inscricao, Classificacao, InscricaoCriterioAtendido
 from .reports import RelatorioAprovadosService
+from apps.admin_mixins import CustomTitleMixin
 
 # 
 # FORMS
@@ -90,7 +91,8 @@ class InscricaoCriterioAtendidoInline(admin.TabularInline):
 # 
 
 @admin.register(StatusInscricao)
-class StatusInscricaoAdmin(admin.ModelAdmin):
+class StatusInscricaoAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = "adm Status de Inscrição"
     """Admin para gerenciar Status de Inscrição com seletor visual de cor"""
     form = StatusInscricaoForm
     list_display = ['nome', 'cor_display', 'ordem']
@@ -105,14 +107,14 @@ class StatusInscricaoAdmin(admin.ModelAdmin):
     )
 
     def cor_display(self, obj):
-        """Exibe quadrado colorido representando a cor do status"""
+        """Exibe quadrado colorido"""
         if obj.cor:
             return format_html(
-                '',
+                '<span style="display: inline-block; width: 30px; height: 30px; '
+                'background-color: {}; border: 2px solid #ccc; border-radius: 4px;"></span>',
                 obj.cor
             )
         return '—'
-
     cor_display.short_description = 'Cor'
     cor_display.admin_order_field = 'cor'
 
@@ -121,7 +123,8 @@ class StatusInscricaoAdmin(admin.ModelAdmin):
 # 
 
 @admin.register(Inscricao)
-class InscricaoAdmin(admin.ModelAdmin):
+class InscricaoAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = "adm Inscrições nos Cursos"
     """Admin para gerenciar Inscrições de interessados em eventos"""
     list_display = ['get_interessado', 'evento', 'status', 'data_inscricao']
     list_filter = ['status', 'evento', 'data_inscricao']
@@ -158,8 +161,9 @@ class InscricaoAdmin(admin.ModelAdmin):
 # 
 
 @admin.register(Classificacao)
-class ClassificacaoAdmin(admin.ModelAdmin):
+class ClassificacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
     """Admin para gerenciar Classificações com matrícula em lote + relatórios"""
+    custom_title = "adm Classificações"
 
     list_display = [
         'get_posicao',
@@ -324,15 +328,7 @@ class ClassificacaoAdmin(admin.ModelAdmin):
             if form.is_valid():
                 turma = form.cleaned_data['turma']
 
-                # Validação: A turma selecionada pertence ao evento das classificações?
-                # if turma.evento != evento:
-                #     self.message_user(
-                #         request, 
-                #         f'❌ A turma "{turma.nome}" não pertence ao evento "{evento.nome}".', 
-                #         level=messages.ERROR
-                #     )
-                #     return
-                
+                # Validação: A turma selecionada pertence ao evento correto               
                 if turma.evento != evento:
                     self.message_user(
                         request,
@@ -619,8 +615,9 @@ class ClassificacaoAdmin(admin.ModelAdmin):
 # 
 
 @admin.register(InscricaoCriterioAtendido)
-class InscricaoCriterioAtendidoAdmin(admin.ModelAdmin):
+class InscricaoCriterioAtendidoAdmin(CustomTitleMixin, admin.ModelAdmin):
     """Admin para gerenciar Critérios Atendidos por Inscrições (Somente leitura)"""
+    custom_title = "adm Critérios Atendidos"
 
     list_display = [
         'get_interessado',

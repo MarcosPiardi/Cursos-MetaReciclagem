@@ -32,8 +32,8 @@ from .certificado import GeradorCertificado
 def gestao_matricula_view(request):
     """
     Exibe a tela de gestão de matrícula.
-    GET sem evento_id: mostra apenas o seletor de eventos.
-    GET com evento_id: mostra o evento selecionado e a lista de classificações.
+    GET sem evento_id: mostra TODOS os classificados.
+    GET com evento_id: filtra pelo evento selecionado.
     """
     evento_id = request.GET.get('evento_id')
 
@@ -56,6 +56,13 @@ def gestao_matricula_view(request):
             ).order_by('posicao')
         except Evento.DoesNotExist:
             messages.error(request, 'Evento não encontrado.')
+    else:
+        # Sem filtro: carrega TODOS os classificados
+        classificacoes = Classificacao.objects.select_related(
+            'inscricao__interessado',
+            'inscricao__status',
+            'inscricao__evento',
+        ).order_by('inscricao__evento__nome', 'posicao')
 
     contexto = {
         'eventos_disponiveis': eventos_disponiveis,

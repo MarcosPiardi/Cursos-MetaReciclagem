@@ -28,6 +28,7 @@ from apps.interessados.admin import (
 )
 from apps.interessados.models import Interessado, Sexo, Fototipo, PasswordResetToken
 from .factories import InteressadoFactory, SexoFactory, FototipoFactory
+from apps.admin_mixins import CustomTitleMixin
 
 pytestmark = pytest.mark.django_db
 

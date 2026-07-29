@@ -26,6 +26,7 @@ import csv
 # ==========================================
 
 from .models import Status, Criterio, Evento, EventoCriterio, Turma, Horario
+from apps.admin_mixins import CustomTitleMixin
 
 
 class StatusForm(forms.ModelForm):
@@ -42,7 +43,8 @@ class StatusForm(forms.ModelForm):
 
 
 @admin.register(Status)
-class StatusAdmin(admin.ModelAdmin):
+class StatusAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = 'adm Status Eventos'
     form = StatusForm
     list_display = ['nome', 'cor_visual', 'ordem']
     list_editable = ['ordem']
@@ -69,7 +71,8 @@ class StatusAdmin(admin.ModelAdmin):
 
 
 @admin.register(Criterio)
-class CriterioAdmin(admin.ModelAdmin):
+class CriterioAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = 'adm Critérios'
     list_display = ['nome', 'tipo_criterio', 'categoria', 'pontos', 'ativo']
     list_filter = ['tipo_criterio', 'categoria', 'ativo']
     list_editable = ['ativo']
@@ -133,7 +136,8 @@ class TurmaInline(admin.TabularInline):
 
 
 @admin.register(Evento)
-class EventoAdmin(admin.ModelAdmin):
+class EventoAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = 'adm Cursos e Eventos'
     list_display = [
         'nome',
         'status_colorido',
@@ -521,14 +525,16 @@ class EventoAdmin(admin.ModelAdmin):
 
 
 @admin.register(Turma)
-class TurmaAdmin(admin.ModelAdmin):
+class TurmaAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = 'adm Turmas' 
     list_display = ['nome', 'evento', 'turno', 'capacidade', 'data_inicio', 'data_fim']
     list_filter = ['evento', 'turno']
     search_fields = ['nome', 'evento__nome']
 
 
 @admin.register(Horario)
-class HorarioAdmin(admin.ModelAdmin):
+class HorarioAdmin(CustomTitleMixin, admin.ModelAdmin):
+    custom_title = 'adm Horários'
     list_display = ['turma', 'dia_semana_display', 'hora_inicio', 'hora_fim']
     list_filter = ['turma', 'dia_semana']
 
