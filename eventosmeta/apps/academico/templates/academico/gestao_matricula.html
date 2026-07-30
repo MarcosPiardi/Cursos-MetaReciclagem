@@ -6,9 +6,12 @@ Atualizações:
  - 12/01/2026 - Criação do template com estrutura básica, cabeçalho e lista de turmas
  - 27/07/2026 - Substituído dropdown por lista de links (evento + turma) e adicionada coluna Evento/Turma na grid
  - 28/07/2026 - Listbox 2 colunas com scroll, tabela sempre visível sem filtro, toolbar sticky, botão Remover Matrículas, Limpar Filtros na barra de ações
+ - 29/07/2026 - Adicionadas colunas Nº Matrícula e Status Matrícula (LEFT JOIN via prefetch_related)
+ - 29/07/2026 - Status Inscrição com cor dinâmica, reordenação de colunas, fonte maior, scroll horizontal corrigido
+ - 30/07/2026 - Corrigidos valores dos botões para bater com a view, adicionado botão Pendente,
+                cores dos botões dinâmicas via status_cores, layout uniformizado, cabeçalho fixo com scroll
 -->
 {% extends "admin/base_site.html" %}
-{% comment %} {% load static %} {% endcomment %}
 {% block title %}Gestão de Classificados/Matrículas{% endblock %}
 {% block breadcrumbs %}
 <div class="breadcrumbs">
@@ -46,8 +49,7 @@ Atualizações:
         opacity: 0.9;
         font-size: 13px;
     }
-
-    /* Listbox 2 colunas com scroll */
+    /* Listbox de eventos */
     .selecao-eventos {
         background: white;
         padding: 15px 20px;
@@ -84,7 +86,7 @@ Atualizações:
         border-right: 1px solid #f0f0f0;
         transition: all 0.15s;
     }
-    .listbox-eventos-grid a:nth-child(2n) {
+    .listbox-eventos-grid a:nth-child(3n) {
         border-right: none;
     }
     .listbox-eventos-grid a:hover {
@@ -102,7 +104,6 @@ Atualizações:
         padding: 12px;
         grid-column: 1 / -1;
     }
-
     /* Toolbar sticky */
     .acoes-toolbar {
         background: #f8f9fa;
@@ -120,6 +121,7 @@ Atualizações:
         color: #205067;
         font-size: 16px;
     }
+    /* Botoes uniformizados */
     .botoes-acao {
         display: flex;
         gap: 8px;
@@ -139,57 +141,58 @@ Atualizações:
         gap: 6px;
         text-decoration: none;
         white-space: nowrap;
+        min-width: 180px;
+        justify-content: center;
+        color: white;
     }
-    .btn-matricular { background: #28a745; color: white; }
-    .btn-matricular:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); }
-    .btn-cancelar { background: #dc3545; color: white; }
-    .btn-cancelar:hover { background: #c82333; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3); }
-    .btn-expirar { background: #6c757d; color: white; }
-    .btn-expirar:hover { background: #5a6268; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3); }
-    .btn-desistente { background: #ffc107; color: #212529; }
-    .btn-desistente:hover { background: #e0a800; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3); }
-    .btn-nao-localizado { background: #17a2b8; color: white; }
-    .btn-nao-localizado:hover { background: #138496; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3); }
-    .btn-remover-matricula { background: #6f42c1; color: white; }
-    .btn-remover-matricula:hover { background: #5a32a3; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(111, 66, 193, 0.3); }
+    .btn-acao:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        filter: brightness(0.85);
+    }
+    .btn-matricular { background: #28a745; }
+    .btn-remover-matricula { background: #4f42c1; }
     .btn-limpar { background: #6c757d; color: white !important; }
-    .btn-limpar:hover { background: #5a6268; color: white !important; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3); }
+    .btn-limpar:hover { color: white !important; }
     .separador-botoes {
         width: 1px;
         height: 28px;
         background: #dee2e6;
         margin: 0 4px;
     }
-
-    /* Tabela */
+    /* Tabela com cabecalho fixo */
     .tabela-classificacao {
         background: white;
         border-radius: 8px;
-        overflow: hidden;
+        overflow: auto;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        max-height: 60vh;
     }
     .tabela-classificacao table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 900px;
     }
-    .tabela-classificacao thead {
-        background: #205067;
-        color: white;
-    }
-    .tabela-classificacao th {
-        padding: 12px 10px;
+    .tabela-classificacao thead th {
+        padding: 6px 10px;
         text-align: left;
         font-weight: 600;
-        font-size: 13px;
+        font-size: 12px;
+        color: black;
+        background: #c7d3d8;
+        vertical-align: middle;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
-    .tabela-classificacao th:first-child {
+    .tabela-classificacao thead th:first-child {
         width: 50px;
         text-align: center;
     }
     .tabela-classificacao td {
         padding: 10px 10px;
         border-bottom: 1px solid #dee2e6;
-        font-size: 13px;
+        font-size: 14px;
     }
     .tabela-classificacao tbody tr:hover {
         background: #f8f9fa;
@@ -200,23 +203,22 @@ Atualizações:
     .badge-status {
         padding: 4px 10px;
         border-radius: 20px;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
         display: inline-block;
     }
     .badge-aprovado { background: #d4edda; color: #155724; }
     .badge-espera { background: #fff3cd; color: #856404; }
-    .badge-confirmado { background: #cce5ff; color: #004085; }
     .posicao-badge {
         display: inline-block;
         background: #205067;
         color: white;
         padding: 4px 8px;
-        border-radius: 50%;
+        border-radius: 15%;
         font-weight: bold;
         min-width: 30px;
         text-align: center;
-        font-size: 12px;
+        font-size: 13px;
     }
     .info-vazia {
         text-align: center;
@@ -241,19 +243,7 @@ Atualizações:
         <h1>Gestão de Classificados/Matrículas</h1>
         <p>Selecione um evento ou visualize todas as classificações abaixo</p>
     </div>
-
-    <!-- Listbox 3 colunas 
-    Como o evento_id viaja do template para a view
-    No template (gestao_matricula.html)
-    O evento_id é passado pela URL em dois pontos:
-    1. Listbox de eventos -- cada link carrega o ID na query string:
-       <a href="{% url 'academico:gestao_matricula' %}?evento_id={{ evento.id }}">
-       Isso gera uma URL como: /academico/gestao-matricula/?evento_id=15
-    2. Botao "Limpar Filtros" -- link sem evento_id, volta para a URL limpa:
-        <a href="{% url 'academico:gestao_matricula' %}">
-        Gera: /academico/gestao-matricula/ (sem parametro)
-    Nao ha AJAX, nao ha form GET. É puramente navegacao por URL.
-    -->
+    <!-- Listbox de eventos -->
     <div class="selecao-eventos">
         <label class="selecao-eventos-label">Filtrar por Evento:</label>
         <div class="listbox-eventos">
@@ -269,9 +259,7 @@ Atualizações:
             </div>
         </div>
     </div>
-
-    <!-- Ações (sempre visíveis quando há classificações) -->
-    <!-- Acoes (sticky) + Botao Limpar Filtros movido para ca -->
+    <!-- Ações + Tabela (só aparece se houver classificações) -->
     {% if classificacoes %}
     <div class="acoes-toolbar">
         <h3>Ações Disponíveis</h3>
@@ -282,23 +270,24 @@ Atualizações:
             <button type="button" class="btn-acao btn-matricular" onclick="confirmarAcao('matricular')">
                 Matricular Selecionados
             </button>
-            <button type="button" class="btn-acao btn-cancelar" onclick="confirmarAcao('Cancelado')">
+            <button type="button" class="btn-acao" style="background: {{ status_cores.1 }};" onclick="confirmarAcao('pendente')">
+                Marcar como Pendente
+            </button>
+            <button type="button" class="btn-acao" style="background: {{ status_cores.5 }};" onclick="confirmarAcao('cancelada')">
                 Marcar como Cancelado
             </button>
-            <button type="button" class="btn-acao btn-expirar" onclick="confirmarAcao('Expirado')">
+            <button type="button" class="btn-acao" style="background: {{ status_cores.6 }};" onclick="confirmarAcao('expirada')">
                 Marcar como Expirado
             </button>
-            <button type="button" class="btn-acao btn-desistente" onclick="confirmarAcao('Desistente')">
+            <button type="button" class="btn-acao" style="background: {{ status_cores.7 }};" onclick="confirmarAcao('desistente')">
                 Marcar como Desistente
             </button>
-            <button type="button" class="btn-acao btn-nao-localizado" onclick="confirmarAcao('Nao Localizado')">
-                Marcar como Nao Localizado
+            <button type="button" class="btn-acao" style="background: {{ status_cores.8 }};" onclick="confirmarAcao('nao_localizado')">
+                Marcar como Não Localizado
             </button>
             <button type="button" class="btn-acao btn-remover-matricula" onclick="confirmarAcao('remover_matricula')">
                 Remover Matrículas
             </button>
-
-            <!-- ALTERACAO 2: Limpar Filtros movido para a barra de acoes -->
             {% if evento_selecionado %}
             <div class="separador-botoes"></div>
             <a href="{% url 'academico:gestao_matricula' %}" class="btn-acao btn-limpar">
@@ -307,54 +296,71 @@ Atualizações:
             {% endif %}
         </div>
     </div>
-
-
     <!-- Tabela -->
     <div class="tabela-classificacao">
         <table>
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="selecionar-todos" onchange="selecionarTodos(this)"></th>
-                    <th>Posição</th>
-                    <th>Nome</th>
-                    <th>CPF</th>
-                    <th>Evento</th>
-                    <th>Situação</th>
-                    <th>Status Inscrição</th>
-                    <th>Pontuação</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for c in classificacoes %}
-                <tr>
-                    <td style="text-align: center;">
-                        <input type="checkbox" class="checkbox-inscricao" name="inscricao" value="{{ c.inscricao.id }}">
-                    </td>
-                    <td style="text-align: center;">
-                        <span class="posicao-badge">{{ c.posicao }}</span>
-                    </td>
-                    <td>{{ c.inscricao.interessado.nome }}</td>
-                    <td>{{ c.inscricao.interessado.cpf }}</td>
-                    <td>{{ c.inscricao.evento.nome }}</td>
-                    <td>
-                        {% if c.classificado %}
-                            <span class="badge-status badge-aprovado">Aprovado</span>
-                        {% elif c.lista_espera %}
-                            <span class="badge-status badge-espera">Lista de Espera</span>
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selecionar-todos" onchange="selecionarTodos(this)"></th>
+                <th>Posição</th>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Evento</th>
+                <th>Classificação</th>
+                <th>Pontuação</th>
+                <th>Status<br>Inscrição</th>
+                <th>Nº<br>Matrícula</th>
+                <th>Status<br>Matrícula</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in classificacoes %}
+            <tr>
+                <td style="text-align: center;">
+                    <input type="checkbox" class="checkbox-inscricao" name="inscricao" value="{{ c.inscricao.id }}">
+                </td>
+                <td style="text-align: center;">
+                    <span class="posicao-badge">{{ c.posicao }}</span>
+                </td>
+                <td>{{ c.inscricao.interessado.nome }}</td>
+                <td>{{ c.inscricao.interessado.cpf|slice:":3" }}.{{ c.inscricao.interessado.cpf|slice:"3:6" }}.{{ c.inscricao.interessado.cpf|slice:"6:9" }}-{{ c.inscricao.interessado.cpf|slice:"9:" }}</td>
+                <td>{{ c.inscricao.evento.nome }}</td>
+                <td>
+                    {% if c.classificado %}
+                        <span class="badge-status badge-aprovado">Aprovado</span>
+                    {% elif c.lista_espera %}
+                        <span class="badge-status badge-espera">Lista de Espera</span>
+                    {% else %}
+                        <span class="badge-status">-</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: center; font-weight: bold;">{{ c.pontuacao_total }}</td>
+                <td>
+                    <span class="badge-status" style="background: {{ c.inscricao.status.cor }}; color: white;">{{ c.inscricao.status.nome }}</span>
+                </td>
+                <td style="text-align: center;">
+                    {% with matricula=c.inscricao.matriculas.first %}
+                        {% if matricula %}
+                            {{ matricula.numero_matricula|slice:":4" }}-{{ matricula.numero_matricula|slice:"4:" }}
                         {% else %}
-                            <span class="badge-status">-</span>
+                            ---
                         {% endif %}
-                    </td>
-                    <td>
-                        <span class="badge-status badge-confirmado">{{ c.inscricao.status.nome }}</span>
-                    </td>
-                    <td style="text-align: center; font-weight: bold;">{{ c.pontuacao_total }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
+                    {% endwith %}
+                </td>
+                <td>
+                    {% with matricula=c.inscricao.matriculas.first %}
+                        {% if matricula %}
+                            <span class="badge-status" style="background: {{ matricula.status.cor }}; color: white;">{{ matricula.status.nome }}</span>
+                        {% else %}
+                            ---
+                        {% endif %}
+                    {% endwith %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
         </table>
     </div>
-
     <!-- Formulários ocultos -->
     <form id="form-matricula" method="POST" action="{% url 'academico:processar_matricula' %}" style="display: none;">
         {% csrf_token %}
@@ -437,4 +443,7 @@ Atualizações:
     }
 </script>
 {% endblock %}
+
+
+
 

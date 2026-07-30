@@ -1,0 +1,228 @@
+<!--
+Arquivo: matricular_alunos.html
+Caminho: apps/academico/templates/academico/matricular_alunos.html
+Descrição: Página intermediária para seleção de turma antes de matricular
+Data: 30/07/2026
+-->
+{% extends "admin/base_site.html" %}
+{% block title %}Matricular Alunos Selecionados{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Início</a>
+    &rsaquo;
+    <a href="{% url 'academico:gestao_matricula' %}">Gestão de Matrículas</a>
+    &rsaquo;
+    <span style="color: white; font-size: 13px;">Matricular Alunos</span>
+</div>
+{% endblock %}
+{% block extrastyle %}
+<style>
+    .container-matricular {
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    .header-matricular {
+        background: linear-gradient(135deg, #205067 0%, #2d7a9b 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .header-matricular h1 {
+        margin: 0 0 5px 0;
+        font-size: 22px;
+    }
+    .header-matricular p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+    .card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .card h2 {
+        margin: 0 0 15px 0;
+        color: #205067;
+        font-size: 18px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #205067;
+        font-size: 15px;
+    }
+ .form-group select {
+    width: 100% !important;
+    max-width: 500px;
+    padding: 10px !important;
+    border: 2px solid #ddd !important;
+    border-radius: 6px;
+    font-size: 14px;
+    height: auto !important;
+    background: white !important;
+    color: #333 !important;
+    appearance: auto;
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+}
+    .form-group select:focus {
+        border-color: #205067;
+        outline: none;
+    }
+    .form-group .help {
+        font-size: 13px;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+    .info-box {
+        background: #e3f2fd;
+        border: 1px solid #90caf9;
+        border-radius: 6px;
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #0d47a1;
+    }
+    .info-box strong {
+        font-size: 16px;
+    }
+    .tabela-alunos {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .tabela-alunos thead {
+        background: #205067;
+        color: white;
+    }
+    .tabela-alunos th {
+        padding: 10px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .tabela-alunos td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #dee2e6;
+        font-size: 13px;
+    }
+    .tabela-alunos tbody tr:nth-child(even) {
+        background: #fafafa;
+    }
+    .botoes {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .btn {
+        padding: 10px 24px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-confirmar {
+        background: #28a745;
+        color: white;
+    }
+    .btn-confirmar:hover {
+        background: #218838;
+    }
+    .btn-cancelar {
+        background: #998e2a;
+        color: white !important;
+    }
+    .btn-cancelar:hover {
+        background: #aeca10;
+        color: white !important;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container-matricular">
+    <div class="header-matricular">
+        <h1>Matricular Alunos Selecionados</h1>
+        <p>Evento: {{ evento.nome }}</p>
+    </div>
+
+    <div class="info-box">
+        <strong>{{ total_selecionado }}</strong> inscrição(ões) selecionada(s) para matrícula.
+    </div>
+
+    <form method="POST" action="{% url 'academico:processar_matricula' %}">
+        {% csrf_token %}
+
+        {# Repassa os IDs das inscrições #}
+        {% for iid in inscricoes_ids %}
+        <input type="hidden" name="inscricoes_selecionadas" value="{{ iid }}">
+        {% endfor %}
+        <input type="hidden" name="evento_id" value="{{ evento.id }}">
+        <input type="hidden" name="confirmar_matricula" value="1">
+
+        <div class="card">
+            <h2>Selecione a Turma</h2>
+            <div class="form-group">
+                <label for="turma">Turma:</label>
+                <select name="turma" id="turma" required>
+                    <option value="">-- Escolha uma turma --</option>
+                    {% for turma in turmas %}
+                    <option value="{{ turma.id }}">
+                        {{ turma.nome }} (Capacidade: {{ turma.capacidade }})
+                    </option>
+                    {% endfor %}
+                </select>
+                <div class="help">A turma deve pertencer ao evento "{{ evento.nome }}".</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Alunos Selecionados</h2>
+            <table class="tabela-alunos">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Status Atual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for insc in inscricoes %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ insc.interessado.nome }}</td>
+                        <td>{{ insc.interessado.cpf }}</td>
+                        <td>{{ insc.status.nome }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="botoes">
+            <button type="submit" class="btn btn-confirmar">
+                Confirmar Matrícula
+            </button>
+            <a href="{% url 'academico:gestao_matricula' %}?evento_id={{ evento.id }}" class="btn btn-cancelar">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+

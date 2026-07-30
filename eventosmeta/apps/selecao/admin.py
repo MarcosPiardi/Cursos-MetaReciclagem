@@ -2,7 +2,6 @@
 Admin do app SELEÇÃO
 Arquivo: apps/selecao/admin.py
 Data: 10 de abril de 2026
-
 Histórico de Alterações:
 - 12/01/2026: Adicionados relatórios PDF e Excel com opções de ordenação
 - 20/01/2026: Registrados todos os models no admin_site customizado (melhor prática)
@@ -12,7 +11,7 @@ Histórico de Alterações:
 - 20/02/2026: Reordenação de colunas + coluna posição reduzida + colunas classificado/lista_espera unificadas em get_classificado
 - 08/04/2026: Adicionada trava de capacidade na action matricular_alunos_action
 - 10/04/2026: Lógica da action matricular_alunos_action revisada e corrigida para validação de capacidade, duplicidade e atomicidade.
-
+- 29/07/2026: Link de acesso movido da coluna posição para o nome do aluno; Removido filtro lista_espera; Adicionado filtro colapsável via CSS/JS
 Funcionalidades:
 - Gestão de Status de Inscrição (com seletor de cor)
 - Gestão de Inscrições (com inline de critérios atendidos)
@@ -34,6 +33,23 @@ from .models import StatusInscricao, Inscricao, Classificacao, InscricaoCriterio
 from .reports import RelatorioAprovadosService
 from apps.admin_mixins import CustomTitleMixin
 
+#
+# FILTERS
+#
+class EventoAlfabeticoFilter(admin.SimpleListFilter):
+    """Filtro de Evento ordenado alfabeticamente"""
+    title = 'Evento'
+    parameter_name = 'inscricao__evento'
+
+    def lookups(self, request, model_admin):
+        # 29/07/2026: Eventos em ordem alfabetica
+        eventos = Evento.objects.order_by('nome')
+        return [(e.id, e.nome) for e in eventos]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(inscricao__evento__id=self.value())
+        return queryset
 # 
 # FORMS
 # 
@@ -165,20 +181,25 @@ class ClassificacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
     """Admin para gerenciar Classificações com matrícula em lote + relatórios"""
     custom_title = "adm Classificações"
 
+    # 29/07/2026: Reordenado - Classificado e Pontuacao antes de Status Inscricao
     list_display = [
         'get_posicao',
         'get_interessado',
         'get_cpf',
         'get_evento',
-        'get_status_inscricao',
         'get_classificado',
         'pontuacao_total',
+        'get_status_inscricao',
     ]
+    
+    # 29/07/2026: Link de acesso movido da coluna posição para o nome do aluno
+    list_display_links = ['get_interessado']
 
     list_filter = [
         'classificado',
-        'lista_espera',
-        'inscricao__evento',
+        # 29/07/2026: Removido 'lista_espera' do filtro
+        # 'inscricao__evento',
+        EventoAlfabeticoFilter,  # 29/07/2026: Filtro customizado alfabetico
         'inscricao__status'
     ]
 
@@ -221,14 +242,26 @@ class ClassificacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
         'processado_em', 'atualizado_em'
     ]
 
+    # 29/07/2026: CSS/JS para filtro colapsável
+    class Media:
+        css = {
+            'all': ('css/admin/collapsible_filter.css',)
+        }
+        js = ('js/admin/collapsible_filter.js',)
+
+    # ... todos os metodos abaixo permanecem SEM ALTERACAO ...
+    # get_posicao, get_interessado, get_cpf, get_evento,
+    # get_status_inscricao, get_classificado, matricular_alunos_action,
+    # _validar_e_gerar_relatorio, _validar_e_exportar_excel,
+    # gerar_relatorio_*, exportar_excel_*, has_*_permission
+
     def get_posicao(self, obj):
         """Posição com tamanho reduzido e centralizado"""
         return format_html(
-            '{}"º',
+            '<span style="display: inline-block; text-align: center; width: 100%;">{}º</span>',
             obj.posicao
         )
-
-    get_posicao.short_description = '#'
+    get_posicao.short_description = '# Posição'
     get_posicao.admin_order_field = 'posicao'
 
     def get_interessado(self, obj):
@@ -448,7 +481,7 @@ class ClassificacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
             'action_checkbox_name': ACTION_CHECKBOX_NAME,
         }
 
-        return render(request, 'admin/selecao/matricular_alunos.html', context)
+        return render(request, 'academico/matricular_alunos.html', context)
 
     matricular_alunos_action.short_description = '🎓 Matricular alunos selecionados'
 
