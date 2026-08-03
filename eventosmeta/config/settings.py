@@ -161,6 +161,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles_collected'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+
 # ==========================================
 # MODELOS E AUTENTICAÇÃO
 # ==========================================

@@ -1,74 +1,44 @@
-# ============================================================
-# CONTROLE DE VERSÃO
-# ============================================================
+# Controle de versão
 .git
 .gitignore
-.github/
 
-# ============================================================
-# CONFIGURAÇÃO LOCAL
-# ============================================================
-.env
-.env.*
-.vscode/
-.idea/
-
-# ============================================================
-# PYTHON E CACHE
-# ============================================================
-__pycache__/
-__pycache__
-*.pyc
-*.py[cod]
-*.so
-.Python
+# Ambiente virtual
 venv/
-ENV/
 env/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 *.egg-info/
-dist/
-build/
 
-# ============================================================
-# TESTES E COBERTURA (NÃO PRECISA NA IMAGEM)
-# ============================================================
+# Testes e cobertura
 .pytest_cache/
-.pytest_cache
-.cache/
 .coverage
-coverage.xml
+.coveragerc
 htmlcov/
+pytest.ini
+conftest.py
 
-# ============================================================
-# DOCUMENTAÇÃO (NÃO PRECISA NA IMAGEM)
-# ============================================================
-README.md
-CHANGELOG.md
-*.md
+# Documentação (não precisa ir pra imagem em produção)
+documentacao/
 
-# ============================================================
-# BANCO DE DADOS LOCAL
-# ============================================================
-db.sqlite3
-*.sqlite3
+# Ambiente Docker/IDE
+.dockerignore
+Dockerfile
+docker-compose*.yml
+.vscode/
 
-# ============================================================
-# LOGS E TEMPORÁRIOS
-# ============================================================
-*.log
-logs/
+# Variáveis de ambiente (nunca vai pra imagem)
+.env
+.env.example
+.env.prod
+
+# Logs
+logs/*.log
+
+# Arquivos temporários
+temp/
 *.bak
-*.tmp
-
-# ============================================================
-# SISTEMA OPERACIONAL
-# ============================================================
-.DS_Store
-Thumbs.db
-
-# ============================================================
-# NODE.JS (OPCIONAL)
-# ============================================================
-node_modules/
-npm-debug.log
-yarn-error.log

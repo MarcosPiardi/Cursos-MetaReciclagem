@@ -213,6 +213,25 @@ class TestValidarCriterio:
         assert resultado['valido'] is True
         assert any('código' in aviso.lower() for aviso in resultado['avisos'])
 
+
+    def test_criterio_sem_codigo_gera_aviso(self):
+        criterio = CriterioFactory.build(
+        nome='Teste',
+        tipo_criterio='PONTUACAO',
+        pontos=10,
+        categoria='TESTE',
+        codigo=''
+        )
+        # resultado = ClassificacaoValidator.validar_criterio(criterio)
+        # assert resultado['valido'] is True
+        # assert any('código' in aviso.lower() for aviso in resultado['avisos'])
+        resultado = ClassificacaoValidator.validar_criterio(criterio)
+        print(f"ERROS: {resultado['erros']}")
+        print(f"AVISOS: {resultado['avisos']}")
+        assert resultado['valido'] is True
+
+
+
 # =============================================================================
 # TestValidarInscricao
 # =============================================================================

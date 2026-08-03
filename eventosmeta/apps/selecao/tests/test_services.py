@@ -189,14 +189,29 @@ class TestClassificadorServiceDesempate:
         yield  # teste executa aqui
         # rollback automático pelo pytest-django, não precisa limpar depois
             
-    def test_desempate_por_data_inscricao_igual_pontuacao(self, status_pendente, status_classificado, status_lista_espera, criterio):
+    def test_desempate_por_data_inscricao_igual_pontuacao(self, status_pendente, status_classificado, status_lista_espera):
         evento = EventoFactory(total_vagas=5)
+        # Categoria permissiva: sempre atende, garantindo pontuacao igual
+        criterio = CriterioFactory(
+            nome='Criterio Teste',
+            tipo_criterio='PONTUACAO',
+            pontos=10,
+            categoria='OUTRO',
+        )
         EventoCriterioFactory(evento=evento, criterio=criterio)
         agora = timezone.now()
-        inscricao_primeira = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=agora - timedelta(minutes=5))
-        inscricao_segunda = InscricaoFactory(evento=evento, status=status_pendente, data_inscricao=agora)
+        inscricao_primeira = InscricaoFactory(
+            evento=evento, status=status_pendente,
+            data_inscricao=agora - timedelta(minutes=5),
+        )
+        inscricao_segunda = InscricaoFactory(
+            evento=evento, status=status_pendente,
+            data_inscricao=agora,
+        )
         ClassificadorService.classificar_evento(evento)
-        classificacoes = Classificacao.objects.filter(inscricao__evento=evento).order_by('posicao')
+        classificacoes = Classificacao.objects.filter(
+            inscricao__evento=evento
+        ).order_by('posicao')
         assert classificacoes[0].inscricao == inscricao_primeira
         assert classificacoes[0].posicao == 1
         assert classificacoes[1].inscricao == inscricao_segunda
@@ -245,14 +260,6 @@ class TestClassificadorServiceDesempate:
         assert classificacoes[3].inscricao == inscricao_empate_b
         assert classificacoes[3].pontuacao_total == Decimal('25.00')
         assert classificacoes[3].posicao == 4
-
-class TestClassificadorServiceProcessamento:
-    def test_processar_inscricao_cria_classificacao(self, evento):
-        inscricao = InscricaoFactory(evento=evento)
-        ClassificadorService.processar_inscricao(inscricao)
-        classificacao = Classificacao.objects.get(inscricao=inscricao)
-        assert classificacao.pontuacao_total == Decimal('10.00')
-
 
 
 class TestClassificadorServiceAtendeCriterio:

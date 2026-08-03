@@ -15,6 +15,7 @@
 #                      * variáveis de porta via .env (POSTGRES_PORT,
 #                        NGINX_PORT, DJANGO_PORT)
 #                      * removido backup.sql hardcoded
+#  - 01/08/2026 - Adição de healthcheck no db_eventosmeta
 # =============================================================================
 
 # version: "3.8"
@@ -27,7 +28,6 @@ networks:
 volumes:
   pgdata_eventosmeta:
     name: pgdata_eventosmeta
-    
 
 services:
   db_eventosmeta:
@@ -35,9 +35,9 @@ services:
     container_name: db_eventosmeta
     restart: unless-stopped
     environment:
-      POSTGRES_DB: bdmetareciclagem
-      POSTGRES_USER: metareciclagem_user
-      POSTGRES_PASSWORD: meta2025@forte
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     ports:
       - "${POSTGRES_PORT:-15459}:5432"
     volumes:
@@ -45,7 +45,7 @@ services:
     networks:
       - metareciclagem_net
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-metareciclagem_user} -d ${POSTGRES_DB:-bdmetareciclagem}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,11 +60,10 @@ services:
     depends_on:
       db_eventosmeta:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
-      DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE:-config.settings}
-      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
-      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
-      DATABASE_URL: postgres://${POSTGRES_USER:-eventosmeta}:${POSTGRES_PASSWORD:-eventosmeta}@db_eventosmeta:5432/${POSTGRES_DB:-eventosmeta}
+      DATABASE_HOST: db_eventosmeta
     ports:
       - "${DJANGO_PORT:-1362}:8000"
     volumes:
@@ -89,10 +88,7 @@ services:
     ports:
       - "${NGINX_PORT:-80}:80"
     volumes:
-    - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    - ./:/app:ro
-    # - web_eventosmeta:/app:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./:/app:ro
     networks:
       - metareciclagem_net
-      
-  

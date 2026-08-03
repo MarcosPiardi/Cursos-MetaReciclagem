@@ -227,20 +227,20 @@ class TestAvaliacaoAdmin:
 
     # --- Changelist View & Filtros Contextuais ---
     def test_changelist_view_contexto(self):
-        """Deve incluir eventos_disponiveis no contexto"""
+        """Deve incluir turmas_com_avaliacao no contexto"""
         response = self.client.get(reverse('admin:academico_avaliacao_changelist'))
         assert response.status_code == 200
-        assert 'eventos_disponiveis' in response.context
+        assert 'turmas_com_avaliacao' in response.context
 
     def test_changelist_view_com_evento_filter(self):
-        """Deve incluir evento_nome e turmas_disponiveis com evento_filter"""
+        """Deve incluir evento_selecionado e turmas_com_avaliacao com evento_filter"""
         response = self.client.get(
             reverse('admin:academico_avaliacao_changelist'),
             {'matricula__turma__evento__id__exact': str(self.base['evento'].pk)}
         )
         assert response.status_code == 200
-        assert response.context.get('evento_nome') == self.base['evento'].nome
-        assert 'turmas_disponiveis' in response.context
+        assert response.context.get('evento_selecionado') == str(self.base['evento'].pk)
+        assert 'turmas_com_avaliacao' in response.context
 
     def test_changelist_view_com_turma_filter(self):
         """Deve incluir turma_nome no contexto com turma_filter"""
