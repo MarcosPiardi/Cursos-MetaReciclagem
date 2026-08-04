@@ -1,0 +1,493 @@
+pg_restore: connecting to database for restore
+pg_restore: dropping FK CONSTRAINT selecao_inscricaocriterioatendido selecao_inscricaocri_inscricao_id_f4596be5_fk_selecao_i
+pg_restore: dropping FK CONSTRAINT selecao_inscricaocriterioatendido selecao_inscricaocri_criterio_id_92a1333d_fk_eventos_c
+pg_restore: dropping FK CONSTRAINT selecao_inscricao selecao_inscricao_status_id_1747a6a8_fk_selecao_s
+pg_restore: dropping FK CONSTRAINT selecao_inscricao selecao_inscricao_interessado_id_c7990ace_fk_interessa
+pg_restore: dropping FK CONSTRAINT selecao_inscricao selecao_inscricao_evento_id_69022fc4_fk_eventos_evento_id
+pg_restore: dropping FK CONSTRAINT selecao_classificacao selecao_classificaca_inscricao_id_32f20847_fk_selecao_i
+pg_restore: dropping FK CONSTRAINT interessados_solicitacaoexclusao interessados_solicit_interessado_id_72cb2d83_fk_interessa
+pg_restore: dropping FK CONSTRAINT interessados_solicitacaoexclusao interessados_solicit_analisado_por_id_a4448b09_fk_accounts_
+pg_restore: dropping FK CONSTRAINT interessados_passwordresettoken interessados_passwor_interessado_id_6d208345_fk_interessa
+pg_restore: dropping FK CONSTRAINT interessados_interessado interessados_interes_sexo_id_d912f7e0_fk_interessa
+pg_restore: dropping FK CONSTRAINT interessados_interessado interessados_interes_fototipo_id_1bd82591_fk_interessa
+pg_restore: dropping FK CONSTRAINT eventos_turma eventos_turma_evento_id_63fb57f5_fk_eventos_evento_id
+pg_restore: dropping FK CONSTRAINT eventos_horario eventos_horario_turma_id_29c0bdff_fk_eventos_turma_id
+pg_restore: dropping FK CONSTRAINT eventos_eventocriterio eventos_eventocriterio_evento_id_5f07f643_fk_eventos_evento_id
+pg_restore: dropping FK CONSTRAINT eventos_eventocriterio eventos_eventocriter_criterio_id_7e3b9bd4_fk_eventos_c
+pg_restore: dropping FK CONSTRAINT eventos_evento eventos_evento_status_id_412ac246_fk_eventos_status_id
+pg_restore: dropping FK CONSTRAINT django_admin_log django_admin_log_user_id_c564eba6_fk_accounts_usuario_id
+pg_restore: dropping FK CONSTRAINT django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co
+pg_restore: dropping FK CONSTRAINT axes_accessattemptexpiration axes_accessattemptex_access_attempt_id_6b73a47a_fk_axes_acce
+pg_restore: dropping FK CONSTRAINT auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co
+pg_restore: dropping FK CONSTRAINT auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id
+pg_restore: dropping FK CONSTRAINT auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm
+pg_restore: dropping FK CONSTRAINT accounts_usuario_user_permissions accounts_usuario_use_usuario_id_d048ad71_fk_accounts_
+pg_restore: dropping FK CONSTRAINT accounts_usuario_user_permissions accounts_usuario_use_permission_id_3de42c14_fk_auth_perm
+pg_restore: dropping FK CONSTRAINT accounts_usuario_groups accounts_usuario_groups_group_id_81d91a41_fk_auth_group_id
+pg_restore: dropping FK CONSTRAINT accounts_usuario_groups accounts_usuario_gro_usuario_id_8eb16911_fk_accounts_
+pg_restore: dropping FK CONSTRAINT academico_matricula academico_matricula_turma_id_ada4fc93_fk_eventos_turma_id
+pg_restore: dropping FK CONSTRAINT academico_matricula academico_matricula_status_id_c0fa5b2c_fk_academico
+pg_restore: dropping FK CONSTRAINT academico_matricula academico_matricula_interessado_id_27c13dae_fk_interessa
+pg_restore: dropping FK CONSTRAINT academico_matricula academico_matricula_inscricao_id_a95f8468_fk_selecao_i
+pg_restore: dropping FK CONSTRAINT academico_avaliacao academico_avaliacao_matricula_id_0125d759_fk_academico
+pg_restore: dropping INDEX selecao_statusinscricao_nome_7e620433_like
+pg_restore: dropping INDEX selecao_inscricaocriterioatendido_inscricao_id_f4596be5
+pg_restore: dropping INDEX selecao_inscricaocriterioatendido_criterio_id_92a1333d
+pg_restore: dropping INDEX selecao_inscricao_status_id_1747a6a8
+pg_restore: dropping INDEX selecao_inscricao_interessado_id_c7990ace
+pg_restore: dropping INDEX selecao_inscricao_evento_id_69022fc4
+pg_restore: dropping INDEX interessados_solicitacaoexclusao_interessado_id_72cb2d83
+pg_restore: dropping INDEX interessados_solicitacaoexclusao_analisado_por_id_a4448b09
+pg_restore: dropping INDEX interessados_sexo_nome_c6c8ae4e_like
+pg_restore: dropping INDEX interessados_passwordresettoken_token_c8a8033f_like
+pg_restore: dropping INDEX interessados_passwordresettoken_interessado_id_6d208345
+pg_restore: dropping INDEX interessados_interessado_sexo_id_d912f7e0
+pg_restore: dropping INDEX interessados_interessado_fototipo_id_1bd82591
+pg_restore: dropping INDEX interessados_interessado_email_004f6a1a_like
+pg_restore: dropping INDEX interessados_interessado_cpf_hash_0c279a5c_like
+pg_restore: dropping INDEX interessados_interessado_cpf_b91198ed_like
+pg_restore: dropping INDEX eventos_turma_evento_id_63fb57f5
+pg_restore: dropping INDEX eventos_status_nome_7b0c99ed_like
+pg_restore: dropping INDEX eventos_horario_turma_id_29c0bdff
+pg_restore: dropping INDEX eventos_eventocriterio_evento_id_5f07f643
+pg_restore: dropping INDEX eventos_eventocriterio_criterio_id_7e3b9bd4
+pg_restore: dropping INDEX eventos_evento_status_id_412ac246
+pg_restore: dropping INDEX eventos_criterio_codigo_b06552c8_like
+pg_restore: dropping INDEX django_session_session_key_c0390e0f_like
+pg_restore: dropping INDEX django_session_expire_date_a5c62663
+pg_restore: dropping INDEX django_admin_log_user_id_c564eba6
+pg_restore: dropping INDEX django_admin_log_content_type_id_c4bce8eb
+pg_restore: dropping INDEX axes_accesslog_username_df93064b_like
+pg_restore: dropping INDEX axes_accesslog_username_df93064b
+pg_restore: dropping INDEX axes_accesslog_user_agent_0e659004_like
+pg_restore: dropping INDEX axes_accesslog_user_agent_0e659004
+pg_restore: dropping INDEX axes_accesslog_ip_address_86b417e5
+pg_restore: dropping INDEX axes_accessfailurelog_username_a8b7e8a4_like
+pg_restore: dropping INDEX axes_accessfailurelog_username_a8b7e8a4
+pg_restore: dropping INDEX axes_accessfailurelog_user_agent_ea145dda_like
+pg_restore: dropping INDEX axes_accessfailurelog_user_agent_ea145dda
+pg_restore: dropping INDEX axes_accessfailurelog_ip_address_2e9f5a7f
+pg_restore: dropping INDEX axes_accessattempt_username_3f2d4ca0_like
+pg_restore: dropping INDEX axes_accessattempt_username_3f2d4ca0
+pg_restore: dropping INDEX axes_accessattempt_user_agent_ad89678b_like
+pg_restore: dropping INDEX axes_accessattempt_user_agent_ad89678b
+pg_restore: dropping INDEX axes_accessattempt_ip_address_10922d9c
+pg_restore: dropping INDEX auth_permission_content_type_id_2f476e4b
+pg_restore: dropping INDEX auth_group_permissions_permission_id_84c5c92e
+pg_restore: dropping INDEX auth_group_permissions_group_id_b120cbf9
+pg_restore: dropping INDEX auth_group_name_a6ea08ec_like
+pg_restore: dropping INDEX accounts_usuario_username_c366c69f_like
+pg_restore: dropping INDEX accounts_usuario_user_permissions_usuario_id_d048ad71
+pg_restore: dropping INDEX accounts_usuario_user_permissions_permission_id_3de42c14
+pg_restore: dropping INDEX accounts_usuario_groups_usuario_id_8eb16911
+pg_restore: dropping INDEX accounts_usuario_groups_group_id_81d91a41
+pg_restore: dropping INDEX accounts_usuario_email_19c7414e_like
+pg_restore: dropping INDEX accounts_usuario_cpf_88f87c69_like
+pg_restore: dropping INDEX academico_statusmatricula_nome_f1319f70_like
+pg_restore: dropping INDEX academico_matricula_turma_id_ada4fc93
+pg_restore: dropping INDEX academico_matricula_status_id_c0fa5b2c
+pg_restore: dropping INDEX academico_matricula_numero_matricula_63207837_like
+pg_restore: dropping INDEX academico_matricula_interessado_id_27c13dae
+pg_restore: dropping INDEX academico_matricula_inscricao_id_a95f8468
+pg_restore: dropping INDEX academico_m_turma_i_1f9f0d_idx
+pg_restore: dropping INDEX academico_m_numero__4bc01b_idx
+pg_restore: dropping INDEX academico_m_inscric_af84a1_idx
+pg_restore: dropping CONSTRAINT selecao_statusinscricao selecao_statusinscricao_pkey
+pg_restore: dropping CONSTRAINT selecao_statusinscricao selecao_statusinscricao_nome_key
+pg_restore: dropping CONSTRAINT selecao_inscricaocriterioatendido selecao_inscricaocriterioatendido_pkey
+pg_restore: dropping CONSTRAINT selecao_inscricaocriterioatendido selecao_inscricaocriteri_inscricao_id_criterio_id_c88c00eb_uniq
+pg_restore: dropping CONSTRAINT selecao_inscricao selecao_inscricao_pkey
+pg_restore: dropping CONSTRAINT selecao_inscricao selecao_inscricao_interessado_id_evento_id_a51d630a_uniq
+pg_restore: dropping CONSTRAINT selecao_classificacao selecao_classificacao_pkey
+pg_restore: dropping CONSTRAINT selecao_classificacao selecao_classificacao_inscricao_id_key
+pg_restore: dropping CONSTRAINT selecao_classificacao selecao_classificacao_inscricao_id_32f20847_uniq
+pg_restore: dropping CONSTRAINT interessados_solicitacaoexclusao interessados_solicitacaoexclusao_pkey
+pg_restore: dropping CONSTRAINT interessados_sexo interessados_sexo_pkey
+pg_restore: dropping CONSTRAINT interessados_sexo interessados_sexo_nome_c6c8ae4e_uniq
+pg_restore: dropping CONSTRAINT interessados_passwordresettoken interessados_passwordresettoken_token_key
+pg_restore: dropping CONSTRAINT interessados_passwordresettoken interessados_passwordresettoken_pkey
+pg_restore: dropping CONSTRAINT interessados_interessado interessados_interessado_pkey
+pg_restore: dropping CONSTRAINT interessados_interessado interessados_interessado_email_004f6a1a_uniq
+pg_restore: dropping CONSTRAINT interessados_interessado interessados_interessado_cpf_key
+pg_restore: dropping CONSTRAINT interessados_interessado interessados_interessado_cpf_hash_0c279a5c_uniq
+pg_restore: dropping CONSTRAINT interessados_fototipo interessados_fototipo_pkey
+pg_restore: dropping CONSTRAINT eventos_turma eventos_turma_pkey
+pg_restore: dropping CONSTRAINT eventos_turma eventos_turma_evento_id_nome_8d323f73_uniq
+pg_restore: dropping CONSTRAINT eventos_status eventos_status_pkey
+pg_restore: dropping CONSTRAINT eventos_status eventos_status_nome_key
+pg_restore: dropping CONSTRAINT eventos_horario eventos_horario_pkey
+pg_restore: dropping CONSTRAINT eventos_eventocriterio eventos_eventocriterio_pkey
+pg_restore: dropping CONSTRAINT eventos_eventocriterio eventos_eventocriterio_evento_id_criterio_id_9ee1bd55_uniq
+pg_restore: dropping CONSTRAINT eventos_evento eventos_evento_pkey
+pg_restore: dropping CONSTRAINT eventos_criterio eventos_criterio_pkey
+pg_restore: dropping CONSTRAINT eventos_criterio eventos_criterio_codigo_key
+pg_restore: dropping CONSTRAINT django_session django_session_pkey
+pg_restore: dropping CONSTRAINT django_migrations django_migrations_pkey
+pg_restore: dropping CONSTRAINT django_content_type django_content_type_pkey
+pg_restore: dropping CONSTRAINT django_content_type django_content_type_app_label_model_76bd3d3b_uniq
+pg_restore: dropping CONSTRAINT django_admin_log django_admin_log_pkey
+pg_restore: dropping CONSTRAINT axes_accesslog axes_accesslog_pkey
+pg_restore: dropping CONSTRAINT axes_accessfailurelog axes_accessfailurelog_pkey
+pg_restore: dropping CONSTRAINT axes_accessattemptexpiration axes_accessattemptexpiration_pkey
+pg_restore: dropping CONSTRAINT axes_accessattempt axes_accessattempt_username_ip_address_user_agent_8ea22282_uniq
+pg_restore: dropping CONSTRAINT axes_accessattempt axes_accessattempt_pkey
+pg_restore: dropping CONSTRAINT auth_permission auth_permission_pkey
+pg_restore: dropping CONSTRAINT auth_permission auth_permission_content_type_id_codename_01ab375a_uniq
+pg_restore: dropping CONSTRAINT auth_group auth_group_pkey
+pg_restore: dropping CONSTRAINT auth_group_permissions auth_group_permissions_pkey
+pg_restore: dropping CONSTRAINT auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq
+pg_restore: dropping CONSTRAINT auth_group auth_group_name_key
+pg_restore: dropping CONSTRAINT accounts_usuario accounts_usuario_username_key
+pg_restore: dropping CONSTRAINT accounts_usuario_user_permissions accounts_usuario_user_permissions_pkey
+pg_restore: dropping CONSTRAINT accounts_usuario_user_permissions accounts_usuario_user_pe_usuario_id_permission_id_0065a2ce_uniq
+pg_restore: dropping CONSTRAINT accounts_usuario accounts_usuario_pkey
+pg_restore: dropping CONSTRAINT accounts_usuario_groups accounts_usuario_groups_usuario_id_group_id_90f476d3_uniq
+pg_restore: dropping CONSTRAINT accounts_usuario_groups accounts_usuario_groups_pkey
+pg_restore: dropping CONSTRAINT accounts_usuario accounts_usuario_email_19c7414e_uniq
+pg_restore: dropping CONSTRAINT accounts_usuario accounts_usuario_cpf_key
+pg_restore: dropping CONSTRAINT academico_statusmatricula academico_statusmatricula_pkey
+pg_restore: dropping CONSTRAINT academico_statusmatricula academico_statusmatricula_nome_key
+pg_restore: dropping CONSTRAINT academico_matricula academico_matricula_turma_id_interessado_id_51257fc9_uniq
+pg_restore: dropping CONSTRAINT academico_matricula academico_matricula_pkey
+pg_restore: dropping CONSTRAINT academico_matricula academico_matricula_numero_matricula_key
+pg_restore: dropping CONSTRAINT academico_avaliacao academico_avaliacao_pkey
+pg_restore: dropping CONSTRAINT academico_avaliacao academico_avaliacao_matricula_id_key
+pg_restore: dropping SEQUENCE selecao_statusinscricao_id_seq
+pg_restore: dropping TABLE selecao_statusinscricao
+pg_restore: dropping SEQUENCE selecao_inscricaocriterioatendido_id_seq
+pg_restore: dropping TABLE selecao_inscricaocriterioatendido
+pg_restore: dropping SEQUENCE selecao_inscricao_id_seq
+pg_restore: dropping TABLE selecao_inscricao
+pg_restore: dropping SEQUENCE selecao_classificacao_id_seq
+pg_restore: dropping TABLE selecao_classificacao
+pg_restore: dropping SEQUENCE interessados_solicitacaoexclusao_id_seq
+pg_restore: dropping TABLE interessados_solicitacaoexclusao
+pg_restore: dropping SEQUENCE interessados_sexo_id_seq
+pg_restore: dropping TABLE interessados_sexo
+pg_restore: dropping SEQUENCE interessados_passwordresettoken_id_seq
+pg_restore: dropping TABLE interessados_passwordresettoken
+pg_restore: dropping SEQUENCE interessados_interessado_id_seq
+pg_restore: dropping TABLE interessados_interessado
+pg_restore: dropping SEQUENCE interessados_fototipo_id_seq
+pg_restore: dropping TABLE interessados_fototipo
+pg_restore: dropping SEQUENCE eventos_turma_id_seq
+pg_restore: dropping TABLE eventos_turma
+pg_restore: dropping SEQUENCE eventos_status_id_seq
+pg_restore: dropping TABLE eventos_status
+pg_restore: dropping SEQUENCE eventos_horario_id_seq
+pg_restore: dropping TABLE eventos_horario
+pg_restore: dropping SEQUENCE eventos_eventocriterio_id_seq
+pg_restore: dropping TABLE eventos_eventocriterio
+pg_restore: dropping SEQUENCE eventos_evento_id_seq
+pg_restore: dropping TABLE eventos_evento
+pg_restore: dropping SEQUENCE eventos_criterio_id_seq
+pg_restore: dropping TABLE eventos_criterio
+pg_restore: dropping TABLE django_session
+pg_restore: dropping SEQUENCE django_migrations_id_seq
+pg_restore: dropping TABLE django_migrations
+pg_restore: dropping SEQUENCE django_content_type_id_seq
+pg_restore: dropping TABLE django_content_type
+pg_restore: dropping SEQUENCE django_admin_log_id_seq
+pg_restore: dropping TABLE django_admin_log
+pg_restore: dropping SEQUENCE axes_accesslog_id_seq
+pg_restore: dropping TABLE axes_accesslog
+pg_restore: dropping SEQUENCE axes_accessfailurelog_id_seq
+pg_restore: dropping TABLE axes_accessfailurelog
+pg_restore: dropping TABLE axes_accessattemptexpiration
+pg_restore: dropping SEQUENCE axes_accessattempt_id_seq
+pg_restore: dropping TABLE axes_accessattempt
+pg_restore: dropping SEQUENCE auth_permission_id_seq
+pg_restore: dropping TABLE auth_permission
+pg_restore: dropping SEQUENCE auth_group_permissions_id_seq
+pg_restore: dropping TABLE auth_group_permissions
+pg_restore: dropping SEQUENCE auth_group_id_seq
+pg_restore: dropping TABLE auth_group
+pg_restore: dropping SEQUENCE accounts_usuario_user_permissions_id_seq
+pg_restore: dropping TABLE accounts_usuario_user_permissions
+pg_restore: dropping SEQUENCE accounts_usuario_id_seq
+pg_restore: dropping SEQUENCE accounts_usuario_groups_id_seq
+pg_restore: dropping TABLE accounts_usuario_groups
+pg_restore: dropping TABLE accounts_usuario
+pg_restore: dropping SEQUENCE academico_statusmatricula_id_seq
+pg_restore: dropping TABLE academico_statusmatricula
+pg_restore: dropping SEQUENCE academico_matricula_id_seq
+pg_restore: dropping TABLE academico_matricula
+pg_restore: dropping SEQUENCE academico_avaliacao_id_seq
+pg_restore: dropping TABLE academico_avaliacao
+pg_restore: creating TABLE "public.academico_avaliacao"
+pg_restore: creating SEQUENCE "public.academico_avaliacao_id_seq"
+pg_restore: creating TABLE "public.academico_matricula"
+pg_restore: creating SEQUENCE "public.academico_matricula_id_seq"
+pg_restore: creating TABLE "public.academico_statusmatricula"
+pg_restore: creating SEQUENCE "public.academico_statusmatricula_id_seq"
+pg_restore: creating TABLE "public.accounts_usuario"
+pg_restore: creating TABLE "public.accounts_usuario_groups"
+pg_restore: creating SEQUENCE "public.accounts_usuario_groups_id_seq"
+pg_restore: creating SEQUENCE "public.accounts_usuario_id_seq"
+pg_restore: creating TABLE "public.accounts_usuario_user_permissions"
+pg_restore: creating SEQUENCE "public.accounts_usuario_user_permissions_id_seq"
+pg_restore: creating TABLE "public.auth_group"
+pg_restore: creating SEQUENCE "public.auth_group_id_seq"
+pg_restore: creating TABLE "public.auth_group_permissions"
+pg_restore: creating SEQUENCE "public.auth_group_permissions_id_seq"
+pg_restore: creating TABLE "public.auth_permission"
+pg_restore: creating SEQUENCE "public.auth_permission_id_seq"
+pg_restore: creating TABLE "public.axes_accessattempt"
+pg_restore: creating SEQUENCE "public.axes_accessattempt_id_seq"
+pg_restore: creating TABLE "public.axes_accessattemptexpiration"
+pg_restore: creating TABLE "public.axes_accessfailurelog"
+pg_restore: creating SEQUENCE "public.axes_accessfailurelog_id_seq"
+pg_restore: creating TABLE "public.axes_accesslog"
+pg_restore: creating SEQUENCE "public.axes_accesslog_id_seq"
+pg_restore: creating TABLE "public.django_admin_log"
+pg_restore: creating SEQUENCE "public.django_admin_log_id_seq"
+pg_restore: creating TABLE "public.django_content_type"
+pg_restore: creating SEQUENCE "public.django_content_type_id_seq"
+pg_restore: creating TABLE "public.django_migrations"
+pg_restore: creating SEQUENCE "public.django_migrations_id_seq"
+pg_restore: creating TABLE "public.django_session"
+pg_restore: creating TABLE "public.eventos_criterio"
+pg_restore: creating SEQUENCE "public.eventos_criterio_id_seq"
+pg_restore: creating TABLE "public.eventos_evento"
+pg_restore: creating SEQUENCE "public.eventos_evento_id_seq"
+pg_restore: creating TABLE "public.eventos_eventocriterio"
+pg_restore: creating SEQUENCE "public.eventos_eventocriterio_id_seq"
+pg_restore: creating TABLE "public.eventos_horario"
+pg_restore: creating SEQUENCE "public.eventos_horario_id_seq"
+pg_restore: creating TABLE "public.eventos_status"
+pg_restore: creating SEQUENCE "public.eventos_status_id_seq"
+pg_restore: creating TABLE "public.eventos_turma"
+pg_restore: creating SEQUENCE "public.eventos_turma_id_seq"
+pg_restore: creating TABLE "public.interessados_fototipo"
+pg_restore: creating SEQUENCE "public.interessados_fototipo_id_seq"
+pg_restore: creating TABLE "public.interessados_interessado"
+pg_restore: creating SEQUENCE "public.interessados_interessado_id_seq"
+pg_restore: creating TABLE "public.interessados_passwordresettoken"
+pg_restore: creating SEQUENCE "public.interessados_passwordresettoken_id_seq"
+pg_restore: creating TABLE "public.interessados_sexo"
+pg_restore: creating SEQUENCE "public.interessados_sexo_id_seq"
+pg_restore: creating TABLE "public.interessados_solicitacaoexclusao"
+pg_restore: creating SEQUENCE "public.interessados_solicitacaoexclusao_id_seq"
+pg_restore: creating TABLE "public.selecao_classificacao"
+pg_restore: creating SEQUENCE "public.selecao_classificacao_id_seq"
+pg_restore: creating TABLE "public.selecao_inscricao"
+pg_restore: creating SEQUENCE "public.selecao_inscricao_id_seq"
+pg_restore: creating TABLE "public.selecao_inscricaocriterioatendido"
+pg_restore: creating SEQUENCE "public.selecao_inscricaocriterioatendido_id_seq"
+pg_restore: creating TABLE "public.selecao_statusinscricao"
+pg_restore: creating SEQUENCE "public.selecao_statusinscricao_id_seq"
+pg_restore: processing data for table "public.academico_avaliacao"
+pg_restore: processing data for table "public.academico_matricula"
+pg_restore: processing data for table "public.academico_statusmatricula"
+pg_restore: processing data for table "public.accounts_usuario"
+pg_restore: processing data for table "public.accounts_usuario_groups"
+pg_restore: processing data for table "public.accounts_usuario_user_permissions"
+pg_restore: processing data for table "public.auth_group"
+pg_restore: processing data for table "public.auth_group_permissions"
+pg_restore: processing data for table "public.auth_permission"
+pg_restore: processing data for table "public.axes_accessattempt"
+pg_restore: processing data for table "public.axes_accessattemptexpiration"
+pg_restore: processing data for table "public.axes_accessfailurelog"
+pg_restore: processing data for table "public.axes_accesslog"
+pg_restore: processing data for table "public.django_admin_log"
+pg_restore: processing data for table "public.django_content_type"
+pg_restore: processing data for table "public.django_migrations"
+pg_restore: processing data for table "public.django_session"
+pg_restore: processing data for table "public.eventos_criterio"
+pg_restore: processing data for table "public.eventos_evento"
+pg_restore: processing data for table "public.eventos_eventocriterio"
+pg_restore: processing data for table "public.eventos_horario"
+pg_restore: processing data for table "public.eventos_status"
+pg_restore: processing data for table "public.eventos_turma"
+pg_restore: processing data for table "public.interessados_fototipo"
+pg_restore: processing data for table "public.interessados_interessado"
+pg_restore: processing data for table "public.interessados_passwordresettoken"
+pg_restore: processing data for table "public.interessados_sexo"
+pg_restore: processing data for table "public.interessados_solicitacaoexclusao"
+pg_restore: processing data for table "public.selecao_classificacao"
+pg_restore: processing data for table "public.selecao_inscricao"
+pg_restore: processing data for table "public.selecao_inscricaocriterioatendido"
+pg_restore: processing data for table "public.selecao_statusinscricao"
+pg_restore: executing SEQUENCE SET academico_avaliacao_id_seq
+pg_restore: executing SEQUENCE SET academico_matricula_id_seq
+pg_restore: executing SEQUENCE SET academico_statusmatricula_id_seq
+pg_restore: executing SEQUENCE SET accounts_usuario_groups_id_seq
+pg_restore: executing SEQUENCE SET accounts_usuario_id_seq
+pg_restore: executing SEQUENCE SET accounts_usuario_user_permissions_id_seq
+pg_restore: executing SEQUENCE SET auth_group_id_seq
+pg_restore: executing SEQUENCE SET auth_group_permissions_id_seq
+pg_restore: executing SEQUENCE SET auth_permission_id_seq
+pg_restore: executing SEQUENCE SET axes_accessattempt_id_seq
+pg_restore: executing SEQUENCE SET axes_accessfailurelog_id_seq
+pg_restore: executing SEQUENCE SET axes_accesslog_id_seq
+pg_restore: executing SEQUENCE SET django_admin_log_id_seq
+pg_restore: executing SEQUENCE SET django_content_type_id_seq
+pg_restore: executing SEQUENCE SET django_migrations_id_seq
+pg_restore: executing SEQUENCE SET eventos_criterio_id_seq
+pg_restore: executing SEQUENCE SET eventos_evento_id_seq
+pg_restore: executing SEQUENCE SET eventos_eventocriterio_id_seq
+pg_restore: executing SEQUENCE SET eventos_horario_id_seq
+pg_restore: executing SEQUENCE SET eventos_status_id_seq
+pg_restore: executing SEQUENCE SET eventos_turma_id_seq
+pg_restore: executing SEQUENCE SET interessados_fototipo_id_seq
+pg_restore: executing SEQUENCE SET interessados_interessado_id_seq
+pg_restore: executing SEQUENCE SET interessados_passwordresettoken_id_seq
+pg_restore: executing SEQUENCE SET interessados_sexo_id_seq
+pg_restore: executing SEQUENCE SET interessados_solicitacaoexclusao_id_seq
+pg_restore: executing SEQUENCE SET selecao_classificacao_id_seq
+pg_restore: executing SEQUENCE SET selecao_inscricao_id_seq
+pg_restore: executing SEQUENCE SET selecao_inscricaocriterioatendido_id_seq
+pg_restore: executing SEQUENCE SET selecao_statusinscricao_id_seq
+pg_restore: creating CONSTRAINT "public.academico_avaliacao academico_avaliacao_matricula_id_key"
+pg_restore: creating CONSTRAINT "public.academico_avaliacao academico_avaliacao_pkey"
+pg_restore: creating CONSTRAINT "public.academico_matricula academico_matricula_numero_matricula_key"
+pg_restore: creating CONSTRAINT "public.academico_matricula academico_matricula_pkey"
+pg_restore: creating CONSTRAINT "public.academico_matricula academico_matricula_turma_id_interessado_id_51257fc9_uniq"
+pg_restore: creating CONSTRAINT "public.academico_statusmatricula academico_statusmatricula_nome_key"
+pg_restore: creating CONSTRAINT "public.academico_statusmatricula academico_statusmatricula_pkey"
+pg_restore: creating CONSTRAINT "public.accounts_usuario accounts_usuario_cpf_key"
+pg_restore: creating CONSTRAINT "public.accounts_usuario accounts_usuario_email_19c7414e_uniq"
+pg_restore: creating CONSTRAINT "public.accounts_usuario_groups accounts_usuario_groups_pkey"
+pg_restore: creating CONSTRAINT "public.accounts_usuario_groups accounts_usuario_groups_usuario_id_group_id_90f476d3_uniq"
+pg_restore: creating CONSTRAINT "public.accounts_usuario accounts_usuario_pkey"
+pg_restore: creating CONSTRAINT "public.accounts_usuario_user_permissions accounts_usuario_user_pe_usuario_id_permission_id_0065a2ce_uniq"
+pg_restore: creating CONSTRAINT "public.accounts_usuario_user_permissions accounts_usuario_user_permissions_pkey"
+pg_restore: creating CONSTRAINT "public.accounts_usuario accounts_usuario_username_key"
+pg_restore: creating CONSTRAINT "public.auth_group auth_group_name_key"
+pg_restore: creating CONSTRAINT "public.auth_group_permissions auth_group_permissions_group_id_permission_id_0cd325b0_uniq"
+pg_restore: creating CONSTRAINT "public.auth_group_permissions auth_group_permissions_pkey"
+pg_restore: creating CONSTRAINT "public.auth_group auth_group_pkey"
+pg_restore: creating CONSTRAINT "public.auth_permission auth_permission_content_type_id_codename_01ab375a_uniq"
+pg_restore: creating CONSTRAINT "public.auth_permission auth_permission_pkey"
+pg_restore: creating CONSTRAINT "public.axes_accessattempt axes_accessattempt_pkey"
+pg_restore: creating CONSTRAINT "public.axes_accessattempt axes_accessattempt_username_ip_address_user_agent_8ea22282_uniq"
+pg_restore: creating CONSTRAINT "public.axes_accessattemptexpiration axes_accessattemptexpiration_pkey"
+pg_restore: creating CONSTRAINT "public.axes_accessfailurelog axes_accessfailurelog_pkey"
+pg_restore: creating CONSTRAINT "public.axes_accesslog axes_accesslog_pkey"
+pg_restore: creating CONSTRAINT "public.django_admin_log django_admin_log_pkey"
+pg_restore: creating CONSTRAINT "public.django_content_type django_content_type_app_label_model_76bd3d3b_uniq"
+pg_restore: creating CONSTRAINT "public.django_content_type django_content_type_pkey"
+pg_restore: creating CONSTRAINT "public.django_migrations django_migrations_pkey"
+pg_restore: creating CONSTRAINT "public.django_session django_session_pkey"
+pg_restore: creating CONSTRAINT "public.eventos_criterio eventos_criterio_codigo_key"
+pg_restore: creating CONSTRAINT "public.eventos_criterio eventos_criterio_pkey"
+pg_restore: creating CONSTRAINT "public.eventos_evento eventos_evento_pkey"
+pg_restore: creating CONSTRAINT "public.eventos_eventocriterio eventos_eventocriterio_evento_id_criterio_id_9ee1bd55_uniq"
+pg_restore: creating CONSTRAINT "public.eventos_eventocriterio eventos_eventocriterio_pkey"
+pg_restore: creating CONSTRAINT "public.eventos_horario eventos_horario_pkey"
+pg_restore: creating CONSTRAINT "public.eventos_status eventos_status_nome_key"
+pg_restore: creating CONSTRAINT "public.eventos_status eventos_status_pkey"
+pg_restore: creating CONSTRAINT "public.eventos_turma eventos_turma_evento_id_nome_8d323f73_uniq"
+pg_restore: creating CONSTRAINT "public.eventos_turma eventos_turma_pkey"
+pg_restore: creating CONSTRAINT "public.interessados_fototipo interessados_fototipo_pkey"
+pg_restore: creating CONSTRAINT "public.interessados_interessado interessados_interessado_cpf_hash_0c279a5c_uniq"
+pg_restore: creating CONSTRAINT "public.interessados_interessado interessados_interessado_cpf_key"
+pg_restore: creating CONSTRAINT "public.interessados_interessado interessados_interessado_email_004f6a1a_uniq"
+pg_restore: creating CONSTRAINT "public.interessados_interessado interessados_interessado_pkey"
+pg_restore: creating CONSTRAINT "public.interessados_passwordresettoken interessados_passwordresettoken_pkey"
+pg_restore: creating CONSTRAINT "public.interessados_passwordresettoken interessados_passwordresettoken_token_key"
+pg_restore: creating CONSTRAINT "public.interessados_sexo interessados_sexo_nome_c6c8ae4e_uniq"
+pg_restore: creating CONSTRAINT "public.interessados_sexo interessados_sexo_pkey"
+pg_restore: creating CONSTRAINT "public.interessados_solicitacaoexclusao interessados_solicitacaoexclusao_pkey"
+pg_restore: creating CONSTRAINT "public.selecao_classificacao selecao_classificacao_inscricao_id_32f20847_uniq"
+pg_restore: creating CONSTRAINT "public.selecao_classificacao selecao_classificacao_inscricao_id_key"
+pg_restore: creating CONSTRAINT "public.selecao_classificacao selecao_classificacao_pkey"
+pg_restore: creating CONSTRAINT "public.selecao_inscricao selecao_inscricao_interessado_id_evento_id_a51d630a_uniq"
+pg_restore: creating CONSTRAINT "public.selecao_inscricao selecao_inscricao_pkey"
+pg_restore: creating CONSTRAINT "public.selecao_inscricaocriterioatendido selecao_inscricaocriteri_inscricao_id_criterio_id_c88c00eb_uniq"
+pg_restore: creating CONSTRAINT "public.selecao_inscricaocriterioatendido selecao_inscricaocriterioatendido_pkey"
+pg_restore: creating CONSTRAINT "public.selecao_statusinscricao selecao_statusinscricao_nome_key"
+pg_restore: creating CONSTRAINT "public.selecao_statusinscricao selecao_statusinscricao_pkey"
+pg_restore: creating INDEX "public.academico_m_inscric_af84a1_idx"
+pg_restore: creating INDEX "public.academico_m_numero__4bc01b_idx"
+pg_restore: creating INDEX "public.academico_m_turma_i_1f9f0d_idx"
+pg_restore: creating INDEX "public.academico_matricula_inscricao_id_a95f8468"
+pg_restore: creating INDEX "public.academico_matricula_interessado_id_27c13dae"
+pg_restore: creating INDEX "public.academico_matricula_numero_matricula_63207837_like"
+pg_restore: creating INDEX "public.academico_matricula_status_id_c0fa5b2c"
+pg_restore: creating INDEX "public.academico_matricula_turma_id_ada4fc93"
+pg_restore: creating INDEX "public.academico_statusmatricula_nome_f1319f70_like"
+pg_restore: creating INDEX "public.accounts_usuario_cpf_88f87c69_like"
+pg_restore: creating INDEX "public.accounts_usuario_email_19c7414e_like"
+pg_restore: creating INDEX "public.accounts_usuario_groups_group_id_81d91a41"
+pg_restore: creating INDEX "public.accounts_usuario_groups_usuario_id_8eb16911"
+pg_restore: creating INDEX "public.accounts_usuario_user_permissions_permission_id_3de42c14"
+pg_restore: creating INDEX "public.accounts_usuario_user_permissions_usuario_id_d048ad71"
+pg_restore: creating INDEX "public.accounts_usuario_username_c366c69f_like"
+pg_restore: creating INDEX "public.auth_group_name_a6ea08ec_like"
+pg_restore: creating INDEX "public.auth_group_permissions_group_id_b120cbf9"
+pg_restore: creating INDEX "public.auth_group_permissions_permission_id_84c5c92e"
+pg_restore: creating INDEX "public.auth_permission_content_type_id_2f476e4b"
+pg_restore: creating INDEX "public.axes_accessattempt_ip_address_10922d9c"
+pg_restore: creating INDEX "public.axes_accessattempt_user_agent_ad89678b"
+pg_restore: creating INDEX "public.axes_accessattempt_user_agent_ad89678b_like"
+pg_restore: creating INDEX "public.axes_accessattempt_username_3f2d4ca0"
+pg_restore: creating INDEX "public.axes_accessattempt_username_3f2d4ca0_like"
+pg_restore: creating INDEX "public.axes_accessfailurelog_ip_address_2e9f5a7f"
+pg_restore: creating INDEX "public.axes_accessfailurelog_user_agent_ea145dda"
+pg_restore: creating INDEX "public.axes_accessfailurelog_user_agent_ea145dda_like"
+pg_restore: creating INDEX "public.axes_accessfailurelog_username_a8b7e8a4"
+pg_restore: creating INDEX "public.axes_accessfailurelog_username_a8b7e8a4_like"
+pg_restore: creating INDEX "public.axes_accesslog_ip_address_86b417e5"
+pg_restore: creating INDEX "public.axes_accesslog_user_agent_0e659004"
+pg_restore: creating INDEX "public.axes_accesslog_user_agent_0e659004_like"
+pg_restore: creating INDEX "public.axes_accesslog_username_df93064b"
+pg_restore: creating INDEX "public.axes_accesslog_username_df93064b_like"
+pg_restore: creating INDEX "public.django_admin_log_content_type_id_c4bce8eb"
+pg_restore: creating INDEX "public.django_admin_log_user_id_c564eba6"
+pg_restore: creating INDEX "public.django_session_expire_date_a5c62663"
+pg_restore: creating INDEX "public.django_session_session_key_c0390e0f_like"
+pg_restore: creating INDEX "public.eventos_criterio_codigo_b06552c8_like"
+pg_restore: creating INDEX "public.eventos_evento_status_id_412ac246"
+pg_restore: creating INDEX "public.eventos_eventocriterio_criterio_id_7e3b9bd4"
+pg_restore: creating INDEX "public.eventos_eventocriterio_evento_id_5f07f643"
+pg_restore: creating INDEX "public.eventos_horario_turma_id_29c0bdff"
+pg_restore: creating INDEX "public.eventos_status_nome_7b0c99ed_like"
+pg_restore: creating INDEX "public.eventos_turma_evento_id_63fb57f5"
+pg_restore: creating INDEX "public.interessados_interessado_cpf_b91198ed_like"
+pg_restore: creating INDEX "public.interessados_interessado_cpf_hash_0c279a5c_like"
+pg_restore: creating INDEX "public.interessados_interessado_email_004f6a1a_like"
+pg_restore: creating INDEX "public.interessados_interessado_fototipo_id_1bd82591"
+pg_restore: creating INDEX "public.interessados_interessado_sexo_id_d912f7e0"
+pg_restore: creating INDEX "public.interessados_passwordresettoken_interessado_id_6d208345"
+pg_restore: creating INDEX "public.interessados_passwordresettoken_token_c8a8033f_like"
+pg_restore: creating INDEX "public.interessados_sexo_nome_c6c8ae4e_like"
+pg_restore: creating INDEX "public.interessados_solicitacaoexclusao_analisado_por_id_a4448b09"
+pg_restore: creating INDEX "public.interessados_solicitacaoexclusao_interessado_id_72cb2d83"
+pg_restore: creating INDEX "public.selecao_inscricao_evento_id_69022fc4"
+pg_restore: creating INDEX "public.selecao_inscricao_interessado_id_c7990ace"
+pg_restore: creating INDEX "public.selecao_inscricao_status_id_1747a6a8"
+pg_restore: creating INDEX "public.selecao_inscricaocriterioatendido_criterio_id_92a1333d"
+pg_restore: creating INDEX "public.selecao_inscricaocriterioatendido_inscricao_id_f4596be5"
+pg_restore: creating INDEX "public.selecao_statusinscricao_nome_7e620433_like"
+pg_restore: creating FK CONSTRAINT "public.academico_avaliacao academico_avaliacao_matricula_id_0125d759_fk_academico"
+pg_restore: creating FK CONSTRAINT "public.academico_matricula academico_matricula_inscricao_id_a95f8468_fk_selecao_i"
+pg_restore: creating FK CONSTRAINT "public.academico_matricula academico_matricula_interessado_id_27c13dae_fk_interessa"
+pg_restore: creating FK CONSTRAINT "public.academico_matricula academico_matricula_status_id_c0fa5b2c_fk_academico"
+pg_restore: creating FK CONSTRAINT "public.academico_matricula academico_matricula_turma_id_ada4fc93_fk_eventos_turma_id"
+pg_restore: creating FK CONSTRAINT "public.accounts_usuario_groups accounts_usuario_gro_usuario_id_8eb16911_fk_accounts_"
+pg_restore: creating FK CONSTRAINT "public.accounts_usuario_groups accounts_usuario_groups_group_id_81d91a41_fk_auth_group_id"
+pg_restore: creating FK CONSTRAINT "public.accounts_usuario_user_permissions accounts_usuario_use_permission_id_3de42c14_fk_auth_perm"
+pg_restore: creating FK CONSTRAINT "public.accounts_usuario_user_permissions accounts_usuario_use_usuario_id_d048ad71_fk_accounts_"
+pg_restore: creating FK CONSTRAINT "public.auth_group_permissions auth_group_permissio_permission_id_84c5c92e_fk_auth_perm"
+pg_restore: creating FK CONSTRAINT "public.auth_group_permissions auth_group_permissions_group_id_b120cbf9_fk_auth_group_id"
+pg_restore: creating FK CONSTRAINT "public.auth_permission auth_permission_content_type_id_2f476e4b_fk_django_co"
+pg_restore: creating FK CONSTRAINT "public.axes_accessattemptexpiration axes_accessattemptex_access_attempt_id_6b73a47a_fk_axes_acce"
+pg_restore: creating FK CONSTRAINT "public.django_admin_log django_admin_log_content_type_id_c4bce8eb_fk_django_co"
+pg_restore: creating FK CONSTRAINT "public.django_admin_log django_admin_log_user_id_c564eba6_fk_accounts_usuario_id"
+pg_restore: creating FK CONSTRAINT "public.eventos_evento eventos_evento_status_id_412ac246_fk_eventos_status_id"
+pg_restore: creating FK CONSTRAINT "public.eventos_eventocriterio eventos_eventocriter_criterio_id_7e3b9bd4_fk_eventos_c"
+pg_restore: creating FK CONSTRAINT "public.eventos_eventocriterio eventos_eventocriterio_evento_id_5f07f643_fk_eventos_evento_id"
+pg_restore: creating FK CONSTRAINT "public.eventos_horario eventos_horario_turma_id_29c0bdff_fk_eventos_turma_id"
+pg_restore: creating FK CONSTRAINT "public.eventos_turma eventos_turma_evento_id_63fb57f5_fk_eventos_evento_id"
+pg_restore: creating FK CONSTRAINT "public.interessados_interessado interessados_interes_fototipo_id_1bd82591_fk_interessa"
+pg_restore: creating FK CONSTRAINT "public.interessados_interessado interessados_interes_sexo_id_d912f7e0_fk_interessa"
+pg_restore: creating FK CONSTRAINT "public.interessados_passwordresettoken interessados_passwor_interessado_id_6d208345_fk_interessa"
+pg_restore: creating FK CONSTRAINT "public.interessados_solicitacaoexclusao interessados_solicit_analisado_por_id_a4448b09_fk_accounts_"
+pg_restore: creating FK CONSTRAINT "public.interessados_solicitacaoexclusao interessados_solicit_interessado_id_72cb2d83_fk_interessa"
+pg_restore: creating FK CONSTRAINT "public.selecao_classificacao selecao_classificaca_inscricao_id_32f20847_fk_selecao_i"
+pg_restore: creating FK CONSTRAINT "public.selecao_inscricao selecao_inscricao_evento_id_69022fc4_fk_eventos_evento_id"
+pg_restore: creating FK CONSTRAINT "public.selecao_inscricao selecao_inscricao_interessado_id_c7990ace_fk_interessa"
+pg_restore: creating FK CONSTRAINT "public.selecao_inscricao selecao_inscricao_status_id_1747a6a8_fk_selecao_s"
+pg_restore: creating FK CONSTRAINT "public.selecao_inscricaocriterioatendido selecao_inscricaocri_criterio_id_92a1333d_fk_eventos_c"
+pg_restore: creating FK CONSTRAINT "public.selecao_inscricaocriterioatendido selecao_inscricaocri_inscricao_id_f4596be5_fk_selecao_i"

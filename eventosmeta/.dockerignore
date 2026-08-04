@@ -28,6 +28,7 @@ documentacao/
 # Ambiente Docker/IDE
 .dockerignore
 Dockerfile
+Dockerfile.prod
 docker-compose*.yml
 .vscode/
 

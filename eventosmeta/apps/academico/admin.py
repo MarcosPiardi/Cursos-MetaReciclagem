@@ -265,12 +265,20 @@ class AvaliacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
         extra_context['certificado_selecionado'] = certificado_filter
 
         # Nomes para o painel de contexto
+        # Corrigido (busca evento mesmo sem turma):
         if turma_filter:
             try:
                 turma = Turma.objects.select_related('evento').get(pk=turma_filter)
                 extra_context['turma_nome'] = turma.nome
                 extra_context['evento_nome'] = turma.evento.nome
             except Turma.DoesNotExist:
+                pass
+        elif evento_filter:
+            try:
+                from apps.eventos.models import Evento
+                evento = Evento.objects.get(pk=evento_filter)
+                extra_context['evento_nome'] = evento.nome
+            except Evento.DoesNotExist:
                 pass
 
         return super().changelist_view(request, extra_context=extra_context)

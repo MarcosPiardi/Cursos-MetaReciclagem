@@ -1,11 +1,11 @@
 # ============================================================
-# Arquivo: Dockerfile
-# Caminho: eventosmeta/Dockerfile
-# Finalidade: Imagem Docker para Django MetaReciclagem (Desenvolvimento)
+# Arquivo: Dockerfile.prod
+# Caminho: eventosmeta/Dockerfile.prod
+# Finalidade: Imagem Docker para Django MetaReciclagem (Producao)
 # Atualizacoes:
 #  - 29/06/2026 - Versao inicial
-#  - 08/03/2026 - Adicionado cabecalho padronizado
-#               - Corrigido CMD: runserver para dev (gunicorn fica no Dockerfile.prod)
+#  - 08/03/2026 - Corrigido: removido chmod duplicado e ENTRYPOINT comentado
+#               - Cabecalho corrigido de Python (""") para Dockerfile (#)
 # ============================================================
 
 FROM python:3.13-slim
@@ -37,9 +37,9 @@ USER django
 
 EXPOSE 8000
 
-# Entrypoint: roda migrations + collectstatic antes de iniciar
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Entrypoint: roda migrations + collectstatic antes de iniciar a app
+ENTRYPOINT ["./entrypoint.sh"]
 
-# CMD dev: runserver com auto-reload (compose sobrescreve se necessario)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# CMD default (compose-prod sobrescreve com workers/threads via env vars)
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-", "config.wsgi:application"]
 
