@@ -101,6 +101,10 @@ def processar_matricula_view(request):
 
     Lógica espelha a action matricular_alunos_action do admin (apps/selecao/admin.py).
     """
+    print("=" * 50)
+    print(f"VIEW CHAMADA: method={request.method}, POST keys={list(request.POST.keys())}")
+    print("=" * 50)
+
     evento_id = request.POST.get('evento_id')
     inscricoes_ids = request.POST.getlist('inscricoes_selecionadas')
 
@@ -144,6 +148,11 @@ def processar_matricula_view(request):
     # 5. SEGUNDO POST: confirmar_matricula
     if 'confirmar_matricula' in request.POST:
         turma_id = request.POST.get('turma')
+
+        print("=" * 50)
+        print(f"VIEW CHAMADA: method={request.method}, POST keys={list(request.POST.keys())}")
+        print("=" * 50)
+
 
         if not turma_id:
             messages.error(request, 'Selecione uma turma.')
@@ -248,6 +257,9 @@ def processar_matricula_view(request):
         return redirect(f'{reverse("academico:gestao_matricula")}?evento_id={evento_id}')
 
     # 6. PRIMEIRO POST: mostrar página intermediária
+    print("=" * 50)
+    print(f"VIEW CHAMADA: method={request.method}, POST keys={list(request.POST.keys())}")
+    print("=" * 50)
     context = {
         'evento': evento,
         'turmas': turmas,

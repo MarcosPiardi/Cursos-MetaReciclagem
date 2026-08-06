@@ -177,6 +177,8 @@ Data: 30/07/2026
             <h2>Selecione a Turma</h2>
             <div class="form-group">
                 <label for="turma">Turma:</label>
+                {% comment %} {{ turmas|length }} {% endcomment %}
+                <p>DEBUG: {{ turmas|length }} turmas | {{ turmas|default:"None" }}</p>
                 <select name="turma" id="turma" required>
                     <option value="">-- Escolha uma turma --</option>
                     {% for turma in turmas %}

@@ -315,16 +315,22 @@ class ClassificacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
     get_classificado.short_description = 'Classificado?'
     get_classificado.admin_order_field = 'classificado'
 
-    # 
-    # ACTION: MATRICULAR ALUNOS EM LOTE (COM TRAVA DE CAPACIDADE)
-    # 
 
+    # ======================================================================
+    # ACTION: MATRICULAR ALUNOS EM LOTE (COM TRAVA DE CAPACIDADE)
+    # ======================================================================
     def matricular_alunos_action(self, request, queryset):
         """
         Action para matricular alunos classificados em uma turma com validação de capacidade,
         evento único, turma existente e proteção contra duplicidade.
+
+        Atualizações:
+         - 08/04/2026 - Adicionada trava de capacidade
+         - 10/04/2026 - Lógica revisada e corrigida
+         - 06/08/2026 - CORREÇÃO: Adicionado turmas, inscricoes, inscricoes_ids e
+                        total_selecionado ao contexto para compatibilidade com o template
+                        matricular_alunos.html (que não usa {{ form }}, e sim {% for turma in turmas %})
         """
-        
         # 1. Validações iniciais (GET ou POST antes do form.is_valid())
         if queryset.count() == 0:
             self.message_user(request, '❌ Nenhuma classificação foi selecionada.', level=messages.ERROR)
@@ -343,54 +349,58 @@ class ClassificacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
             return
 
         if len(eventos_ids) > 1:
-            # Pega os nomes dos eventos para a mensagem de erro
-            eventos_nomes = [c.inscricao.evento.nome for c in queryset[:5]] # Limita para não sobrecarregar
-            self.message_user(request, f'❌ Selecione apenas classificações do MESMO EVENTO. Eventos detectados: {", ".join(set(eventos_nomes))}', level=messages.ERROR)
+            eventos_nomes = [c.inscricao.evento.nome for c in queryset[:5]]
+            self.message_user(
+                request,
+                f'❌ Selecione apenas classificações do MESMO EVENTO. Eventos detectados: {", ".join(set(eventos_nomes))}',
+                level=messages.ERROR
+            )
             return
 
-        evento = Evento.objects.get(id=list(eventos_ids)[0]) # Pega o único evento
+        evento = Evento.objects.get(id=list(eventos_ids)[0])
 
-        if not Turma.objects.filter(evento=evento).exists():
-            self.message_user(request, f'❌ O evento "{evento.nome}" não possui turmas cadastradas. Crie uma turma em Eventos > Turmas.', level=messages.ERROR)
+        # CORREÇÃO 06/08/2026: Armazenar turmas em variável para reutilizar no contexto
+        turmas = Turma.objects.filter(evento=evento).order_by('nome')
+        if not turmas.exists():
+            self.message_user(
+                request,
+                f'❌ O evento "{evento.nome}" não possui turmas cadastradas. Crie uma turma em Eventos > Turmas.',
+                level=messages.ERROR
+            )
             return
 
-        # 2. Processamento da requisição (POST)
+        # 2. Processamento da requisição (POST com confirmar_matricula)
         if 'confirmar_matricula' in request.POST:
             form = MatricularAlunosForm(request.POST, evento=evento)
-
             if form.is_valid():
                 turma = form.cleaned_data['turma']
 
-                # Validação: A turma selecionada pertence ao evento correto               
+                # Validação: A turma selecionada pertence ao evento correto
                 if turma.evento != evento:
                     self.message_user(
                         request,
                         f'❌ A turma "{turma.nome}" não pertence ao evento "{evento.nome}".',
                         level=messages.ERROR
                     )
-                    return  # <-- sem redirect aqui
+                    return
 
-
-                # 
                 # TRAVA DE CAPACIDADE: Validar antes de criar matrículas
-                # 
-                # Contar matrículas ATIVAS na turma
                 matriculas_existentes = Matricula.objects.filter(
                     turma=turma,
                     status__nome__iexact='Ativa'
                 ).count()
-                
                 vagas_restantes = turma.capacidade - matriculas_existentes
                 total_selecionado = queryset.count()
-
                 if total_selecionado > vagas_restantes:
                     self.message_user(
                         request,
-                        f'❌ Falha na operação: Você selecionou {total_selecionado} classificados, mas a turma "{turma.nome}" possui apenas {vagas_restantes} vaga(s) disponível(eis). (Capacidade total: {turma.capacidade}, Matrículas atuais: {matriculas_existentes})',
+                        f'❌ Falha na operação: Você selecionou {total_selecionado} classificados, '
+                        f'mas a turma "{turma.nome}" possui apenas {vagas_restantes} vaga(s) '
+                        f'disponível(eis). (Capacidade total: {turma.capacidade}, '
+                        f'Matrículas atuais: {matriculas_existentes})',
                         level=messages.ERROR
                     )
                     return
-                # 
 
                 # Buscar Status de Matrícula e Inscrição necessários
                 try:
@@ -398,7 +408,6 @@ class ClassificacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
                 except StatusMatricula.DoesNotExist:
                     self.message_user(request, '❌ Status "ATIVA" não encontrado em Status de Matrículas. Crie-o primeiro.', level=messages.ERROR)
                     return
-
                 try:
                     status_inscricao_confirmada = StatusInscricao.objects.get(nome__iexact='CONFIRMADA')
                 except StatusInscricao.DoesNotExist:
@@ -408,62 +417,43 @@ class ClassificacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
                 matriculas_criadas = 0
                 erros = []
 
-                # 
                 # CRIAÇÃO DE MATRÍCULAS COM PROTEÇÃO DE DUPLICIDADE E ATOMICIDADE
-                # 
                 with transaction.atomic():
                     for classificacao in queryset:
                         try:
                             inscricao = classificacao.inscricao
                             interessado = inscricao.interessado
 
-                            # Proteção contra duplicidade: verificar se já está matriculado
+                            # Proteção contra duplicidade
                             if Matricula.objects.filter(turma=turma, interessado=interessado).exists():
                                 erros.append(f'⚠️ {interessado.nome} já está matriculado nesta turma. Matrícula ignorada.')
-                                continue # Pula para a próxima classificação
+                                continue
 
-                            # Cria a matrícula
                             Matricula.objects.create(
                                 turma=turma,
                                 interessado=interessado,
                                 inscricao=inscricao,
                                 status=status_matricula_ativa
                             )
-
-                            # Atualiza o status da inscrição para CONFIRMADA
                             inscricao.status = status_inscricao_confirmada
                             inscricao.save()
-
                             matriculas_criadas += 1
-
                         except Exception as e:
-                            # Qualquer erro durante a criação de uma matrícula específica
-                            # será capturado e adicionado à lista de erros.
-                            # A transação atômica garante que, se um erro crítico ocorrer
-                            # fora deste try/except, tudo será revertido.
                             erros.append(f'❌ Erro ao matricular {interessado.nome}: {str(e)}')
-                            # Não damos 'continue' aqui para permitir que a transação tente
-                            # as próximas matrículas, mas o erro será reportado.
-                            # Se a intenção é que QUALQUER erro dentro do loop reverta TUDO,
-                            # então o try/except deve estar fora do loop, englobando o atomic block.
-                            # No entanto, a abordagem atual permite reportar erros individuais
-                            # e continuar com outras matrículas, se a exceção não for fatal para a transação.
-                            # Para garantir rollback total em qualquer erro, o 'try' externo ao 'with' seria melhor.
-                            # Mantendo a estrutura original, a exceção dentro do loop apenas registra o erro.
-                            # Se a exceção for grave e não tratada, o 'atomic' fará o rollback.
 
                 # Mensagens de feedback após a operação
                 if matriculas_criadas > 0:
-                    self.message_user(request, f'✅ {matriculas_criadas} matrícula(s) criada(s) na turma "{turma.nome}"!', level=messages.SUCCESS)
-
+                    self.message_user(
+                        request,
+                        f'✅ {matriculas_criadas} matrícula(s) criada(s) na turma "{turma.nome}"!',
+                        level=messages.SUCCESS
+                    )
                 if erros:
                     for erro in erros:
-                        self.message_user(request, erro, level=messages.WARNING) # Usar WARNING para erros individuais
-
+                        self.message_user(request, erro, level=messages.WARNING)
                 return
-
             else:
-                # Erros de validação do formulário (ex: turma não selecionada)
+                # Erros de validação do formulário
                 for field, errors in form.errors.items():
                     for error in errors:
                         self.message_user(request, f'❌ Erro no campo "{field}": {error}', level=messages.ERROR)
@@ -472,18 +462,33 @@ class ClassificacaoAdmin(CustomTitleMixin, admin.ModelAdmin):
         else:
             form = MatricularAlunosForm(evento=evento)
 
+        # ==================================================================
+        # CORREÇÃO 06/08/2026: Montar contexto com TODAS as variáveis
+        # que o template matricular_alunos.html espera.
+        # O template NÃO usa {{ form }} — ele itera sobre {{ turmas }}
+        # e {{ inscricoes }} manualmente.
+        # ==================================================================
+        inscricoes_ids = list(queryset.values_list('inscricao_id', flat=True))
+        inscricoes = Inscricao.objects.filter(
+            id__in=inscricoes_ids
+        ).select_related('interessado', 'status', 'evento').order_by('interessado__nome')
+
         context = {
             'title': 'Matricular Alunos Selecionados',
             'form': form,
+            'turmas': turmas,                          # CORREÇÃO 06/08/2026
             'classificacoes': queryset,
+            'inscricoes': inscricoes,                  # CORREÇÃO 06/08/2026
+            'inscricoes_ids': inscricoes_ids,          # CORREÇÃO 06/08/2026
+            'total_selecionado': queryset.count(),     # CORREÇÃO 06/08/2026
             'evento': evento,
             'opts': self.model._meta,
             'action_checkbox_name': ACTION_CHECKBOX_NAME,
         }
-
         return render(request, 'academico/matricular_alunos.html', context)
-
     matricular_alunos_action.short_description = '🎓 Matricular alunos selecionados'
+
+
 
     # 
     # MÉTODOS AUXILIARES PARA RELATÓRIOS

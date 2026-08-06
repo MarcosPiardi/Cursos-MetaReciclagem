@@ -1,38 +1,28 @@
 # Arquivo: docker-compose-prod.yml
 # Caminho: eventosmeta/docker-compose-prod.yml
 # Projeto: EventosMeta / MetaReciclagem
-# Ambiente: Produção
+# Ambiente: Producao
 # Host alvo: 10.30.166.21
 # Finalidade: Orquestracao Django + PostgreSQL + Nginx (Producao)
 # Atualizacoes:
 #  - 29/06/2026 - Versao inicial
 #  - 03/07/2026 - Refatoracao e padronizacao
 #  - 06/07/2026 - Adicionados healthchecks em db_eventosmeta e web_eventosmeta.
-#  - 07/07/2026 - Rede nomeada metareciclagem_net_prod e volumes nomeados.
-#               - Portas NGINX via .env.prod (NGINX_HTTP_PORT, NGINX_HTTPS_PORT).
+#  - 07/07/2026 - Rede nomeada rede1 e volumes nomeados.
+#               - Portas NGINX via stack.env (NGINX_HTTP_PORT, NGINX_HTTPS_PORT).
 #               - Logging json-file limitado (10m, 5 arquivos).
 #               - Gunicorn workers/threads via ENV (GUNICORN_WORKERS, GUNICORN_THREADS).
-#               - Revisão final e padronização de nomes prefixados *_eventosmeta_prod.
-#  - 03/08/2026 - Corrigidos nomes de variáveis de ambiente para bater com
+#               - Revisao final e padronizacao de nomes prefixados *_eventosmeta_prod.
+#  - 03/08/2026 - Corrigidos nomes de variaveis de ambiente para bater com
 #                 settings.py (DATABASE_NAME/USER/PASSWORD em vez de
 #                 POSTGRES_*; removidas DATABASE_URL/DJANGO_SECRET_KEY/
-#                 DJANGO_ALLOWED_HOSTS, que não existem no settings.py).
-#               - Corrigido volume de estáticos para staticfiles_collected
+#                 DJANGO_ALLOWED_HOSTS, que nao existem no settings.py).
+#               - Corrigido volume de estaticos para staticfiles_collected
 #                 (nome real de STATIC_ROOT no settings.py).
-#
-# Uso:
-#   docker compose --env-file .env.prod -f docker-compose-prod.yml up -d
-#
-# Variáveis esperadas no arquivo .env.prod:
-#   NGINX_HTTP_PORT=80
-#   NGINX_HTTPS_PORT=443
-#   GUNICORN_WORKERS=3
-#   GUNICORN_THREADS=4
-#   DATABASE_NAME=eventosmeta
-#   DATABASE_USER=eventosmeta
-#   DATABASE_PASSWORD=<senha_segura>
-#   SECRET_KEY=<chave_segura>
-#   ALLOWED_HOSTS=10.30.166.21,eventosmeta.metareciclagem.org
+#  - 04/08/2026 - Corrigido mapeamento de porta NGINX (host:container) para
+#                 suportar porta customizada (1366) mantendo Nginx interno na 80.
+#               - Corrigido healthcheck do Nginx para testar porta 80 interna.
+#               - adotado padrao de rede externa rede1 (alinhado com outros sistemas).
 # =============================================================================
 
 name: eventosmeta_prod
@@ -43,7 +33,7 @@ services:
     container_name: db_eventosmeta_prod
     restart: always
     env_file:
-      - .env.prod
+      - stack.env
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
@@ -52,7 +42,7 @@ services:
     volumes:
       - db_data_eventosmeta_prod:/var/lib/postgresql/data
     networks:
-      - metareciclagem_net_prod
+      - rede
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
       interval: 15s
@@ -66,14 +56,11 @@ services:
         max-file: "5"
 
   web_eventosmeta_prod:
-    build:
-      context: .
-      dockerfile: Dockerfile.prod
     image: eventosmeta_web:prod
     container_name: web_eventosmeta_prod
     restart: always
     env_file:
-      - .env.prod
+      - stack.env
     environment:
       DATABASE_HOST: db_eventosmeta_prod
       GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
@@ -91,7 +78,7 @@ services:
       - static_eventosmeta_prod:/app/staticfiles_collected
       - media_eventosmeta_prod:/app/media
     networks:
-      - metareciclagem_net_prod
+      - rede
     depends_on:
       db_eventosmeta_prod:
         condition: service_healthy
@@ -117,22 +104,20 @@ services:
     restart: always
     environment:
       NGINX_HTTP_PORT: ${NGINX_HTTP_PORT:-80}
-      NGINX_HTTPS_PORT: ${NGINX_HTTPS_PORT:-443}
     ports:
-      - "${NGINX_HTTP_PORT:-80}:${NGINX_HTTP_PORT:-80}"
-      # - "${NGINX_HTTPS_PORT:-443}:${NGINX_HTTPS_PORT:-443}"
+      - "${NGINX_HTTP_PORT:-80}:80"
     volumes:
       - ./nginx/prod.conf:/etc/nginx/conf.d/default.conf:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - static_eventosmeta_prod:/usr/share/nginx/static:ro
       - media_eventosmeta_prod:/usr/share/nginx/media:ro
     networks:
-      - metareciclagem_net_prod
+      - rede
     depends_on:
       web_eventosmeta_prod:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:${NGINX_HTTP_PORT:-80}/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:80/ || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -144,9 +129,9 @@ services:
         max-file: "5"
 
 networks:
-  metareciclagem_net_prod:
-    name: metareciclagem_net_prod
-    driver: bridge
+  rede:
+    external:
+      name: rede1
 
 volumes:
   db_data_eventosmeta_prod:
@@ -155,6 +140,7 @@ volumes:
     name: static_eventosmeta_prod
   media_eventosmeta_prod:
     name: media_eventosmeta_prod
+
 
 
     
