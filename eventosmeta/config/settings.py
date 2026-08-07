@@ -6,7 +6,7 @@ Atualizações:
  - 20/02/2026 - Adicionada configuração de e-mail para desenvolvimento
  - 20/02/2026 - EMAIL_BACKEND migrado para SMTP real via .env
  - 23/02/2026 - Migrado para CustomEmailBackend do servidor interno da prefeitura
-                IP 10.28.10.54 porta 587 — aceita destinatários externos
+                IP 10.30.166.54 porta 587 — aceita destinatários externos
  - 12/03/2026 - Adicionadas configurações de rate limiting (django-axes) e CSP headers
  - 12/03/2026 - Atualizado AXES para django-axes 6.1.1 e CSP para django-csp 4.0+
  - 03/07/2026 - Refatoração estrutural do arquivo

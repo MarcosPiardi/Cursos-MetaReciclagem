@@ -33,6 +33,7 @@ from django.template.loader import render_to_string, TemplateDoesNotExist
 from django.conf import settings
 from django.template import TemplateDoesNotExist
 from django.db import transaction
+from django.urls import reverse
 
 from .models import Interessado, PasswordResetToken, gerar_hash_cpf
 from .forms import CadastroInteressadoForm, LoginInteressadoForm, EdicaoInteressadoForm
@@ -329,6 +330,8 @@ def inscrever_evento_view(request, evento_id):
 # Alteracao: 12/03/2026 — Rate limiting via middleware
 # Alteracao: 17/03/2026 — Busca por cpf_hash (CPF criptografado no banco)
 # Alteracao: 29/05/2026 — try/except no send_mail (evita 500 se SMTP falhar)
+# Alteracao: 07/08/2026 — Corrigido link de recuperacao: URL hardcoded
+#                          trocada por reverse() para incluir prefixo eventosmeta/
 # ==========================================
 
 def senha_recuperar_view(request):
@@ -338,6 +341,7 @@ def senha_recuperar_view(request):
     - Sem e-mail cadastrado → redireciona para pagina de orientacao
     - CPF nao encontrado   → exibe erro no formulario
     CORRIGIDO (29/05/2026): send_mail com try/except — mensagem amigavel em vez de 500
+    CORRIGIDO (07/08/2026): Link gerado via reverse() em vez de URL hardcoded
     """
     erro      = None
     cpf_value = ''
@@ -366,8 +370,11 @@ def senha_recuperar_view(request):
                     expira_em=timezone.now() + timedelta(minutes=30)
                 )
 
+                # 07/08/2026 - CORRECAO: Usar reverse() em vez de URL hardcoded
+                # Antes:  f'/inscricao/senha/redefinir/{token}/'
+                # Depois: reverse() resolve automaticamente o prefixo eventosmeta/
                 link = request.build_absolute_uri(
-                    f'/inscricao/senha/redefinir/{token}/'
+                    reverse('interessados:senha_redefinir', kwargs={'token': token})
                 )
 
                 contexto_email = {

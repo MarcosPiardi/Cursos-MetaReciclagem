@@ -6,6 +6,9 @@
 #  - 29/06/2026 - Versao inicial
 #  - 08/03/2026 - Corrigido: removido chmod duplicado e ENTRYPOINT comentado
 #               - Cabecalho corrigido de Python (""") para Dockerfile (#)
+#  - 06/08/2026 - Corrigido ENTRYPOINT de caminho relativo para absoluto
+#               - CMD atualizado para incluir --threads e --graceful-timeout
+#                 como fallback sincronizado com o command do compose-prod
 # ============================================================
 
 FROM python:3.13-slim
@@ -38,8 +41,13 @@ USER django
 EXPOSE 8000
 
 # Entrypoint: roda migrations + collectstatic antes de iniciar a app
-ENTRYPOINT ["./entrypoint.sh"]
+# CAMINHO ABSOLUTO: evita problemas de resolucao relativa
+ENTRYPOINT ["/app/entrypoint.sh"]
 
-# CMD default (compose-prod sobrescreve com workers/threads via env vars)
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-", "config.wsgi:application"]
+# CMD default (fallback se nao houver command no compose)
+# O compose-prod sobrescreve com workers/threads via env vars
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "4", "--timeout", "120", "--graceful-timeout", "30", "--access-logfile", "-", "--error-logfile", "-", "config.wsgi:application"]
+
+
+
 

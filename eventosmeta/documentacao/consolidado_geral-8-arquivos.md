@@ -1047,7 +1047,7 @@ Falha no Envio de Email
 
 Configurações de HOST ou PORT incorretas para a rede municipal.
 
-Validar o .env com o IP 10.28.10.54 e porta 587.
+Validar o .env com o IP 10.30.166.54 e porta 587.
 
 Erro 429 (Rate Limit)
 

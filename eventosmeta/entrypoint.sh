@@ -2,41 +2,56 @@
 # ============================================================
 # Arquivo: entrypoint.sh
 # Caminho: eventosmeta/entrypoint.sh
-# Finalidade: Script de inicialização do container Django
-#             Executa migrações, coleta estáticos e inicia Gunicorn
-# Atualizações:
-#  - 07/07/2026 - Versão inicial com healthcheck do PostgreSQL
-#  - 01/08/2026 - Adição de verificação da variável DEBUG para coletar arquivos estáticos apenas em produção
+# Finalidade: Script de inicializacao do container Django
+#             Executa migracoes, coleta estaticos e inicia Gunicorn
+# Atualizacoes:
+#  - 07/07/2026 - Versao inicial com healthcheck do PostgreSQL
+#  - 01/08/2026 - Adicao de verificacao da variavel DEBUG para
+#                 coletar arquivos estaticos apenas em producao
+#  - 06/08/2026 - Removido --clear do collectstatic (era lento e
+#                 desnecessario em todo restart).
+#               - Removido bloco comentado antigo (confundia leitura).
+#               - Adicionada espera pelo PostgreSQL antes de migrar.
+#               - Adicionado echo de feedback para logs do container.
 # ============================================================
-
-
-# o que está comentado abaixo é para ser usado em produção, mas não é necessário para desenvolvimento local, pois o Django já serve arquivos estáticos no modo DEBUG=True.
-# e foi uma sugestão do claude o que vem mais abaixo é o que está sendo usado atualmente foi uma sugestão do Claude/Adapta
-
-# set -e
-
-# echo "Executando migrations..."
-# python manage.py migrate --noinput
-
-# echo "Coletando arquivos estáticos..."
-# python manage.py collectstatic --noinput --clear
-
-# echo "Iniciando aplicação..."
-# exec "$@"
-
-
 
 set -e
 
+# Aguardar PostgreSQL estar pronto antes de continuar
+echo "Aguardando PostgreSQL..."
+while ! python -c "
+import socket, os
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = os.environ.get('DATABASE_HOST', 'db_eventosmeta_prod')
+port = int(os.environ.get('DATABASE_PORT', 5432))
+try:
+    s.connect((host, port))
+    s.close()
+    exit(0)
+except:
+    exit(1)
+"; do
+    echo "PostgreSQL nao esta pronto, tentando novamente em 2s..."
+    sleep 2
+done
+echo "PostgreSQL esta pronto."
+
+# Executar migracoes do banco de dados
 echo "Executando migrations..."
 python manage.py migrate --noinput
 
+# Coletar arquivos estaticos apenas em producao
 if [ "$DEBUG" = "True" ] || [ "$DEBUG" = "1" ]; then
-    echo "Ambiente de desenvolvimento — pulando collectstatic."
+    echo "Ambiente de desenvolvimento -- pulando collectstatic."
 else
-    echo "Coletando arquivos estáticos..."
-    python manage.py collectstatic --noinput --clear
+    echo "Coletando arquivos estaticos..."
+    python manage.py collectstatic --noinput
 fi
 
-echo "Iniciando aplicação..."
+# Passar o controle para o command definido no docker-compose
+echo "Iniciando aplicacao..."
 exec "$@"
+
+
+
+

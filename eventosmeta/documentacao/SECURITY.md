@@ -49,7 +49,7 @@ Contato confidencial com a equipe de segurança.
 
 ## Email
 
-- CustomEmailBackend DataCenter 10.28.10.54:587.
+- CustomEmailBackend DataCenter 10.30.166.54:587.
 - TLS.
 - Rate-limiting.
 - Validação de destinatário.

@@ -19,7 +19,7 @@ class TestCustomEmailBackendSSLContext:
 
     def test_sem_certificate_desabilita_verificacao(self):
         backend = CustomEmailBackend(
-            host="10.28.10.54",
+            host="10.30.166.54",
             port=587,
             username="teste",
             password="senha",
@@ -32,7 +32,7 @@ class TestCustomEmailBackendSSLContext:
     @patch.object(ssl.SSLContext, "load_cert_chain")
     def test_com_ssl_certfile_mantem_verificacao(self, mock_load):
         backend = CustomEmailBackend(
-            host="10.28.10.54",
+            host="10.30.166.54",
             port=587,
             username="teste",
             password="senha",
@@ -46,7 +46,7 @@ class TestCustomEmailBackendSSLContext:
 
     def test_context_e_cached_property(self):
         backend = CustomEmailBackend(
-            host="10.28.10.54",
+            host="10.30.166.54",
             port=587,
             username="teste",
             password="senha",
@@ -58,7 +58,7 @@ class TestCustomEmailBackendSSLContext:
 
     def test_ssl_context_sem_cert_e_sem_keyfile(self):
         backend = CustomEmailBackend(
-            host="10.28.10.54",
+            host="10.30.166.54",
             port=587,
             username="teste",
             password="senha",
@@ -81,7 +81,7 @@ class TestCustomEmailBackend:
 
     def test_timeout_padrao_nao_definido(self):
         backend = CustomEmailBackend(
-            host="10.28.10.54",
+            host="10.30.166.54",
             port=587,
             username="teste",
             password="senha",
@@ -91,7 +91,7 @@ class TestCustomEmailBackend:
 
     def test_timeout_personalizado(self):
         backend = CustomEmailBackend(
-            host="10.28.10.54",
+            host="10.30.166.54",
             port=587,
             username="teste",
             password="senha",

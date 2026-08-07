@@ -23,6 +23,13 @@
 #                 suportar porta customizada (1366) mantendo Nginx interno na 80.
 #               - Corrigido healthcheck do Nginx para testar porta 80 interna.
 #               - adotado padrao de rede externa rede1 (alinhado com outros sistemas).
+#  - 06/08/2026 - Adicionado build no servico web (Portainer builda a imagem
+#                 automaticamente se nao existir, em vez de tentar baixar).
+#               - Alterado env_file de stack.env para .env.prod (arquivo
+#                 que ja existe no projeto, simplifica o deploy via File Browser).
+#               - Mantido command: com gunicorn via env vars (lugar correto
+#                 para flexibilidade no Portainer). A redundancia com o CMD
+#                 do Dockerfile.prod sera resolvida ao editar o Dockerfile.prod.
 # =============================================================================
 
 name: eventosmeta_prod
@@ -33,7 +40,7 @@ services:
     container_name: db_eventosmeta_prod
     restart: always
     env_file:
-      - stack.env
+      - .env.prod
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}
@@ -56,11 +63,14 @@ services:
         max-file: "5"
 
   web_eventosmeta_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
     image: eventosmeta_web:prod
     container_name: web_eventosmeta_prod
     restart: always
     env_file:
-      - stack.env
+      - .env.prod
     environment:
       DATABASE_HOST: db_eventosmeta_prod
       GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
@@ -117,7 +127,7 @@ services:
       web_eventosmeta_prod:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:80/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:80/health/ || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -140,7 +150,6 @@ volumes:
     name: static_eventosmeta_prod
   media_eventosmeta_prod:
     name: media_eventosmeta_prod
-
 
 
     
