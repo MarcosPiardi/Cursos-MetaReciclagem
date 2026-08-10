@@ -41,5 +41,6 @@ EXPOSE 8000
 ENTRYPOINT ["/app/entrypoint.sh"]
 
 # CMD dev: runserver com auto-reload (compose sobrescreve se necessario)
+RUN chmod +x /app/entrypoint.sh
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 

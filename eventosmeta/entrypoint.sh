@@ -28,7 +28,7 @@ try:
     s.connect((host, port))
     s.close()
     exit(0)
-except:
+except Exception:
     exit(1)
 "; do
     echo "PostgreSQL nao esta pronto, tentando novamente em 2s..."

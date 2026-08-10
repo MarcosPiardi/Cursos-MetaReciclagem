@@ -241,4 +241,8 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
 
 
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
+
+
+
     
