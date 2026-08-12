@@ -36,7 +36,7 @@ name: eventosmeta_prod
 
 services:
   db_eventosmeta_prod:
-    image: postgres:16-alpine
+    image: postgres:16.10-alpine
     container_name: db_eventosmeta_prod
     restart: always
     env_file:

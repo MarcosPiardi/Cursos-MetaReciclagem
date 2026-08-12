@@ -135,6 +135,16 @@ DATABASES = {
 }
 
 # ==========================================
+# CACHE (Redis)
+# ==========================================
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://redis_eventosmeta:6379",
+    }
+}
+
+# ==========================================
 # VALIDAÇÃO DE SENHA
 # ==========================================
 AUTH_PASSWORD_VALIDATORS = [

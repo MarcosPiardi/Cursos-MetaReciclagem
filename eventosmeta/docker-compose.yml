@@ -1,37 +1,43 @@
 # =============================================================================
 # Arquivo: docker-compose.yml
 # Caminho: eventosmeta/docker-compose.yml
-# Finalidade: Orquestracao Django + PostgreSQL + Nginx (Desenvolvimento)
-# Ambiente otimizado para DESENVOLVIMENTO.
+# Finalidade: Orquestracao Django + PostgreSQL + Nginx  (Deploy de Testes)
+# Ambiente otimizado para DEPLOY DE TESTES com Gunicorn.
 # Atualizacoes:
 #  - 29/06/2026 - Versao inicial
 #  - 03/07/2026 - Refatoracao e padronizacao
 #  - 03/07/2026 - Criação inicial do docker-compose.
 #  - 06/07/2026 - Adição do serviço nginx_eventosmeta.
 #  - 06/07/2026 - Padronização de nomes prefixados (db/web/nginx_eventosmeta).
-#  - 07/07/2026 - Otimização para desenvolvimento:
+#  - 07/07/2026 - Otimização de volumes e redes nomeadas.
 #                      * healthcheck no web_eventosmeta
-#                      * rede nomeada metareciclagem_net
+#                      * rede nomeada rede1
 #                      * variáveis de porta via .env (POSTGRES_PORT,
 #                        NGINX_PORT, DJANGO_PORT)
 #                      * removido backup.sql hardcoded
 #  - 01/08/2026 - Adição de healthcheck no db_eventosmeta
+#  - 10/08/2026 - Mudança de runserver para gunicorn (deploy de testes)
+#  - 10/08/2026 - Atualização PostgreSQL para 16.10-alpine (compatibilidade dump)
 # =============================================================================
 
 # version: "3.8"
 
 networks:
-  metareciclagem_net:
-    name: metareciclagem_net
-    driver: bridge
+  rede:
+    external: true
+    name: rede1    
 
 volumes:
   pgdata_eventosmeta:
     name: pgdata_eventosmeta
+  static_eventosmeta:
+    name: static_eventosmeta
+  media_eventosmeta:
+    name: media_eventosmeta
 
 services:
   db_eventosmeta:
-    image: postgres:15-alpine
+    image: postgres:16.10-alpine
     container_name: db_eventosmeta
     restart: unless-stopped
     environment:
@@ -43,13 +49,37 @@ services:
     volumes:
       - pgdata_eventosmeta:/var/lib/postgresql/data
     networks:
-      - metareciclagem_net
+      - rede
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${DATABASE_NAME}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"  
+  redis_eventosmeta:
+    image: redis:7-alpine
+    container_name: redis_eventosmeta
+    restart: unless-stopped
+    expose:
+      - 6379
+    networks:
+      - rede
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   web_eventosmeta:
     build:
@@ -60,24 +90,42 @@ services:
     depends_on:
       db_eventosmeta:
         condition: service_healthy
+      redis_eventosmeta:
+        condition: service_healthy  
     env_file:
       - .env
     environment:
       DATABASE_HOST: db_eventosmeta
-    ports:
-      - "${DJANGO_PORT:-1362}:8000"
+    # ports:
+    #   - "${DJANGO_PORT:-1362}:8000"
     volumes:
       - .:/app
-    command: python manage.py runserver 0.0.0.0:8000
+      - static_eventosmeta:/app/staticfiles_collected
+      - media_eventosmeta:/app/media
+    expose:
+      - 8000 
+    command: >-
+      gunicorn config.wsgi:application
+      --bind 0.0.0.0:8000
+      --workers ${GUNICORN_WORKERS:-3}
+      --threads ${GUNICORN_THREADS:-4}
+      --timeout 120
+      --graceful-timeout 30
+      --access-logfile -
+      --error-logfile -
     networks:
-      - metareciclagem_net
+      - rede
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/', timeout=5)\" || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
       start_period: 40s
-
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"  
   nginx_eventosmeta:
     image: nginx:alpine
     container_name: nginx_eventosmeta
@@ -85,11 +133,23 @@ services:
     depends_on:
       web_eventosmeta:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:80/health/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"      
     ports:
       - "${NGINX_PORT:-80}:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./:/app:ro
+      - static_eventosmeta:/app/staticfiles_collected:ro
+      - media_eventosmeta:/app/media:ro
     networks:
-      - metareciclagem_net  
+      - rede

@@ -13,6 +13,8 @@
 #               - Removido bloco comentado antigo (confundia leitura).
 #               - Adicionada espera pelo PostgreSQL antes de migrar.
 #               - Adicionado echo de feedback para logs do container.
+# 
+#   host = os.environ.get('DATABASE_HOST', 'db_eventosmeta_prod')
 # ============================================================
 
 set -e
@@ -22,7 +24,7 @@ echo "Aguardando PostgreSQL..."
 while ! python -c "
 import socket, os
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = os.environ.get('DATABASE_HOST', 'db_eventosmeta_prod')
+host = os.environ.get('DATABASE_HOST', 'db_eventosmeta')
 port = int(os.environ.get('DATABASE_PORT', 5432))
 try:
     s.connect((host, port))
@@ -41,12 +43,15 @@ echo "Executando migrations..."
 python manage.py migrate --noinput
 
 # Coletar arquivos estaticos apenas em producao
-if [ "$DEBUG" = "True" ] || [ "$DEBUG" = "1" ]; then
-    echo "Ambiente de desenvolvimento -- pulando collectstatic."
-else
-    echo "Coletando arquivos estaticos..."
-    python manage.py collectstatic --noinput
-fi
+                    # if [ "$DEBUG" = "True" ] || [ "$DEBUG" = "1" ]; then
+                    #     echo "Ambiente de desenvolvimento -- pulando collectstatic."
+                    # else
+                    #     echo "Coletando arquivos estaticos..."
+                    #     python manage.py collectstatic --noinput
+                    # fi
+echo "Coletando arquivos estaticos..."
+python manage.py collectstatic --noinput
+
 
 # Passar o controle para o command definido no docker-compose
 echo "Iniciando aplicacao..."
