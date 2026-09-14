@@ -108,8 +108,18 @@ def notificacoes_eventos(request):
                         evento.tipo_alerta = 'pos_evento'
                         eventos_para_notificar.append(evento)
 
-    except Exception:
-        eventos_para_notificar = []
+    # except Exception:
+    #     eventos_para_notificar = []
+
+    except Exception as e:
+        import traceback
+        print(f"[DEBUG context_processor] Erro: {e}")
+        traceback.print_exc()
+        eventos_para_notificar = []    
+
+    print(f"[DEBUG context_processor] Eventos para notificar: {len(eventos_para_notificar)}")
+    for ev in eventos_para_notificar:
+        print(f"[DEBUG] {ev.nome} - {ev.tipo_alerta}")
 
     return {
         'eventos_notificacao': eventos_para_notificar

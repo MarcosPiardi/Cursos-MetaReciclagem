@@ -1,3 +1,6 @@
+# Arquivo: .dockerignore
+# Caminho: eventosmeta/.dockerignore
+
 # Controle de versão
 .git
 .gitignore

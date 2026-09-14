@@ -278,3 +278,5 @@ class Horario(models.Model):
     
     def __str__(self):
         return f'{self.turma.nome} - {self.get_dia_semana_display()}'
+
+        

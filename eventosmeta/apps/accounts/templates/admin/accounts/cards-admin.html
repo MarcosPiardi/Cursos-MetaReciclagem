@@ -1,57 +1,228 @@
 {% extends "admin/index.html" %}
-{% load i18n static %}
+{% load i18n static log %}
 
 {% comment %}
-Arquivo: cards-admin.html    antigo index.html
+Arquivo: cards-admin.html
 Caminho: apps/accounts/templates/admin/accounts/cards-admin.html
-Finalidade: Customização da página inicial do admin com cards de acesso aos dashboards
-Atualizações:
+Finalidade: Customizacao da pagina inicial do admin com layout de 4 quadrantes
+            (cards, notificacoes, painel de controle e acoes recentes)
+Atualizacoes:
  - 13/07/2026 - Corrigidos links de dashboard para usar namespace 'dashboard:'
-                (dashboard_eventos, dashboard_interessados, dashboard_processo_seletivo,
-                dashboard_lgpd), resolvendo erro NoReverseMatch após refatoração
-                que moveu rotas do dashboard para app próprio com app_name='dashboard'
+ - 09/09/2026 - Adicionado painel lateral de notificacoes de eventos
+ - 11/09/2026 - Layout reestruturado em 4 quadrantes (2x2) conforme referencia
+ - 11/09/2026 (fix) - Corrigido problema de largura: o bloco 'sidebar' padrao
+               do admin/index.html continuava ativo com float:right e
+               espremia o conteudo. Solucao:
+               - coltype alterado para 'colM' (sem coluna reservada)
+               - content_title e sidebar padrao suprimidos
+               - Acoes Recentes agora renderizado manualmente dentro do
+                 quadrante-4, usando {% get_admin_log %} diretamente
+ - 11/09/2026 (fix 2) - Removida a div 'header-admin' customizada (nav
+               duplicado com Dashboard/Inicio/Exclusoes LGPD), pois o
+               Django ja exibe essas informacoes na barra padrao do admin
+ - 11/09/2026 (fix 3) - Causa raiz da largura pela metade encontrada:
+               regra padrao do Django '.dashboard #content { width: 600px; }'
+               (base.css do framework). Sobrescrita via bloco extrastyle
+               com 'width: auto'
+ - 14/09/2026 - Removidas as bordas coloridas de debug dos quadrantes
+               (layout ja validado visualmente)
 {% endcomment %}
 
-{% block content %}
-<div style="margin: 20px 0;">
-    <h2 style="border-bottom: 2px solid #417690; padding-bottom: 10px;">📊 Dashboards</h2>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0;">
-        <a href="{% url 'dashboard:academico' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
-            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">📚 Informações Acadêmicas</h3>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Notas, frequências e aprovações</p>
-        </a>
-        
-        <a href="{% url 'dashboard:eventos' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">📅 Eventos/Cursos e Turmas</h3>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Informações sobre eventos/turmas</p>
-        </a>
-        
-        <a href="{% url 'dashboard:interessados' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
-            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">👥 Interessados</h3>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Cadastros e perfis</p>
-        </a>
-        
-        <a href="{% url 'dashboard:processo_seletivo' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
-            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">📝 Inscrições e Classificações</h3>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Processo seletivo e classificação</p>
-        </a>
+{% block coltype %}colM{% endblock %}
 
-        <a href="{% url 'dashboard:lgpd' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
-            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">🗑️ LGPD / Exclusões</h3>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Solicitações de exclusão de dados</p>
-        </a>  
+{% block content_title %}{% endblock %}
 
-        <a href="{% url 'dashboard:geral' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
-            <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">Dashboard Administrativo  </h3>
-            <p style="margin: 0; opacity: 0.9; font-size: 16px;">Acesso Rápido às Métricas Gerais</p>
-        </a>  
+{% block sidebar %}{% endblock %}
 
-    </div>
-</div>
-
+{% block extrastyle %}
 {{ block.super }}
+<style>
+    .dashboard #content {
+        width: auto;
+    }
+</style>
 {% endblock %}
 
+{% block content %}
 
+<!-- ==========================================
+     WRAPPER PRINCIPAL: tela inteira
+     ========================================== -->
+<div id="wrapper-admin-principal" class="wrapper-admin-principal" style="width: 100%;">
 
+    <!-- ==========================================
+         CONTAINER-QUADRANTES
+         Grid 2x2: duas linhas, duas colunas
+         Coluna esquerda = 2/3, coluna direita = 1/3 (2fr / 1fr)
+         ========================================== -->
+    <div id="container-quadrantes" class="container-quadrantes" style="display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: auto auto; gap: 15px; width: 100%; box-sizing: border-box;">
+
+        <!-- ==========================================
+             QUADRANTE-1: CARDS
+             Superior esquerdo
+             ========================================== -->
+        <div id="quadrante-cards" class="quadrante quadrante-cards" style="grid-column: 1; grid-row: 1; box-sizing: border-box;">
+
+            <div class="section-header" id="header-cards" style="display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #417690; padding-bottom: 10px; margin: 0 0 15px 0;">
+                <i class="bi bi-bar-chart-line-fill" style="font-size: 22px; color: #417690;"></i>
+                <h2 style="margin: 0; font-size: 20px; color: #417690;"> 📊 - Dashboards</h2>
+            </div>
+
+            <div id="cards-grid" class="dashboard-cards-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+
+                <div class="dashboard-card" id="card-academico">
+                    <a href="{% url 'dashboard:academico' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; height: 100%; box-sizing: border-box;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">Informações Acadêmicas</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: 16px;">Notas, Frequências e Aprovações</p>
+                    </a>
+                </div>
+
+                <div class="dashboard-card" id="card-eventos">
+                    <a href="{% url 'dashboard:eventos' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; height: 100%; box-sizing: border-box;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">Eventos/Cursos e Turmas</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: 16px;">Informações sobre eventos/turmas</p>
+                    </a>
+                </div>
+
+                <div class="dashboard-card" id="card-interessados">
+                    <a href="{% url 'dashboard:interessados' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; height: 100%; box-sizing: border-box;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">Interessados</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: 16px;">Cadastros e perfis</p>
+                    </a>
+                </div>
+
+                <div class="dashboard-card" id="card-seletivo">
+                    <a href="{% url 'dashboard:processo_seletivo' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; height: 100%; box-sizing: border-box;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">Inscrições e Classificações</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: 16px;">Processo seletivo e classificação</p>
+                    </a>
+                </div>
+
+                <div class="dashboard-card" id="card-lgpd">
+                    <a href="{% url 'dashboard:lgpd' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; height: 100%; box-sizing: border-box;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">LGPD / Exclusões</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: 16px;">Solicitações de exclusão de dados</p>
+                    </a>
+                </div>
+
+                <div class="dashboard-card" id="card-geral">
+                    <a href="{% url 'dashboard:geral' %}" style="display: block; padding: 20px; background: linear-gradient(135deg, #2d7a9b 70%, #205067 100%); color: white; text-decoration: none; border-radius: 2px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; height: 100%; box-sizing: border-box;">
+                        <h3 style="margin: 0 0 10px 0; font-size: 18px; color: black;">Dashboard Administrativo</h3>
+                        <p style="margin: 0; opacity: 0.9; font-size: 16px;">Acesso Rápido às Métricas Gerais</p>
+                    </a>
+                </div>
+
+            </div>
+            <!-- Fim do cards-grid -->
+
+        </div>
+        <!-- Fim do quadrante-cards -->
+
+        <!-- ==========================================
+             QUADRANTE-2: NOTIFICACOES
+             Superior direito
+             ========================================== -->
+        <div id="quadrante-notificacoes" class="quadrante quadrante-notificacoes" style="grid-column: 2; grid-row: 1; box-sizing: border-box;">
+
+            {% if eventos_notificacao %}
+            <div class="section-header" id="header-notificacoes" style="display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #2d7a9b; padding-bottom: 10px; margin: 0 0 15px 0;">
+                <i class="bi bi-bell-fill" style="font-size: 22px; color: #2d7a9b;"></i>
+                <h2 style="margin: 0; font-size: 20px; color: #2d7a9b;">🚨 - Notificações de Eventos ({{ eventos_notificacao|length }})</h2>
+            </div>
+
+            <div id="notificacoes-panel" class="notificacoes-panel" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 15px;">
+                {% for evento in eventos_notificacao %}
+                <div class="notificacao-item" id="notificacao-{{ forloop.counter }}" style="margin-bottom: 10px; padding-bottom: {% if not forloop.last %}10px; border-bottom: 1px solid #ffe699{% else %}0{% endif %};">
+                    <strong style="color: #856404; display: block; margin-bottom: 3px;">
+                        <i class="bi bi-exclamation-triangle-fill" style="margin-right: 5px;"></i>{{ evento.nome }}
+                    </strong>
+                    <small style="color: #856404; display: block; padding-left: 24px;">
+                        {% if evento.tipo_alerta == 'inscricao' %}
+                            Inscricoes abertas mas status nao atualizado.
+                        {% elif evento.tipo_alerta == 'pos_inscricao' %}
+                            Inscricoes encerradas, aguardando inicio. Verificar status.
+                        {% elif evento.tipo_alerta == 'evento' %}
+                            Evento em andamento mas status nao e "Em Andamento".
+                        {% elif evento.tipo_alerta == 'pos_evento' %}
+                            Evento finalizado mas status nao atualizado.
+                        {% endif %}
+                    </small>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="section-header" id="header-notificacoes" style="display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #417690; padding-bottom: 10px; margin: 0 0 15px 0;">
+                <i class="bi bi-bell-fill" style="font-size: 22px; color: #417690;"></i>
+                <h2 style="margin: 0; font-size: 20px; color: #417690;">Notificações de Eventos</h2>
+            </div>
+            <div id="notificacoes-panel-vazio" class="notificacoes-panel" style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; color: #6c757d;">
+                <small>Nenhuma notificação de evento no momento.</small>
+            </div>
+            {% endif %}
+
+        </div>
+        <!-- Fim do quadrante-notificacoes -->
+
+        <!-- ==========================================
+             QUADRANTE-3: PAINEL DE CONTROLE
+             Inferior esquerdo
+             ========================================== -->
+        <div id="quadrante-painel-controle" class="quadrante quadrante-painel-controle" style="grid-column: 1; grid-row: 2; box-sizing: border-box;">
+
+            <div class="section-header" id="header-painel" style="display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #417690; padding-bottom: 10px; margin: 0 0 15px 0;">
+                <i class="bi bi-gear-fill" style="font-size: 22px; color: #417690;"></i>
+                <h2 style="margin: 0; font-size: 20px; color: #417690;"> 🎛️ - Painel de Controle</h2>
+            </div>
+
+            {{ block.super }}
+
+        </div>
+        <!-- Fim do quadrante-painel-controle -->
+
+        <!-- ==========================================
+             QUADRANTE-4: ACOES RECENTES
+             Inferior direito
+             Renderizado manualmente (bloco sidebar padrao foi suprimido acima)
+             ========================================== -->
+        <div id="quadrante-acoes-recentes" class="quadrante quadrante-acoes-recentes" style="grid-column: 2; grid-row: 2; box-sizing: border-box;">
+
+            <div class="section-header" id="header-acoes" style="display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #417690; padding-bottom: 10px; margin: 0 0 15px 0;">
+                <i class="bi bi-clock-history" style="font-size: 22px; color: #417690;"></i>
+                <h2 style="margin: 0; font-size: 20px; color: #417690;"> 🔷 - Ações Recentes</h2>
+            </div>
+
+            {% get_admin_log 10 as admin_log for_user user %}
+            {% if not admin_log %}
+                <p>{% translate 'None available' %}</p>
+            {% else %}
+                <ul class="actionlist" style="list-style: none; padding: 0; margin: 0;">
+                {% for entry in admin_log %}
+                    <li style="padding: 6px 0; border-bottom: 1px solid #eee;">
+                        {% if entry.is_deletion or not entry.get_admin_url %}
+                            {{ entry.object_repr }}
+                        {% else %}
+                            <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                        {% endif %}
+                        <br>
+                        {% if entry.content_type %}
+                            <span class="mini quiet" style="color: #6c757d; font-size: 12px;">{{ entry.content_type|capfirst }}</span>
+                        {% else %}
+                            <span class="mini quiet" style="color: #6c757d; font-size: 12px;">{% translate 'Unknown content' %}</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+        </div>
+        <!-- Fim do quadrante-acoes-recentes -->
+
+    </div>
+    <!-- Fim do container-quadrantes -->
+
+</div>
+<!-- Fim do wrapper-admin-principal -->
+
+{% endblock %}
 

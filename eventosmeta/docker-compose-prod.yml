@@ -47,7 +47,7 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - db_data_eventosmeta_prod:/var/lib/postgresql/data
+      - pgdata_eventosmeta_prod:/var/lib/postgresql/data
     networks:
       - rede
     healthcheck:
@@ -144,8 +144,8 @@ networks:
       name: rede1
 
 volumes:
-  db_data_eventosmeta_prod:
-    name: db_data_eventosmeta_prod
+  pgdata_eventosmeta_prod:
+    name: pgdata_eventosmeta_prod
   static_eventosmeta_prod:
     name: static_eventosmeta_prod
   media_eventosmeta_prod:

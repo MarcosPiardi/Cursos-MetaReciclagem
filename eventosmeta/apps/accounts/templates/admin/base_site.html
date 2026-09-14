@@ -1,15 +1,34 @@
+<!--
+Arquivo: base_site.html
+Caminho: apps/accounts/templates/admin/base_site.html
+Finalidade: Template base customizado do Django Admin com favicon e navegacao
+Atualizacoes:
+ - 09/09/2026 - Adicionado favicon no bloco extrahead
+               - Notificacoes removidas do nav-global (movidas para cards-admin.html)
+               - Corrigido URL do dashboard de admin:dashboard para dashboard:geral
+-->
+
 {% extends "admin/base.html" %}
+{% load static %}
 
 {% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
-{% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">MetaReciclagem - Administração</a></h1>
+{% block extrahead %}
+{{ block.super }}
+<link rel="icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}">
+<link rel="shortcut icon" type="image/png" href="{% static 'images/favicon-metareciclagem.png' %}">
 {% endblock %}
 
-{% block nav-global %}
-<div style="background: #417690; padding: 10px 20px;">
-    <a href="{% url 'admin:dashboard' %}" style="color: white; text-decoration: none; margin-right: 20px;">📊 Dashboard</a>
-    <a href="{% url 'admin:index' %}" style="color: white; text-decoration: none; margin-right: 20px;">🏠 Início</a>
-    <a href="{% url 'dashboard:lgpd' %}" style="color: #ffcccc; text-decoration: none;">🗑️ Exclusões LGPD</a>
-</div>
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">MetaReciclagem - Administracao</a></h1>
 {% endblock %}
+
+{% comment %} {% block nav-global %}
+<div style="background: #417690; padding: 10px 20px;">
+    <a href="{% url 'dashboard:geral' %}" style="color: white; text-decoration: none; margin-right: 20px;">Dashboard</a>
+    <a href="{% url 'admin:index' %}" style="color: white; text-decoration: none; margin-right: 20px;">Inicio</a>
+    <a href="{% url 'dashboard:lgpd' %}" style="color: #ffcccc; text-decoration: none;">Exclusoes LGPD</a>
+</div>
+{% endblock %} {% endcomment %}
+
+
