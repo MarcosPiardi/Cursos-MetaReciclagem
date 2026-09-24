@@ -22,18 +22,6 @@
 
 # version: "3.8"
 
-networks:
-  rede:
-    external: true
-    name: rede1    
-
-volumes:
-  pgdata_eventosmeta:
-    name: pgdata_eventosmeta
-  static_eventosmeta:
-    name: static_eventosmeta
-  media_eventosmeta:
-    name: media_eventosmeta
 
 services:
   db_eventosmeta:
@@ -153,3 +141,16 @@ services:
       - media_eventosmeta:/app/media:ro
     networks:
       - rede
+
+networks:
+  rede:
+    external: true
+    name: rede1    
+
+volumes:
+  pgdata_eventosmeta:
+    name: pgdata_eventosmeta
+  static_eventosmeta:
+    name: static_eventosmeta
+  media_eventosmeta:
+    name: media_eventosmeta

@@ -1,9 +1,10 @@
+# =============================================================================
 # Arquivo: docker-compose-prod.yml
 # Caminho: eventosmeta/docker-compose-prod.yml
 # Projeto: EventosMeta / MetaReciclagem
 # Ambiente: Producao
-# Host alvo: 10.30.166.21
-# Finalidade: Orquestracao Django + PostgreSQL + Nginx (Producao)
+# Host alvo: 10.30.166.109
+# Finalidade: Orquestracao Django + PostgreSQL + Redis + Nginx (Producao)
 # Atualizacoes:
 #  - 29/06/2026 - Versao inicial
 #  - 03/07/2026 - Refatoracao e padronizacao
@@ -30,8 +31,11 @@
 #               - Mantido command: com gunicorn via env vars (lugar correto
 #                 para flexibilidade no Portainer). A redundancia com o CMD
 #                 do Dockerfile.prod sera resolvida ao editar o Dockerfile.prod.
+#  - 17/09/2026 - Corrigido 'Host alvo' no cabecalho:
+#                 10.30.166.21 -> 10.30.166.109 (IP real do servidor de producao)
+#  - 17/09/2026 - Adicionado servico redis_eventosmeta_prod (cache) e
+#                 dependencia no web_eventosmeta_prod
 # =============================================================================
-
 name: eventosmeta_prod
 
 services:
@@ -56,6 +60,26 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  redis_eventosmeta_prod:
+    image: redis:7-alpine
+    container_name: redis_eventosmeta_prod
+    restart: always
+    expose:
+      - 6379
+    networks:
+      - rede
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     logging:
       driver: json-file
       options:
@@ -91,6 +115,8 @@ services:
       - rede
     depends_on:
       db_eventosmeta_prod:
+        condition: service_healthy
+      redis_eventosmeta_prod:
         condition: service_healthy
     healthcheck:
       test:

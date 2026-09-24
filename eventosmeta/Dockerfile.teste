@@ -1,0 +1,48 @@
+# ============================================================
+# Arquivo: Dockerfile.teste
+# Caminho: eventosmeta/Dockerfile.teste
+# Finalidade: Imagem Docker para Django MetaReciclagem (Ambiente de Teste)
+# Atualizacoes:
+#  - 15/09/2026 - Versao inicial copiado de Dockerfile.prod e alterado para ambiente de teste  
+# =============================================================================================
+
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    DJANGO_SETTINGS_MODULE=config.settings
+
+# Criar usuario nao-root
+RUN useradd -m -u 1000 django
+
+WORKDIR /app
+
+# Instalar dependencias primeiro (aproveita cache de layers)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar codigo do projeto
+COPY . .
+
+# Permissoes: chmod no entrypoint, criar diretorios, ownership
+RUN chmod +x /app/entrypoint.sh && \
+    mkdir -p /app/staticfiles_collected /app/media && \
+    chown -R django:django /app
+
+# Trocar para usuario nao-root
+USER django
+
+EXPOSE 8000
+
+# Entrypoint: roda migrations + collectstatic antes de iniciar a app
+# CAMINHO ABSOLUTO: evita problemas de resolucao relativa
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# CMD default (fallback se nao houver command no compose)
+# O compose-teste sobrescreve com workers/threads via env vars
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--threads", "4", "--timeout", "120", "--graceful-timeout", "30", "--access-logfile", "-", "--error-logfile", "-", "config.wsgi:application"]
+
+
+
+

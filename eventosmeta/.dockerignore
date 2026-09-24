@@ -39,6 +39,9 @@ docker-compose*.yml
 .env
 .env.example
 .env.prod
+.env.teste
+.env.local
+.env*
 
 # Logs
 logs/*.log

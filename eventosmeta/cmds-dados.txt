@@ -1,0 +1,1926 @@
+pytest apps/dashboard/tests/test_services.py -v
+cls
+pip install factory-boy
+pip list | findstr pytest
+cls
+python manage.py runserver
+cls
+python manage.py check
+python manage.py test
+cls
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+cls
+(Get-PSReadLineOption).HistorySavePath
+[Microsoft.PowerShell.PSConsoleReadLine]::ClearHistory()
+exit
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+exit
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python -m pytest apps/eventos/tests/ -x -v
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestStatusForm -x -v
+cls
+python -m pytest apps/eventos/tests/ -x -v
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestStatusForm -x -v
+python -m pytest apps/eventos/tests/ -x -v
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEventoCriterioInlineMethods -x -v
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEventoCriterioInlineMethods -x -v
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEventoCriterioInlineMethods::test_get_queryset_usar_select_related -x -v
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEventoCriterioInlineMethods::test_get_queryset_usar_select_related -x -v
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEventoCriterioInlineMethods::test_get_queryset_usar_select_related -x -v
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/eventos/tests/ -x -v --tb=short
+cls
+python -m pytest apps/eventos/tests/ -x -v --tb=short
+cls
+python -m pytest apps/eventos/tests/ -x -v --tb=short
+cls
+python -m pytest apps/eventos/tests/ -x -v --tb=short
+cls
+python -m pytest apps/eventos/tests/ -x -v --tb=short
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEdgeCases -v --tb=short
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEdgeCases -v --tb=short
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEdgeCases -v --tb=short
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEdgeCases -v --tb=short
+cls
+python -m pytest apps/eventos/tests/ -x -v --tb=short
+cls
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEdgeCases -v --tb=short
+exit
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py::TestEdgeCases -v --tb=short
+cls
+python -m pytest apps/eventos/tests/ -x -v --tb=short
+cls
+python -m pytest apps/selecao/tests/test_reports.py -v --tb=short
+cls
+python -m pytest apps/selecao/tests/test_reports.py -k "TestGerar" -v --tb=short
+cls
+python -m pytest apps/selecao/tests/test_reports.py -k "TestRelatorioAprovadosService" -v --tb=short
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+exit
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+pytest apps/eventos/tests/test_admin_config.py -v
+python -m pytest apps/eventos/tests/test_admin_config.py -v
+cls
+python -m pytest apps/eventos/tests/test_admin_config.py -v
+cls
+python -m pytest apps/academico/tests/test_services.py -v --tb=short
+cls
+python -m pytest apps/academico/tests/test_services.py -v --tb=short
+cls
+& c:/PMS/PMS2025/Inscr-Meta/prg-Meta/Eventos-MetaReciclagem/.venv/Scripts/python.exe
+cls
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python -m pytest apps/academico/tests/test_views.py -v --tb=short
+cls
+coverage run -m pytest apps/academico/tests/test_views.py -v
+cls
+coverage report -m
+python -m pytest --cov=apps --cov-report=html
+cls
+exit
+exit
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+exit
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python -m pytest apps/academico/tests/test_services.py::TestMatricularAlunos -v --tb=short
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/selecao/tests/test_services.py::TestClassificadorService::test_desempate_por_data_inscricao_igual_pontuacao --pdb -x
+cls
+python manage.py makemigrations selecao && python manage.py migrate
+apps/selecao/tests/test_services.py::TestClassificadorServiceDesempate -v --tb=short
+python -m pytest apps/selecao/tests/test_services.py::TestClassificadorServiceDesempate -v --tb=short
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/academico/tests/test_admin.py -v --tb=short
+cls
+python -m pytest apps/academico/tests/test_admin.py -v --tb=short
+cls
+python -m pytest apps/academico/tests/test_admin.py::TestAvaliacaoAdmin::test_gerar_certificados_ja_emitido -v --tb=long -s
+cls
+python -m pytest apps/academico/tests/test_admin.py::TestAvaliacaoAdmin::test_gerar_certificados_ja_emitido -v --tb=long -s
+cls
+python -m pytest apps/academico/tests/test_admin.py::TestAvaliacaoAdmin::test_gerar_certificados_ja_emitido -v --tb=long -s
+cls
+python -m pytest apps/academico/tests/test_admin.py -v --tb=short
+cls
+python -m pytest apps/academico/tests/test_admin.py -v --tb=short
+cls
+python -m pytest apps/academico/tests/test_admin.py::TestAvaliacaoAdmin::test_gerar_certificados_ja_emitido -v --tb=short
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/academico/tests/test_admin.py -v --tb=short
+cls
+python -m pytest apps/academico/tests/test_admin.py -v --tb=short
+cls
+python -m pytest apps/academico/tests/test_admin.py -v 
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/academico/tests/test_admin.py -v --tb=short
+cls
+python -m pytest apps/academico/tests/test_admin.py -v --tb=short
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/academico/tests/test_admin.py::TestAvaliacaoAdmin::test_gerar_certificados_ja_emitido -v --tb=long -s
+cls
+python -m pytest apps/academico/tests/test_admin.py::TestAvaliacaoAdmin::test_gerar_certificados_ja_emitido -v --tb=long -s
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/selecao/tests/test_services.py -k test_desempate_por_data_inscricao_igual_pontuacao
+cls
+python -m pytest apps/selecao/tests/test_services.py
+cls
+python -m pytest apps/selecao/tests/test_services.py
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/selecao/tests/test_services.py
+cls
+python -m pytest apps/selecao/tests/test_services.py
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python -m pytest apps/selecao/tests/test_services.py
+cls
+python -m pytest apps/selecao/tests/test_services.py
+cls
+python -m pytest apps/selecao/tests/test_services.py
+cls
+python -m pytest apps/selecao/tests/test_services.py
+cls
+python -m pytest apps/selecao/ --cov=apps/selecao
+cls
+python -m pytest apps/selecao/tests/test_services.py apps/selecao/tests/test_validators.py
+cls
+python -m pytest apps/accounts/ apps/interessados/ apps/eventos/ apps/selecao/tests/
+cls
+python -m pytest --cov=apps --cov-report=html --pdb
+cls
+python -m pytest apps/eventos/tests/ apps/selecao/tests/test_services.py::TestClassificadorServiceDesempate -v
+cls
+python -m pytest apps/interessados/tests/ apps/selecao/tests/test_services.py::TestClassificadorServiceDesempate -v
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest -x
+cls
+python -m pytest apps/interessados/tests/test_criptografar_cpfs.py -v
+cls
+python -m pytest apps/interessados/tests/test_criptografar_cpfs.py -v
+cls
+cls
+cls
+python manage.py runserver
+cls
+cls
+cls
+cls
+cls
+cls
+cls
+cls
+python -m pytest apps/interessados/tests/test_popular_cpf_hash.py -v
+cls
+python -m pytest apps/interessados/tests/test_popular_cpf_hash.py -v
+cls
+python -m pytest apps/interessados/tests/test_popular_cpf_hash.py -v
+cls
+tree /f /a > 25-06-2026-estrutura.txt
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/selecao/tests/test_validators.py -v 
+cls
+python -m pytest apps/selecao/tests/test_validators.py -v 
+cls
+python -m pytest apps/selecao/tests/test_validators.py -v 
+cls
+python -m pytest apps/selecao/tests/test_validators.py -v 
+cls
+python -m pytest apps/selecao/tests/test_validators.py -v 
+cls
+python -m pytest apps/selecao/tests/test_services.py -v 
+cls
+python -m pytest apps/selecao/tests/test_services.py -v 
+cls
+python -m pytest apps/selecao/tests/test_services.py -v 
+cls
+python -m pytest apps/selecao/tests/test_services.py -v 
+cls
+python -m pytest apps/accounts/tests/test_views.py -v
+cls
+python -m pytest apps/accounts/tests/test_views.py -v
+cls
+python -m pytest apps/accounts/tests/test_views.py -v
+cls
+python -m pytest apps/accounts/tests/test_views.py -v
+cls
+python -m pytest apps/interessados/tests/test_views.py -v
+cls
+python -m pytest apps/interessados/tests/test_views.py -v
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/interessados/tests/test_views.py -v
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/selecao/tests/test_validators.py -v
+cls
+python -m pytest apps/selecao/tests/test_services.py -v
+cls
+python -m pytest apps/selecao/tests/test_services.py -v
+cls
+python -m pytest apps/selecao/tests/test_validators.py -v
+cls
+python -m pytest apps/selecao/tests/test_services.py apps/selecao/tests/test_validators.py -q
+cls
+python -m pytest apps/selecao/tests/test_services.py apps/selecao/tests/test_validators.py -q
+cls
+python -m pytest apps/selecao/tests/test_services.py apps/selecao/tests/test_validators.py -q
+cls
+pytest apps/selecao/tests/test_validators.py::TestValidarCriterio -q
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+python -m pytest apps/selecao/tests/test_services.py -v
+cls
+python -m pytest apps/selecao/tests/test_validators.py -v
+cls
+python -m pytest --cov=apps --cov-report=html
+cls
+start htmlcov/index.html
+wsl --list
+wsl --list -v
+pip freeze > requirements.txt
+docker --version
+Test-NetConnection -ComputerName 10.30.166.21 -Port 22
+Test-NetConnection -ComputerName 10.30.166.21 -Port 22
+tree /f
+tree /f /a
+tree /f
+tree /f /a
+tree /f
+tree /f /a
+cls
+tree /f /a
+cls
+exit
+wsl.exe -d Ubuntu
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+dir
+cd..
+dir
+cd eventosmeta
+dir
+cls
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta`
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`
+.\organizar_container.ps1
+docker info
+cls
+docker desktop
+docker info
+docker desktop version
+docker desktop
+docker desktop diagnose
+cls
+wsl -l -v
+wsl --install -d Ubuntu
+wsl -d docker-desktop
+cls
+wsl -l -v
+wsl --install -d Ubuntu
+wsl -d Ubuntu
+docker info
+wsl -d docker-desktop
+cls
+wsl --shutdown
+wsl -d docker-desktop
+docker info
+wsl -l -v
+exit
+exit
+docker info
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+.\organizar_container.ps1
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+docker compose build
+cls
+docker compose build
+cls
+docker compose up -d
+cls
+docker compose logs web --tail 20
+cls
+docker compose build
+docker compose up -d
+docker compose logs web --tail 20
+cls
+docker compose build
+docker compose up -d
+docker compose logs web --tail 15
+http://localhost
+curl http://localhost
+cls
+docker compose exec web python manage.py makemigrations eventos
+docker compose exec web python manage.py migrate
+cls
+docker compose logs nginx
+cls
+docker compose logs nginx
+cls
+curl http://localhost:8000
+cls
+curl -L http://localhost
+exit
+curl -L http://localhost
+curl -l http://localhost
+curl -I http://localhost
+docker compose exec nginx nginx -s reload
+curl -I http://localhost
+cls
+docker compose cp nginx.conf nginx:/etc/nginx/conf.d/default.conf
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+docker compose cp nginx.conf nginx:/etc/nginx/conf.d/default.conf
+cls
+docker compose build
+docker compose up -d
+cls
+curl -I http://localhost
+cls
+docker compose build
+docker compose up -d
+curl -I http://localhost
+cls
+docker compose exec web python -c "from config.settings import SECURE_SSL_REDIRECT; print(SECURE_SSL_REDIRECT)"
+docker compose exec web grep -n "SECURE_SSL\|SECURE_PROXY_SSL\|SECURE_HSTS\|SecurityMiddleware" config/settings.py
+cls
+docker compose exec web sed -i 's/SECURE_SSL_REDIRECT            = True/SECURE_SSL_REDIRECT            = False/' config/settings.py
+docker compose restart web
+cls
+curl -I http://localhost
+cls
+docker compose ps
+cls
+exit
+ipconfig
+cls
+python manage.py runserver
+cls
+docker compose exec web python manage.py makemigrations eventos
+docker compose exec web python manage.py migrate
+ping 10.30.166.21
+cls
+docker compose exec web python manage.py showmigrations eventos
+cls
+docker compose build
+cls
+ssh mpiardi@10.30.166.21
+cls
+ssh mpiardi@10.30.166.21
+exit
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+exit
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+cls
+ssh mpiardi@10.30.166.21
+docker compose up -d
+curl -fsSL https://get.docker.com | sudo bash
+exit
+dir
+cls
+docker compose down
+docker compose build
+docker compose up -d
+cls
+ssh mpiardi@10.30.166.21
+ping 10.30.166.21
+ipconfig
+cls
+ping 10.30.166.21
+ssh mpiardi@10.30.166.21
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+netstat -ano | findstr :80
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+copy .env.docker .env
+copy .env.local .env
+cls
+python manage.py runserver
+type .env | findstr DB_HOST
+type .env | findstr HOST
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+type .env | findstr /C:"DATABASE_HOST"
+dir .*
+copy .env.docker .env
+cls
+docker save eventosmeta-web -o eventosmeta-web.tar
+scp eventosmeta-web.tar mpiardi@10.30.166.21:/tmp/
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+exit
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python c:\PMS\SCRIPTS\concatenar_todo_projeto.py
+cls
+C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\__pycache__\
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python c:\PMS\SCRIPTS\criar_arquivos_docker.py
+python "C:\PMS\scripts\criar_arquivos_docker.py"
+cls
+python "C:\PMS\scripts\criar_arquivos_docker.py"
+cls
+python "C:\PMS\scripts\criar_arquivos_docker.py"
+cls
+python "C:\PMS\scripts\criar_arquivos_docker.py"
+cls
+python "C:\PMS\scripts\criar_arquivos_docker.py"
+cls
+python "C:\PMS\scripts\criar_arquivos_docker.py"
+cls
+python "C:\PMS\scripts\criar_arquivos_docker.py"
+cls
+python "C:\PMS\scripts\criar_arquivos_docker.py"
+cls
+python "C:\PMS\scripts\criar_arquivos_docker.py"
+cls
+docker-compose build
+docker --version
+docker ps
+cls
+docker-compose build
+cls
+docker-compose build
+cls
+docker-compose up -d
+docker-compose ps
+curl http://localhost
+docker-compose logs web
+docker-compose logs db
+docker-compose logs nginx
+docker-compose restart web
+docker-compose logs web
+ls -la entrypoint.sh
+dir entr*.*
+cls
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+cls
+docker-compose ps
+docker-compose logs web
+cls
+docker-compose down -v
+docker-compose build --no-cache
+cls
+docker-compose down
+docker-compose down -v
+docker-compose build --no-cache
+docker-compose up -d
+docker-compose logs web
+docker-compose logs db
+cls
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+pg_dump -U metareciclagem_user -h localhost -W bdmetareciclagem > backup.sql
+dir 
+docker image ls
+docker compose build --no-cache
+docker compose -f docker-compose-prod.yml build --no-cache
+docker compose -f docker-compose-prod.yml up -d
+docker compose ps
+cls
+curl http://localhost/health/
+python "C:\PMS\scripts\concatenar_todo_projeto.py"
+cls
+git reset --soft HEAD~1
+git log --oneline -10
+git log --oneline --all
+cls
+git status
+cls
+git log --oneline -10
+cls
+python manage.py runserver
+python manage.py check
+cls
+python manage.py runserver
+cls
+python manage.py check
+python manage.py runserver
+cls
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+docker compose up --build
+docker compose up
+docker compose exec web python manage.py check
+docker compose exec web python manage.py migrate
+cls
+docker compose up --build
+cls
+docker compose up --build
+cls
+pg_dump -U SEU_USUARIO -h localhost -p 5432 -d eventosmetaSEU_BANCO --encoding=UTF8 --inserts --column-inserts -f backup.sql
+pg_dump -U mpiardi -h localhost -p 5432 -d eventosmeta --encoding=UTF8 --inserts --column-inserts -f backup.sql
+pg_dump -U metareciclagem_user -h localhost -p 5432 -d metareciclagem --encoding=UTF8 --inserts --column-inserts -f backup.sql
+pg_dump -U metareciclagem_user -h localhost -p 5432 -d bdmetareciclagem --encoding=UTF8 --inserts --column-inserts -f backup.sql
+cls
+docker compose down
+docker volume rm eventosmeta_postgres_data
+docker volume ls
+docker compose up --build
+exit
+cls
+docker compose down
+docker volume rm eventosmeta_postgres_data
+docker compose up --build
+docker compose logs -f
+docker compose logs -f web
+docker compose ps
+docker compose logs -f web_eventosmeta
+cls
+docker compose config --services
+docker ps
+docker compose config --services
+docker volume ls
+cls
+docker compose config --services
+docker ps
+docker volume ls
+dir
+tree /f
+cls
+docker compose config --services
+docker ps
+docker volume ls
+dir
+cls
+docker compose config --services
+findstr /S /N /C:"docker compose config" *
+cls
+docker compose config --services
+docker volume ls
+docker ps -a
+docker images
+git log --oneline -10
+tree /f
+cls
+tree
+tree /f /a
+cls
+docker compose down -v
+docker container prune -f
+docker image rm web_eventosmeta postgres:16-alpine nginx:1.27-alpine -f 2>$null
+docker volume prune -f
+docker ps -a
+docker images
+docker volume ls
+cls
+docker compose down -v
+docker compose -f docker-compose-prod.yml down -v
+docker container prune -f
+docker image rm eventosmeta-web:latest eventosmeta-web_eventosmeta:latest -f 2>$null
+docker volume prune -f
+docker network prune -f
+docker ps -a
+cls
+docker stop eventosmeta-nginx-prod eventosmeta-web-prod eventosmeta-db-prod
+docker rm eventosmeta-nginx-prod eventosmeta-web-prod eventosmeta-db-prod -f
+docker image prune -a -f
+docker volume rm eventosmeta_static_volume_prod eventosmeta_media_volume_prod eventosmeta_postgres_data_prod -f
+docker network prune -f
+docker ps -a
+docker images
+docker volume ls
+cls
+Write-Host "=== CONTAINERS ===" -ForegroundColor Green`
+docker ps -a
+Write-Host "`n=== IMAGENS ===" -ForegroundColor Green`
+docker images
+Write-Host "`n=== VOLUMES ===" -ForegroundColor Green`
+docker volume ls
+Write-Host "`n=== REDES ===" -ForegroundColor Green`
+docker network ls
+cls
+Test-Path .env
+docker compose down -v
+docker compose up -d
+cls
+docker compose up -d
+cls
+docker compose logs web_eventosmeta
+docker compose logs web_eventosmeta > logs.txt
+docker compose logs web_eventosmeta --tail=100
+cls
+docker compose down -v
+docker compose up -d
+docker compose logs web_eventosmeta --tail=50
+cls
+type docker-compose.yml | findstr "DJANGO_SETTINGS_MODULE"
+docker compose down -v
+cls
+docker compose up -d
+docker compose logs web_eventosmeta --tail=100
+cls
+type docker-compose.yml | findstr "services:" -A 20
+cls
+docker compose down -v
+docker compose up -d
+type docker-compose.yml | findstr "services:" -A 20
+docker compose logs web_eventosmeta --tail=100
+cls
+git status
+git diff .dockerignore
+git diff .gitignore
+git diff docker-compose.yml
+cls
+docker compose down -v
+docker compose up -d
+cd\
+dir nginx/nginx.conf
+dir nginx.conf /s
+dir /s /b C:\nginx.conf
+cls
+Get-ChildItem -Path C:\ -Name "nginx.conf" -Recurse
+cls
+docker compose down -v
+docker compose up -d
+Start-Sleep -Seconds 40
+docker compose ps
+docker compose exec -T db_eventosmeta psql -U metareciclagem_user < backup_completo.sql
+docker compose exec -T db_eventosmeta psql -U metareciclagem_user < backup.sql
+cls
+docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem < backup.sql
+dir backup.sql
+docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem < backup.sql
+cls
+docker compose down -v
+docker compose up -d
+docker compose down -v
+cls
+docker compose down -v
+docker rmi eventosmeta_web_eventos nginx postgres
+docker system prune -a --volumes
+docker images
+docker volume ls
+cls
+docker compose down -v
+docker compose ps
+curl http://localhost/health/
+curl http://localhost/admin/
+docker compose logs web_eventosmeta --tail=20
+cls
+docker compose up -d
+cls
+Start-Sleep -Seconds 40
+docker compose ps
+curl http://localhost/health/
+docker compose logs web_eventosmeta --tail=30
+cls
+Start-Sleep -Seconds 20
+docker compose ps
+curl http://localhost/health/
+curl http://localhost/admin/
+docker compose logs web_eventosmeta --tail=50
+cls
+Get-Content backup.sql | docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem
+cls
+docker compose down -v
+docker compose up -d
+Start-Sleep -Seconds 40
+Get-Content backup.sql | docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem
+docker compose down -v
+docker volume rm metareciclagem_pgdata_eventosmeta
+docker volume ls | findstr metareciclagem
+docker compose up -d
+Start-Sleep -Seconds 40
+PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> docker compose down -v                                                                                     `
+[+] down 5/5`
+ ✔ Container nginx_eventosmeta Removed                                                                                                                                           0.4s`
+ ✔ Container web_eventosmeta   Removed                                                                                                                                           0.4s`
+ ✔ Container db_eventosmeta    Removed                                                                                                                                           0.6s`
+ ✔ Network metareciclagem_net  Removed                                                                                                                                           0.2s`
+ ✔ Volume pgdata_eventosmeta   Removed                                                                                                                                           0.0s`
+PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> docker volume rm metareciclagem_pgdata_eventosmeta`
+Error response from daemon: get metareciclagem_pgdata_eventosmeta: no such volume`
+PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> docker volume ls | findstr metareciclagem`
+PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> docker compose up -d                                                                                       `
+[+] up 5/5`
+ ✔ Network metareciclagem_net  Created                                                                                                                                           0.0s`
+ ✔ Volume pgdata_eventosmeta   Created                                                                                                                                           0.0s`
+ ✔ Container db_eventosmeta    Healthy                                                                                                                                           6.1s`
+ ✔ Container web_eventosmeta   Healthy                                                                                                                                          38.7s`
+ ✔ Container nginx_eventosmeta Started                                                                                                                                          38.8s`
+PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta> Start-Sleep -Seconds 40                                                                                    `
+PS C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta>cls
+cls
+get-history
+docker compose ps
+cls
+Get-Content backup.sql | docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem
+cls
+docker compose down -v
+docker compose up -d
+Start-Sleep -Seconds 40
+docker compose exec -T db_eventosmeta pg_dump -U metareciclagem_user -d bdmetareciclagem --clean --if-exists --encoding=UTF8 -f /tmp/backup_novo.sql
+Get-ChildItem -Path C:\ -Name "backup_novo*" -Recurse
+Get-ChildItem -Path C:\ -Name "backup_novo.sql" -Recurse
+docker compose cp db_eventosmeta:/tmp/backup_novo.sql ./backup_novo.sql
+Get-ChildItem -Path C:\ -Name "backup_novo.sql" -Recurse
+dir backup_novo.sql
+cls
+Get-Content backup_novo.sql | docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem
+Start-Sleep -Seconds 20
+docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT COUNT(*) as total_tabelas FROM information_schema.tables WHERE table_schema='public';"
+cls
+docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT COUNT(*) as total_tabelas FROM information_schema.tables WHERE table_schema='public';"
+docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT COUNT(*) as total_interessados FROM interessados_interessado;"
+docker compose logs web_eventosmeta --tail=20
+cls
+docker compose down -v
+docker compose up -d
+Start-Sleep -Seconds 40
+cls
+docker compose exec -T db_eventosmeta dropdb -U metareciclagem_user bdmetareciclagem
+docker compose exec -T db_eventosmeta createdb -U metareciclagem_user bdmetareciclagem
+Get-Content backup.sql | docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem
+Start-Sleep -Seconds 20
+docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT COUNT(*) as total_interessados FROM interessados_interessado;"
+docker compose logs web_eventosmeta --tail=20
+cls
+Start-Sleep -Seconds 30
+docker compose ps
+docker compose exec -T db_eventosmeta psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT COUNT(*) as inscricoes FROM selecao_inscricao;"
+docker compose logs web_eventosmeta --tail=30
+cls
+docker compose exec nginx_eventosmeta cat /etc/nginx/conf.d/default.conf
+docker compose exec web_eventosmeta ls -la /app/staticfiles_collected/
+docker compose logs nginx_eventosmeta --tail=20
+cls
+docker compose exec nginx_eventosmeta sh -c 'cat > /etc/nginx/conf.d/default.conf << "EOF"`
+upstream django {`
+    server web_eventosmeta:8000;`
+}`
+`
+server {`
+    listen 80;`
+    server_name _;`
+    client_max_body_size 100M;`
+`
+    location /static/ {`
+        alias /app/staticfiles_collected/;`
+    }`
+`
+    location / {`
+        proxy_pass http://django;`
+        proxy_set_header Host $host;`
+        proxy_set_header X-Real-IP $remote_addr;`
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`
+        proxy_set_header X-Forwarded-Proto $scheme;`
+    }`
+}`
+EOF'
+cls
+docker compose down
+cls
+docker compose down
+docker compose up -d
+Start-Sleep -Seconds 40
+docker compose ps
+cls
+docker compose exec nginx_eventosmeta cat /etc/nginx/conf.d/default.conf
+docker compose logs nginx_eventosmeta --tail=20
+cls
+docker compose logs web_eventosmeta --tail=30
+docker compose exec web_eventosmeta ls -la /app/staticfiles_collected/
+docker compose exec web_eventosmeta python manage.py collectstatic --noinput
+cls
+docker compose down
+docker compose up -d
+Start-Sleep -Seconds 40
+cls
+docker compose logs web_eventosmeta --tail=50 | grep -A 10 "500"
+docker compose logs web_eventosmeta --tail=50
+docker compose logs web_eventosmeta --tail=50 | Select-String "500|error|Error|ERROR"
+docker compose exec nginx_eventosmeta nginx -s reload
+cls
+docker compose exec web_eventosmeta tail -f /app/logs/django.log
+docker compose logs web_eventosmeta -f 2>&1 | Select-String "Traceback|Exception|Error" -A 20
+cls
+docker compose exec nginx_eventosmeta nginx -s reload
+cls
+docker compose exec web_eventosmeta sh
+cls
+cat config/settings.py | Select-String "AUTH_USER_MODEL|INSTALLED_APPS" -A 5
+cls
+docker compose exec web_eventosmeta cat /app/config/settings.py | Select-String "AUTH_USER_MODEL"
+docker compose exec web_eventosmeta cat /app/config/settings.py | Select-String "INSTALLED_APPS" -A 15
+cls
+docker compose exec web_eventosmeta cat /app/accounts/admin.py
+docker compose exec web_eventosmeta cat /app/config/settings.py | Select-String "INSTALLED_APPS" -A 20
+cls
+docker compose exec web_eventosmeta ls -la /app/
+docker compose exec web_eventosmeta ls -la /app/accounts/
+cls
+docker compose exec web_eventosmeta ls -la /app/apps/
+docker compose exec web_eventosmeta ls -la /app/apps/accounts/
+docker compose exec web_eventosmeta ls -la /apps/accounts/
+docker compose exec web_eventosmeta ls -la /app/accounts/
+cls
+docker compose exec web_eventosmeta cat /app/apps/accounts/admin.py
+cls
+docker compose exec web_eventosmeta sh
+cls
+docker compose exec web_eventosmeta cat /app/config/urls.py | Select-String "admin"
+docker compose exec web_eventosmeta cat /app/config/urls.py
+cls
+git log --oneline --all
+cls
+git show 28e17a7:"C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\admin.py"
+git show 28e17a7:C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\accounts\admin.py
+git show 28e17a7:\apps\accounts\admin.py
+git show 28e17a7:apps\accounts\admin.py
+git show 28e17a7:admin.py
+cls
+docker compose logs web_eventosmeta -f
+cls
+.\debug-admin.ps1
+cls
+.\debug-admin.ps1
+cls
+.\debug-admin.ps1
+cls
+.\debug-admin.ps1
+cls
+docker compose down
+cls
+docker compose down
+docker ps
+docker compose down -v
+docker compose build --no-cache web_eventosmeta
+docker compose up -d
+cls
+docker compose logs web_eventosmeta
+cls
+docker compose logs web_eventosmeta > django-logs.txt
+docker compose restart web-eventosmeta
+docker compose restart web_eventosmeta
+start-Sleep -Seconds 15
+docker ps
+Start-Sleep -Seconds 25
+docker ps
+docker compose logs web_eventosmeta | Select-String -Pattern "ERROR|Traceback|Exception" -Context 3
+cls
+docker compose restart web_eventosmeta
+Start-Sleep -Seconds 20
+docker ps
+cls
+docker compose restart web_eventosmeta
+Start-Sleep -Seconds 20
+docker ps
+docker compose logs web_eventosmeta 2>&1 | Out-File -FilePath "logs-completos.txt" -Encoding UTF8
+docker ps
+cls
+python manage.py runserver
+cls
+docker stop $(docker ps -q)
+docker rm $(docker ps -aq)
+docker volume rm $(docker volume ls -q)
+docker image prune -a -f
+docker ps
+docker volume ls
+docker images
+cls
+grep -r "admin.site.register(Sexo" --include="*.py"
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+Get-ChildItem -Path "apps" -Recurse -Filter "admin.py" | ForEach-Object {`
+    Write-Host "=== $($_.FullName) ===" -ForegroundColor Green`
+    Select-String -Path $_.FullName -Pattern "admin_site|admin.site.register" | Select-Object LineNumber, Line`
+}
+cls
+Get-ChildItem -Path "apps" -Recurse -Filter "admin.py" | ForEach-Object {`
+    Write-Host "=== $($_.FullName) ===" -ForegroundColor Green`
+    Select-String -Path $_.FullName -Pattern "admin_site|admin.site.register" | Select-Object LineNumber, Line`
+}
+cls
+Get-ChildItem -Path "apps" -Recurse -Filter "admin.py" | ForEach-Object {`
+    Write-Host "=== $($_.FullName) ===" -ForegroundColor Green`
+    Select-String -Path $_.FullName -Pattern "admin_site|admin.site.register" | Select-Object LineNumber, Line`
+}
+cls
+python manage.py runserver
+cls
+Get-ChildItem -Path "apps" -Recurse -Filter "admin.py" | ForEach-Object {`
+    $file = $_.FullName`
+    $content = Get-Content $file -Raw`
+    `
+    if ($content -match "from apps.accounts.admin import admin_site") {`
+        Write-Host "❌ REMOVER: $file" -ForegroundColor Red`
+        Write-Host "   Linha com: from apps.accounts.admin import admin_site"`
+    }`
+    `
+    if ($content -match "site=admin_site") {`
+        Write-Host "❌ REMOVER ', site=admin_site' em: $file" -ForegroundColor Red`
+    }`
+}
+cls
+Get-ChildItem -Path "apps" -Recurse -Filter "admin.py" | ForEach-Object {`
+    $file = $_.FullName`
+    $content = Get-Content $file -Raw`
+    `
+    if ($content -match "from apps.accounts.admin import admin_site") {`
+        Write-Host "❌ REMOVER: $file" -ForegroundColor Red`
+        Write-Host "   Linha com: from apps.accounts.admin import admin_site"`
+    }`
+    `
+    if ($content -match "site=admin_site") {`
+        Write-Host "❌ REMOVER ', site=admin_site' em: $file" -ForegroundColor Red`
+    }`
+}
+cls
+python manage.py runserver
+cls
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+findstr /s /i "admin_site" *.*
+cls
+findstr /s /i "admin_site" *.py
+python manage.py dbshell
+cls
+python manage.py dbshell
+cls
+python manage.py dbshell
+exit
+python manage.py dbshell
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+python manage.py runserver --verbosity 3
+Get-ChildItem -Path "." -Recurse -Filter "*.log" | Select-Object FullName
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+findstr /s /i "admin_site" *.py
+cls
+findstr /s /i "admin_site" *.py
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+grep -r "from apps.accounts.admin import admin_site" --include="*.py"
+cls
+grep -r "from apps.accounts.admin import admin_site" --include="*.py"
+findstr /s /i "admin_site" *.py
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+python manage.py check
+cls
+python manage.py runserver --noreload
+cls
+python manage.py runserver --noreload
+cls
+python manage.py runserver --noreload
+cls
+echo $env:DEBUG
+$env:DEBUG = $null
+echo $env:DEBUG
+python manage.py runserver
+cls
+echo $env:DEBUG
+python manage.py runserver
+cls
+findstr /S /N "dashboard_academico" *.py *.html
+python manage.py runserver
+findstr /S /N "dashboard_academico" *.py *.htmlcls
+cls
+findstr /S /N "dashboard_eventos dashboard_interessados dashboard_processo_seletivo dashboard_lgpd" *.html
+cls
+python manage.py runserver
+cls
+cls
+findstr /s /i "admin_site" *.py
+cls
+findstr /s /i "admin_site" *.py
+cls
+dir
+tree /f /a > 14-04-2026-estrutura.txt
+tree /f /a > 14-04-2026-estrutura2.txt
+python manage.py runserver
+cls
+tree /f /a > 14-04-2026-estrutura2.txt
+tree /f /a > 14-04-2026-estrutura3.txt
+cls
+Get-ScheduledTask | Where-Object {$_.State -eq "Ready"} | Select-Object TaskName, TaskPath
+Get-WinEvent -LogName "Microsoft-Windows-TaskScheduler/Operational" -MaxEvents 50 | Select-Object TimeCreated, Message | Format-Table -AutoSize
+cls
+Get-ScheduledTask | Where-Object {$_.Actions.Arguments -like "*.ps1"} | Select-Object TaskName, TaskPath
+Get-ScheduledTask | Where-Object {$_.Actions.Arguments -like "*.bat"} | Select-Object TaskName, TaskPath
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+cd\
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+cls
+cls
+Get-ScheduledTask | Where-Object {$_.TaskName -like "*limpar*"} | Select-Object TaskName, State
+Get-ScheduledTask | Where-Object {$_.TaskName -like "*limpar*"}
+exit
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+exit
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+dir *.html /s
+exit
+cls
+tree *.html  /f /a > 15-07-2026-estrutura-html.txt
+tree *.html  /f /a
+tree /F | findstr ".html"
+tree /F /a | findstr ".html"
+tree /f /a > 15-07-2026-estrutura-html.txt
+cls
+python manage.py runserver
+grep -r "template/admin/index.html" C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\
+Get-ChildItem -Recurse -Filter "*.html" | Select-String "template/admin/index.html"
+dir
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+cls
+Get-ChildItem -Recurse -Filter "*.html" | Select-String "template/admin/index.html"
+exit
+exit
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cd templates
+cls
+Get-ChildItem -Recurse -Filter "*.py" | Select-String "base\.html"
+cls
+Get-ChildItem -Recurse -Filter "*.py" | Select-String "base_auth\.html"
+Get-ChildItem -Recurse -Filter "*.py" | Select-String "index\.html"
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+tree /f /a > 16-07-2026-estrutura-html.txt
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+exit
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+exit
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+tree /f /a > 16-07-2026-estrutura-html2.txt
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+Get-ChildItem -Recurse -Filter "urls.py" | Select-String "dashboard"
+Get-ChildItem -Recurse -Filter "*.html" -Path "apps/accounts/templates/admin" | Select-String "url.*dashboard"
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+Get-ChildItem -Recurse -Filter "urls.py" | Select-String "path.*dashboard.*name.*dashboard"
+Get-ChildItem -Recurse -Filter "urls.py" -Path "config" | Select-String "dashboard|admin"
+Get-ChildItem -Recurse -Filter "base_site.html" -Path "apps/accounts/templates/admin" | Select-String "dashboard"
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python analisar_arquitetura_py
+dir
+python manage.py analisar_arquitetura.py
+python analisar_arquitetura.py
+dir
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python analisar_arquitetura.py
+cls
+tree /f /a > 17-07-2026-estrutura.txt
+python analisar_arquitetura.py
+python temp\analisar_arquitetura.py
+cd\
+dir relatorio_htmls.txt /s
+git diff --name-status HEAD~5 HEAD
+cls
+python manage.py check
+python manage.py runserver
+cls
+python manage.py findstatic base.html
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal
+python manage.py findstatic base.html
+dir
+cd..
+cls
+dir
+python manage.py findstatic C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal\base.html
+python manage.py findstatic C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta\apps\portal\templates\portal base.html
+cls
+python manage.py runserver
+cls
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+cls
+findstr /s /n "extends" apps\*.html
+cls
+python corrige_templates_extends.py
+cls
+python scripts_admin/corrige_templates_extends.py
+python scripts_admin/corrige_templates_extends.py --aplicar
+python scripts_admin/corrige_templates_extends.py
+cls
+python manage.py runserver
+cls
+python manage.py pytest apps/accounts/tests/test_views_exclusao.py -v
+python -m pytest apps/accounts/tests/test_views_exclusao.py -v
+pytest apps/accounts/tests/test_views_exclusao.py -v
+cls
+python -m pytest --cov -v
+cls
+python -m pytest --cov -v
+cls
+python -m pytest apps/accounts/tests/test_views.py -v
+cls
+python -m pytest apps/accounts/tests/test_views.py -v
+python -m pytest --cov -v
+python manage.py runserver
+cls
+python -m pytest apps/accounts/tests/test_middleware.py apps/dashboard/tests/test_views.py -v
+cls
+python -m pytest --cov -v
+cls
+python -m pytest apps/interessados/tests/test_urls.py -v
+cls
+python -m pytest -v --tb=line
+cls
+python -m pytest apps/interessados/tests/test_views.py::TestTrocarSenhaObrigatorioView -v
+cls
+python -m pytest --cov -v
+cls
+python -m pytest --cov=apps --cov-report=html
+python detect_orphans.py
+cls
+python detect_orphans.py
+cls
+python detect_orphans.py
+cls
+python detect_orphans.py
+cls
+python detect_orphans.py
+cls
+Get-ChildItem -Recurse -Filter "listar.html" | Select-Object FullName
+Select-String -Path "*.py","apps\**\*.py","apps\**\*.html" -Pattern "listar" -Recurse | Select-Object Path, LineNumber, Line
+cls
+Get-ChildItem -Path "apps" -Recurse -Include "*.py","*.html" | Select-String -Pattern "listar"
+cls
+python detect_orphans.py
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python detect_orphans.py
+cls
+Get-ChildItem -Path "apps" -Recurse -Include "*.py","*.html" | Select-String -Pattern "listar"
+where.exe claude
+cd\
+where.exe claude
+Get-Command claude -ErrorAction SilentlyContinue | Select-Object Source
+where.exe claude
+Get-Command claude -ErrorAction SilentlyContinue | Select-Object Source
+npm install -g @anthropic-ai/claude-code
+Get-Command claude -ErrorAction SilentlyContinue | Select-Object Source
+where.exe claude
+$npmGlobal = npm config get prefix
+cd\
+$npmGlobal = npm config get prefix
+node --version
+npm install -g @anthropic-ai/claude-code
+$npmGlobal = npm config get prefix
+npm root -g
+[Environment]::SetEnvironmentVariable(`
+    "Path",`
+    [Environment]::GetEnvironmentVariable("Path", "Machine") + ";C:\Users\mpiardi\AppData\Roaming\npm",`
+    "Machine"`
+)
+& 'C:\Users\mpiardi\AppData\Roaming\npm\claude.cmd'
+exit
+exit
+cls
+Get-ChildItem -Path "apps" -Recurse -Include "*.py","*.html" | Select-String -Pattern "listar"
+Get-ChildItem -Path "apps" -Recurse -Include "*.py","*.html" | Select-String -Pattern "listar.html"
+cls
+python mapeamento_referencias.py
+cls
+python mapeamento_referencias.py
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python mapeamento_referencias.py
+cls
+python mapeamento_referencias.py
+cls
+python mapeamento_referencias.py
+cls
+python mapeamento_referencias.py
+cls
+cd C:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\eventosmeta
+cls 
+dir /?
+dir help
+Get-ChildItem -Recurse -Filter *.html | Select-Object -ExpandProperty FullName
+python manage.py runserver
+cls
+pip install django-unused-templates
+python -m pip install --upgrade unused
+python manage.py cleanup_unused_templates
+cls
+python manage.py cleanup_unused_templates
+cls
+pip install django-unused-templates
+pip list
+cls
+python encontrar_templates_orfaos.py
+pip uninstall unused
+pip list
+cls
+Get-ChildItem -Path "apps" -Recurse -Filter "*.html" | ForEach-Object {`
+    $nome = $_.BaseName`
+    $caminho = $_.FullName`
+    $refs = Get-ChildItem -Path "apps" -Recurse -Include "*.py","*.html" | Select-String -Pattern $nome -List | Where-Object { $_.Path -ne $caminho }`
+    if ($refs.Count -eq 0) {`
+        Write-Host "SEM USO: $caminho"`
+    }`
+}
+cls
+Get-ChildItem -Path "apps" -Recurse -Filter "*.html" | ForEach-Object {`
+    $nome = $_.BaseName`
+    $caminho = $_.FullName`
+    $refs = Get-ChildItem -Path "apps" -Recurse -Include "*.py","*.html" | Select-String -Pattern $nome -List | Where-Object { $_.Path -ne $caminho }`
+    if ($refs.Count -eq 0) {`
+        Write-Host "SEM USO: $caminho"`
+    }`
+}
+cls
+python investigar_template.py
+.investigar_template.ps1
+.\investigar_template.ps1 -NomeArquivo "gestao_matricula"
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+exit
+cls
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+git log --online -10
+git log --oneline -10
+git log --oneline -- graph -10
+git log --oneline --graph -10
+cls
+git log --oneline -10
+cls
+git log --oneline --format="%h %ad %s" --date=short -10
+cls
+git log --oneline -10
+cls
+python manage.py runserver
+cls
+git log --oneline -10
+git log --oneline -20
+git log --oneline -10
+git log --oneline -20
+cls
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+python -m pytest --cov -v
+cls
+python -m pytest apps/academico/tests/test_admin.py -v
+cls
+python -m pytest --cov -v
+cls
+pytest --cov 
+cls
+pip freeze > requirements.txt
+tree /f /a > 31-07-2026-estrutura.txt
+python -m pytest apps/selecao/tests/test_services.py -v
+cls
+python -m pytest apps/selecao/tests/test_services.py -v
+cls
+python -m pytest -v
+cls
+python -m pytest apps/selecao/tests/test_validators.py::TestValidarCriterio::test_criterio_sem_codigo_gera_aviso -v -s --tb=long
+cls
+python -m pytest apps/selecao/tests/test_validators.py::TestValidarCriterio::test_criterio_sem_codigo_gera_aviso -v -s --tb=long
+cls
+python -m pytest -v
+cls
+python manage.py runserver
+cls
+docker compose up --build
+cls
+docker compose up --build
+cls
+docker compose up --build
+dir entrypoint.sh
+cls
+docker compose up --build
+cls
+docker compose up --build
+cls
+docker compose up --build
+v
+cls
+pip install pipreqs
+python.exe -m pip install --upgrade pip
+cls
+pipreqs . --savepath requirements-scan.txt --ignore temp,.venv
+cls
+pipreqs . --savepath requirements-scan.txt --ignore temp,.venv --encoding utf-8
+cls
+Select-String -Path .\apps\*\*.py -Pattern "matplotlib"
+cls
+docker compose up --build
+cls
+cd bk-bdmetareciclagem
+pg_dump -h localhost -p 5432 -U metareciclagem_user -d bdmetareciclagem -F c -f dump_atual.dump
+docker compose port db_eventosmeta 5432
+pg_restore -h localhost -p 15459 -U metareciclagem_user -d bdmetareciclagem --clean --if-exists -v dump_atual.dump
+cls
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+cls
+docker compose --env-file .env up -d --build
+cd..
+cls
+docker compose --env-file .env up -d --build
+docker compose ps
+docker compose logs web_eventosmeta
+docker compose exec web_eventosmeta python manage.py makemigrations eventos
+docker compose exec web_eventosmeta python manage.py migrate
+docker compose --env-file .env.prod -f docker-compose-prod.yml up -d --build
+cls
+python -m pytest apps/eventos/tests/test_models.py -v
+cls
+python -m pytest apps/academico/tests/test_admin.py -v
+cls
+python -m pytest apps/academico/tests/test_admin.py -v
+cls
+python -m pytest -v
+cls
+cls
+docker compose down
+docker compose --env-file .env.prod -f docker-compose-prod.yml up -d --build
+docker compose -f docker-compose-prod.yml ps
+docker compose -f docker-compose-prod.yml logs web_eventosmeta_prod
+cls
+docker compose -f docker-compose-prod.yml ps
+docker compose -f docker-compose-prod.yml logs nginx_eventosmeta_prod
+cls
+docker compose -f docker-compose-prod.yml up -d --force-recreate nginx_eventosmeta_prod
+docker compose -f docker-compose-prod.yml ps
+docker compose -f docker-compose-prod.yml logs --tail=20 nginx_eventosmeta_prod
+cls
+docker compose -f docker-compose-prod.yml up -d --force-recreate web_eventosmeta_prod
+pg_restore pg_restore -l dump_atual.dump
+pg_restore pg_restore -l bk-bdmetareciclagem\dump_atual.dump
+pg_restore -l bk-bdmetareciclagem\dump_atual.dump
+cls
+pg_restore -h localhost -p 5432 -U metareciclagem_user -d bdmetareciclagem --clean --if-exists -v bk-bdmetareciclagem\dump_atual.dump > log_restore.txt 2>&1
+cls
+docker cp bk-bdmetareciclagem/dump_atual.dump db_eventosmeta_prod:/tmp/dump_atual.dump
+docker exec db_eventosmeta_prod pg_restore -U metareciclagem_user -d bdmetareciclagem --clean --if-exists -v /tmp/dump_atual.dump
+docker exec db_eventosmeta_prod rm /tmp/dump_atual.dump
+cls
+docker exec db_eventosmeta_prod psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT COUNT(*) FROM auth_user;"
+docker exec db_eventosmeta_prod psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT COUNT(*) FROM accounts_usuarios;"
+docker exec db_eventosmeta_prod psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT COUNT(*) FROM accounts_usuario;"
+docker exec db_eventosmeta_prod psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT COUNT(*) FROM auth_group;"
+cls
+docker exec nginx_eventosmeta_prod ls -la /usr/share/nginx/static/css/
+docker exec web_eventosmeta_prod python -c "import django; django.setup(); from django.conf import settings; print('STATIC_URL:', settings.STATIC_URL); print('STATIC_ROOT:', settings.STATIC_ROOT)"
+cls
+docker exec web_eventosmeta_prod ls -la /app/static/css/
+docker exec web_eventosmeta_prod find /app -name "*.css" -not -path "*/staticfiles_collected/*" -not -path "*/site-packages/*" -ls
+docker exec web_eventosmeta_prod python -c "import django; django.setup(); from django.test import Client; c=Client(); r=c.get('/'); print(r.content.decode()[:3000])"
+cls
+python -m pytest -v
+cls
+ssh mpiardi@10.30.166.21
+docker save -o eventosmeta_web_prod.tar eventosmeta_web:prod
+dir /s /b stack.env
+Get-ChildItem -Path . -Recurse -Filter "stack.env" -ErrorAction SilentlyContinue
+Get-ChildItem -Path . -Recurse -Filter ".env.example" -ErrorAction SilentlyContinue
+cls
+docker image prune -a
+docker exec db_eventosmeta_prod pg_restore -U metareciclagem_user -d bdmetareciclagem --clean --if-exists -v /bk-bdmetareciclagem/dump_atual.dump
+docker exec db_eventosmeta_prod pg_restore -U metareciclagem_user -d bdmetareciclagem --clean --if-exists -v bk-bdmetareciclagem\dump_atual.dump
+cls
+docker exec db_eventosmeta_prod ls /backup
+docker exec db_eventosmeta_prod ls
+docker exec db_eventosmeta_prod ls /tmp
+cls
+docker exec db_eventosmeta_prod ls /backup
+docker exec db_eventosmeta_prod ls
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+docker exec db_eventosmeta_prod ls
+docker exec db_eventosmeta_prod ls /home
+docker exec db_eventosmeta_prod ls /etc
+docker exec db_eventosmeta_prod ls
+docker exec db_eventosmeta_prod ls /media
+docker exec db_eventosmeta_prod ls /mnt
+docker exec db_eventosmeta_prod ls /tmp
+docker exec db_eventosmeta_prod ls /usr
+docker exec db_eventosmeta_prod ls /var
+cls
+docker exec db_eventosmeta_prod ls
+cls
+docker cp .\bk-bdmetareciclagem\dump_atual.dump db_eventosmeta_prod:/tmp/dump_atual.dump
+docker exec db_eventosmeta_prod pg_restore -U metareciclagem_user -d bdmetareciclagem --clean --if-exists -v /tmp/dump_atual.dump
+cls
+docker exec db_eventosmeta_prod psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT count(*) FROM eventos_evento;"`
+docker exec db_eventosmeta_prod psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT count(*) FROM interessados_interessado;"`
+docker exec db_eventosmeta_prod psql -U metareciclagem_user -d bdmetareciclagem -c "SELECT count(*) FROM selecao_inscricao;"
+docker restart web_eventosmeta_prod
+cls
+docker port db_eventosmeta_prod
+docker exec web_eventosmeta_prod python manage.py shell -c "from eventos.models import Evento; print('Eventos:', Evento.objects.count())"
+cls
+docker exec web_eventosmeta_prod python manage.py shell -c "from django.db import connection; cursor = connection.cursor(); cursor.execute('SELECT count(*) FROM eventos_evento'); print('Eventos:', cursor.fetchone()[0])"
+docker exec web_eventosmeta_prod python -c "import django; django.setup(); from django.conf import settings; print(settings.CSRF_TRUSTED_ORIGINS)"
+cls
+docker exec web_eventosmeta_prod sh -c "cat >> /app/config/settings.py << 'EOF'`
+`
+# Fix temporario - CSRF para HTTP`
+CSRF_TRUSTED_ORIGINS = ['http://10.30.166.21:1366']`
+CSRF_COOKIE_SECURE = False`
+SESSION_COOKIE_SECURE = False`
+EOF"
+docker restart web_eventosmeta_prod
+ssh mpiardi@10.30.166.21
+cls
+ssh mpiardi@10.30.166.21
+python manage.py runserver
+python manage.py migrate
+python manage.py runserver
+cls
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+dir /s /b
+cls
+python -c "import pathlib; [p.unlink() for p in pathlib.Path('.').rglob('*.pyc')]"
+python -c "import pathlib, shutil; [shutil.rmtree(p) for p in pathlib.Path('.').rglob('__pycache__')]"
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+SELECT app, name, applied `
+FROM django_migrations `
+ORDER BY applied DESC;
+sudo docker exec db_eventosmeta_prod cat /var/log/postgresql/postgresql-15.log | grep -i "ALTER\|CREATE\|DROP"
+cls
+python manage.py showmigrations
+cls
+python -c "import pathlib, shutil; [shutil.rmtree(p) for p in pathlib.Path('.').rglob('__pycache__')]"
+python manage.py runserver
+cls
+python -c "import pathlib, shutil; [shutil.rmtree(p) for p in pathlib.Path('.').rglob('__pycache__')]"
+python manage.py runserver
+cls
+docker --version
+ssh mpiardi@10.30.166.21
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+git pull origin main
+git show --stat HEAD
+git status
+git rm --cached eventosmeta_web_prod.tar
+git filter-branch --force --index-filter "git rm --cached --ignore-unmatch eventosmeta_web_prod.tar" --prune-empty --tag-name-filter cat -- --all
+cd.
+cd..
+cls
+cd eventosmeta
+dir
+echo "eventosmeta_web_prod.tar" >> .gitignore`
+echo "*.tar" >> .gitignore`
+git add .gitignore`
+git commit -m "Adiciona .gitignore para arquivos tar"
+cls
+git filter-branch --force --index-filter "git rm --cached --ignore-unmatch eventosmeta/eventosmeta_web_prod.tar" --prune-empty --tag-name-filter cat -- --all
+cd..
+cls
+git filter-branch --force --index-filter "git rm --cached --ignore-unmatch eventosmeta/eventosmeta_web_prod.tar" --prune-empty --tag-name-filter cat -- --all
+git pull origin main
+git show --stat HEAD
+git stash
+git filter-branch --force --index-filter "git rm --cached --ignore-unmatch eventosmeta/eventosmeta_web_prod.tar" --prune-empty --tag-name-filter cat -- --all
+cls
+git stash pop
+git push origin main --force
+cls
+git fsck --unreachable --no-reflogs | grep commit
+git fsck --unreachable --no-reflogs | Select-String "commit"
+git fsck --unreachable --no-reflogs | sls "commit"
+cls
+git show --stat c1cd3535d85941ad6e44723066eeff08db1e5ade
+git show --stat a34f8d75681043c9862c78a98a26126251d2b583
+git show --stat 48d85bc95589e9281a8822dd2c662a46efb38ee6
+git show --stat f1bc43b051cb26903864f8f336352c7b489ee585
+git show --stat 381e1d5a98e66478aafd46547918997080d364e3
+cls
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+git tag -a v1.0 -m "versao estavel de 06/08/2026"
+git push origin v1.0
+cls
+ssh seu_usuario@10.30.166.21
+ssh mpiardi@10.30.166.21
+cls
+python manage.py runserver
+cd eventosmeta
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python -c "from decouple import config; print('BACKEND:', config('EMAIL_BACKEND'))"
+python -c "import os; print('ENV VAR:', os.environ.get('EMAIL_BACKEND', 'NAO DEFINIDA'))"
+[Environment]::SetEnvironmentVariable('EMAIL_BACKEND', $null, 'User')
+exit
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+exit
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python -c "import os; print('ENV VAR:', os.environ.get('EMAIL_BACKEND', 'NAO DEFINIDA'))"
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python -c "import os; print('ENV VAR:', os.environ.get('EMAIL_BACKEND', 'NAO DEFINIDA'))"
+python manage.py runserver
+cls
+python -c "from decouple import AutoConfig; c = AutoConfig(); print('SEARCH_PATH:', c.config.search_path)"
+Test-NetConnection -ComputerName 10.28.10.54 -Port 587
+Test-NetConnection -ComputerName smtp.prefeitura.gov.br -Port 587
+Test-NetConnection -ComputerName smtp.sorocaba.gov.br -Port 587
+Test-NetConnection -ComputerName smtp.sorocaba.sp.gov.br -Port 587
+cls
+Test-NetConnection -ComputerName 10.30.166.54 -Port 587
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+[Environment]::GetEnvironmentVariable('EMAIL_HOST', 'User')
+python -c "from decouple import config; print('EMAIL_HOST:', config('EMAIL_HOST'))"
+[Environment]::GetEnvironmentVariable('EMAIL_HOST', 'Machine')
+python -c "import os; print('PROCESS:', os.environ.get('EMAIL_HOST', 'NAO DEFINIDA'))"
+python -c "from pathlib import Path; [print(p) for p in Path('.').resolve().parents if (p / '.env').exists()]"
+exit
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+$env:EMAIL_HOST = "10.30.166.54"
+$env:EMAIL_BACKEND = "apps.interessados.utils.FallbackEmailBackend"
+Remove-Item Env:\EMAIL_HOST -ErrorAction SilentlyContinue
+$env:EMAIL_HOST = "10.30.166.54"
+$env:EMAIL_BACKEND = "apps.interessados.utils.FallbackEmailBackend"
+python -c "import os; print('EMAIL_HOST:', os.environ.get('EMAIL_HOST'))"
+python manage.py runserver
+cls
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python -c "import os; print(os.environ.get('EMAIL_HOST', 'NOT SET'))"
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+python -m pytest -v --tb=short
+cls
+python manage.py check --deploy
+cls
+$env:DJANGO_SETTINGS_MODULE = "config.settings"`
+$env:DEBUG = "False"`
+python manage.py check --deploy
+$env:DJANGO_SETTINGS_MODULE = "config.settings"`
+$env:DEBUG = "False"`
+python manage.py check --deploy
+cls
+python manage.py runserver
+cls
+Select-String -Path .\*.html,.\**\*.html -Pattern "favicon" -CaseSensitive:$false | Select-Object FileName, LineNumber, Line | Format-Table -AutoSize -Wrap
+cls
+Get-ChildItem -Recurse -Filter "*.html" | Select-String -Pattern "favicon" | Select-Object FileName, LineNumber, Line | Format-Table -AutoSize -Wrap
+cls
+Get-ChildItem -Recurse -Filter "*.html" | Where-Object { $_.FullName -notmatch '\\.venv\|\__pycache__\|\\.git\' } | Select-String -Pattern "favicon" | Select-Object Path, LineNumber, Line | Format-Table -AutoSize -Wrap
+cls
+Get-ChildItem -Recurse -Filter "*.html" -Exclude *.pyc | Where-Object { $_.FullName -notmatch '\\.venv\|\__pycache__\|\\.git\' } | Select-String -Pattern "favicon" | Select-Object FileName, LineNumber, Line | Format-Table -AutoSize -Wrap
+cls
+Get-ChildItem -Recurse -Filter "*.html" | Where-Object { $_.FullName -notlike "*\.venv*" -and $_.FullName -notlike "*\__pycache__*" -and $_.FullName -notlike "*\.git*" } | Select-String -Pattern "favicon" | Select-Object FileName, LineNumber, Line | Format-Table -AutoSize -Wrap
+cls
+Get-ChildItem -Recurse -Filter "*.html" | Where-Object { $_.FullName -notlike "*\.venv*" -and $_.FullName -notlike "*\__pycache__*"  -and $_.FullName -notlike "*\htmlcov*" -and $_.FullName -notlike "*\.git*" } | Select-String -Pattern "favicon" | Select-Object FileName, LineNumber, Line | Format-Table -AutoSize -Wrap
+cls
+Get-ChildItem -Recurse -Filter "*.py" | Where-Object { $_.FullName -notlike "*\.venv*" -and $_.FullName -notlike "*\__pycache__*" } | Select-String -Pattern "static_path\s*=" | Select-Object FileName, LineNumber, Line | Format-Table -AutoSize -Wrap
+python manage.py runserver
+cls
+Select-String -Path .\docker-compose*.yml -Pattern "env_file" | Format-Table -AutoSize -Wrap
+Select-String -Path .\docker-compose*.yml -Pattern "env_file" -Context 0,2
+Select-String -Path .\.gitignore -Pattern "\.env"
+cls
+python -m pytest -v --tb=short
+cls
+python manage.py makemigrations --check --dry-run
+python manage.py collectstatic --noinput
+cls
+ssh mpiardi@10.30.166.21
+docker ps -a
+docker container prune -f
+docker image prune -a -f
+docker volume prune -f
+docker ps -a
+cls
+docker stop web_eventosmeta_prod db_eventosmeta_prod nginx_eventosmeta_prod
+docker rm web_eventosmeta_prod db_eventosmeta_prod nginx_eventosmeta_prod
+docker rmi eventosmeta_web:prod postgres:16-alpine nginx:1.27-alpine
+docker volume rm eventosmeta_prod_db_data_eventosmeta_prod eventosmeta_prod_static_eventosmeta_prod eventosmeta_prod_media_eventosmeta_prod
+docker ps -a
+docker images
+cls
+docker ps
+sudo netstat -tlnp | grep 9090
+cls
+tar -cf eventosmeta.tar --exclude='.venv' --exclude='__pycache__' --exclude='db.sqlite3' --exclude='.git' --exclude='staticfiles_collected' --exclude='htmlcov' --exclude='.pytest_cache' .
+scp eventosmeta.tar mpiardi@10.30.166.21:/opt/
+scp eventosmeta.tar mpiardi@10.30.166.21:/tmp/
+clear
+sudo docker compose -f /opt/eventosmeta/docker-compose-prod.yml down
+ssh mpiardi@10.30.166.21
+exit
+scp eventosmeta.tar mpiardi@10.30.166.21:/tmp/
+exit
+ssh mpiardi@10.30.166.21
+docker ps
+sudo netstat -tlnp | grep 9090
+ssh mpiardi@10.30.166.21
+dir /s /b | findstr /v "__pycache__ .git node_modules"
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+dir /s /b | findstr /v "__pycache__ .git node_modules"
+cls
+tar -cf ..\metareciclagem.tar --exclude="__pycache__" --exclude=".pytest_cache" --exclude=".git" --exclude="htmlcov" --exclude="db.sqlite3" --exclude="log_restore.txt" --exclude="logs" --exclude="bk-bdmetareciclagem" --exclude="staticfiles_collected" --exclude=".coveragerc" --exclude="conftest.py" --exclude="pytest.ini" --exclude="requirements-dev.txt" --exclude="requirements-scan.txt" --exclude=".vscode" .
+docker stop filebrowser_metarec
+ssh mpiardi@10.30.166.21
+cls
+ssh mpiardi@10.30.166.21
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+psql --version
+docker ps -a
+type .env
+cls
+cls
+ssh mpiardi@10.30.166.21
+ssh mpiardi@10.30.166.21
+Get-Disk | Format-Table Number, FriendlyName, OperationalStatus, HealthStatus, Size, PartitionStyle
+Get-Volume | Format-Table DriveLetter, FileSystemLabel, FileSystem, HealthStatus, Size, SizeRemaining
+Get-PnpDevice -Class DiskDrive | Format-Table Status, FriendlyName, InstanceId
+Get-PnpDevice -PresentOnly | Where-Object { $_.InstanceId -like 'USB*' } | Format-Table Status, Class, FriendlyName, InstanceId
+cls
+Get-PnpDevice -Class DiskDrive | Where-Object { $_.FriendlyName -like "*SSD*" } | Format-List Status, Class, FriendlyName, InstanceId, Problem, ProblemCode
+pnputil /scan-devices
+Get-Disk | Format-Table Number, FriendlyName, OperationalStatus, HealthStatus, Size, PartitionStyle
+Get-PnpDevice -Class DiskDrive | Where-Object { $_.FriendlyName -eq "SSD SSD USB Device" } | Format-List *
+Get-Partition | Sort-Object DiskNumber, PartitionNumber | Format-Table DiskNumber, PartitionNumber, DriveLetter, Size, Type
+Get-Volume | Sort-Object DriveLetter | Format-Table DriveLetter, FileSystemLabel, FileSystem, HealthStatus, Size, SizeRemaining
+clear
+ssh mpiardi@10.30.166.21
+find /caminho/local/do/projeto -type f \( -name '*.py' -o -name 'Dockerfile*' -o -name 'docker-compose*' -o -name 'entrypoint*' -o -name '*.sh' -o -name '*.env' -o -name 'requirements*' -o -name '*.conf' -o -name '*.cfg' -o -name '*.ini' -o -name '*.yml' -o -name '*.yaml' -o -name '*.json' \) -exec md5sum {} + > local_checksums.txt
+cls
+find /c/PMS/PMS2025/Inscr-Meta/prg-Meta/Eventos-MetaReciclagem/eventosmeta -type f \( -name '*.py' -o -name 'Dockerfile*' -o -name 'docker-compose*' -o -name 'entrypoint*' -o -name '*.sh' -o -name '*.env' -o -name 'requirements*' -o -name '*.conf' -o -name '*.cfg' -o -name '*.ini' -o -name '*.yml' -o -name '*.yaml' -o -name '*.json' \) -exec md5sum {} + | sed 's|/c/PMS/PMS2025/Inscr-Meta/prg-Meta/Eventos-MetaReciclagem/eventosmeta/||' | sort > local_checksums.txt
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+find /c/PMS/PMS2025/Inscr-Meta/prg-Meta/Eventos-MetaReciclagem/eventosmeta -type f \( -name '*.py' -o -name 'Dockerfile*' -o -name 'docker-compose*' -o -name 'entrypoint*' -o -name '*.sh' -o -name '*.env' -o -name 'requirements*' -o -name '*.conf' -o -name '*.cfg' -o -name '*.ini' -o -name '*.yml' -o -name '*.yaml' -o -name '*.json' \) -exec md5sum {} + | sed 's|/c/PMS/PMS2025/Inscr-Meta/prg-Meta/Eventos-MetaReciclagem/eventosmeta/||' | sort > local_checksums.txt
+cls
+exit
+exit
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+cls
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+Get-ChildItem "C:\Program Files\DBeaver" -Force
+cd C:\Program Files\DBeaver
+cd\
+cd C:\Program Files\DBeaver
+dir
+cd program files
+cd \program files
+cd /program files
+cd "program files"
+dir
+cd "C:\Program Files\DBeaver"
+dir
+cd\
+dir
+cd "C:\Program Files (x86)"
+dir
+cd\
+cd "C:\Program Files\DBeaver"
+cls
+ditr
+dir
+cd\
+dir dbeaver
+exit
+Get-ItemProperty ``
+  "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" ,`
+  "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*" ,`
+  "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" ``
+  -ErrorAction SilentlyContinue |`
+Where-Object { $_.DisplayName -like "*DBeaver*" } |`
+Select-Object DisplayName, DisplayVersion, InstallLocation, UninstallString, QuietUninstallString
+dir
+exit
+echo $env:DATABASE_HOST
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+dir
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+python manage.py clearcache
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+python manage.py runserver
+c:\PMS\PMS2025\Inscr-Meta\prg-Meta\Eventos-MetaReciclagem\.venv\Scripts\Activate.ps1
+cls
+python manage.py runserver
+cls
+python -m pytest -v --tb=short
+cls
+cd C:\Users\mpiardi\OneDrive\oPMS\PMS2025\Inscr-Meta
+cls
+Get-ChildItem -Recurse -File | Select-Object Name, DirectoryPath, LastWriteTime | Export-Csv -Path "relatorio_arquivos.csv" -Encoding utf8 -NoTypeInformation
+dir
+cd..
+dir
+cd eventosmeta-12-12-2025
+Get-ChildItem -Recurse -File | Select-Object Name, DirectoryPath, LastWriteTime | Export-Csv -Path "relatorio_arquivos-eventosmeta12-12.csv" -Encoding utf8 -NoTypeInformation
+dir
+cd C:\Users\mpiardi\OneDrive\oPMS\PMS2025\PMS2025\Inscr-Meta
+Get-ChildItem -Recurse -File | Select-Object Name, DirectoryPath, LastWriteTime | Export-Csv -Path "relatorio_arquivos-eventosmeta20252025.csv" -Encoding utf8 -NoTypeInformation
+python manage.py runserver
+cls
+docker images
+doskey /history
+Get-Content (Get-PSReadlineOption).HistorySavePath
+cls
+Get-Content (Get-PSReadlineOption).HistorySavePath > cmds-dados.txt

@@ -14,11 +14,7 @@ Atualizações:
                 • inclusão condicional do debug_toolbar
                 • ajuste de LOGIN_URL para prefixo /eventosmeta/
                 • adição de INTERNAL_IPS para desenvolvimento
- - 21/07/2026 - Corrigido TEMPLATES DIRS: removidas entradas redundantes de apps
-                individuais (accounts/templates, portal/templates) que causavam
-                conflitos de resolução com APP_DIRS=True. DIRS agora vazio pois
-                todos os templates residem dentro de apps/*/templates/.
-"""
+ """
 from datetime import timedelta
 from pathlib import Path
 from decouple import Csv, config
@@ -137,12 +133,20 @@ DATABASES = {
 # ==========================================
 # CACHE (Redis)
 # ==========================================
+# CACHES = {    alteração dia 17/09/2026 para usar config() e permitir override via .env
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#         "LOCATION": "redis://redis_eventosmeta:6379",
+#     }
+# }
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://redis_eventosmeta:6379",
+        "LOCATION": config('CACHE_LOCATION', default='redis://redis_eventosmeta:6379'),
     }
 }
+
 
 # ==========================================
 # VALIDAÇÃO DE SENHA
@@ -249,6 +253,7 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=Csv())
