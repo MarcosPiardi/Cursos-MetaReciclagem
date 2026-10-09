@@ -1,0 +1,161 @@
+Ler mais abaixo
+
+Sistema EventosMeta, da MétaReciclagem.
+[break:500ms]
+
+Módulo 3 - Cadastro de Interessados
+[break:500ms]
+
+Senhoras e Senhores, Bom Dia!!!
+[break:300ms]
+
+Aprenderemos nessa aula a fazer um cadastro como interessado no sistema.
+Esse cadastro será feito uma única vez e depois servirá para o interessado manifestar o interesse nos cursos e eventos que serão ofertados ao longo do tempo.  
+[break:300ms]
+
+O acesso pode ser tanto pelo botão "Acesso Interessado" na barra de título, [break:200ms] quanto no botão "Login" no card superior central 
+[break:1s]
+
+Como a intenção aqui neste vídeo é mostrar o cadastramento do interessado, não vamos preencher o CPF e Senha e sim clicar em "Criar conta agora" para abrir o formulário de dados.
+[break:1s]
+
+Essa é a tela de cadastro de interessado a ser preenchida pelo próprio interessado ou por algum funcionário da Métareciclagem quando esse tiver dificuldades em preenchê-lo.
+[break:2s]
+Os campos que tiverem um pequeno asterisco vermelho ao lado, são campos de preenchimento obrigatório.
+[break:200ms] 
+Os campos são segmentados em 9 partes para melhor entendimento.
+Em primeiro temos os "Dados Pessoais"
+[break:200ms]
+Endereço do interessado
+[break:200ms]
+Contato
+[break:200ms]
+Se participa ou não de algum programa social
+[break:200ms]
+Se ele tem alguma Necessidade Especial
+[break:200ms]
+Quando o interessado for menor de idade ou tenha um responsável legal, as informações deste também deverão ser preenchidas
+[break:200ms]
+Se houver alguma observação sobre esse interessado, existe um espaço para anotação em "Observações"
+[break:200ms]
+O Interessado deverá digitar sua senha com 6 caracteres e repeti-la sem erros na confirmação
+[break:200ms]
+Ao final da tela existe um "Termo de Consentimento" para que o mesmo aceite o tratamento de seus dados pessoais conforme a LGPD - Lei Geral de Proteção de Dados.
+[break:200ms]
+E por último o botão "Criar Cadastro" para salvar as informações cadastradas.
+[break:200ms]
+
+Agora vamos preencher com informações fictícias em modo acelerado para não se perder muito tempo assistindo digitação.
+[break:5s]
+Ao digitar o CEP, o sistema já vai buscar o nome da rua, bairro, cidade e Unidade Federativa da moradia.
+[break:5s]
+
+A senha que tenho cadastrado para todos os interessados é [break:200ms] senha123
+[break:4s]
+
+Deixei de propósito o aceite do termo de consentimento, que é um campo obrigatório, para mostrar que o sistema não grava se todos os campos obrigatórios não estiverem preenchidos.
+[break:2s]
+
+E não gravando, o sistema pede para que a senha seja digitada novamente.
+[break:3s]
+
+Agora sim!
+[break:100ms]
+
+Obrigado por assistir até o fim
+
+
+
+Além de algumas correções no texto, abaixo está a versão para o MS Clipchamp e acima a versão para o site: https://text-to-speech.online/  que tem muita propaganda
+
+
+
+
+
+Módulo 3 - Cadastro de Interessados
+...
+
+Senhoras e Senhores, bem-vindos ao treinamento.
+...
+
+Aprenderemos nessa aula a fazer um cadastro como interessado no sistema EventosMeta, da MétaReciclagem. 
+...
+Esse cadastro será feito uma única vez e depois servirá para o interessado manifestar o interesse nos cursos e eventos que serão ofertados ao longo do tempo.
+...
+
+O acesso pode ser tanto pelo botão "Acesso Interessado" na barra de título, quanto no botão "Login" no card superior central 
+.........
+
+Como a intenção aqui neste vídeo é mostrar o cadastramento do interessado, não vamos preencher o CPF e Senha e sim clicar em "Criar conta agora" para abrir o formulário de dados.
+.........
+
+Essa é a tela de cadastro de interessado a ser preenchida pelo próprio interessado ou por algum funcionário da Métareciclagem quando esse tiver dificuldades em preenchê-lo.
+..................
+
+Os campos que tiverem um pequeno asterisco vermelho ao lado, são campos de preenchimento obrigatório.
+...
+Os campos são segmentados em 9 partes para melhor entendimento.
+Em primeiro temos os "Dados Pessoais"
+...
+Endereço do interessado
+...
+Contato
+...
+Se participa ou não de algum programa social
+...
+Se ele tem alguma Necessidade Especial
+...
+Quando o interessado for menor de idade ou tenha um responsável legal, as informações deste também deverão ser preenchidas
+...
+Se houver alguma observação sobre esse interessado, existe um espaço para anotação em "Observações"
+...
+O Interessado deverá digitar sua senha com 6 caracteres e repeti-la sem erros na confirmação
+...
+Ao final da tela existe um "Termo de Consentimento" para que o mesmo aceite o tratamento de seus dados pessoais conforme a LGPD - Lei Geral de Proteção de Dados.
+...
+E por último o botão "Criar Cadastro" para salvar as informações cadastradas.
+.........
+Agora vamos preencher com informações fictícias e em modo acelerado para não se perder muito tempo assistindo digitação.
+..................
+Ao digitar o CEP, o sistema já vai buscar o nome da rua, bairro, cidade e Unidade Federativa da moradia.
+........................
+
+A senha que tenho cadastrado para todos os interessados é 
+ senha123
+.........
+
+Deixei de propósito o aceite do termo de consentimento que é um campo obrigatório para mostrar que o sistema não grava se todos os campos obrigatórios não estiverem preenchidos.
+.........
+
+E não gravando, o sistema pede para que a senha seja digitada novamente.
+...........................
+
+Agora sim
+..................
+
+Obrigado por assistir até o fim
+
+
+
+
+Pedro Paulo Pereira
+
+735.616.210-58
+	
+22/11/2001
+
+Sorocaba / SP
+
+1532382111
+15900112233
+pedro@email.com
+
+
+
+
+
+
+
+
+
+

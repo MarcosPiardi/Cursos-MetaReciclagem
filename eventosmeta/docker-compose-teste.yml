@@ -12,6 +12,9 @@
 #  - 22/09/2026 - Removido env_file (Portainer nao acessa /home/mpiardi);
 #                 variaveis do Django viram referencias ${...} do painel da stack;
 #                 correcao do aviso external.name (name + external: true)
+#  - 28/09/2026 - Alteração para publicar a porta do banco (pelo Portainer) e poder acessar via DBeaver, foi adicionada 
+#               - a porta 5433:5432 (adição de 5433:5432 e a regra de não usar "Re-pull" no update) 
+#               - isso deixa o banco de dados acessível externamente, mas não é recomendado em produção.
 # =============================================================================
 name: eventosmeta_teste
 
@@ -20,6 +23,8 @@ services:
     image: postgres:16.10-alpine
     container_name: db_eventosmeta_teste
     restart: always
+    # ports:                     Para publicar a porta do banco (pelo Portainer) para poder acessar via DBeaver (ou PgAdmin, descomente a linha abaixo e comente a linha "expose: - 5432")
+    #   - "5433:5432"
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USER}

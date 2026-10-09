@@ -1,0 +1,31 @@
+Sistema EventosMeta, da MétaReciclagem.
+[break:500ms]
+
+Módulo 4 [break:200ms] Recuperar senha Interessados
+[break:500ms]
+
+Senhoras e Senhores, Bom Dia!!!
+[break:300ms]
+
+Aprenderemos nessa aula como interessado recupera sua senha no sistema.
+Esse cadastro será feito uma única vez e depois servirá para o interessado manifestar o interesse nos cursos e eventos que serão ofertados ao longo do tempo.  
+[break:300ms]
+
+O acesso pode ser tanto pelo botão "Acesso Interessado" na barra de título, [break:200ms] quanto no botão "Login" no card superior central 
+[break:1s]
+
+Como a intenção aqui neste vídeo é mostrar o cadastramento do interessado, não vamos preencher o CPF e Senha e sim clicar em "Criar conta agora" para abrir o formulário de dados.
+[break:1s]
+
+Essa é a tela de cadastro de interessado a ser preenchida pelo próprio interessado ou por algum funcionário da Métareciclagem quando esse tiver dificuldades em preenchê-lo.
+[break:2s]
+Os campos que tiverem um pequeno asterisco vermelho ao lado, são campos de preenchimento obrigatório.
+[break:200ms] 
+Os campos são segmentados em 9 partes para melhor entendimento.
+Em primeiro temos os "Dados Pessoais"
+[break:200ms]
+Endereço do interessado
+[break:200ms]
+Contato
+
+

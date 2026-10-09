@@ -1,0 +1,92 @@
+Sistema EventosMeta, da MétaReciclagem.
+[break:500ms]
+
+Módulo 4 [break:200ms] Logando no sistema e alterando dados de cadastro
+[break:500ms]
+
+Senhoras e Senhores, Bom Dia!!!
+[break:300ms]
+
+Aprenderemos nessa aula como o interessado pode corrigir alguma informação de seu cadastro
+Vamos alterar, neste caso, o e-mail do interessado que cadastramos anteriormente para poder recuperar a senha em caso de esquecimento.
+[break:1s]
+
+Então vamos fazer o acesso pelo botão "Login" no card superior central 
+[break:300ms]
+
+Informamos o CPF do senhor Pedro Paulo que cadastramos no vídeo anterior e a senha.
+[break:1s]
+
+Uma rápida apresentação das funcionalidades desta tela que exploraremos depois:
+[break:300ms]
+
+Boas vindas ao interessado (confira se o nome está correto)
+[break:300ms]
+
+Botão para editar os dados
+[break:300ms]
+
+Botão de saída (Logout)
+[break:300ms]
+
+Botão que apresenta a política de privacidade da prefeitura de Sorocaba
+[break:300ms]
+
+Solicitação de exclusão dos dados no cadastro da MétaReciclagem
+[break:300ms]
+
+Um pequeno dashboard 
+[break:300ms]
+
+As inscrições feitas pelo candidato
+[break:300ms]
+
+E a lista de cursos e eventos com inscrições abertas 
+[break:300ms]
+
+Ao pedirmos para editar os dados, será mostrado todas as informações cadastradas anteriormente.
+E aqui iremos alterar apenas o e-mail para que possamos usar depois na recuperação de senha, mas todos os demais campos são passíveis de alteração.
+[break:3s]
+
+Alterei o e-mail de pedro@email.com para mpiardi@sorocaba.sp.gov.br [break:200ms] (meu e-mail institucional para demonstração no próximo vídeo)
+[break:500ms]
+
+Salvamos a alteração e concluímos esse vídeo.
+
+
+Obrigado
+
+
+
+
+
+
+735.616.210-58
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

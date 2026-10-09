@@ -1,0 +1,48 @@
+Módulo 2 - Tela de abertura do sistema
+[break:2s]
+
+Senhoras e Senhores, Bom Dia!!!
+[break:1s]
+
+Essa é a apresentação da tela inicial do sistema EventosMeta, o Portal da MétaReciclagem da Prefeitura de Sorocaba para que o cidadão se cadastre e escolha que cursos e/ou eventos queira participar.
+
+O endereço desta tela é h, t, t, p, s,[break:100ms] dois pontos, barra, barra, dez, trinta, um, meia, meia, vinte e um dois pontos, um, três, meia, meia, [break:500ms] que ao ser acessada pela primeira vez poderá acontecer de aparecer o aviso "Não seguro" ou "Sua conexão não é privada". 
+[break:2s]
+
+E o que fazer nesta situação ? [break:200ms]
+Neste momento, apenas prosseguir.
+Clique na área do aviso → "Detalhes" ou "Configurações avançadas".
+Clique em "Ir para o site (não seguro)" e depois em "Prosseguir para dez, trinta, um, meia, meia, vinte e um (não seguro)"
+A partir de agora o site abre normalmente, mas ficará um aviso persistente na barra de endereço desta maneira (é o preço do certificado autoassinado).
+Depois, em produção, iremos corrigir isso.
+[break:1s]
+
+
+Apresentando toda a tela temos aqui na parte de cima o cabeçalho com opções de botões.
+
+Início -> que volta para essa tela inicial do sistema. Os botões com o logotipo da prefeitura e o da metareciclagem fazem a mesma coisa.
+[break:2s]
+Acesso Interessado -> Vai para a tela de login do interessado que será preenchido com o CPF e senha.
+Acesso Staff -> vai para a tela de login do Staff e Administradores (pessoas que trabalham para a metareciclagem e responsáveis pela administração dos dados do site). O login destas pessoas será niickname e senha.
+
+Logo abaixo temos 3 cards com 1 opção de escolha cada.
+
+CARD 1 - O primeiro card é o "Consultar Resultado" que é uma consulta pública de resultados de classificação de cada curso para um determinado CPF. Nesta consulta não existe a necessidade de se logar ao sistema.
+Ao escolhermos um CPF ele mostrará essa tela com todas as inscrições que ele fez e sua devida classificação.
+Se clicarmos em "Ver lista completa" então será mostrado como ficou a lista de classificados e a lista de espera daquele curso.
+o que estão acima são os classificados e abaixo (em amarelo) os que estão na lista de espera.
+[break:2s]
+CARD 2 - Área do Interessado tem o botão semelhante ao "Acesso Interessado) que leva ao login do cidadão interessado em se matricular em algum curso ou evento
+o login e senha será explicado em outro módulo explicativo.
+[break:2s]
+CARD 3 - É onde temos o botão "Fale Conosco" que disponibiliza várias informações (que deverão ser atualizadas oportunamente). temos inclusive um botão que abre o google maps em aba aparte mostrando a localização da Metareciclagem.
+[break:2s]
+Na sequência teremos os cards de eventos e cursos disponíveis para inscrição.
+
+Em cada card teremos algumas informações básicas, mas também teremos dois botões que nos leva aos detalhes de cada curso, bem como para a classificação deste se essa operação já tiver ocorrido.
+
+Clicando em "Detalhes" teremos as principais informações de interesse para quem quer se candidatar a uma vaga ou saber se está entre os classificados para fazer o curso ou assistir uma palestra. Temos também aqui um botão que nos mostra a lista de classificados.
+
+Esse é portal de entrada do sistema.
+
+
